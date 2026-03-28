@@ -1,0 +1,109 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Restaurant {
+  id                 String   @id @default(cuid())
+  name               String
+  address            String
+  cuisine            String
+  neighborhood       String
+  rating             Float
+  reviewCount        Int
+  priceLevel         Int
+  image              String
+  description        String
+  tags               String   // JSON stringified array
+  timesBookedOnReslot Int     @default(0)
+  seatType           String   // "Inomhus" | "Utomhus" | "Båda"
+  instagram          String?
+  website            String?
+  vibeTags           String   // JSON stringified array
+  goodForTags        String   // JSON stringified array
+  foodTags           String   // JSON stringified array
+  latitude           Float?
+  longitude          Float?
+  isExclusive        Boolean  @default(false)
+  city               String   @default("Stockholm")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  reservations     Reservation[]
+  restaurantAlerts RestaurantAlert[]
+}
+
+model Reservation {
+  id                  String   @id @default(cuid())
+  restaurantId        String
+  restaurant          Restaurant @relation(fields: [restaurantId], references: [id])
+  submitterPhone      String
+  submitterFirstName  String
+  submitterLastName   String
+  reservationDate     DateTime
+  reservationTime     String   // "19:00" format
+  partySize           Int
+  seatType            String
+  nameOnReservation   String
+  status              String   @default("active") // "active" | "claimed" | "expired" | "cancelled"
+  claimerPhone        String?
+  cancelFee           Float?
+  prepaidAmount       Float?
+  verificationLink    String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model UserProfile {
+  id           String   @id @default(cuid())
+  phone        String   @unique
+  firstName    String
+  lastName     String
+  email        String
+  avatar       String?
+  tokens       Int      @default(0)
+  selectedCity String   @default("Stockholm")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model RestaurantAlert {
+  id           String     @id @default(cuid())
+  userPhone    String
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  enabled      Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+}
+
+model ActivityAlert {
+  id           String   @id @default(cuid())
+  userPhone    String
+  type         String   // "drop" | "claim" | "token" | "premium"
+  title        String
+  message      String
+  read         Boolean  @default(false)
+  restaurantId String?
+  createdAt    DateTime @default(now())
+}
+
+model OtpCode {
+  id        String   @id @default(cuid())
+  phone     String
+  code      String
+  used      Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  phone     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}

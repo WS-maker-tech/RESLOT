@@ -1,0 +1,384 @@
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #FAFAF8;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    padding: 24px 16px 40px;
+  }
+
+  h2 { font-family: 'Playfair Display', serif; font-size: 22px; color: #111827; margin-bottom: 6px; }
+  .subtitle { color: #6B7280; font-size: 14px; margin-bottom: 28px; line-height: 1.5; }
+
+  .cards { display: flex; flex-direction: column; gap: 20px; }
+
+  .card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .card.selected { border-color: #E06A4E; box-shadow: 0 4px 20px rgba(224,106,78,0.18); }
+
+  .card-label {
+    display: inline-block;
+    background: #E06A4E;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+  }
+
+  /* --- OPTION A: Fullbild med gradient overlay --- */
+  .option-a-phone {
+    background: #F5F3EF;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .phone-header-a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2px 10px;
+  }
+  .phone-header-a .city-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: #111827;
+  }
+  .phone-header-a .icons { display: flex; gap: 8px; color: #6B7280; font-size: 14px; }
+  .phone-header-a .icon-btn {
+    width: 30px; height: 30px;
+    background: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  .restaurant-card-a {
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+    height: 130px;
+    background: linear-gradient(135deg, #2D2926 0%, #1a1510 100%);
+  }
+  .restaurant-card-a .bg-img {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #6B4226 0%, #3D2010 60%, #1a0f08 100%);
+    opacity: 0.9;
+  }
+  .restaurant-card-a .overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 50%);
+  }
+  .restaurant-card-a .content {
+    position: absolute; bottom: 12px; left: 14px; right: 14px;
+    color: white;
+  }
+  .restaurant-card-a .content h4 { font-size: 15px; font-weight: 600; font-family: 'Playfair Display', serif; }
+  .restaurant-card-a .content .meta { font-size: 11px; opacity: 0.75; margin-top: 2px; display: flex; gap: 6px; align-items: center; }
+  .restaurant-card-a .content .dot { width: 3px; height: 3px; background: rgba(255,255,255,0.6); border-radius: 50%; }
+
+  .date-strip-a {
+    display: flex; gap: 6px; overflow: hidden;
+  }
+  .date-chip {
+    flex: 1; background: white; border-radius: 10px;
+    padding: 6px 4px; text-align: center;
+    font-size: 10px; color: #6B7280;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .date-chip.active { background: #E06A4E; color: white; }
+  .date-chip .day { font-weight: 700; font-size: 13px; display: block; }
+
+  /* --- OPTION B: Minimal kort, vit bakgrund, clean --- */
+  .option-b-phone {
+    background: #FAFAF8;
+    padding: 16px;
+  }
+  .phone-header-b {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px;
+  }
+  .phone-header-b .q-btn {
+    width: 28px; height: 28px;
+    border: 1.5px solid #E5E3DF;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: #6B7280; font-weight: 600;
+  }
+  .phone-header-b .city-pill {
+    display: flex; align-items: center; gap: 4px;
+    background: white;
+    border: 1px solid #E5E3DF;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 13px; font-weight: 600; color: #111827;
+  }
+  .phone-header-b .right-icons { display: flex; gap: 8px; }
+  .phone-header-b .icon-sm {
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: #111827;
+  }
+
+  .restaurant-card-b {
+    background: white;
+    border-radius: 16px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+    display: flex;
+    height: 82px;
+  }
+  .restaurant-card-b .img-col {
+    width: 82px; min-width: 82px;
+    background: linear-gradient(135deg, #8B6250 0%, #5C3D29 100%);
+  }
+  .restaurant-card-b .info-col {
+    padding: 12px 14px; flex: 1;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .restaurant-card-b .info-col h4 { font-size: 13px; font-weight: 600; color: #111827; }
+  .restaurant-card-b .info-col .tag { font-size: 10px; color: #9CA3AF; margin-top: 2px; }
+  .restaurant-card-b .right-col {
+    padding: 12px 12px; display: flex; flex-direction: column;
+    justify-content: center; align-items: flex-end; gap: 4px;
+  }
+  .restaurant-card-b .time-badge {
+    background: #FFF3F1;
+    color: #E06A4E;
+    font-size: 10px; font-weight: 700;
+    padding: 3px 8px; border-radius: 6px;
+  }
+  .restaurant-card-b .party { font-size: 10px; color: #9CA3AF; }
+
+  /* --- OPTION C: Magazine/editorial stil --- */
+  .option-c-phone {
+    background: #111827;
+    padding: 16px;
+  }
+  .phone-header-c {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px;
+  }
+  .phone-header-c .title { color: white; font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 600; }
+  .phone-header-c .icon-sm { color: rgba(255,255,255,0.7); font-size: 14px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; }
+  .phone-header-c .icons { display: flex; gap: 4px; }
+
+  .restaurant-card-c-hero {
+    border-radius: 14px;
+    overflow: hidden;
+    height: 155px;
+    background: linear-gradient(135deg, #8B4513 0%, #4a2000 100%);
+    position: relative;
+    margin-bottom: 8px;
+  }
+  .restaurant-card-c-hero .overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.1) 60%);
+  }
+  .restaurant-card-c-hero .badge {
+    position: absolute; top: 10px; left: 10px;
+    background: #E06A4E; color: white;
+    font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 4px;
+  }
+  .restaurant-card-c-hero .bottom {
+    position: absolute; bottom: 14px; left: 14px; right: 14px;
+  }
+  .restaurant-card-c-hero .bottom h4 { color: white; font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 600; }
+  .restaurant-card-c-hero .bottom .row { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
+  .restaurant-card-c-hero .bottom .meta { color: rgba(255,255,255,0.65); font-size: 10px; }
+  .restaurant-card-c-hero .bottom .claim-btn {
+    background: #E06A4E; color: white;
+    font-size: 10px; font-weight: 700;
+    padding: 5px 12px; border-radius: 8px;
+  }
+
+  .cards-row-c { display: flex; gap: 8px; }
+  .restaurant-card-c-sm {
+    flex: 1;
+    border-radius: 12px;
+    overflow: hidden;
+    height: 80px;
+    background: linear-gradient(135deg, #5C4033 0%, #2D1B0E 100%);
+    position: relative;
+  }
+  .restaurant-card-c-sm .overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%);
+  }
+  .restaurant-card-c-sm .bottom { position: absolute; bottom: 8px; left: 8px; right: 8px; }
+  .restaurant-card-c-sm .bottom h4 { color: white; font-size: 10px; font-weight: 600; font-family: 'Playfair Display', serif; }
+  .restaurant-card-c-sm .bottom .t { color: rgba(255,255,255,0.6); font-size: 9px; }
+</style>
+
+<h2>Vilken kortstil ska sätta tonen?</h2>
+<p class="subtitle">Alla tre behåller ert ljusa tema och korall-accent. Skillnaden är hur restaurang­korten presenteras — det avgör hela appens känsla.</p>
+
+<div class="cards">
+
+  <!-- OPTION A -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div style="padding: 16px 16px 0;">
+      <span class="card-label">A</span>
+      <div style="font-size: 13px; font-weight: 600; color: #111827; margin-bottom: 2px;">Fullbild + gradient — Lyxig & immersiv</div>
+      <div style="font-size: 11px; color: #6B7280; margin-bottom: 12px;">Restaurangbilderna tar plats. Känslan är Resy/Airbnb. Datumväljaren och header är ljusa, korten är rika och mörka.</div>
+    </div>
+    <div class="option-a-phone">
+      <div class="phone-header-a">
+        <span style="font-size: 14px;">?</span>
+        <div class="city-title">Bokningar i Stockholm ▾</div>
+        <div class="icons">
+          <div class="icon-btn">🔍</div>
+          <div class="icon-btn" style="background: #FFF3F1; color: #E06A4E; font-size: 11px; font-weight: 700;">3</div>
+        </div>
+      </div>
+      <div class="date-strip-a">
+        <div class="date-chip"><span class="day">Idag</span>26 mar</div>
+        <div class="date-chip active"><span class="day">Tor</span>27 mar</div>
+        <div class="date-chip"><span class="day">Fre</span>28 mar</div>
+        <div class="date-chip"><span class="day">Lör</span>29 mar</div>
+        <div class="date-chip"><span class="day">Sön</span>30 mar</div>
+      </div>
+      <div class="restaurant-card-a">
+        <div class="bg-img"></div>
+        <div class="overlay"></div>
+        <div class="content">
+          <h4>Frantzén</h4>
+          <div class="meta">
+            <span>New Nordic</span><div class="dot"></div>
+            <span>Norrmalm</span><div class="dot"></div>
+            <span>19:30 · 2 pers</span>
+          </div>
+        </div>
+      </div>
+      <div class="restaurant-card-a">
+        <div class="overlay"></div>
+        <div class="content" style="background: linear-gradient(135deg, #2C4A3E, #162920); position: absolute; inset:0;"></div>
+        <div class="overlay"></div>
+        <div class="content">
+          <h4>Ekstedt</h4>
+          <div class="meta">
+            <span>Eldad Nordisk</span><div class="dot"></div>
+            <span>Östermalm</span><div class="dot"></div>
+            <span>20:00 · 4 pers</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPTION B -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div style="padding: 16px 16px 0;">
+      <span class="card-label">B</span>
+      <div style="font-size: 13px; font-weight: 600; color: #111827; margin-bottom: 2px;">Kompakt lista — Ren & luftig</div>
+      <div style="font-size: 11px; color: #6B7280; margin-bottom: 12px;">Vit bakgrund hela vägen. Restaurang­korten är horisontella och kompakta — man ser fler på en gång. Bruce-liknande känsla.</div>
+    </div>
+    <div class="option-b-phone">
+      <div class="phone-header-b">
+        <div class="q-btn">?</div>
+        <div class="city-pill">Stockholm ▾</div>
+        <div class="right-icons">
+          <div class="icon-sm">🔍</div>
+          <div class="icon-sm" style="color: #E06A4E; font-weight: 700; font-size: 12px;">3c</div>
+        </div>
+      </div>
+      <div class="restaurant-card-b">
+        <div class="img-col"></div>
+        <div class="info-col">
+          <h4>Frantzén</h4>
+          <div class="tag">New Nordic · Norrmalm</div>
+        </div>
+        <div class="right-col">
+          <div class="time-badge">19:30</div>
+          <div class="party">2 pers</div>
+        </div>
+      </div>
+      <div class="restaurant-card-b">
+        <div class="img-col" style="background: linear-gradient(135deg, #2C4A3E, #162920);"></div>
+        <div class="info-col">
+          <h4>Ekstedt</h4>
+          <div class="tag">Eldad Nordisk · Östermalm</div>
+        </div>
+        <div class="right-col">
+          <div class="time-badge">20:00</div>
+          <div class="party">4 pers</div>
+        </div>
+      </div>
+      <div class="restaurant-card-b">
+        <div class="img-col" style="background: linear-gradient(135deg, #4A3728, #2A1F17);"></div>
+        <div class="info-col">
+          <h4>Oaxen Krog</h4>
+          <div class="tag">Modern Svensk · Djurgården</div>
+        </div>
+        <div class="right-col">
+          <div class="time-badge">18:45</div>
+          <div class="party">2 pers</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPTION C -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div style="padding: 16px 16px 0;">
+      <span class="card-label">C</span>
+      <div style="font-size: 13px; font-weight: 600; color: #111827; margin-bottom: 2px;">Magazine dark — Editorial & exklusiv</div>
+      <div style="font-size: 11px; color: #6B7280; margin-bottom: 12px;">Mörk header + hero-kort + grid. Känslan är Tock/Resident Advisor. Exklusivt, som att bläddra i ett matmagasin.</div>
+    </div>
+    <div class="option-c-phone">
+      <div class="phone-header-c">
+        <div class="title">Bokningar i Stockholm ▾</div>
+        <div class="icons">
+          <div class="icon-sm">🔍</div>
+          <div class="icon-sm" style="color: #E06A4E;">●</div>
+        </div>
+      </div>
+      <div class="restaurant-card-c-hero">
+        <div class="overlay"></div>
+        <div class="badge">Tillgänglig nu</div>
+        <div class="bottom">
+          <h4>Frantzén</h4>
+          <div class="row">
+            <span class="meta">Tor 27 mar · 19:30 · 2 pers</span>
+            <div class="claim-btn">Ta över →</div>
+          </div>
+        </div>
+      </div>
+      <div class="cards-row-c">
+        <div class="restaurant-card-c-sm">
+          <div class="overlay"></div>
+          <div class="bottom"><h4>Ekstedt</h4><div class="t">20:00 · 4 pers</div></div>
+        </div>
+        <div class="restaurant-card-c-sm" style="background: linear-gradient(135deg, #3D4A3E, #1E2920);">
+          <div class="overlay"></div>
+          <div class="bottom"><h4>Oaxen</h4><div class="t">18:45 · 2 pers</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function toggleSelect(el) {
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+</script>
