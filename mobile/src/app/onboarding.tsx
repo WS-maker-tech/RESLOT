@@ -69,28 +69,28 @@ type StripCard = { name: string; meta: string; image: string };
 const STRIP_COL_A: StripCard[] = [
   { name: "Frantzén", meta: "New Nordic · 20:00", image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=300&h=500&fit=crop" },
   { name: "Oaxen Krog", meta: "Scandinavian · 20:30", image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=300&h=500&fit=crop" },
-  { name: "Gastrologik", meta: "Nordic · 19:00", image: "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?w=300&h=500&fit=crop" },
-  { name: "Adam/Albin", meta: "Fine Dining · 19:30", image: "https://images.unsplash.com/photo-1424847651672-bf20a4b0982b?w=300&h=500&fit=crop" },
-  { name: "Ekstedt", meta: "Fire Nordic · 18:30", image: "https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?w=300&h=500&fit=crop" },
-  { name: "Nello", meta: "Italian · 21:00", image: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=300&h=500&fit=crop" },
+  { name: "Gastrologik", meta: "Nordic · 19:00", image: "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=300&h=500&fit=crop" },
+  { name: "Adam/Albin", meta: "Fine Dining · 19:30", image: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=300&h=500&fit=crop" },
+  { name: "Ekstedt", meta: "Fire Nordic · 18:30", image: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=300&h=500&fit=crop" },
+  { name: "Nello", meta: "Italian · 21:00", image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=300&h=500&fit=crop" },
 ];
 
 const STRIP_COL_B: StripCard[] = [
   { name: "Babette", meta: "French-Nordic · 19:30", image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=300&h=500&fit=crop" },
-  { name: "Punk Royale", meta: "Avant-garde · 21:00", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=300&h=500&fit=crop" },
-  { name: "Mathias D.", meta: "Nordic · 20:00", image: "https://images.unsplash.com/photo-1476224203421-9ac39bcb3df1?w=300&h=500&fit=crop" },
-  { name: "Operakällaren", meta: "Classic · 19:00", image: "https://images.unsplash.com/photo-1578474846132-e79dc14c7a85?w=300&h=500&fit=crop" },
-  { name: "Speceriet", meta: "Swedish · 18:00", image: "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=300&h=500&fit=crop" },
-  { name: "Agrikultur", meta: "Neo-bistro · 20:00", image: "https://images.unsplash.com/photo-1544025162-d76538239271?w=300&h=500&fit=crop" },
+  { name: "Punk Royale", meta: "Avant-garde · 21:00", image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&h=500&fit=crop" },
+  { name: "Mathias D.", meta: "Nordic · 20:00", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=300&h=500&fit=crop" },
+  { name: "Operakällaren", meta: "Classic · 19:00", image: "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=300&h=500&fit=crop" },
+  { name: "Speceriet", meta: "Swedish · 18:00", image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=300&h=500&fit=crop&sat=-20" },
+  { name: "Agrikultur", meta: "Neo-bistro · 20:00", image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=300&h=500&fit=crop&sat=-20" },
 ];
 
 const STRIP_COL_C: StripCard[] = [
-  { name: "Sushi Sho", meta: "Japanese · 19:00", image: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=300&h=500&fit=crop" },
-  { name: "Lilla Ego", meta: "French · 20:30", image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=300&h=500&fit=crop" },
-  { name: "Basement", meta: "Bar & Grill · 21:00", image: "https://images.unsplash.com/photo-1432139555190-58524dae6a55?w=300&h=500&fit=crop" },
-  { name: "Gro", meta: "Vegetarian · 19:30", image: "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=300&h=500&fit=crop" },
-  { name: "Prinsen", meta: "Brasserie · 18:30", image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&h=500&fit=crop" },
-  { name: "Djuret", meta: "Meat · 20:00", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=300&h=500&fit=crop&crop=entropy" },
+  { name: "Sushi Sho", meta: "Japanese · 19:00", image: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=300&h=500&fit=crop&sat=-10" },
+  { name: "Lilla Ego", meta: "French · 20:30", image: "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=300&h=500&fit=crop&sat=-10" },
+  { name: "Basement", meta: "Bar & Grill · 21:00", image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=300&h=500&fit=crop&sat=-10" },
+  { name: "Gro", meta: "Vegetarian · 19:30", image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=300&h=500&fit=crop&sat=-10" },
+  { name: "Prinsen", meta: "Brasserie · 18:30", image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&h=500&fit=crop&sat=-10" },
+  { name: "Djuret", meta: "Meat · 20:00", image: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=300&h=500&fit=crop&sat=-10" },
 ];
 
 function RestaurantStripCard({ card }: { card: StripCard }) {
@@ -428,20 +428,9 @@ function SplashStep({ onGetStarted, onExplore }: { onGetStarted: () => void; onE
       </View>
 
       {/* Copy Section */}
-      <View style={{ paddingHorizontal: 24, paddingBottom: 12 }}>
-        {/* Availability */}
-        <Animated.View
-          entering={FadeInUp.springify().damping(18)}
-          style={{ flexDirection: "row", alignItems: "center", gap: 7 }}
-        >
-          <PulsingDot />
-          <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.success }}>
-            Bokningar tillgängliga nu
-          </Text>
-        </Animated.View>
-
+      <View style={{ paddingHorizontal: 24, paddingBottom: 12, marginTop: -24 }}>
         {/* Logo */}
-        <Animated.View entering={FadeInUp.delay(70).springify().damping(18)} style={{ marginTop: 14 }}>
+        <Animated.View entering={FadeInUp.delay(70).springify().damping(18)} style={{ marginTop: 0 }}>
           <Text
             style={{
               fontFamily: FONTS.displayBold,
