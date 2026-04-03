@@ -52,7 +52,7 @@ import { useReservations, useRestaurants, useProfile, useMissedReservations, use
 import { api } from "@/lib/api/api";
 import { useAuthStore } from "@/lib/auth-store";
 import type { Reservation, MissedReservation, Restaurant } from "@/lib/api/types";
-import { C, FONTS, SPACING, RADIUS, ICON } from "../../lib/theme";
+import { C, FONTS, SPACING, SHADOW, RADIUS, ICON } from "../../lib/theme";
 import { RestaurantCard } from "@/components/RestaurantCard";
 import { FilterChips } from "@/components/FilterChips";
 import { DayPicker, generateDays } from "@/components/DayPicker";
@@ -1733,74 +1733,92 @@ export default function HomeScreen() {
             <Animated.View
               testID="empty-state"
               entering={FadeInDown.delay(100).springify()}
-              style={{ alignItems: "center", justifyContent: "center", paddingTop: 60 }}
+              style={{ alignItems: "center", justifyContent: "center", paddingTop: 40, paddingHorizontal: 24 }}
             >
               <Animated.View
                 entering={ZoomIn.springify().delay(150)}
                 style={{
-                  width: 72,
-                  height: 72,
-                  borderRadius: 36,
+                  width: 88,
+                  height: 88,
+                  borderRadius: 44,
                   backgroundColor: C.coralLight,
                   alignItems: "center",
                   justifyContent: "center",
-                  marginBottom: 20,
+                  marginBottom: 24,
                 }}
               >
-                <Calendar size={32} color={C.coral} strokeWidth={ICON.strokeWidth} />
+                <Text style={{ fontSize: 38 }}>🍽️</Text>
               </Animated.View>
               <Animated.View entering={FadeInDown.delay(220).springify()}>
                 <Text
                   style={{
                     fontFamily: FONTS.displayBold,
-                    fontSize: 18,
+                    fontSize: 22,
                     color: C.dark,
-                    letterSpacing: -0.3,
+                    letterSpacing: -0.5,
                     textAlign: "center",
                   }}
                 >
-                  Inga lediga bord just nu
+                  Inga bord just nu
                 </Text>
               </Animated.View>
               <Animated.View entering={FadeInDown.delay(300).springify()}>
                 <Text
                   style={{
                     fontFamily: FONTS.regular,
-                    fontSize: 14,
+                    fontSize: 15,
                     color: C.textTertiary,
-                    marginTop: 8,
+                    marginTop: 10,
                     textAlign: "center",
-                    paddingHorizontal: 40,
-                    lineHeight: 20,
+                    lineHeight: 22,
                   }}
                 >
-                  Prova ett annat datum eller lägg till en bevakning så meddelar vi dig
+                  Nya bokningar dyker upp hela tiden.{"\n"}Bevaka en restaurang så pingar vi dig!
                 </Text>
               </Animated.View>
-              <Animated.View entering={FadeInDown.delay(380).springify()}>
+
+              {/* Example cards showing what's possible */}
+              <Animated.View entering={FadeInDown.delay(380).springify()} style={{ marginTop: 28, width: "100%", gap: 10 }}>
+                <View style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.lg, borderWidth: 0.5, borderColor: C.borderLight, padding: 14, flexDirection: "row", alignItems: "center", gap: 12, opacity: 0.5, ...SHADOW.card }}>
+                  <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: C.bgInput }} />
+                  <View style={{ flex: 1, gap: 4 }}>
+                    <View style={{ width: 100, height: 12, borderRadius: 4, backgroundColor: C.bgInput }} />
+                    <View style={{ width: 140, height: 10, borderRadius: 4, backgroundColor: C.bgInput }} />
+                  </View>
+                </View>
+                <View style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.lg, borderWidth: 0.5, borderColor: C.borderLight, padding: 14, flexDirection: "row", alignItems: "center", gap: 12, opacity: 0.3, ...SHADOW.card }}>
+                  <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: C.bgInput }} />
+                  <View style={{ flex: 1, gap: 4 }}>
+                    <View style={{ width: 80, height: 12, borderRadius: 4, backgroundColor: C.bgInput }} />
+                    <View style={{ width: 120, height: 10, borderRadius: 4, backgroundColor: C.bgInput }} />
+                  </View>
+                </View>
+              </Animated.View>
+
+              <Animated.View entering={FadeInDown.delay(450).springify()}>
                 <Pressable
                   testID="empty-state-cta"
-                accessibilityLabel="Lägg till bevakning"
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  router.push("/add-watch");
-                }}
-                style={{
-                  marginTop: 24,
-                  backgroundColor: C.coral,
-                  borderRadius: RADIUS.md,
-                  paddingVertical: 14,
-                  paddingHorizontal: 28,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 8,
-                }}
-              >
-                <Eye size={16} color="#111827" strokeWidth={2} />
-                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: "#111827" }}>
-                  Bevaka restaurang
-                </Text>
-              </Pressable>
+                  accessibilityLabel="Bevaka restaurang"
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    router.push("/add-watch");
+                  }}
+                  style={{
+                    marginTop: 24,
+                    backgroundColor: C.coral,
+                    borderRadius: RADIUS.md,
+                    paddingVertical: 14,
+                    paddingHorizontal: 28,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 8,
+                  }}
+                >
+                  <Eye size={16} color="#111827" strokeWidth={2} />
+                  <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: "#111827" }}>
+                    Bevaka restaurang
+                  </Text>
+                </Pressable>
               </Animated.View>
             </Animated.View>
           ) : null

@@ -630,14 +630,14 @@ export default function CreditsScreen() {
 
           {creditAlerts.length === 0 ? (
             <Animated.View entering={FadeInDown.delay(620).springify()} style={{ alignItems: "center", paddingVertical: 24 }}>
-              <View style={{ width: 52, height: 52, borderRadius: RADIUS.lg, backgroundColor: "rgba(0,0,0,0.03)", alignItems: "center", justifyContent: "center", marginBottom: 12 }}>
-                <Clock size={24} color={C.textTertiary} strokeWidth={ICON.strokeWidth} />
+              <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: "rgba(201,169,110,0.10)", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
+                <Clock size={28} color={C.gold} strokeWidth={ICON.strokeWidth} />
               </View>
-              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.textPrimary, textAlign: "center" }}>
+              <Text style={{ fontFamily: FONTS.displayBold, fontSize: 17, color: C.textPrimary, textAlign: "center", letterSpacing: -0.2 }}>
                 Ingen historik än
               </Text>
-              <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textSecondary, marginTop: 4, textAlign: "center" }}>
-                Dina credits-transaktioner visas här
+              <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textSecondary, marginTop: 6, textAlign: "center", lineHeight: 20, paddingHorizontal: 20 }}>
+                Här ser du alla transaktioner:{"\n"}+2 (bokning övertagen), −2 (tog över), +1 (referral)
               </Text>
             </Animated.View>
           ) : (
@@ -652,15 +652,15 @@ export default function CreditsScreen() {
               }}
             >
               {creditAlerts.map((alert, index) => {
-                const isSpent = alert.title.toLowerCase().includes("köpt");
-                const isEarned =
-                  alert.title.toLowerCase().includes("tjäna") ||
-                  alert.title.toLowerCase().includes("credit");
-                const iconColor = isSpent ? C.coral : C.success;
-                const IconComponent = isSpent ? ShoppingCart : isEarned ? Gift : Clock;
-                const iconBg = isSpent
-                  ? C.coralLight
-                  : C.successLight;
+                const msgLower = (alert.message ?? alert.title ?? "").toLowerCase();
+                const isSpent = msgLower.includes("köp") || msgLower.includes("tog över") || msgLower.includes("−") || msgLower.includes("debit");
+                const isReferral = msgLower.includes("referral") || msgLower.includes("bjud");
+                const isEarned = !isSpent;
+                const iconColor = isSpent ? C.coral : isReferral ? C.gold : C.success;
+                const IconComponent = isSpent ? ShoppingCart : isReferral ? UserPlus : isEarned ? Gift : Clock;
+                const iconBg = isSpent ? C.coralLight : isReferral ? "rgba(201,169,110,0.12)" : C.successLight;
+                const amountLabel = isSpent ? "−2" : isReferral ? "+1" : "+2";
+                const amountColor = isSpent ? C.coral : C.success;
 
                 return (
                   <Animated.View
@@ -738,6 +738,12 @@ export default function CreditsScreen() {
                         >
                           {alert.message}
                         </Text>
+                      </View>
+                      <View style={{ alignItems: "flex-end", justifyContent: "center", marginLeft: 8 }}>
+                        <Text style={{ fontFamily: FONTS.bold, fontSize: 16, color: amountColor, letterSpacing: -0.3 }}>
+                          {amountLabel}
+                        </Text>
+                        <Text style={{ fontFamily: FONTS.regular, fontSize: 10, color: C.textTertiary }}>credits</Text>
                       </View>
                     </View>
                   </Animated.View>

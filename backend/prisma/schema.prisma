@@ -31,7 +31,7 @@ model Restaurant {
   longitude          Float?
   isExclusive        Boolean  @default(false)
   city               String   @default("Stockholm")
-  googlePlaceId      String?  @unique  // Link to Google Places API
+  // googlePlaceId   String?  @unique  // Link to Google Places API (enable after Mac Mini Supabase migration)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 

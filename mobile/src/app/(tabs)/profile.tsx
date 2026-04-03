@@ -521,6 +521,28 @@ export default function ProfileScreen() {
                   Tillitsprofil
                 </Text>
 
+                {/* Trust score overview */}
+                <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 20, gap: 16 }}>
+                  <View style={{ width: 72, height: 72, borderRadius: 36, backgroundColor: C.coralLight, alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: C.coral }}>
+                    <Text testID="trust-score" style={{ fontFamily: FONTS.bold, fontSize: 28, color: C.coral, letterSpacing: -1 }}>
+                      {Math.min(100, Math.round((completedCount * 25) + (cancelledCount >= 1 ? 10 : 0) + (completedCount >= 3 ? 15 : 0)))}
+                    </Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontFamily: FONTS.displayBold, fontSize: 16, color: C.textPrimary, letterSpacing: -0.2 }}>
+                      Trust Score
+                    </Text>
+                    <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textTertiary, marginTop: 2, lineHeight: 18 }}>
+                      Baserat på genomförda bokningar, avbokningar i tid och aktivitet
+                    </Text>
+                  </View>
+                </View>
+
+                {/* Score bar */}
+                <View style={{ height: 6, backgroundColor: C.bgInput, borderRadius: 3, marginBottom: 20, overflow: "hidden" }}>
+                  <View style={{ height: "100%", width: `${Math.min(100, Math.round((completedCount * 25) + (cancelledCount >= 1 ? 10 : 0) + (completedCount >= 3 ? 15 : 0)))}%`, backgroundColor: C.coral, borderRadius: 3 }} />
+                </View>
+
                 <View style={{ gap: 14 }}>
                   {/* Genomförda bokningar */}
                   <View className="flex-row items-center" style={{ gap: 12 }}>
@@ -537,24 +559,16 @@ export default function ProfileScreen() {
                       <ShieldCheck size={18} color={C.success} strokeWidth={2} />
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text
-                        style={{
-                          fontFamily: FONTS.regular,
-                          fontSize: 13,
-                          color: C.textTertiary,
-                        }}
-                      >
+                      <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textTertiary }}>
                         Genomförda bokningar
+                      </Text>
+                      <Text style={{ fontFamily: FONTS.regular, fontSize: 11, color: C.success }}>
+                        +25 poäng per bokning
                       </Text>
                     </View>
                     <Text
                       testID="completed-count"
-                      style={{
-                        fontFamily: FONTS.bold,
-                        fontSize: 20,
-                        color: C.textPrimary,
-                        letterSpacing: -0.3,
-                      }}
+                      style={{ fontFamily: FONTS.bold, fontSize: 20, color: C.textPrimary, letterSpacing: -0.3 }}
                     >
                       {completedCount}
                     </Text>
@@ -577,24 +591,16 @@ export default function ProfileScreen() {
                       <Clock size={18} color={C.gold} strokeWidth={2} />
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text
-                        style={{
-                          fontFamily: FONTS.regular,
-                          fontSize: 13,
-                          color: C.textTertiary,
-                        }}
-                      >
+                      <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textTertiary }}>
                         Avbokade i tid
+                      </Text>
+                      <Text style={{ fontFamily: FONTS.regular, fontSize: 11, color: C.gold }}>
+                        +10 poäng bonus
                       </Text>
                     </View>
                     <Text
                       testID="cancelled-count"
-                      style={{
-                        fontFamily: FONTS.bold,
-                        fontSize: 20,
-                        color: C.textPrimary,
-                        letterSpacing: -0.3,
-                      }}
+                      style={{ fontFamily: FONTS.bold, fontSize: 20, color: C.textPrimary, letterSpacing: -0.3 }}
                     >
                       {cancelledCount}
                     </Text>
@@ -617,24 +623,16 @@ export default function ProfileScreen() {
                       <AlertTriangle size={18} color={C.coral} strokeWidth={2} />
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text
-                        style={{
-                          fontFamily: FONTS.regular,
-                          fontSize: 13,
-                          color: C.textTertiary,
-                        }}
-                      >
+                      <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textTertiary }}>
                         Uteblivna
+                      </Text>
+                      <Text style={{ fontFamily: FONTS.regular, fontSize: 11, color: C.error }}>
+                        −30 poäng per utebliven
                       </Text>
                     </View>
                     <Text
                       testID="noshow-count"
-                      style={{
-                        fontFamily: FONTS.bold,
-                        fontSize: 20,
-                        color: C.textPrimary,
-                        letterSpacing: -0.3,
-                      }}
+                      style={{ fontFamily: FONTS.bold, fontSize: 20, color: C.textPrimary, letterSpacing: -0.3 }}
                     >
                       0
                     </Text>
@@ -696,8 +694,52 @@ export default function ProfileScreen() {
               </View>
             </Animated.View>
 
+            {/* Senaste aktivitet */}
+            <Animated.View entering={FadeInDown.delay(170).springify()} className="mx-5 mb-5">
+              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textTertiary, letterSpacing: 0.8, textTransform: "uppercase", marginBottom: SPACING.sm, paddingHorizontal: 4 }}>
+                Senaste aktivitet
+              </Text>
+              <View style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.xl, borderWidth: 0.5, borderColor: C.borderLight, overflow: "hidden", ...SHADOW.card }}>
+                {myReservations.length === 0 ? (
+                  <View style={{ padding: 24, alignItems: "center" }}>
+                    <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textTertiary }}>Ingen aktivitet ännu</Text>
+                  </View>
+                ) : (
+                  myReservations.slice(0, 3).map((res, idx) => {
+                    const isSubmitter = res.submitterPhone === phone;
+                    const actionText = isSubmitter ? "Lade upp" : "Tog över";
+                    const actionColor = isSubmitter ? C.coral : C.success;
+                    const resDate = new Date(res.createdAt ?? res.reservationDate);
+                    const daysAgo = Math.floor((Date.now() - resDate.getTime()) / (1000 * 60 * 60 * 24));
+                    const timeLabel = daysAgo === 0 ? "Idag" : daysAgo === 1 ? "Igår" : `${daysAgo}d sedan`;
+                    return (
+                      <View key={res.id}>
+                        {idx > 0 ? <View style={{ height: 0.5, backgroundColor: C.divider, marginLeft: 54 }} /> : null}
+                        <View style={{ flexDirection: "row", alignItems: "center", padding: 14, gap: 12 }}>
+                          <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: isSubmitter ? C.coralLight : C.successLight, alignItems: "center", justifyContent: "center" }}>
+                            <Text style={{ fontSize: 14 }}>{isSubmitter ? "📤" : "📥"}</Text>
+                          </View>
+                          <View style={{ flex: 1 }}>
+                            <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.textPrimary }} numberOfLines={1}>
+                              {actionText} · {res.restaurant?.name ?? "Restaurang"}
+                            </Text>
+                            <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary, marginTop: 1 }}>
+                              {timeLabel}
+                            </Text>
+                          </View>
+                          <Text style={{ fontFamily: FONTS.bold, fontSize: 13, color: actionColor }}>
+                            {isSubmitter ? "+2" : "−2"}
+                          </Text>
+                        </View>
+                      </View>
+                    );
+                  })
+                )}
+              </View>
+            </Animated.View>
+
             <Animated.View
-              entering={FadeInDown.delay(180).springify()}
+              entering={FadeInDown.delay(220).springify()}
               className="mx-5 mb-5"
               testID="account-section"
             >

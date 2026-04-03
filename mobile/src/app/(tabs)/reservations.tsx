@@ -711,14 +711,14 @@ export default function ReservationsScreen() {
               </Text>
               {submittedReservations.length === 0 ? (
                 <Animated.View entering={FadeInDown.delay(100).springify()} style={{ paddingHorizontal: SPACING.lg, paddingVertical: 32, alignItems: "center" }}>
-                  <Animated.View entering={ZoomIn.springify().delay(150)} style={{ width: 56, height: 56, borderRadius: 16, backgroundColor: "rgba(0,0,0,0.03)", alignItems: "center", justifyContent: "center", marginBottom: 12 }}>
-                    <BookOpen size={24} color={C.textTertiary} strokeWidth={ICON.strokeWidth} />
+                  <Animated.View entering={ZoomIn.springify().delay(150)} style={{ width: 64, height: 64, borderRadius: 20, backgroundColor: C.coralLight, alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
+                    <Text style={{ fontSize: 28 }}>📤</Text>
                   </Animated.View>
                   <Animated.View entering={FadeInDown.delay(200).springify()}>
-                    <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.textPrimary, textAlign: "center" }}>Inga upplagda bokningar</Text>
+                    <Text style={{ fontFamily: FONTS.displayBold, fontSize: 17, color: C.textPrimary, textAlign: "center", letterSpacing: -0.2 }}>Lägg upp din första bokning</Text>
                   </Animated.View>
                   <Animated.View entering={FadeInDown.delay(280).springify()}>
-                    <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textTertiary, marginTop: 4, textAlign: "center", lineHeight: 20 }}>Dela din bokning och tjäna credits</Text>
+                    <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textTertiary, marginTop: 6, textAlign: "center", lineHeight: 20 }}>Har du en bokning du inte kan använda?{"\n"}Dela den och tjäna +2 credits!</Text>
                   </Animated.View>
                 </Animated.View>
               ) : submittedReservations.map((reservation: Reservation, index: number) => (
@@ -733,14 +733,14 @@ export default function ReservationsScreen() {
               </Text>
               {claimedReservations.length === 0 ? (
                 <Animated.View entering={FadeInDown.delay(100).springify()} style={{ paddingHorizontal: SPACING.lg, paddingVertical: 32, alignItems: "center" }}>
-                  <Animated.View entering={ZoomIn.springify().delay(150)} style={{ width: 56, height: 56, borderRadius: 16, backgroundColor: "rgba(0,0,0,0.03)", alignItems: "center", justifyContent: "center", marginBottom: 12 }}>
-                    <BookOpen size={24} color={C.textTertiary} strokeWidth={ICON.strokeWidth} />
+                  <Animated.View entering={ZoomIn.springify().delay(150)} style={{ width: 64, height: 64, borderRadius: 20, backgroundColor: C.successLight, alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
+                    <Text style={{ fontSize: 28 }}>🍽️</Text>
                   </Animated.View>
                   <Animated.View entering={FadeInDown.delay(200).springify()}>
-                    <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.textPrimary, textAlign: "center" }}>Inga övertagna bokningar</Text>
+                    <Text style={{ fontFamily: FONTS.displayBold, fontSize: 17, color: C.textPrimary, textAlign: "center", letterSpacing: -0.2 }}>Hitta ditt nästa bord</Text>
                   </Animated.View>
                   <Animated.View entering={FadeInDown.delay(280).springify()}>
-                    <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textTertiary, marginTop: 4, textAlign: "center", lineHeight: 20 }}>Utforska bokningar och ta över ett bord</Text>
+                    <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textTertiary, marginTop: 6, textAlign: "center", lineHeight: 20 }}>Utforska tillgängliga bokningar på hemskärmen{"\n"}och ta över ett bord med dina credits</Text>
                   </Animated.View>
                 </Animated.View>
               ) : claimedReservations.map((reservation: Reservation, index: number) => (

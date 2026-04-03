@@ -1254,7 +1254,7 @@ function CreditsIntroStep({ onContinue, onBack }: { onContinue: () => void; onBa
       iconBg: C.coralLight,
       iconColor: C.orange,
       title: "Dela din bokning",
-      subtitle: "Kan du inte gå? Lägg upp den på Reslot",
+      subtitle: "T.ex. Frantzén kl 20:00 → lägg upp på Reslot",
       badge: "+2 credits",
       badgeBg: C.successLight,
       badgeColor: C.success,
@@ -1265,7 +1265,7 @@ function CreditsIntroStep({ onContinue, onBack }: { onContinue: () => void; onBa
       iconBg: "rgba(201,169,110,0.12)",
       iconColor: C.gold,
       title: "Tjäna credits",
-      subtitle: "Få credits när någon tar över din bokning",
+      subtitle: "Någon tar över ditt Frantzén-bord → +2 credits",
       badge: null as string | null,
       badgeBg: undefined as string | undefined,
       badgeColor: undefined as string | undefined,
@@ -1276,7 +1276,7 @@ function CreditsIntroStep({ onContinue, onBack }: { onContinue: () => void; onBa
       iconBg: C.successLight,
       iconColor: C.success,
       title: "Ta över en bokning",
-      subtitle: "Använd credits för fullbokade restauranger",
+      subtitle: "Använd credits → ta över bord på Ekstedt",
       badge: "−2 credits",
       badgeBg: C.coralLight,
       badgeColor: C.orange,
@@ -1326,7 +1326,7 @@ function CreditsIntroStep({ onContinue, onBack }: { onContinue: () => void; onBa
               lineHeight: 23,
             }}
           >
-            Dela, tjäna, ta över — en enkel loop
+            Så fungerar det — med riktiga restauranger
           </Text>
         </Animated.View>
 
@@ -1464,6 +1464,16 @@ function CreditsIntroStep({ onContinue, onBack }: { onContinue: () => void; onBa
         entering={enterFromBottom(460)}
         style={{ paddingBottom: 16 }}
       >
+        <Pressable
+          testID="credits-intro-skip-btn"
+          accessibilityLabel="Hoppa över"
+          onPress={onContinue}
+          style={{ alignItems: "center", paddingVertical: 10, marginBottom: 4 }}
+        >
+          <Text style={{ fontFamily: FONTS.medium, fontSize: 14, color: C.grayLight }}>
+            Hoppa över
+          </Text>
+        </Pressable>
         <PrimaryButton
           testID="credits-intro-continue-btn"
           label="Jag förstår — fortsätt"
@@ -1557,6 +1567,36 @@ function FloatingParticle({ emoji, delay: d, startX, startY }: { emoji: string; 
     opacity: op.value,
   }));
   return <Animated.View style={pStyle}><Text style={{ fontSize: 20 }}>{emoji}</Text></Animated.View>;
+}
+
+function SocialProofCounter({ cityName }: { cityName: string }) {
+  const [count, setCount] = useState(0);
+  const target = 2400;
+
+  useEffect(() => {
+    const duration = 1400;
+    const steps = 35;
+    const stepValue = target / steps;
+    let current = 0;
+    const interval = setInterval(() => {
+      current += stepValue;
+      if (current >= target) {
+        setCount(target);
+        clearInterval(interval);
+      } else {
+        setCount(Math.round(current));
+      }
+    }, duration / steps);
+    return () => clearInterval(interval);
+  }, []);
+
+  const formatted = count >= 1000 ? `${Math.floor(count / 1000)} ${(count % 1000).toString().padStart(3, "0")}` : count.toString();
+
+  return (
+    <Text style={{ fontFamily: FONTS.medium, fontSize: 14, color: C.gold }}>
+      Gå med {formatted}+ andra i {cityName}
+    </Text>
+  );
 }
 
 // ==================== STEP 7: WELCOME ====================
@@ -1704,15 +1744,7 @@ function WelcomeStep({ onContinue, firstName, cityName }: { onContinue: () => vo
         }}
       >
         <Users size={14} color={C.gold} strokeWidth={2} />
-        <Text
-          style={{
-            fontFamily: FONTS.medium,
-            fontSize: 14,
-            color: C.gold,
-          }}
-        >
-          2 400+ användare i {cityName || "Stockholm"}
-        </Text>
+        <SocialProofCounter cityName={cityName || "Stockholm"} />
       </Animated.View>
 
       <View style={{ flex: 1 }} />

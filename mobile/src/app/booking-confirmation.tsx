@@ -5,6 +5,7 @@ import {
   ScrollView,
   Pressable,
   ActivityIndicator,
+  Share,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -20,6 +21,10 @@ import {
   Undo2,
   Timer,
   MapPin,
+  Share2,
+  CalendarPlus,
+  QrCode,
+  Copy,
 } from "lucide-react-native";
 import Animated, {
   FadeInDown,
@@ -186,13 +191,27 @@ function CountdownTimer({
 
 function CelebrationView() {
   const bounceScale = useSharedValue(0);
+  const ringPulse = useSharedValue(1);
 
   useEffect(() => {
     bounceScale.value = withSpring(1, { damping: 8, stiffness: 120 });
-  }, [bounceScale]);
+    setTimeout(() => {
+      ringPulse.value = withRepeat(
+        withSequence(
+          withTiming(1.06, { duration: 1000 }),
+          withTiming(1, { duration: 1000 })
+        ),
+        -1,
+        true
+      );
+    }, 400);
+  }, [bounceScale, ringPulse]);
 
   const celebrationStyle = useAnimatedStyle(() => ({
     transform: [{ scale: bounceScale.value }],
+  }));
+  const pulseStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: ringPulse.value }],
   }));
 
   return (
@@ -207,28 +226,30 @@ function CelebrationView() {
         borderColor: C.successLight,
       }}
     >
-      <Animated.View style={celebrationStyle}>
-        <View
-          style={{
-            width: 64,
-            height: 64,
-            borderRadius: 32,
-            backgroundColor: C.success,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <CheckCircle size={32} color="#FFFFFF" strokeWidth={2} />
-        </View>
+      <Animated.View style={pulseStyle}>
+        <Animated.View style={celebrationStyle}>
+          <View
+            style={{
+              width: 80,
+              height: 80,
+              borderRadius: 40,
+              backgroundColor: C.success,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <PartyPopper size={36} color="#FFFFFF" strokeWidth={2} />
+          </View>
+        </Animated.View>
       </Animated.View>
       <Text
         testID="confirmed-text"
         style={{
           fontFamily: FONTS.displayBold,
-          fontSize: 22,
+          fontSize: 24,
           color: C.success,
           marginTop: SPACING.md,
-          letterSpacing: -0.4,
+          letterSpacing: -0.5,
         }}
       >
         Bokningen är din!
@@ -243,7 +264,7 @@ function CelebrationView() {
           lineHeight: 21,
         }}
       >
-        Övertagandet är bekräftat. Kom ihåg att dyka upp i tid!
+        Övertagandet är bekräftat. Vi ses på restaurangen!
       </Text>
     </Animated.View>
   );
@@ -483,6 +504,105 @@ export default function BookingConfirmationScreen() {
                 />
               )}
             </Animated.View>
+
+            {/* Action buttons - shown after grace period */}
+            {graceExpired && !cancelSuccess ? (
+              <Animated.View entering={FadeInDown.delay(200).springify()} style={{ marginTop: SPACING.lg, gap: 10 }}>
+                {/* Reference number */}
+                <View
+                  style={{
+                    backgroundColor: C.bgCard,
+                    borderRadius: RADIUS.lg,
+                    borderWidth: 0.5,
+                    borderColor: C.borderLight,
+                    padding: SPACING.md,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    ...SHADOW.card,
+                  }}
+                >
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+                    <View style={{ width: 38, height: 38, borderRadius: 11, backgroundColor: "rgba(201,169,110,0.10)", alignItems: "center", justifyContent: "center" }}>
+                      <QrCode size={18} color={C.gold} strokeWidth={2} />
+                    </View>
+                    <View>
+                      <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary }}>Referensnummer</Text>
+                      <Text testID="reference-number" style={{ fontFamily: FONTS.bold, fontSize: 16, color: C.textPrimary, letterSpacing: 1 }}>
+                        {reservation.id.substring(0, 8).toUpperCase()}
+                      </Text>
+                    </View>
+                  </View>
+                  <Pressable
+                    testID="copy-reference-btn"
+                    accessibilityLabel="Kopiera referensnummer"
+                    onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
+                    style={{ width: 38, height: 38, borderRadius: 11, backgroundColor: C.coralLight, alignItems: "center", justifyContent: "center" }}
+                  >
+                    <Copy size={16} color={C.coral} strokeWidth={2} />
+                  </Pressable>
+                </View>
+
+                {/* Calendar + Share buttons */}
+                <View style={{ flexDirection: "row", gap: 10 }}>
+                  <Pressable
+                    testID="add-to-calendar-btn"
+                    accessibilityLabel="Lägg till i kalender"
+                    onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
+                    style={{
+                      flex: 1,
+                      backgroundColor: C.bgCard,
+                      borderRadius: RADIUS.lg,
+                      borderWidth: 0.5,
+                      borderColor: C.borderLight,
+                      paddingVertical: 14,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 8,
+                      ...SHADOW.card,
+                    }}
+                  >
+                    <CalendarPlus size={18} color={C.coral} strokeWidth={2} />
+                    <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.textPrimary }}>
+                      Kalender
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    testID="share-booking-btn"
+                    accessibilityLabel="Dela med vänner"
+                    onPress={async () => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      try {
+                        await Share.share({
+                          message: `Jag har bokat bord på ${restaurant.name} den ${formatDate(reservation.reservationDate)} kl ${formatTime(reservation.reservationTime)}! 🍽️`,
+                        });
+                      } catch {}
+                    }}
+                    style={{
+                      flex: 1,
+                      backgroundColor: C.coral,
+                      borderRadius: RADIUS.lg,
+                      paddingVertical: 14,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 8,
+                      ...SHADOW.elevated,
+                    }}
+                  >
+                    <Share2 size={18} color="#111827" strokeWidth={2} />
+                    <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: "#111827" }}>
+                      Dela
+                    </Text>
+                  </Pressable>
+                </View>
+              </Animated.View>
+            ) : null}
 
             {/* Cancel button during grace period */}
             {!graceExpired ? (
