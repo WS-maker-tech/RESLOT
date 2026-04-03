@@ -270,7 +270,7 @@ export default function TabLayout() {
             tabBarBadge: badgeCount,
             tabBarBadgeStyle: {
               backgroundColor: C.coral,
-              color: "#FFFFFF",
+              color: "#111827",
               fontSize: 10,
               fontFamily: FONTS.semiBold,
               minWidth: 18,

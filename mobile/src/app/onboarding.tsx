@@ -288,7 +288,7 @@ function PrimaryButton({
           style={{
             fontFamily: FONTS.bold,
             fontSize: 16,
-            color: "#FFFFFF",
+            color: "#111827",
             letterSpacing: -0.2,
           }}
         >

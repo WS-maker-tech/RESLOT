@@ -585,3 +585,40 @@ Stripe-integrationen uppgraderad till produktionskvalitet med SCA/PSD2-kompatibi
 - Webhook: idempotency via processedEvent, signaturverifiering
 
 DONE_STRIPE_PROD
+
+---
+
+## DONE_FINAL_PASS — Sista polishen (2026-04-03)
+
+### 1. Vita texter på pistachio-knappar → svart #111827
+Fixade alla knappar med vit text på pistachio (#7EC87A) bakgrund:
+- `reservations.tsx` — "Försök igen"
+- `_layout.tsx` — Bevakningar badge-text
+- `profile.tsx` — "Försök igen", "Köp credits", kamera-ikon
+- `alerts.tsx` — "Försök igen", "Lägg till bevakning" (2 instanser, inklusive Plus-ikon)
+- `restaurant/[id].tsx` — "Gå tillbaka"
+- `onboarding.tsx` — Huvud-CTA-knapp
+
+### 2. Hårdkodade orangea färger
+- Inga hårdkodade orange hex-värden (#E06A4E etc.) hittades
+- `C.orange` i onboarding.tsx är alias för `ThemeC.coral` (#7EC87A) — korrekt
+
+### 3. Text-klippning & spacing
+- Alla `numberOfLines` har korrekt lineHeight och flex-layout
+- Inga klippningsproblem identifierade
+- Spacing konsekvent via SPACING-tokens
+
+### 4. "Du missade"-sektionen
+- Backend-endpoint `/api/reservations/missed` finns och returnerar data
+- MissedBookingsSection renderas korrekt när data finns (conditionell rendering)
+- Korrekt placering i hemskärmen efter NewOnReslotSection
+
+### 5. Navigation
+- Alla MenuItem-tryck har korrekt onPress med registrerade routes
+- Alla routes registrerade i `_layout.tsx`: invite, payment, support, account-settings, credits, faq, add-watch, etc.
+
+### Verifiering
+- `npx tsc --noEmit` — 0 fel
+- Dev server (localhost:8081) — 200 OK
+
+DONE_FINAL_PASS

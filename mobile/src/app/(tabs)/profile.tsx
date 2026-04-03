@@ -342,7 +342,7 @@ export default function ProfileScreen() {
                 style={{
                   fontFamily: FONTS.semiBold,
                   fontSize: 15,
-                  color: "#FFFFFF",
+                  color: "#111827",
                 }}
               >
                 Försök igen
@@ -375,7 +375,7 @@ export default function ProfileScreen() {
                   cachePolicy="memory-disk"
                 />
                 <View style={{ position: "absolute", bottom: 0, right: 0, width: 26, height: 26, borderRadius: 13, backgroundColor: C.coral, alignItems: "center", justifyContent: "center", borderWidth: 2, borderColor: C.bg }}>
-                  <Camera size={12} color="#FFFFFF" strokeWidth={ICON.strokeWidth} />
+                  <Camera size={12} color="#111827" strokeWidth={ICON.strokeWidth} />
                 </View>
               </Pressable>
               <Text
@@ -486,7 +486,7 @@ export default function ProfileScreen() {
                   onPress={handleBuyCreditsPress}
                 >
                   <Animated.View style={[buyAnimStyle, { marginTop: 12, backgroundColor: C.coral, borderRadius: 12, paddingVertical: 10, alignItems: "center" }]}>
-                    <Text style={{ fontFamily: FONTS.bold, fontSize: 14, color: "#FFFFFF" }}>Köp credits</Text>
+                    <Text style={{ fontFamily: FONTS.bold, fontSize: 14, color: "#111827" }}>Köp credits</Text>
                   </Animated.View>
                 </Pressable>
               </View>

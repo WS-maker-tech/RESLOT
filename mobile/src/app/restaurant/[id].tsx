@@ -884,7 +884,7 @@ export default function RestaurantDetailScreen() {
               shadowOpacity: 0.25,
             })}
           >
-            <Text style={{ fontFamily: FONTS.bold, fontSize: 15, color: "#FFFFFF" }}>Gå tillbaka</Text>
+            <Text style={{ fontFamily: FONTS.bold, fontSize: 15, color: "#111827" }}>Gå tillbaka</Text>
           </Pressable>
         </View>
       </View>

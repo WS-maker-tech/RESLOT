@@ -470,7 +470,7 @@ export default function ReservationsScreen() {
               onPress={() => refetch()}
               style={{ marginTop: SPACING.md, backgroundColor: C.coral, borderRadius: RADIUS.md, paddingVertical: 12, paddingHorizontal: 28 }}
             >
-              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: "#FFFFFF" }}>
+              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: "#111827" }}>
                 Försök igen
               </Text>
             </Pressable>

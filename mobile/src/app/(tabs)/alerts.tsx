@@ -455,7 +455,7 @@ export default function AlertsScreen() {
               onPress={() => { alertsRefetch(); restaurantAlertsRefetch(); watchesRefetch(); }}
               style={{ marginTop: SPACING.md, backgroundColor: C.coral, borderRadius: RADIUS.md, paddingVertical: 12, paddingHorizontal: 28 }}
             >
-              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: "#FFFFFF" }}>
+              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: "#111827" }}>
                 Försök igen
               </Text>
             </Pressable>
@@ -666,8 +666,8 @@ export default function AlertsScreen() {
               onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/add-watch"); }}
               style={{ marginHorizontal: SPACING.lg, marginTop: SPACING.md, marginBottom: SPACING.sm, backgroundColor: C.coral, borderRadius: RADIUS.md, paddingVertical: 14, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 }}
             >
-              <Plus size={18} color="#FFFFFF" strokeWidth={ICON.strokeWidth} />
-              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: "#FFFFFF" }}>Lägg till bevakning</Text>
+              <Plus size={18} color="#111827" strokeWidth={ICON.strokeWidth} />
+              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: "#111827" }}>Lägg till bevakning</Text>
             </Pressable>
 
             {watchesLoading ? (
@@ -745,8 +745,8 @@ export default function AlertsScreen() {
                       gap: 8,
                     }}
                   >
-                    <Plus size={16} color="#FFFFFF" strokeWidth={ICON.strokeWidth} />
-                    <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: "#FFFFFF" }}>
+                    <Plus size={16} color="#111827" strokeWidth={ICON.strokeWidth} />
+                    <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: "#111827" }}>
                       Lägg till bevakning
                     </Text>
                   </Pressable>
