@@ -30,7 +30,6 @@ import {
   CreditCard,
   Undo2,
   Timer,
-  Users,
 } from "lucide-react-native";
 import Animated, {
   FadeInDown,

@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Upload, ArrowDownLeft, UserPlus, ChevronRight, Clock, ShoppingCart, Gift, AlertCircle } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
+import * as WebBrowser from "expo-web-browser";
 import Animated, {
   FadeInDown,
   useSharedValue,
@@ -117,15 +118,31 @@ export default function CreditsScreen() {
   const [buyingQuantity, setBuyingQuantity] = React.useState<number | null>(null);
   const targetCredits = profile?.credits ?? 0;
 
+  const [purchaseError, setPurchaseError] = React.useState<string | null>(null);
+
   const handleBuyCredits = async (quantity: number) => {
     if (!phone) return;
     setBuyingQuantity(quantity);
+    setPurchaseError(null);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     try {
-      await purchaseMutation.mutateAsync({ phone, quantity });
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      const result = await purchaseMutation.mutateAsync({ phone, quantity });
+      if (result.checkoutUrl) {
+        // Production: open Stripe Checkout in browser
+        await WebBrowser.openBrowserAsync(result.checkoutUrl, {
+          dismissButtonStyle: "close",
+          presentationStyle: WebBrowser.WebBrowserPresentationStyle.FORM_SHEET,
+        });
+        // Refetch profile to get updated credits (webhook may have fired)
+        profileRefetch();
+      } else {
+        // Dev mode: credits granted immediately
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
     } catch (err) {
       console.error("[Credits] Purchase failed:", err);
+      const msg = err instanceof Error ? err.message : "Köpet kunde inte genomföras. Försök igen.";
+      setPurchaseError(msg);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       setBuyingQuantity(null);
@@ -466,6 +483,12 @@ export default function CreditsScreen() {
                   )}
                 </AnimatedPressable>
               ))}
+              {purchaseError ? (
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginTop: 4, backgroundColor: "rgba(239,68,68,0.08)", borderRadius: RADIUS.sm, padding: 10 }}>
+                  <AlertCircle size={14} color={C.error} strokeWidth={2} />
+                  <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.error, flex: 1 }}>{purchaseError}</Text>
+                </View>
+              ) : null}
             </View>
           </Animated.View>
         </View>

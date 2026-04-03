@@ -1,7 +1,6 @@
 import "@vibecodeapp/proxy"; // DO NOT REMOVE OTHERWISE VIBECODE PROXY WILL NOT WORK
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import "./env";
 import { sampleRouter } from "./routes/sample";
 import { restaurantsRouter } from "./routes/restaurants";
 import { reservationsRouter } from "./routes/reservations";
@@ -16,6 +15,8 @@ import { notificationsRouter } from "./routes/notifications";
 import { logger } from "hono/logger";
 import { authMiddleware } from "./middleware/auth";
 import { db } from "./db";
+import { getStripe } from "./stripe";
+import { env } from "./env";
 
 const app = new Hono();
 
@@ -54,14 +55,34 @@ app.use(
 app.use("*", logger());
 
 // Stripe webhook must be BEFORE auth middleware (Stripe signs requests, not our auth)
+// Import directly to avoid dynamic import issues with body streaming
 app.post("/api/webhooks/stripe", async (c) => {
-  // Forward to credits webhook handler
-  const { creditsRouter } = await import("./routes/credits");
+  const stripe = getStripe();
+  if (!stripe || !env.STRIPE_WEBHOOK_SECRET) {
+    return c.json({ error: { message: "Webhook ej konfigurerad", code: "NOT_CONFIGURED" } }, 503);
+  }
+
+  const sig = c.req.header("stripe-signature");
+  if (!sig) {
+    return c.json({ error: { message: "Saknar stripe-signature header", code: "BAD_REQUEST" } }, 400);
+  }
+
+  // Read raw body ONCE here — do not consume it again downstream
+  const rawBody = await c.req.text();
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(rawBody, sig, env.STRIPE_WEBHOOK_SECRET);
+  } catch (err) {
+    console.error("[STRIPE WEBHOOK] Signaturverifiering misslyckades:", err);
+    return c.json({ error: { message: "Ogiltig signatur", code: "BAD_SIGNATURE" } }, 400);
+  }
+
+  // Forward validated event to credits webhook handler by injecting raw body
   return creditsRouter.fetch(
     new Request(new URL("/webhook", c.req.url).toString(), {
       method: "POST",
       headers: c.req.raw.headers,
-      body: c.req.raw.body,
+      body: rawBody,
     }),
     c.env
   );

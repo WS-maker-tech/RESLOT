@@ -383,16 +383,28 @@ reservationsRouter.post(
     }
 
     // Stripe pre-auth for service fee
-    const stripeResult = await createClaimPreAuth({
-      amountSek: SERVICE_FEE_SEK,
-      reservationId: id,
-      claimerPhone,
-      stripeCustomerId,
-    });
+    let stripeResult;
+    try {
+      stripeResult = await createClaimPreAuth({
+        amountSek: SERVICE_FEE_SEK,
+        reservationId: id,
+        claimerPhone,
+        stripeCustomerId,
+      });
+    } catch (err: unknown) {
+      console.error("[CLAIM] Stripe pre-auth error:", err);
+      const msg = err instanceof Error && err.message.includes("card")
+        ? "Ditt kort nekades. Kontrollera dina kortuppgifter och försök igen."
+        : "Betalningen kunde inte genomföras. Försök igen senare.";
+      return c.json(
+        { error: { message: msg, code: "PAYMENT_FAILED" } },
+        402
+      );
+    }
 
     if (!stripeResult) {
       return c.json(
-        { error: { message: "Betalning ej tillgänglig", code: "PAYMENT_UNAVAILABLE" } },
+        { error: { message: "Betalning ej tillgänglig. Kontrollera att du har registrerat ett kort.", code: "PAYMENT_UNAVAILABLE" } },
         503
       );
     }
@@ -495,6 +507,7 @@ reservationsRouter.post(
         data: {
           ...updated,
           stripeClientSecret: stripeResult.clientSecret,
+          stripeRequiresAction: stripeResult.requiresAction,
         },
       });
     } catch (err: unknown) {

@@ -10,6 +10,9 @@ import type {
   Watch,
   WatchFilterOptions,
   SavedRestaurant,
+  CardStatus,
+  CheckoutSessionResult,
+  CreditsPurchaseResult,
 } from "./types";
 
 // ─── Restaurants ───────────────────────────────────────
@@ -301,9 +304,31 @@ export function usePurchaseCredits() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: { phone: string; quantity: number }) =>
-      api.post<{ success: boolean; newBalance: number }>("/api/credits/purchase", data),
-    onSuccess: (_: { success: boolean; newBalance: number }, variables: { phone: string; quantity: number }) => {
+      api.post<CreditsPurchaseResult>("/api/credits/purchase", data),
+    onSuccess: (_: CreditsPurchaseResult, variables: { phone: string; quantity: number }) => {
       queryClient.invalidateQueries({ queryKey: ["profile", variables.phone] });
+      queryClient.invalidateQueries({ queryKey: ["activityAlerts", variables.phone] });
+    },
+  });
+}
+
+// ---- Card setup ----
+export function useCardStatus(phone: string | null | undefined) {
+  return useQuery({
+    queryKey: ["cardStatus", phone],
+    queryFn: () => api.get<CardStatus>("/api/credits/card-status"),
+    enabled: !!phone,
+    staleTime: 30 * 1000,
+  });
+}
+
+export function useSetupCard() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () =>
+      api.post<CheckoutSessionResult>("/api/credits/setup-card", {}),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cardStatus"] });
     },
   });
 }

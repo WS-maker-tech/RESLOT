@@ -126,6 +126,27 @@ export interface SavedRestaurant {
   createdAt: string;
 }
 
+export interface CardStatus {
+  hasCard: boolean;
+  cardLast4: string | null;
+  cardBrand: string | null;
+}
+
+export interface CheckoutSessionResult {
+  checkoutUrl: string | null;
+  sessionId: string;
+}
+
+export interface CreditsPurchaseResult {
+  checkoutUrl: string | null;
+  sessionId?: string;
+  amount: number;
+  currency: string;
+  // Dev mode fields
+  success?: boolean;
+  newBalance?: number;
+}
+
 export interface TagWithCount {
   label: string;
   count: number;

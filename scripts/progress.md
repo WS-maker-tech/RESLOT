@@ -514,3 +514,74 @@ Kristallklar ansvarsmodell och avbokningsflöde genom hela appen. Baserat på Re
 - **CTA:** "Jag förstår" — dark button
 
 DONE_LIABILITY_UX
+
+---
+
+## DONE_STRIPE_PROD — Stripe Integration Production-Ready (2026-04-03)
+
+Stripe-integrationen uppgraderad till produktionskvalitet med SCA/PSD2-kompatibilitet, Checkout Sessions, och komplett felhantering på svenska.
+
+### 1. Backend: stripe.ts — Produktionsredo betalningslogik
+
+#### Pre-auth vid claim (off_session + sparad betalmetod)
+- `createClaimPreAuth` använder nu sparad betalmetod via `getDefaultPaymentMethod()`
+- Om kund har sparat kort: `off_session: true` + `confirm: true` — sömlös pre-auth
+- Om SCA krävs (authentication_required): returnerar `requiresAction: true` + `clientSecret`
+- Fallback: `automatic_payment_methods` om inget kort sparat
+
+#### No-show-avgift (off_session)
+- `createNoShowFeeCharge` kräver nu sparad betalmetod (inte `automatic_payment_methods`)
+- `off_session: true` + explicit `payment_method` — korrekt för off-session-avgifter
+- Returnerar `null` om ingen betalmetod finns
+
+#### Nya funktioner
+- `getDefaultPaymentMethod(customerId)` — hämtar kundens sparade kort
+- `createSetupIntent(customerId)` — skapar SetupIntent för kortsparande
+- `createCardSetupCheckoutSession()` — Stripe Checkout setup-mode (SCA/3DS automatiskt)
+- `createCreditsCheckoutSession()` — Stripe Checkout för creditköp (SCA/3DS automatiskt)
+
+### 2. Backend: credits.ts — Checkout Sessions + svenska felmeddelanden
+
+#### Nya endpoints
+- `POST /api/credits/purchase` — returnerar `checkoutUrl` (Stripe Checkout)
+- `POST /api/credits/setup-card` — Checkout Session setup-mode för kortregistrering
+- `GET /api/credits/card-status` — `{ hasCard, cardLast4, cardBrand }`
+
+#### Webhook utökad
+- Hanterar `checkout.session.completed` + `payment_intent.succeeded` + `payment_intent.payment_failed`
+- Alla felmeddelanden på svenska med `last_payment_error.message`
+- Try/catch runt hela event-hanteringen, markerar som processed även vid fel
+
+### 3. Backend: index.ts — Webhook-forwarding fixad
+- Verifierar signatur FÖRST, läser raw body EN gång, vidarebefordrar korrekt
+
+### 4. Backend: reservations.ts — Bättre felhantering vid claim
+- Try/catch runt `createClaimPreAuth` med svenska felmeddelanden
+- Returnerar `stripeRequiresAction` i response
+
+### 5. Mobile: payment.tsx — Kortregistrering via Stripe Checkout
+- "Ditt betalkort"-sektion: visar kortstatus eller "Lägg till kort"-knapp
+- Öppnar Stripe Checkout i in-app browser (expo-web-browser)
+- SCA/3DS hanteras automatiskt
+
+### 6. Mobile: credits.tsx — Credits-köp via Checkout Sessions
+- Öppnar Stripe Checkout URL i in-app browser
+- Felmeddelanden i röd ruta under köpknapparna
+
+### 7. Mobile: hooks.ts + types.ts
+- `useCardStatus(phone)`, `useSetupCard()` — nya hooks
+- `CardStatus`, `CheckoutSessionResult`, `CreditsPurchaseResult` — nya typer
+
+### 8. SCA/PSD2-kompatibilitet (EU/Sverige)
+- Credits-köp: Stripe Checkout hanterar 3DS automatiskt
+- Kortregistrering: Checkout setup-mode sparar kort med SCA-mandat
+- Pre-auth vid claim: Off-session med sparad betalmetod
+- No-show-avgift: Off-session med sparad betalmetod
+
+### Verifiering
+- Backend: `npx tsc --noEmit` — 0 fel
+- Mobile: `npx tsc --noEmit` — 0 nya fel (pre-existing i restaurant/[id].tsx)
+- Alla Stripe-anrop via Zod-validerad `env.STRIPE_SECRET_KEY`
+- Webhook: idempotency via processedEvent, signaturverifiering
+
+DONE_STRIPE_PROD
