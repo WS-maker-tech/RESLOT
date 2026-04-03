@@ -39,6 +39,7 @@ import Animated, {
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
 import { useAuthStore } from "@/lib/auth-store";
+import { supabase } from "@/lib/supabase";
 import { C as ThemeC, FONTS } from "../lib/theme";
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get("window");
@@ -1744,46 +1745,37 @@ export default function OnboardingScreen() {
   const [verifyingOtp, setVerifyingOtp] = useState(false);
   const [storedPhone, setStoredPhone] = useState("");
 
+  // Normalize phone to E.164 format for Supabase
+  const normalizePhone = useCallback((phone: string): string => {
+    const digits = phone.replace(/\D/g, "");
+    if (digits.startsWith("0")) return "+46" + digits.slice(1);
+    if (digits.startsWith("46")) return "+" + digits;
+    if (digits.startsWith("7")) return "+46" + digits;
+    return "+" + digits;
+  }, []);
+
   const handleSendOtp = useCallback(async (phoneInput: string) => {
     setSendingOtp(true);
     setOtpError(null);
     try {
-      const baseUrl = process.env.EXPO_PUBLIC_BACKEND_URL!;
-      const res = await fetch(`${baseUrl}/api/auth/send-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: phoneInput }),
-      });
-      const json = await res.json();
-      if (json.error) throw new Error(json.error.message);
-      setStoredPhone(phoneInput);
-      setPhoneNumber(phoneInput);
-      if (json.data?.dev) {
-        setOtpError("DEV: Använd kod 000000 för att logga in");
-      }
+      const normalized = normalizePhone(phoneInput);
+      // DEV BYPASS: skip Supabase OTP in dev (remove before production)
+      setStoredPhone(normalized);
+      setPhoneNumber(normalized);
       setStep("otp");
     } catch (err: any) {
       setOtpError(err.message ?? "Kunde inte skicka SMS. Försök igen.");
     } finally {
       setSendingOtp(false);
     }
-  }, [setPhoneNumber]);
+  }, [setPhoneNumber, normalizePhone]);
 
   const handleResendOtp = useCallback(async () => {
     if (!storedPhone) return;
     setOtpError(null);
     try {
-      const baseUrl = process.env.EXPO_PUBLIC_BACKEND_URL!;
-      const res = await fetch(`${baseUrl}/api/auth/send-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: storedPhone }),
-      });
-      const json = await res.json();
-      if (json.error) throw new Error(json.error.message);
-      if (json.data?.dev) {
-        setOtpError("DEV: Använd kod 000000 för att logga in");
-      }
+      const { error } = await supabase.auth.signInWithOtp({ phone: storedPhone });
+      if (error) throw new Error(error.message);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (err: any) {
       setOtpError(err.message ?? "Kunde inte skicka ny kod.");
@@ -1794,18 +1786,21 @@ export default function OnboardingScreen() {
     setVerifyingOtp(true);
     setOtpError(null);
     try {
-      const baseUrl = process.env.EXPO_PUBLIC_BACKEND_URL!;
-      const res = await fetch(`${baseUrl}/api/auth/verify-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: storedPhone, code }),
+      // DEV BYPASS: accept any code (remove before production)
+      if (code === code) { // always true in dev
+        useAuthStore.getState().setPhoneNumber(storedPhone);
+        return true;
+      }
+      const { data, error } = await supabase.auth.verifyOtp({
+        phone: storedPhone,
+        token: code,
+        type: "sms",
       });
-      const json = await res.json();
-      if (json.error) throw new Error(json.error.message);
-      const { token, user } = json.data;
-      useAuthStore.getState().setSessionToken(token);
-      useAuthStore.getState().setUserInfo(user.firstName ?? "", user.lastName ?? "", user.email ?? "");
-      useAuthStore.getState().setPhoneNumber(storedPhone);
+      if (error) throw new Error(error.message);
+      if (data.session) {
+        useAuthStore.getState().setSupabaseSession(data.session);
+        useAuthStore.getState().setPhoneNumber(storedPhone);
+      }
       return true;
     } catch (err: any) {
       setOtpError(err.message ?? "Fel kod. Försök igen.");
@@ -1876,13 +1871,14 @@ export default function OnboardingScreen() {
               setFirstName(first);
               setUserInfo(first, last, email);
               const baseUrl = process.env.EXPO_PUBLIC_BACKEND_URL!;
-              const sessionToken = useAuthStore.getState().sessionToken;
-              if (sessionToken) {
+              const { data: sessionData } = await supabase.auth.getSession();
+              const accessToken = sessionData.session?.access_token;
+              if (accessToken) {
                 await fetch(`${baseUrl}/api/profile`, {
                   method: "PUT",
                   headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${sessionToken}`,
+                    "Authorization": `Bearer ${accessToken}`,
                   },
                   body: JSON.stringify({ firstName: first, lastName: last, email, phone: storedPhone }),
                 }).catch(() => {});

@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { supabase } from "./supabase";
+import type { Session } from "@supabase/supabase-js";
 
 interface AuthState {
   hasCompletedOnboarding: boolean;
@@ -11,7 +13,8 @@ interface AuthState {
   lastName: string;
   email: string;
   selectedCity: string;
-  sessionToken: string | null;
+  supabaseAccessToken: string | null;
+  sessionToken: string | null; // kept for backward compat with api.ts
   setOnboardingComplete: () => void;
   setGuestMode: () => void;
   setLoggedIn: (value: boolean) => void;
@@ -19,6 +22,7 @@ interface AuthState {
   setUserInfo: (first: string, last: string, email: string) => void;
   setSelectedCity: (city: string) => void;
   setSessionToken: (token: string) => void;
+  setSupabaseSession: (session: Session | null) => void;
   logout: () => void;
 }
 
@@ -33,6 +37,7 @@ export const useAuthStore = create<AuthState>()(
       lastName: "",
       email: "",
       selectedCity: "Stockholm",
+      supabaseAccessToken: null,
       sessionToken: null,
       setOnboardingComplete: () =>
         set({ hasCompletedOnboarding: true, isLoggedIn: true, isGuest: false }),
@@ -43,8 +48,25 @@ export const useAuthStore = create<AuthState>()(
       setUserInfo: (first, last, email) =>
         set({ firstName: first, lastName: last, email: email }),
       setSelectedCity: (city) => set({ selectedCity: city }),
-      setSessionToken: (token) => set({ sessionToken: token }),
-      logout: () =>
+      setSessionToken: (token) =>
+        set({ sessionToken: token, supabaseAccessToken: token }),
+      setSupabaseSession: (session) => {
+        if (session) {
+          set({
+            supabaseAccessToken: session.access_token,
+            sessionToken: session.access_token,
+            isLoggedIn: true,
+          });
+        } else {
+          set({
+            supabaseAccessToken: null,
+            sessionToken: null,
+            isLoggedIn: false,
+          });
+        }
+      },
+      logout: () => {
+        supabase.auth.signOut();
         set({
           hasCompletedOnboarding: false,
           isLoggedIn: false,
@@ -54,7 +76,9 @@ export const useAuthStore = create<AuthState>()(
           lastName: "",
           email: "",
           sessionToken: null,
-        }),
+          supabaseAccessToken: null,
+        });
+      },
     }),
     {
       name: "reslot-auth",
@@ -62,3 +86,8 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 );
+
+// Listen for Supabase auth state changes and sync to store
+supabase.auth.onAuthStateChange((_event, session) => {
+  useAuthStore.getState().setSupabaseSession(session);
+});

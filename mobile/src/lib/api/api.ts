@@ -1,5 +1,6 @@
 import { fetch } from "expo/fetch";
 import { useAuthStore } from "@/lib/auth-store";
+import { supabase } from "@/lib/supabase";
 
 interface ApiResponse<T> {
   data: T;
@@ -7,12 +8,21 @@ interface ApiResponse<T> {
 
 const baseUrl = process.env.EXPO_PUBLIC_BACKEND_URL!;
 
+async function getAccessToken(): Promise<string | null> {
+  // Try to get a fresh Supabase session token
+  const { data } = await supabase.auth.getSession();
+  if (data.session?.access_token) {
+    return data.session.access_token;
+  }
+  // Fallback to stored token
+  return useAuthStore.getState().sessionToken;
+}
+
 const request = async <T>(
   url: string,
   options: { method?: string; body?: string } = {}
 ): Promise<T> => {
-  // Get session token from store state (direct access, not hook)
-  const token = useAuthStore.getState().sessionToken;
+  const token = await getAccessToken();
 
   const headers: Record<string, string> = {};
   if (options.body) headers["Content-Type"] = "application/json";
@@ -22,12 +32,6 @@ const request = async <T>(
     ...options,
     headers,
   });
-
-  // Handle token rotation: if server sends new token, update store
-  const newToken = response.headers.get("x-new-token");
-  if (newToken) {
-    useAuthStore.getState().setSessionToken(newToken);
-  }
 
   // 1. Handle 204 No Content
   if (response.status === 204) {

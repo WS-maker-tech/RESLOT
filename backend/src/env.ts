@@ -17,9 +17,9 @@ const envSchema = z.object({
   STRIPE_WEBHOOK_SECRET: z.string().optional(),
   // Google Places API
   GOOGLE_PLACES_API_KEY: z.string().optional(),
-  // Supabase
-  SUPABASE_URL: z.string().optional(),
-  SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
+  // Supabase (required for auth)
+  SUPABASE_URL: z.string(),
+  SUPABASE_SERVICE_ROLE_KEY: z.string(),
   SUPABASE_ANON_KEY: z.string().optional(),
 });
 
