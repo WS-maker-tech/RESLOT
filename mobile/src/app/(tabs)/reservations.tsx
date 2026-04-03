@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   Pressable,
   Alert,
   StyleSheet,
+  TextInput,
 } from "react-native";
 import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -19,10 +20,13 @@ import {
   BookOpen,
   Trash2,
   AlertCircle,
+  Check,
+  X,
+  Send,
 } from "lucide-react-native";
 import { useAuthStore } from "@/lib/auth-store";
 import { LoginGate } from "@/components/LoginGate";
-import { useMyReservations, useCancelReservation } from "@/lib/api/hooks";
+import { useMyReservations, useCancelReservation, useSubmitFeedback } from "@/lib/api/hooks";
 import type { Reservation } from "@/lib/api/types";
 import Animated, {
   FadeInDown,
@@ -361,9 +365,232 @@ function ReservationCard({
   );
 }
 
+function FeedbackPrompt({
+  reservationId,
+  feedbackGiven,
+  onFeedbackGiven,
+}: {
+  reservationId: string;
+  feedbackGiven: boolean;
+  onFeedbackGiven: (id: string) => void;
+}) {
+  const [step, setStep] = useState<"ask" | "comment" | "done">(feedbackGiven ? "done" : "ask");
+  const [worked, setWorked] = useState<boolean | null>(null);
+  const [comment, setComment] = useState<string>("");
+  const submitFeedback = useSubmitFeedback();
+
+  const handleAnswer = useCallback((answer: boolean) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setWorked(answer);
+    setStep("comment");
+  }, []);
+
+  const handleSubmit = useCallback(async () => {
+    if (worked === null) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    try {
+      await submitFeedback.mutateAsync({
+        reservationId,
+        worked,
+        comment: comment.trim() || undefined,
+      });
+      setStep("done");
+      onFeedbackGiven(reservationId);
+    } catch {
+      // silently fail, user can try again
+    }
+  }, [worked, comment, reservationId, submitFeedback, onFeedbackGiven]);
+
+  if (step === "done") {
+    return (
+      <Animated.View
+        entering={FadeInDown.springify()}
+        style={{
+          marginHorizontal: SPACING.lg,
+          marginBottom: SPACING.md,
+          marginTop: -SPACING.sm,
+          paddingVertical: 12,
+          paddingHorizontal: SPACING.md,
+          backgroundColor: "rgba(126,200,122,0.08)",
+          borderRadius: RADIUS.md,
+          alignItems: "center",
+        }}
+      >
+        <Text
+          style={{
+            fontFamily: FONTS.medium,
+            fontSize: 13,
+            color: C.success,
+          }}
+        >
+          Tack för din feedback!
+        </Text>
+      </Animated.View>
+    );
+  }
+
+  if (step === "comment") {
+    return (
+      <Animated.View
+        entering={FadeInDown.springify()}
+        style={{
+          marginHorizontal: SPACING.lg,
+          marginBottom: SPACING.md,
+          marginTop: -SPACING.sm,
+          paddingVertical: 12,
+          paddingHorizontal: SPACING.md,
+          backgroundColor: C.bgCard,
+          borderRadius: RADIUS.md,
+          borderWidth: 0.5,
+          borderColor: C.borderLight,
+          ...SHADOW.card,
+        }}
+      >
+        <TextInput
+          testID={`feedback-comment-${reservationId}`}
+          value={comment}
+          onChangeText={setComment}
+          placeholder="Kommentar (valfritt)"
+          placeholderTextColor={C.textTertiary}
+          multiline
+          style={{
+            backgroundColor: C.bgInput,
+            borderRadius: RADIUS.sm,
+            paddingHorizontal: 12,
+            paddingVertical: 10,
+            fontFamily: FONTS.regular,
+            fontSize: 13,
+            color: C.textPrimary,
+            minHeight: 44,
+            textAlignVertical: "top",
+          }}
+        />
+        <Pressable
+          testID={`feedback-submit-${reservationId}`}
+          accessibilityLabel="Skicka feedback"
+          onPress={handleSubmit}
+          style={{
+            marginTop: 10,
+            backgroundColor: C.coral,
+            borderRadius: RADIUS.sm,
+            paddingVertical: 10,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 6,
+            minHeight: 44,
+          }}
+        >
+          <Send size={14} color="#111827" strokeWidth={2} />
+          <Text
+            style={{
+              fontFamily: FONTS.semiBold,
+              fontSize: 13,
+              color: "#111827",
+            }}
+          >
+            Skicka
+          </Text>
+        </Pressable>
+      </Animated.View>
+    );
+  }
+
+  return (
+    <Animated.View
+      entering={FadeInDown.springify()}
+      style={{
+        marginHorizontal: SPACING.lg,
+        marginBottom: SPACING.md,
+        marginTop: -SPACING.sm,
+        paddingVertical: 12,
+        paddingHorizontal: SPACING.md,
+        backgroundColor: C.bgCard,
+        borderRadius: RADIUS.md,
+        borderWidth: 0.5,
+        borderColor: C.borderLight,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        ...SHADOW.card,
+      }}
+    >
+      <Text
+        style={{
+          fontFamily: FONTS.medium,
+          fontSize: 13,
+          color: C.textSecondary,
+        }}
+      >
+        Fungerade bokningen?
+      </Text>
+      <View style={{ flexDirection: "row", gap: 8 }}>
+        <Pressable
+          testID={`feedback-yes-${reservationId}`}
+          accessibilityLabel="Ja, bokningen fungerade"
+          onPress={() => handleAnswer(true)}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 4,
+            backgroundColor: "rgba(126,200,122,0.12)",
+            borderRadius: RADIUS.sm,
+            paddingHorizontal: 12,
+            paddingVertical: 8,
+            minHeight: 44,
+          }}
+        >
+          <Check size={14} color={C.coral} strokeWidth={2.5} />
+          <Text
+            style={{
+              fontFamily: FONTS.semiBold,
+              fontSize: 13,
+              color: C.coral,
+            }}
+          >
+            Ja
+          </Text>
+        </Pressable>
+        <Pressable
+          testID={`feedback-no-${reservationId}`}
+          accessibilityLabel="Nej, bokningen fungerade inte"
+          onPress={() => handleAnswer(false)}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 4,
+            backgroundColor: "rgba(220,38,38,0.08)",
+            borderRadius: RADIUS.sm,
+            paddingHorizontal: 12,
+            paddingVertical: 8,
+            minHeight: 44,
+          }}
+        >
+          <X size={14} color={C.danger} strokeWidth={2.5} />
+          <Text
+            style={{
+              fontFamily: FONTS.semiBold,
+              fontSize: 13,
+              color: C.danger,
+            }}
+          >
+            Nej
+          </Text>
+        </Pressable>
+      </View>
+    </Animated.View>
+  );
+}
+
 export default function ReservationsScreen() {
   const isGuest = useAuthStore((s) => s.isGuest);
   const phone = useAuthStore((s) => s.phoneNumber);
+
+  // Track which reservations have been given feedback
+  const [feedbackGivenIds, setFeedbackGivenIds] = useState<Set<string>>(new Set());
+  const handleFeedbackGiven = useCallback((id: string) => {
+    setFeedbackGivenIds((prev) => new Set(prev).add(id));
+  }, []);
 
   // Fetch user's reservations
   const {
@@ -517,7 +744,22 @@ export default function ReservationsScreen() {
                   </Animated.View>
                 </Animated.View>
               ) : claimedReservations.map((reservation: Reservation, index: number) => (
-                <ReservationCard key={reservation.id} reservation={reservation} index={index} onCancel={handleCancel} isSubmitter={false} />
+                <React.Fragment key={reservation.id}>
+                  <ReservationCard reservation={reservation} index={index} onCancel={handleCancel} isSubmitter={false} />
+                  {reservation.status === "completed" && reservation.claimerPhone === phone && !feedbackGivenIds.has(reservation.id) ? (
+                    <FeedbackPrompt
+                      reservationId={reservation.id}
+                      feedbackGiven={feedbackGivenIds.has(reservation.id)}
+                      onFeedbackGiven={handleFeedbackGiven}
+                    />
+                  ) : feedbackGivenIds.has(reservation.id) && reservation.status === "completed" ? (
+                    <FeedbackPrompt
+                      reservationId={reservation.id}
+                      feedbackGiven={true}
+                      onFeedbackGiven={handleFeedbackGiven}
+                    />
+                  ) : null}
+                </React.Fragment>
               ))}
             </View>
           </>

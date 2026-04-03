@@ -687,3 +687,33 @@ Fullständig UX-audit av hela appen som senior UX-designer. Alla skärmar och ko
 - Bokningsbekräftelse (countdown timer, grace period, cancel claim)
 - Kartvy/map (placeholder)
 - LoginGate, _layout.tsx (tab bar, splash, navigation stack)
+
+## DONE_ROUND2 — Rapportering, Feedback, Karta, Sökning (2026-04-03)
+
+### 1. Rapporteringsfunktion
+- Backend: `POST /api/reservations/:id/report` (protected, Zod-validated)
+- Reasons: booking_not_found, wrong_details, restaurant_denied, fraud
+- Duplicate prevention, activity alerts on report
+- Mobile: Report modal on restaurant detail screen (Flag icon, only for claimer on completed reservations)
+
+### 2. Rating på användare (Feedback)
+- Backend: `POST /api/reservations/:id/feedback` (protected, Zod-validated)
+- Trust score aggregation on submitter profile (weighted average, clamped 1.0-5.0)
+- Mobile: "Fungerade bokningen?" prompt on completed claimed reservations in Bokningar tab
+- Ja/Nej + optional comment, success confirmation
+
+### 3. Kartvy
+- Map screen already existed (`/map`)
+- Added MapPin button in home screen header (between credits pill and search toggle)
+- Navigates to `/map` with haptic feedback
+
+### 4. Sökning förbättrad
+- Cuisine filter chips below neighborhood filters on home screen
+- Extracts unique cuisines from reservations, horizontal scrollable chips
+- "Populärt just nu" section: top 5 restaurants by timesBookedOnReslot
+- Horizontal card carousel with image, name, rating, booking count badge
+
+### Verification
+- Backend TypeScript: 0 errors
+- Mobile TypeScript: 0 errors
+- 5 files changed, 983 insertions

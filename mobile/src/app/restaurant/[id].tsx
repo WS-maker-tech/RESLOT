@@ -9,6 +9,8 @@ import {
   ActivityIndicator,
   Dimensions,
   StyleSheet,
+  Modal,
+  TextInput,
 } from "react-native";
 import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -30,6 +32,9 @@ import {
   CreditCard,
   Undo2,
   Timer,
+  Flag,
+  X,
+  AlertTriangle,
 } from "lucide-react-native";
 import Animated, {
   FadeInDown,
@@ -52,6 +57,7 @@ import {
   useClaimReservation,
   useCancelClaim,
   useProfile,
+  useReportReservation,
 } from "@/lib/api/hooks";
 import { useAuthStore } from "@/lib/auth-store";
 import { parseTagsWithCount, parseTags } from "@/lib/api/types";
@@ -645,6 +651,13 @@ export default function RestaurantDetailScreen() {
   const [showGracePeriod, setShowGracePeriod] = useState(false);
   const [showSuccessAnim, setShowSuccessAnim] = useState(false);
 
+  // Report modal state
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState<string | null>(null);
+  const [reportDetails, setReportDetails] = useState("");
+  const [reportSuccess, setReportSuccess] = useState(false);
+  const reportMutation = useReportReservation();
+
   const scaleBtn = useSharedValue(1);
   const scrollY = useSharedValue(0);
   const shakeX = useSharedValue(0);
@@ -810,6 +823,50 @@ export default function RestaurantDetailScreen() {
       Share.share({ message: shareMessage }).catch(() => {});
     }
   }, [reservation]);
+
+  const isClaimerAndCompleted = useMemo(() => {
+    if (!reservation || !phone) return false;
+    return reservation.claimerPhone === phone && reservation.status === "completed";
+  }, [reservation, phone]);
+
+  const handleOpenReport = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setShowReportModal(true);
+    setReportReason(null);
+    setReportDetails("");
+    setReportSuccess(false);
+  }, []);
+
+  const handleSubmitReport = useCallback(async () => {
+    if (!reservation || !reportReason) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    try {
+      await reportMutation.mutateAsync({
+        reservationId: reservation.id,
+        reason: reportReason,
+        details: reportDetails.trim() || undefined,
+      });
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setReportSuccess(true);
+      setTimeout(() => {
+        setShowReportModal(false);
+        setReportSuccess(false);
+      }, 2000);
+    } catch {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    }
+  }, [reservation, reportReason, reportDetails, reportMutation]);
+
+  const handleCloseReport = useCallback(() => {
+    setShowReportModal(false);
+  }, []);
+
+  const REPORT_REASONS = [
+    { key: "booking_not_found", label: "Bokningen finns inte" },
+    { key: "wrong_details", label: "Fel detaljer" },
+    { key: "restaurant_denied", label: "Restaurangen nekade" },
+    { key: "fraud", label: "Bedrägeri" },
+  ] as const;
 
   // --- Loading state (skeleton) ---
   if (isLoading) {
@@ -1622,7 +1679,237 @@ export default function RestaurantDetailScreen() {
             </View>
           </Animated.View>
         ) : null}
+
+        {/* Report button — only for claimer on completed reservations */}
+        {isClaimerAndCompleted ? (
+          <Animated.View
+            entering={FadeInDown.delay(400).springify()}
+            style={{ paddingHorizontal: SPACING.lg, paddingTop: 20, paddingBottom: 8, alignItems: "center" }}
+          >
+            <Pressable
+              testID="report-problem-button"
+              accessibilityLabel="Rapportera problem med bokningen"
+              onPress={handleOpenReport}
+              style={({ pressed }) => ({
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 6,
+                paddingVertical: 12,
+                paddingHorizontal: 16,
+                minHeight: 44,
+                opacity: pressed ? 0.5 : 1,
+              })}
+            >
+              <Flag size={15} color={C.textTertiary} strokeWidth={2} />
+              <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.textTertiary }}>
+                Rapportera problem
+              </Text>
+            </Pressable>
+          </Animated.View>
+        ) : null}
       </Animated.ScrollView>
+
+      {/* Report Modal */}
+      <Modal
+        visible={showReportModal}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={handleCloseReport}
+      >
+        <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
+          {/* Modal header */}
+          <View style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            paddingHorizontal: SPACING.lg,
+            paddingVertical: 14,
+            borderBottomWidth: 0.5,
+            borderBottomColor: C.divider,
+          }}>
+            <Text style={{ fontFamily: FONTS.displayBold, fontSize: 18, color: C.textPrimary, letterSpacing: -0.3 }}>
+              Rapportera problem
+            </Text>
+            <Pressable
+              testID="report-modal-close"
+              accessibilityLabel="Stäng"
+              onPress={handleCloseReport}
+              style={({ pressed }) => ({
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                backgroundColor: "rgba(0,0,0,0.04)",
+                alignItems: "center",
+                justifyContent: "center",
+                transform: [{ scale: pressed ? 0.93 : 1 }],
+              })}
+            >
+              <X size={20} color={C.textSecondary} strokeWidth={2} />
+            </Pressable>
+          </View>
+
+          {reportSuccess ? (
+            <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 32 }}>
+              <View style={{
+                width: 72,
+                height: 72,
+                borderRadius: 36,
+                backgroundColor: C.coralLight,
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: 16,
+              }}>
+                <Check size={36} color={C.coral} strokeWidth={2.5} />
+              </View>
+              <Text style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: C.textPrimary, textAlign: "center", letterSpacing: -0.4 }}>
+                Tack för din rapport
+              </Text>
+              <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textTertiary, marginTop: 8, textAlign: "center", lineHeight: 20 }}>
+                Vi granskar ärendet och återkommer vid behov.
+              </Text>
+            </View>
+          ) : (
+            <View style={{ flex: 1, paddingHorizontal: SPACING.lg, paddingTop: 20 }}>
+              {/* Reason selection */}
+              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.textSecondary, marginBottom: 12 }}>
+                Vad gick fel?
+              </Text>
+              {REPORT_REASONS.map((r) => (
+                <Pressable
+                  key={r.key}
+                  testID={`report-reason-${r.key}`}
+                  accessibilityLabel={r.label}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setReportReason(r.key);
+                  }}
+                  style={({ pressed }) => ({
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 12,
+                    backgroundColor: reportReason === r.key ? C.coralLight : C.bgCard,
+                    borderRadius: RADIUS.md,
+                    paddingVertical: 16,
+                    paddingHorizontal: 16,
+                    marginBottom: 8,
+                    borderWidth: 1.5,
+                    borderColor: reportReason === r.key ? C.coral : C.borderLight,
+                    minHeight: 44,
+                    transform: [{ scale: pressed ? 0.98 : 1 }],
+                  })}
+                >
+                  <AlertTriangle
+                    size={18}
+                    color={reportReason === r.key ? C.coral : C.textTertiary}
+                    strokeWidth={2}
+                  />
+                  <Text style={{
+                    fontFamily: reportReason === r.key ? FONTS.semiBold : FONTS.medium,
+                    fontSize: 15,
+                    color: reportReason === r.key ? C.textPrimary : C.textSecondary,
+                    flex: 1,
+                  }}>
+                    {r.label}
+                  </Text>
+                  {reportReason === r.key ? (
+                    <View style={{
+                      width: 22,
+                      height: 22,
+                      borderRadius: 11,
+                      backgroundColor: C.coral,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}>
+                      <Check size={13} color="#FFFFFF" strokeWidth={3} />
+                    </View>
+                  ) : null}
+                </Pressable>
+              ))}
+
+              {/* Details input — shows after selecting reason */}
+              {reportReason ? (
+                <View style={{ marginTop: 16 }}>
+                  <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.textSecondary, marginBottom: 8 }}>
+                    Beskriv problemet (valfritt)
+                  </Text>
+                  <TextInput
+                    testID="report-details-input"
+                    value={reportDetails}
+                    onChangeText={setReportDetails}
+                    placeholder="T.ex. restaurangen sa att bokningen inte fanns..."
+                    placeholderTextColor={C.textTertiary}
+                    multiline
+                    numberOfLines={4}
+                    textAlignVertical="top"
+                    style={{
+                      backgroundColor: C.bgInput,
+                      borderRadius: RADIUS.md,
+                      padding: 14,
+                      fontFamily: FONTS.regular,
+                      fontSize: 14,
+                      color: C.textPrimary,
+                      minHeight: 100,
+                      lineHeight: 20,
+                    }}
+                  />
+
+                  {/* Submit button */}
+                  <Pressable
+                    testID="report-submit-button"
+                    accessibilityLabel="Skicka rapport"
+                    onPress={handleSubmitReport}
+                    disabled={reportMutation.isPending}
+                    style={({ pressed }) => ({
+                      backgroundColor: C.coral,
+                      borderRadius: RADIUS.lg,
+                      paddingVertical: 16,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      marginTop: 20,
+                      minHeight: 52,
+                      opacity: reportMutation.isPending ? 0.7 : 1,
+                      transform: [{ scale: pressed ? 0.97 : 1 }],
+                      shadowColor: C.coral,
+                      shadowOffset: { width: 0, height: 6 },
+                      shadowOpacity: 0.25,
+                      shadowRadius: 14,
+                      elevation: 6,
+                    })}
+                  >
+                    {reportMutation.isPending ? (
+                      <ActivityIndicator size="small" color={C.dark} />
+                    ) : (
+                      <Text style={{ fontFamily: FONTS.bold, fontSize: 16, color: C.dark }}>
+                        Skicka rapport
+                      </Text>
+                    )}
+                  </Pressable>
+
+                  {/* Error message */}
+                  {reportMutation.isError ? (
+                    <View style={{
+                      backgroundColor: "rgba(239,68,68,0.06)",
+                      borderRadius: RADIUS.md,
+                      padding: 12,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 8,
+                      marginTop: 12,
+                      borderWidth: 1,
+                      borderColor: "rgba(239,68,68,0.12)",
+                    }}>
+                      <AlertCircle size={16} color={C.error} strokeWidth={2} />
+                      <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.error, flex: 1 }}>
+                        Något gick fel. Försök igen.
+                      </Text>
+                    </View>
+                  ) : null}
+                </View>
+              ) : null}
+            </View>
+          )}
+        </SafeAreaView>
+      </Modal>
 
       {/* Bottom CTA bar */}
       <Animated.View

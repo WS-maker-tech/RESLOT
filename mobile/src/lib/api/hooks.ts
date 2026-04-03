@@ -358,11 +358,36 @@ export function useSavePushToken() {
   });
 }
 
+// ─── Feedback ─────────────────────────────────────────
+export function useSubmitFeedback() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ reservationId, worked, comment }: { reservationId: string; worked: boolean; comment?: string }) =>
+      api.post<{ id: string; worked: boolean }>(`/api/reservations/${reservationId}/feedback`, { worked, comment }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["myReservations"] });
+    },
+  });
+}
+
 // ─── Support ─────────────────────────────────────────
 export function useSubmitSupportMessage() {
   return useMutation({
     mutationFn: (data: { message: string; phone?: string; email?: string }) =>
       api.post<{ success: boolean }>("/api/support", data),
+  });
+}
+
+// ─── Report Reservation ─────────────────────────────
+export function useReportReservation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ reservationId, reason, details }: { reservationId: string; reason: string; details?: string }) =>
+      api.post<{ id: string; reason: string; status: string }>(`/api/reservations/${reservationId}/report`, { reason, details }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["reservation"] });
+      qc.invalidateQueries({ queryKey: ["myReservations"] });
+    },
   });
 }
 

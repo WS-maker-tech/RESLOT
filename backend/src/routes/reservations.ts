@@ -927,4 +927,169 @@ reservationsRouter.post("/:id/resell", authMiddleware, async (c) => {
   return c.json({ data: newReservation }, 201);
 });
 
+// POST /api/reservations/:id/report - Report a problematic reservation (PROTECTED)
+reservationsRouter.post(
+  "/:id/report",
+  authMiddleware,
+  zValidator(
+    "json",
+    z.object({
+      reason: z.enum(["booking_not_found", "wrong_details", "restaurant_denied", "fraud"]),
+      details: z.string().max(500).optional(),
+    })
+  ),
+  async (c) => {
+    const id = c.req.param("id");
+    const reporterPhone = c.get("userPhone");
+    const { reason, details } = c.req.valid("json");
+
+    const reservation = await db.reservation.findUnique({
+      where: { id },
+      include: { restaurant: true },
+    });
+
+    if (!reservation) {
+      return c.json({ error: { message: "Reservation not found", code: "NOT_FOUND" } }, 404);
+    }
+
+    // Only the claimer of a completed/grace_period reservation can report
+    if (reservation.claimerPhone !== reporterPhone) {
+      return c.json(
+        { error: { message: "Bara den som tog över bokningen kan rapportera", code: "FORBIDDEN" } },
+        403
+      );
+    }
+
+    if (!["completed", "grace_period"].includes(reservation.status)) {
+      return c.json(
+        { error: { message: "Kan bara rapportera genomförda eller pågående bokningar", code: "INVALID_STATUS" } },
+        400
+      );
+    }
+
+    // Prevent duplicate reports from same user
+    const existingReport = await db.reservationReport.findFirst({
+      where: { reservationId: id, reporterPhone },
+    });
+
+    if (existingReport) {
+      return c.json(
+        { error: { message: "Du har redan rapporterat denna bokning", code: "DUPLICATE" } },
+        409
+      );
+    }
+
+    const report = await db.reservationReport.create({
+      data: {
+        reservationId: id,
+        reporterPhone,
+        reason,
+        details: details ?? null,
+      },
+    });
+
+    // Create activity alert confirming the report
+    await db.activityAlert.create({
+      data: {
+        userPhone: reporterPhone,
+        type: "claim",
+        title: "Rapport mottagen",
+        message: `Din rapport för bokningen på ${reservation.restaurant.name} har registrerats. Vi utreder ärendet.`,
+        restaurantId: reservation.restaurantId,
+      },
+    });
+
+    return c.json({ data: report }, 201);
+  }
+);
+
+// POST /api/reservations/:id/feedback - Give feedback on a reservation (PROTECTED)
+reservationsRouter.post(
+  "/:id/feedback",
+  authMiddleware,
+  zValidator(
+    "json",
+    z.object({
+      worked: z.boolean(),
+      comment: z.string().max(500).optional(),
+    })
+  ),
+  async (c) => {
+    const id = c.req.param("id");
+    const userPhone = c.get("userPhone");
+    const { worked, comment } = c.req.valid("json");
+
+    const reservation = await db.reservation.findUnique({
+      where: { id },
+      include: { restaurant: true },
+    });
+
+    if (!reservation) {
+      return c.json({ error: { message: "Reservation not found", code: "NOT_FOUND" } }, 404);
+    }
+
+    // Only the claimer of a completed reservation can give feedback
+    if (reservation.claimerPhone !== userPhone) {
+      return c.json(
+        { error: { message: "Bara den som tog över bokningen kan ge feedback", code: "FORBIDDEN" } },
+        403
+      );
+    }
+
+    if (reservation.status !== "completed") {
+      return c.json(
+        { error: { message: "Kan bara ge feedback på genomförda bokningar", code: "INVALID_STATUS" } },
+        400
+      );
+    }
+
+    // Prevent duplicate feedback (reservationId is @unique)
+    const existingFeedback = await db.reservationFeedback.findUnique({
+      where: { reservationId: id },
+    });
+
+    if (existingFeedback) {
+      return c.json(
+        { error: { message: "Feedback har redan lämnats för denna bokning", code: "DUPLICATE" } },
+        409
+      );
+    }
+
+    // Create feedback and update submitter trust score in a transaction
+    const feedback = await db.$transaction(async (tx) => {
+      const created = await tx.reservationFeedback.create({
+        data: {
+          reservationId: id,
+          userPhone,
+          worked,
+          comment: comment ?? null,
+        },
+      });
+
+      // Update the SUBMITTER's trust score
+      const submitter = await tx.userProfile.findUnique({
+        where: { phone: reservation.submitterPhone },
+      });
+
+      if (submitter) {
+        const ratingValue = worked ? 5 : 1;
+        const newTrustScore = (submitter.trustScore * submitter.totalFeedbacks + ratingValue) / (submitter.totalFeedbacks + 1);
+        const clampedScore = Math.min(5.0, Math.max(1.0, newTrustScore));
+
+        await tx.userProfile.update({
+          where: { phone: reservation.submitterPhone },
+          data: {
+            trustScore: clampedScore,
+            totalFeedbacks: { increment: 1 },
+          },
+        });
+      }
+
+      return created;
+    });
+
+    return c.json({ data: feedback }, 201);
+  }
+);
+
 export { reservationsRouter };
