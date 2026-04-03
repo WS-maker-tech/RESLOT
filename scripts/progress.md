@@ -622,3 +622,68 @@ Fixade alla knappar med vit text på pistachio (#7EC87A) bakgrund:
 - Dev server (localhost:8081) — 200 OK
 
 DONE_FINAL_PASS
+
+---
+
+## DONE_UX_AUDIT — Senior UX/UI Audit (2026-04-03)
+
+Fullständig UX-audit av hela appen som senior UX-designer. Alla skärmar och komponenter granskade.
+
+### 1. MICRO-COPY: Svenska tecken (å, ä, ö) fixade i booking-confirmation.tsx
+- "Angerfrist" → "Ångerfrist"
+- "Bokningen ar din!" → "Bokningen är din!"
+- "Overtagandet ar bekraftat" → "Övertagandet är bekräftat"
+- "angra overtagandet" → "ångra övertagandet"
+- "Overtagandet har angrats" → "Övertagandet har ångrats"
+- "aterforts" → "återförts"
+- "Antal gaster" → "Antal gäster"
+- "gast/gaster" → "gäst/gäster"
+- "Bokningsbekraftelse" → "Bokningsbekräftelse"
+- "Angra overtagande" → "Ångra övertagande"
+- "folja" → "följa", "ihag" → "ihåg", "bekraftad" → "bekräftad"
+- "angerfristen" → "ångerfristen", "aterfors" → "återförs"
+- DAYS_SV: "Sondag" → "Söndag", "Mandag" → "Måndag", "Lordag" → "Lördag"
+
+### 2. MICRO-COPY: accessibilityLabel-fixar
+- "Ga tillbaka" → "Gå tillbaka" (booking-confirmation.tsx, alla förekomster)
+- "Ta bort fran sparade" → "Ta bort från sparade" (RestaurantCard.tsx)
+
+### 3. NAVIGATIONSFLÖDE: Fel navigation i alerts.tsx
+- `handleRestaurantAlertPress` navigerade till "/" (hemskärmen) istället för restaurangdetalj
+- Fixat: navigerar nu korrekt till `/restaurant/${restaurantId}`
+
+### 4. TILLGÄNGLIGHET: Touch targets för små
+- DayPicker kalenderknapp: 30x30px → 44x44px (iOS minimum 44px)
+- Restaurant-detalj back/share-knappar: 38x38px → 44x44px
+- Map-skärm: lade till saknad accessibilityLabel="Gå tillbaka" på back-knappen
+
+### 5. TILLGÄNGLIGHET: Kontrastproblem — tab badge
+- Tab bar badge hade mörk text (#111827) på grön bakgrund (#7EC87A)
+- Fixat: vit text (#FFFFFF) på grön bakgrund — bättre WCAG kontrast
+
+### 6. NAVIGATIONSFLÖDE: SafeArea-fixar
+- Credits-skärmen saknade `top` i SafeAreaView edges — innehåll kunde döljas under statusbar
+- FAQ-skärmen samma problem
+- Fixat: lagt till `edges={["top", "bottom"]}` på båda
+
+### 7. INFORMATIONSHIERARKI: Empty state copy-fix
+- Reservations empty state sa "tjäna 2 credits" — inkonsekvent med spec
+- Fixat: "Dela din bokning och tjäna credits" (utan specifikt antal)
+
+### Skärmar granskade (alla godkända efter fix):
+- Onboarding (splash, phone, OTP, register, city, credits_intro, welcome)
+- Hem/index (header, search, DayPicker, FilterChips, RestaurantCard, MissedBookings)
+- Restaurangdetalj (HeroSection, BookingDetails, RestaurantInfo, ClaimSection, overlays)
+- Bokningar/reservations (ReservationCard, empty states, cancel flow)
+- Lägg upp/submit (6-steg wizard, validering, confirmation)
+- Bevakningar/alerts (activity tab, watches tab, add alert modal, add-watch screen)
+- Profil (credits card, trust card, menu items, logout)
+- Credits (balance card, buy buttons, history, Stripe checkout)
+- FAQ (accordion, kontakta support CTA)
+- Betalningar/payment (kort status, Stripe setup, no-show info)
+- Bjud in/invite (referral code, copy/share)
+- Support (FAQ, vanliga problem, feedback form, email)
+- Kontoinställningar (edit fields, verified badges, delete account)
+- Bokningsbekräftelse (countdown timer, grace period, cancel claim)
+- Kartvy/map (placeholder)
+- LoginGate, _layout.tsx (tab bar, splash, navigation stack)

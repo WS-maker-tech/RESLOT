@@ -15,6 +15,12 @@ const envSchema = z.object({
   // Stripe (optional - payments)
   STRIPE_SECRET_KEY: z.string().optional(),
   STRIPE_WEBHOOK_SECRET: z.string().optional(),
+  // Google Places API
+  GOOGLE_PLACES_API_KEY: z.string().optional(),
+  // Supabase
+  SUPABASE_URL: z.string().optional(),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
+  SUPABASE_ANON_KEY: z.string().optional(),
 });
 
 /**

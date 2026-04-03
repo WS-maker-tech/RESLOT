@@ -491,7 +491,7 @@ export default function ReservationsScreen() {
                     <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.textPrimary, textAlign: "center" }}>Inga upplagda bokningar</Text>
                   </Animated.View>
                   <Animated.View entering={FadeInDown.delay(280).springify()}>
-                    <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textTertiary, marginTop: 4, textAlign: "center", lineHeight: 20 }}>Dela din bokning och tjäna 2 credits</Text>
+                    <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textTertiary, marginTop: 4, textAlign: "center", lineHeight: 20 }}>Dela din bokning och tjäna credits</Text>
                   </Animated.View>
                 </Animated.View>
               ) : submittedReservations.map((reservation: Reservation, index: number) => (

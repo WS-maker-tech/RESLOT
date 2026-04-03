@@ -31,6 +31,7 @@ model Restaurant {
   longitude          Float?
   isExclusive        Boolean  @default(false)
   city               String   @default("Stockholm")
+  googlePlaceId      String?  @unique  // Link to Google Places API
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
@@ -74,6 +75,8 @@ model Reservation {
   updatedAt                DateTime @updatedAt
 
   noShowReports            NoShowReport[]
+  reports                  ReservationReport[]
+  feedback                 ReservationFeedback?
 
   @@index([status])
   @@index([submitterPhone])
@@ -99,6 +102,8 @@ model UserProfile {
   referralUsed      String?
   stripeCustomerId  String?  @unique
   pushToken         String?
+  trustScore        Float    @default(5.0)   // Aggregated trust score (1-5)
+  totalFeedbacks    Int      @default(0)     // Total number of feedbacks received
   isDeleted         Boolean  @default(false)
   deletedAt         DateTime?
   createdAt         DateTime @default(now())
@@ -201,4 +206,62 @@ model EmailVerification {
 
   @@index([phone, used])
   @@index([email, used])
+}
+
+// --- Google Places cache ---
+model RestaurantCache {
+  placeId       String   @id            // Google Place ID
+  name          String
+  address       String
+  city          String
+  neighborhood  String?
+  latitude      Float?
+  longitude     Float?
+  rating        Float?
+  reviewCount   Int?
+  priceLevel    Int?
+  cuisine       String?
+  imageUrl      String?
+  website       String?
+  instagram     String?
+  phone         String?
+  openingHours  String?  // JSON string
+  tags          String?  // JSON string
+  rawGoogleData String?  // Full Google Places response (JSON)
+  cachedAt      DateTime @default(now())
+  expiresAt     DateTime
+
+  @@index([city])
+  @@index([name])
+  @@index([expiresAt])
+}
+
+// --- Reservation reports ---
+model ReservationReport {
+  id            String   @id @default(cuid())
+  reservationId String
+  reservation   Reservation @relation(fields: [reservationId], references: [id])
+  reporterPhone String
+  reason        String   // booking_not_found, wrong_details, restaurant_denied, fraud
+  details       String?
+  status        String   @default("pending") // pending, reviewed, resolved
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([reservationId])
+  @@index([reporterPhone])
+}
+
+// --- Reservation feedback (post-booking) ---
+model ReservationFeedback {
+  id            String   @id @default(cuid())
+  reservationId String   @unique          // One feedback per reservation
+  reservation   Reservation @relation(fields: [reservationId], references: [id])
+  userPhone     String                    // The claimer giving feedback
+  worked        Boolean                   // Did the booking work? (Ja/Nej)
+  comment       String?                   // Optional free text
+  createdAt     DateTime @default(now())
+
+  @@index([userPhone])
+  @@index([reservationId])
 }

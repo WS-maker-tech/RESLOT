@@ -933,9 +933,9 @@ export default function RestaurantDetailScreen() {
               accessibilityLabel="Gå tillbaka"
               onPress={handleGoBack}
               style={({ pressed }) => ({
-                width: 38,
-                height: 38,
-                borderRadius: 19,
+                width: 44,
+                height: 44,
+                borderRadius: 22,
                 backgroundColor: "rgba(255,255,255,0.9)",
                 alignItems: "center",
                 justifyContent: "center",
@@ -951,9 +951,9 @@ export default function RestaurantDetailScreen() {
               accessibilityLabel="Dela bokning"
               onPress={handleShare}
               style={({ pressed }) => ({
-                width: 38,
-                height: 38,
-                borderRadius: 19,
+                width: 44,
+                height: 44,
+                borderRadius: 22,
                 backgroundColor: "rgba(255,255,255,0.9)",
                 alignItems: "center",
                 justifyContent: "center",

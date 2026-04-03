@@ -183,7 +183,7 @@ function FaqItem({ question, answer, delay }: { question: string; answer: string
 export default function FaqScreen() {
   const router = useRouter();
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }} edges={["bottom"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }} edges={["top", "bottom"]}>
       <ScrollView
         contentContainerStyle={{ paddingBottom: 48 }}
         showsVerticalScrollIndicator={false}

@@ -155,9 +155,9 @@ const styles = StyleSheet.create({
   calendarButton: {
     marginRight: 16,
     marginLeft: 4,
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: C.bgCard,
     borderWidth: 1,
     borderColor: C.borderLight,

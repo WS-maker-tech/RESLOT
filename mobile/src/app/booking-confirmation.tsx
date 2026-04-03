@@ -44,7 +44,7 @@ const MONTHS_SV = [
   "januari", "februari", "mars", "april", "maj", "juni",
   "juli", "augusti", "september", "oktober", "november", "december",
 ];
-const DAYS_SV = ["Sondag", "Mandag", "Tisdag", "Onsdag", "Torsdag", "Fredag", "Lordag"];
+const DAYS_SV = ["Söndag", "Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag", "Lördag"];
 
 function formatDate(dateStr: string): string {
   try {
@@ -133,7 +133,7 @@ function CountdownTimer({
             textTransform: "uppercase",
           }}
         >
-          Angerfrist
+          Ångerfrist
         </Text>
         <Text
           testID="countdown-value"
@@ -177,7 +177,7 @@ function CountdownTimer({
             lineHeight: 19,
           }}
         >
-          Du kan angra overtagandet utan kostnad under angerfristen.
+          Du kan ångra övertagandet utan kostnad under ångerfristen.
         </Text>
       </View>
     </Animated.View>
@@ -231,7 +231,7 @@ function CelebrationView() {
           letterSpacing: -0.4,
         }}
       >
-        Bokningen ar din!
+        Bokningen är din!
       </Text>
       <Text
         style={{
@@ -243,7 +243,7 @@ function CelebrationView() {
           lineHeight: 21,
         }}
       >
-        Overtagandet ar bekraftat. Kom ihag att dyka upp i tid!
+        Övertagandet är bekräftat. Kom ihåg att dyka upp i tid!
       </Text>
     </Animated.View>
   );
@@ -324,7 +324,7 @@ export default function BookingConfirmationScreen() {
           <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 }}>
             <Pressable
               testID="back-button"
-              accessibilityLabel="Ga tillbaka"
+              accessibilityLabel="Gå tillbaka"
               onPress={handleGoBack}
               style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: "rgba(0,0,0,0.04)", alignItems: "center", justifyContent: "center", marginRight: 12 }}
             >
@@ -350,14 +350,14 @@ export default function BookingConfirmationScreen() {
         <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 }}>
           <Pressable
             testID="back-button"
-            accessibilityLabel="Ga tillbaka"
+            accessibilityLabel="Gå tillbaka"
             onPress={handleGoBack}
             style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: "rgba(0,0,0,0.04)", alignItems: "center", justifyContent: "center", marginRight: 12 }}
           >
             <ChevronLeft size={20} color={C.textSecondary} strokeWidth={2} />
           </Pressable>
           <Text style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: C.textPrimary, letterSpacing: -0.4 }}>
-            Bokningsbekraftelse
+            Bokningsbekräftelse
           </Text>
         </View>
       </SafeAreaView>
@@ -373,10 +373,10 @@ export default function BookingConfirmationScreen() {
             <View style={{ alignItems: "center", padding: SPACING.lg }}>
               <CheckCircle size={40} color={C.success} strokeWidth={ICON.strokeWidth} />
               <Text style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: C.success, marginTop: 12 }}>
-                Overtagandet har angrats
+                Övertagandet har ångrats
               </Text>
               <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary, marginTop: 8, textAlign: "center" }}>
-                Dina credits har aterforts.
+                Dina credits har återförts.
               </Text>
             </View>
           ) : null}
@@ -450,9 +450,9 @@ export default function BookingConfirmationScreen() {
                       <Users size={18} color={C.coral} strokeWidth={2} />
                     </View>
                     <View>
-                      <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary }}>Antal gaster</Text>
+                      <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary }}>Antal gäster</Text>
                       <Text testID="booking-party-size" style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.textPrimary }}>
-                        {reservation.partySize} {reservation.partySize === 1 ? "gast" : "gaster"}
+                        {reservation.partySize} {reservation.partySize === 1 ? "gäst" : "gäster"}
                       </Text>
                     </View>
                   </View>
@@ -489,7 +489,7 @@ export default function BookingConfirmationScreen() {
               <Animated.View entering={FadeInDown.delay(200).springify()} style={{ marginTop: SPACING.lg }}>
                 <Pressable
                   testID="cancel-claim-button"
-                  accessibilityLabel="Angra overtagande"
+                  accessibilityLabel="Ångra övertagande"
                   onPress={handleCancelClaim}
                   disabled={cancelClaimMutation.isPending}
                   style={{
@@ -511,7 +511,7 @@ export default function BookingConfirmationScreen() {
                     <>
                       <Undo2 size={18} color={C.error} strokeWidth={2} />
                       <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.error }}>
-                        Angra overtagande
+                        Ångra övertagande
                       </Text>
                     </>
                   )}
@@ -534,8 +534,8 @@ export default function BookingConfirmationScreen() {
                 <AlertCircle size={16} color={C.coral} strokeWidth={2} style={{ marginTop: 2 }} />
                 <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textSecondary, lineHeight: 20, flex: 1 }}>
                   {graceExpired
-                    ? "Bokningen ar bekraftad. Kom ihag att folja restaurangens avbokningsvillkor om du inte kan komma."
-                    : "Under angerfristen kan du angra overtagandet helt kostnadsfritt. Dina credits och serviceavgiften aterfors."}
+                    ? "Bokningen är bekräftad. Kom ihåg att följa restaurangens avbokningsvillkor om du inte kan komma."
+                    : "Under ångerfristen kan du ångra övertagandet helt kostnadsfritt. Dina credits och serviceavgiften återförs."}
                 </Text>
               </View>
             </Animated.View>

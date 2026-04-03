@@ -257,7 +257,7 @@ export const RestaurantCard = React.memo(function RestaurantCard({
               {!isGuest && phone ? (
                 <Pressable
                   testID={`save-restaurant-${restaurant.id}`}
-                  accessibilityLabel={isSaved ? "Ta bort fran sparade" : "Spara restaurang"}
+                  accessibilityLabel={isSaved ? "Ta bort från sparade" : "Spara restaurang"}
                   onPress={handleToggleSave}
                   style={styles.saveButton}
                   hitSlop={8}

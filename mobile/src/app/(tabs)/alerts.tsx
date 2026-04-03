@@ -361,7 +361,7 @@ export default function AlertsScreen() {
 
   const handleRestaurantAlertPress = (restaurantId: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.push("/");
+    router.push(`/restaurant/${restaurantId}` as any);
   };
 
   return (
