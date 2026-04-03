@@ -25,6 +25,10 @@ import {
   AlertCircle,
   HelpCircle,
   Eye,
+  TrendingUp,
+  Flame,
+  Sparkles,
+  Star,
 } from "lucide-react-native";
 import Animated, {
   FadeInDown,
@@ -43,10 +47,10 @@ import Animated, {
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import * as Haptics from "expo-haptics";
 import { useQuery } from "@tanstack/react-query";
-import { useReservations, useProfile, useMissedReservations } from "@/lib/api/hooks";
+import { useReservations, useProfile, useMissedReservations, useNewOnReslot } from "@/lib/api/hooks";
 import { api } from "@/lib/api/api";
 import { useAuthStore } from "@/lib/auth-store";
-import type { Reservation, MissedReservation } from "@/lib/api/types";
+import type { Reservation, MissedReservation, Restaurant } from "@/lib/api/types";
 import { C, FONTS, SPACING, RADIUS, ICON } from "../../lib/theme";
 import { RestaurantCard } from "@/components/RestaurantCard";
 import { FilterChips } from "@/components/FilterChips";
@@ -338,7 +342,7 @@ const Header = React.memo(function Header({
 
 // DayPicker and FilterChips are now in extracted components
 
-// --- Missed Booking Card ---
+// --- Missed Booking Card (Premium) ---
 const MissedBookingCard = React.memo(function MissedBookingCard({
   item,
   index,
@@ -354,7 +358,7 @@ const MissedBookingCard = React.memo(function MissedBookingCard({
   }));
 
   const handlePressIn = useCallback(() => {
-    scale.value = withSpring(0.95, { damping: 15, stiffness: 300 });
+    scale.value = withSpring(0.97, { damping: 15, stiffness: 300 });
   }, [scale]);
 
   const handlePressOut = useCallback(() => {
@@ -376,7 +380,7 @@ const MissedBookingCard = React.memo(function MissedBookingCard({
 
   return (
     <Animated.View
-      entering={FadeInDown.delay(index * 60).springify()}
+      entering={FadeInDown.delay(index * 70).springify()}
     >
       <Pressable
         testID={`missed-card-${index}`}
@@ -392,20 +396,16 @@ const MissedBookingCard = React.memo(function MissedBookingCard({
           style={[
             animStyle,
             {
-              width: 200,
+              width: 220,
               marginRight: 12,
               borderRadius: RADIUS.lg,
               backgroundColor: C.bgCard,
-              borderWidth: 0.5,
-              borderColor: C.borderLight,
               overflow: "hidden",
-              ...({
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.05,
-                shadowRadius: 8,
-                elevation: 2,
-              }),
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.08,
+              shadowRadius: 12,
+              elevation: 3,
             },
           ]}
         >
@@ -414,14 +414,14 @@ const MissedBookingCard = React.memo(function MissedBookingCard({
             <Image
               source={{ uri: restaurant.image }}
               style={{
-                width: 200,
-                height: 110,
+                width: 220,
+                height: 130,
                 backgroundColor: C.bgInput,
               }}
               contentFit="cover"
               cachePolicy="memory-disk"
             />
-            {/* Dark overlay for "missed" feel */}
+            {/* Gradient-like dark overlay */}
             <View
               style={{
                 position: "absolute",
@@ -429,72 +429,95 @@ const MissedBookingCard = React.memo(function MissedBookingCard({
                 left: 0,
                 right: 0,
                 bottom: 0,
-                backgroundColor: "rgba(0,0,0,0.35)",
+                backgroundColor: "rgba(0,0,0,0.30)",
               }}
             />
-            {/* "Tagen" badge */}
+            {/* "Tagen" badge — top left, bold red */}
             <View
               style={{
                 position: "absolute",
-                top: 8,
-                left: 8,
-                backgroundColor: C.coral,
+                top: 10,
+                left: 10,
+                backgroundColor: "#EF4444",
                 borderRadius: 6,
                 paddingHorizontal: 8,
-                paddingVertical: 3,
+                paddingVertical: 4,
                 flexDirection: "row",
                 alignItems: "center",
                 gap: 4,
               }}
             >
+              <Flame size={10} color="#FFFFFF" fill="#FFFFFF" strokeWidth={0} />
               <Text
                 style={{
-                  fontFamily: FONTS.semiBold,
+                  fontFamily: FONTS.bold,
                   fontSize: 10,
-                  color: "#111827",
+                  color: "#FFFFFF",
                   textTransform: "uppercase",
-                  letterSpacing: 0.6,
+                  letterSpacing: 0.8,
                 }}
               >
                 Tagen
               </Text>
             </View>
-            {/* Time-to-claim badge */}
+            {/* Time-to-claim badge — bottom left, speed indicator */}
             {item.timeToClaim !== null && item.timeToClaim > 0 ? (
               <View
                 style={{
                   position: "absolute",
-                  bottom: 8,
-                  right: 8,
-                  backgroundColor: "rgba(0,0,0,0.6)",
-                  borderRadius: 6,
-                  paddingHorizontal: 7,
-                  paddingVertical: 3,
+                  bottom: 10,
+                  left: 10,
+                  backgroundColor: "rgba(0,0,0,0.65)",
+                  borderRadius: 20,
+                  paddingHorizontal: 8,
+                  paddingVertical: 4,
                   flexDirection: "row",
                   alignItems: "center",
-                  gap: 3,
+                  gap: 4,
                 }}
               >
-                <Clock size={10} color="#FFFFFF" strokeWidth={2} />
+                <Clock size={10} color="#FFFFFF" strokeWidth={2.5} />
                 <Text
                   style={{
-                    fontFamily: FONTS.semiBold,
+                    fontFamily: FONTS.bold,
                     fontSize: 10,
                     color: "#FFFFFF",
+                    letterSpacing: -0.1,
                   }}
                 >
                   Gick på {item.timeToClaim} min
                 </Text>
               </View>
             ) : null}
+            {/* Restaurant name on image — bottom right */}
+            <View
+              style={{
+                position: "absolute",
+                bottom: 10,
+                right: 10,
+              }}
+            >
+              {item.claimedAt ? (
+                <Text
+                  style={{
+                    fontFamily: FONTS.semiBold,
+                    fontSize: 10,
+                    color: "rgba(255,255,255,0.8)",
+                    textAlign: "right",
+                  }}
+                >
+                  {formatTimeAgo(item.claimedAt)}
+                </Text>
+              ) : null}
+            </View>
           </View>
 
           {/* Content */}
-          <View style={{ padding: 12 }}>
+          <View style={{ padding: 12, gap: 2 }}>
             <Text
               style={{
-                fontFamily: FONTS.bold,
-                fontSize: 14,
+                fontFamily: FONTS.displaySemiBold,
+                fontSize: 15,
                 color: C.dark,
                 letterSpacing: -0.3,
               }}
@@ -502,52 +525,54 @@ const MissedBookingCard = React.memo(function MissedBookingCard({
             >
               {restaurant.name}
             </Text>
-            <Text
-              style={{
-                fontFamily: FONTS.regular,
-                fontSize: 12,
-                color: C.textTertiary,
-                marginTop: 2,
-              }}
-              numberOfLines={1}
-            >
-              {item.partySize} gäster · {item.reservationTime?.slice(0, 5)}
-            </Text>
-            {item.claimedAt ? (
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginTop: 2 }}>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 3 }}>
+                <Clock size={11} color={C.textTertiary} strokeWidth={2} />
+                <Text
+                  style={{
+                    fontFamily: FONTS.medium,
+                    fontSize: 12,
+                    color: C.textSecondary,
+                  }}
+                >
+                  {item.reservationTime?.slice(0, 5)}
+                </Text>
+              </View>
+              <View style={{ width: 3, height: 3, borderRadius: 1.5, backgroundColor: C.borderLight }} />
               <Text
                 style={{
                   fontFamily: FONTS.medium,
-                  fontSize: 11,
-                  color: C.coral,
-                  marginTop: 4,
+                  fontSize: 12,
+                  color: C.textSecondary,
                 }}
               >
-                {formatTimeAgo(item.claimedAt)}
+                {item.partySize} gäster
               </Text>
-            ) : null}
+            </View>
 
-            {/* CTA: Bevaka */}
+            {/* CTA: Bevaka — full width, prominent */}
             <View
               style={{
-                marginTop: 8,
-                backgroundColor: C.coralLight,
-                borderRadius: 8,
-                paddingVertical: 6,
+                marginTop: 10,
+                backgroundColor: C.coral,
+                borderRadius: 10,
+                paddingVertical: 8,
                 alignItems: "center",
                 flexDirection: "row",
                 justifyContent: "center",
-                gap: 4,
+                gap: 5,
               }}
             >
-              <Eye size={12} color={C.coral} strokeWidth={2} />
+              <Eye size={13} color="#111827" strokeWidth={2.5} />
               <Text
                 style={{
-                  fontFamily: FONTS.semiBold,
-                  fontSize: 12,
-                  color: C.coral,
+                  fontFamily: FONTS.bold,
+                  fontSize: 12.5,
+                  color: "#111827",
+                  letterSpacing: -0.1,
                 }}
               >
-                Bevaka
+                Bevaka liknande
               </Text>
             </View>
           </View>
@@ -557,7 +582,7 @@ const MissedBookingCard = React.memo(function MissedBookingCard({
   );
 });
 
-// --- Missed Bookings Section ---
+// --- Missed Bookings Section (Premium) ---
 function MissedBookingsSection({ city }: { city: string }) {
   const router = useRouter();
   const { data: missed = [] } = useMissedReservations(city);
@@ -568,39 +593,54 @@ function MissedBookingsSection({ city }: { city: string }) {
     <Animated.View
       testID="missed-bookings-section"
       entering={FadeInDown.delay(50).springify()}
-      style={{ marginBottom: 4 }}
+      style={{ marginBottom: 8 }}
     >
+      {/* Section header with FOMO styling */}
       <View
         style={{
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
           paddingHorizontal: SPACING.lg,
-          marginBottom: 10,
-          marginTop: 4,
+          marginBottom: 12,
+          marginTop: 6,
         }}
       >
-        <View>
-          <Text
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+          <View
             style={{
-              fontFamily: FONTS.displayBold,
-              fontSize: 17,
-              color: C.dark,
-              letterSpacing: -0.4,
+              width: 28,
+              height: 28,
+              borderRadius: 8,
+              backgroundColor: "rgba(239,68,68,0.08)",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            Du missade
-          </Text>
-          <Text
-            style={{
-              fontFamily: FONTS.regular,
-              fontSize: 12,
-              color: C.textTertiary,
-              marginTop: 1,
-            }}
-          >
-            Nyligen tagna bokningar
-          </Text>
+            <Flame size={15} color="#EF4444" fill="#EF4444" strokeWidth={0} />
+          </View>
+          <View>
+            <Text
+              style={{
+                fontFamily: FONTS.displayBold,
+                fontSize: 17,
+                color: C.dark,
+                letterSpacing: -0.4,
+              }}
+            >
+              Du missade
+            </Text>
+            <Text
+              style={{
+                fontFamily: FONTS.regular,
+                fontSize: 12,
+                color: C.textTertiary,
+                marginTop: 0,
+              }}
+            >
+              {missed.length} bokningar tagna nyligen
+            </Text>
+          </View>
         </View>
         <Pressable
           testID="missed-see-watches"
@@ -610,17 +650,22 @@ function MissedBookingsSection({ city }: { city: string }) {
             router.push("/add-watch");
           }}
           style={{
-            backgroundColor: C.coralLight,
-            borderRadius: 8,
-            paddingHorizontal: 10,
-            paddingVertical: 5,
+            backgroundColor: C.coral,
+            borderRadius: 10,
+            paddingHorizontal: 12,
+            paddingVertical: 7,
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 4,
           }}
         >
+          <Eye size={12} color="#111827" strokeWidth={2.5} />
           <Text
             style={{
-              fontFamily: FONTS.semiBold,
+              fontFamily: FONTS.bold,
               fontSize: 12,
-              color: C.coral,
+              color: "#111827",
+              letterSpacing: -0.1,
             }}
           >
             Bevaka fler
@@ -633,7 +678,7 @@ function MissedBookingsSection({ city }: { city: string }) {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
           paddingHorizontal: SPACING.lg,
-          paddingBottom: 4,
+          paddingBottom: 6,
         }}
         style={{ flexGrow: 0 }}
       >
@@ -647,6 +692,131 @@ function MissedBookingsSection({ city }: { city: string }) {
               router.push(`/add-watch?restaurantId=${restaurantId}`);
             }}
           />
+        ))}
+      </ScrollView>
+    </Animated.View>
+  );
+}
+
+// --- New on Reslot Discovery Section ---
+function NewOnReslotSection() {
+  const router = useRouter();
+  const { data: newRestaurants = [] } = useNewOnReslot();
+
+  if (newRestaurants.length === 0) return null;
+
+  return (
+    <Animated.View
+      testID="new-on-reslot-section"
+      entering={FadeInDown.delay(80).springify()}
+      style={{ marginBottom: 8 }}
+    >
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          paddingHorizontal: SPACING.lg,
+          marginBottom: 12,
+          marginTop: 6,
+        }}
+      >
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+          <View
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: 8,
+              backgroundColor: "rgba(126,200,122,0.12)",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Sparkles size={15} color={C.success} strokeWidth={2} />
+          </View>
+          <View>
+            <Text
+              style={{
+                fontFamily: FONTS.displayBold,
+                fontSize: 17,
+                color: C.dark,
+                letterSpacing: -0.4,
+              }}
+            >
+              Nya på Reslot
+            </Text>
+            <Text
+              style={{
+                fontFamily: FONTS.regular,
+                fontSize: 12,
+                color: C.textTertiary,
+                marginTop: 0,
+              }}
+            >
+              Restauranger med sin första bokning
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ paddingHorizontal: SPACING.lg, paddingBottom: 6 }}
+        style={{ flexGrow: 0 }}
+      >
+        {newRestaurants.map((restaurant: Restaurant, index: number) => (
+          <Animated.View key={restaurant.id} entering={FadeInDown.delay(index * 70).springify()}>
+            <Pressable
+              testID={`new-restaurant-${index}`}
+              accessibilityLabel={`Visa ${restaurant.name}`}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.push(`/restaurant/${restaurant.id}`);
+              }}
+              style={{
+                width: 180,
+                marginRight: 12,
+                borderRadius: RADIUS.lg,
+                backgroundColor: C.bgCard,
+                overflow: "hidden",
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.08,
+                shadowRadius: 12,
+                elevation: 3,
+              }}
+            >
+              <Image
+                source={{ uri: restaurant.image }}
+                style={{ width: 180, height: 110, backgroundColor: C.bgInput }}
+                contentFit="cover"
+                cachePolicy="memory-disk"
+              />
+              <View style={{ position: "absolute", top: 8, left: 8, backgroundColor: "rgba(126,200,122,0.90)", borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, flexDirection: "row", alignItems: "center", gap: 4 }}>
+                <Sparkles size={10} color="#111827" strokeWidth={2.5} />
+                <Text style={{ fontFamily: FONTS.bold, fontSize: 10, color: "#111827", textTransform: "uppercase", letterSpacing: 0.8 }}>Ny</Text>
+              </View>
+              <View style={{ padding: 12, gap: 2 }}>
+                <Text
+                  style={{ fontFamily: FONTS.displaySemiBold, fontSize: 14, color: C.dark, letterSpacing: -0.3 }}
+                  numberOfLines={1}
+                >
+                  {restaurant.name}
+                </Text>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 4, marginTop: 2 }}>
+                  <Star size={11} color={C.gold} fill={C.gold} strokeWidth={0} />
+                  <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.textSecondary }}>
+                    {restaurant.rating.toFixed(1)}
+                  </Text>
+                  <View style={{ width: 3, height: 3, borderRadius: 1.5, backgroundColor: C.borderLight }} />
+                  <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.textSecondary }} numberOfLines={1}>
+                    {restaurant.cuisine}
+                  </Text>
+                </View>
+              </View>
+            </Pressable>
+          </Animated.View>
         ))}
       </ScrollView>
     </Animated.View>
@@ -923,35 +1093,71 @@ function CityPickerModal({
   );
 }
 
-// --- Count-up text for social proof ---
-function CountUpText({ value, suffix }: { value: number; suffix: string }) {
+// --- Count-up text for social proof (Premium) ---
+function CountUpText({ value, suffix, city }: { value: number; suffix: string; city: string }) {
   const [display, setDisplay] = React.useState(0);
   React.useEffect(() => {
     if (value <= 0) { setDisplay(0); return; }
     setDisplay(0);
-    const steps = 20;
+    const steps = 24;
     const timers: ReturnType<typeof setTimeout>[] = [];
     for (let i = 1; i <= steps; i++) {
       timers.push(setTimeout(() => {
         setDisplay(Math.round((i / steps) * value));
-      }, i * (600 / steps)));
+      }, i * (700 / steps)));
     }
     return () => timers.forEach(clearTimeout);
   }, [value]);
   return (
-    <Text
+    <View
       testID="social-proof-banner"
       style={{
-        fontFamily: FONTS.medium,
-        fontSize: 13,
-        color: C.textSecondary,
-        textAlign: "center",
-        paddingVertical: SPACING.sm,
-        paddingHorizontal: SPACING.lg,
+        marginHorizontal: SPACING.lg,
+        marginVertical: 6,
+        paddingVertical: 10,
+        paddingHorizontal: 16,
+        backgroundColor: "rgba(59,130,246,0.05)",
+        borderRadius: RADIUS.md,
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 10,
       }}
     >
-      {display} {suffix}
-    </Text>
+      <View
+        style={{
+          width: 32,
+          height: 32,
+          borderRadius: 10,
+          backgroundColor: "rgba(59,130,246,0.10)",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <TrendingUp size={16} color="#3B82F6" strokeWidth={2.5} />
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text
+          style={{
+            fontFamily: FONTS.bold,
+            fontSize: 15,
+            color: C.dark,
+            letterSpacing: -0.3,
+          }}
+        >
+          {display} bokningar
+        </Text>
+        <Text
+          style={{
+            fontFamily: FONTS.regular,
+            fontSize: 12,
+            color: C.textTertiary,
+            marginTop: 1,
+          }}
+        >
+          delade denna vecka i {city}
+        </Text>
+      </View>
+    </View>
   );
 }
 
@@ -1145,39 +1351,54 @@ export default function HomeScreen() {
                   justifyContent: "space-between",
                   marginHorizontal: SPACING.lg,
                   marginBottom: SPACING.sm,
-                  paddingVertical: 10,
+                  paddingVertical: 12,
                   paddingHorizontal: 14,
-                  backgroundColor: C.successBg,
+                  backgroundColor: "rgba(34,197,94,0.06)",
                   borderRadius: RADIUS.md,
+                  borderWidth: 1,
+                  borderColor: "rgba(34,197,94,0.12)",
                 }}
               >
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-                  <PulsingGreenDot size={10} />
-                  <Text
-                    style={{
-                      fontFamily: FONTS.semiBold,
-                      fontSize: 14,
-                      color: C.dark,
-                    }}
-                  >
-                    Nya bokningar idag
-                  </Text>
+                  <PulsingGreenDot size={9} />
+                  <View>
+                    <Text
+                      style={{
+                        fontFamily: FONTS.bold,
+                        fontSize: 14,
+                        color: C.dark,
+                        letterSpacing: -0.2,
+                      }}
+                    >
+                      Nya bokningar idag
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: FONTS.regular,
+                        fontSize: 11.5,
+                        color: C.textTertiary,
+                        marginTop: 1,
+                      }}
+                    >
+                      Uppdateras löpande
+                    </Text>
+                  </View>
                 </View>
                 <View
                   style={{
-                    backgroundColor: C.success,
+                    backgroundColor: "#16A34A",
                     borderRadius: 12,
-                    minWidth: 24,
-                    height: 24,
+                    minWidth: 28,
+                    height: 28,
                     alignItems: "center",
                     justifyContent: "center",
-                    paddingHorizontal: 8,
+                    paddingHorizontal: 10,
                   }}
                 >
                   <Text
                     style={{
                       fontFamily: FONTS.bold,
-                      fontSize: 12,
+                      fontSize: 13,
                       color: "#FFFFFF",
                     }}
                   >
@@ -1192,8 +1413,12 @@ export default function HomeScreen() {
               <CountUpText
                 value={stats?.weeklyReservations ?? 24}
                 suffix={`bokningar delade denna vecka i ${selectedCity}`}
+                city={selectedCity}
               />
             </Animated.View>
+
+            {/* Nya på Reslot — discovery section */}
+            <NewOnReslotSection />
 
             {/* Du missade — loss aversion section */}
             <MissedBookingsSection city={selectedCity} />

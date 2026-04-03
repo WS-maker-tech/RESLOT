@@ -91,6 +91,12 @@ export interface RestaurantAlertWithRestaurant {
   restaurant: Restaurant;
 }
 
+export interface WatchFilterOptions {
+  timeRange?: [string, string];
+  weekdays?: number[];
+  partySize?: number;
+}
+
 export interface Watch {
   id: string;
   userPhone: string;
@@ -98,8 +104,14 @@ export interface Watch {
   date: string | null;
   partySize: number | null;
   notes: string | null;
+  filterOptions: string | null;
   createdAt: string;
   restaurant: Restaurant | null;
+}
+
+export function parseWatchFilters(json: string | null): WatchFilterOptions | null {
+  if (!json) return null;
+  try { return JSON.parse(json); } catch { return null; }
 }
 
 export interface MissedReservation extends Reservation {

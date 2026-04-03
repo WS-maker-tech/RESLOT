@@ -239,3 +239,278 @@ Systematisk genomgång av hela kodbasen med TypeScript-verifiering, skärm-för-
 - ✅ reservations.tsx hanterar alla statusar med korrekt svenska
 
 DONE_FINAL_QUALITY
+
+---
+
+## DONE_HOME_FINAL — Home Screen & RestaurantRow Premium Polish (2026-04-03)
+
+Visuell uppgradering av hemskärmen med fokus på restaurangkort, Du missade-sektionen, social proof och urgency badges.
+
+### 1. RestaurantCard — Premium redesign
+- **Bildstorlek:** 84×84 → 100×100px med RADIUS.lg
+- **Layout:** Bild först (vänster), content höger — bättre visuell impact
+- **Social proof:** "X bevakar" badge som overlay på bilden (Eye-ikon, vit text, semi-transparent svart bakgrund)
+- **Save-knapp:** Halvtransparent svart bakgrund istället för vit
+- **Info-hierarki:** Namn → Betyg/Cuisine → Adress → Tid/Gäster chips (pill-formade med bakgrund)
+- **Urgency badges:**
+  - "Idag kl HH:MM" — grön med pulsande dot, bold text, starkare grön (#16A34A)
+  - "Xh Ym kvar" — röd med pulsande urgency dot + Flame-ikon, FOMO
+- **PulsingUrgencyDot** — snabbare puls (600ms) för brådskande känsla
+
+### 2. Du missade-sektionen — Helt omgjord
+- **Sektionsheader:** Flame-ikon i röd bakgrundscirkel + count
+- **"Bevaka fler"-knapp:** Solid grön med Eye-ikon
+- **MissedBookingCard:** 220px bredd, 130px bildhöjd
+- **"Tagen" badge:** Röd med Flame-ikon och vit text
+- **CTA-knapp:** "Bevaka liknande" med solid grön bakgrund
+- **Djupare skuggor** för mer dimension
+
+### 3. Social proof-räknare — Prominent redesign
+- Card-container med TrendingUp-ikon i blå bakgrundscirkel
+- Bold siffra + subtitel, ljusblå bakgrund
+
+### 4. "Nya bokningar idag" — Polished
+- Subtil grön border, undertitel "Uppdateras löpande"
+- Starkare grön räknarbadge (#16A34A)
+
+DONE_HOME_FINAL
+
+---
+
+## DONE_CLAIM_FINAL — Restaurant Page & Claim Flow Premium Polish (2026-04-03)
+
+Fullständig visuell uppgradering av restaurangsidan och hela claim-flödet.
+
+### 1. Hero-bild — Fullbredd & imponerande
+- **Höjd:** 280px → 380px — mer dramatisk, immersiv
+- **Gradient top:** Starkare (0.45 opacity), djupare fade för header-läsbarhet
+- **Gradient bottom:** Cinematic fade (0.55 opacity) med bredare reach
+- **Restaurangnamn** visas nu direkt på hero-bilden med text-shadow
+- **Hero chips:** Party size + tid + datum — alla med elevation shadow
+- **Parallax:** Behållen, anpassad till ny höjd
+
+### 2. Kostnad — Omöjlig att missa
+- **Credits-rad:** Highlighted bakgrund med Sparkles-ikon, 18px bold guld text
+- **Serviceavgift-rad:** Highlighted bakgrund med CreditCard-ikon, 18px bold text
+- **Total-rad:** Svart bakgrund med vit text (20px bold) — sticker ut kraftigt
+- **Saldo-rad:** Border + större text (16px), pistachio-färg
+- **Kort-border:** Tjockare (1.5px) med guld-accent
+- **Shadow:** Uppgraderad till `SHADOW.elevated`
+
+### 3. "Ta över bokning"-knappen — Premium pistachio + svart text
+- **Bakgrund:** `C.coral` (pistachio #7EC87A) när aktiv
+- **Text:** `C.dark` (#111827) svart — hög kontrast, premium känsla
+- **Padding:** 18px vertikal — större tryckyta
+- **Shadow:** Pistachio glow (opacity 0.4, radius 24, offset 10)
+- **Press-animation:** Scale 0.97 med mjuk spring (damping 14, stiffness 280)
+- **Claimed state:** Pistachio bakgrund + svart check + svart text
+
+### 4. Grace period-överlägget — Tydligare
+- **Badge:** Pistachio (inte success-grön), starkare glow
+- **Countdown ring:** 160×160px (från 144), tjockare border (4px)
+- **Progress bar:** 6px tjock (från 4px), pistachio-färg
+- **Info-ruta:** Dedikerad card med Shield-ikon, "Gratis ångerrätt" rubrik
+- **Knappar omordnade:** "Klar — gå till bokning" (pistachio, primary) FÖRST, "Ångra" UNDER
+- **Card:** Bredare (20px margin vs 24), rundare (24px radius), starkare skugga
+
+### 5. Konfetti-animation — Festligare
+- **Partiklar:** 30 → 55 — massivare burst
+- **Spread:** 70% → 90% bredd — fyller hela skärmen
+- **Färger:** 7 → 9 (lade till teal, orange, indigo)
+- **Fysik:** 2200ms livstid (vs 1600ms), 720° rotation (vs 360°)
+- **Drift:** ±130px X-drift (vs ±90px)
+- **Storlek:** Mer variation med mixed former
+
+### 6. Success overlay — Mer celebration
+- **Check-cirkel:** 120×120px (från 100), pistachio bakgrund med 30px glow
+- **Titel:** 30px (från 26)
+- **Ny ångerfrist-badge:** Pistachio pill med Shield-ikon
+- **Restaurangnamn:** 22px (från 20)
+
+### Verifiering
+- ✅ TypeScript: `npx tsc --noEmit` — 0 fel i restaurant/[id].tsx
+- ✅ Alla imports verifierade (Calendar, Shield redan importerade)
+- ✅ Pistachio (#7EC87A) + svart text (#111827) på CTA-knappen
+
+DONE_CLAIM_FINAL
+
+---
+
+## DONE_ONBOARD_FINAL — Onboarding Final Polish v2 (2026-04-03)
+
+Steps 2-7 polish (SplashStep untouched). Emil Kowalski design engineering principles.
+
+### 1. Entrance animation system — Differentiated springs
+- `enterHeading(delay)`: damping 14, stiffness 130 (punchy for headings)
+- `enterContent(delay)`: damping 18, stiffness 140 (smooth for content)
+- `enterFromBottom(delay)`: damping 16, stiffness 130 (CTA buttons)
+- Replaced all generic `.springify().damping(18)` across steps 2-7
+
+### 2. Stagger timing — Tightened ~25%
+- All steps: base delays reduced (80→60, 160→120, 240→180, 300→240)
+- CityStep card stagger: 70ms→55ms between cards
+- CreditsIntroStep row stagger: 80ms→60ms between rows
+- WelcomeStep delays: shortened uniformly (300→200, 420→320, 500→420)
+
+### 3. Critical animation fixes
+- **WelcomeStep confetti ring:** scale(0)→scale(0.85) start + separate opacity fade (220ms ease-out)
+- **OTP error colors:** Green tints for errors → proper red tints (rgba(239,68,68,...))
+- **Checkbox spring:** damping 12→14, stiffness 200→300 (snappier toggle)
+
+### 4. UX polish
+- CityStep selection delay: 500ms→350ms
+- WelcomeStep button icon: #FFFFFF→#111827 (matches PrimaryButton dark text)
+- WelcomeStep social proof: Dynamic city name from user selection
+- WelcomeStep accepts `cityName` prop
+
+### Verifiering
+- ✅ TypeScript: `npx tsc --noEmit` — 0 errors
+- ✅ No scale(0) entrances
+- ✅ Error states use red, not green tints
+- ✅ SplashStep completely untouched
+
+DONE_ONBOARD_FINAL
+
+---
+
+## DONE_PUSH_NOTIFICATIONS — Push Notifications Full Implementation (2026-04-03)
+
+Push-notiser implementerade från grunden med Expo Push API och backend-integration.
+
+### 1. Schema — pushToken i UserProfile
+- `pushToken String?` tillagt i `UserProfile` modellen
+- Databas synkad via `prisma db push`
+
+### 2. Backend Push Service (`backend/src/push.ts`)
+- `sendPushNotification(token, title, body, data)` — skickar via Expo Push API
+- `sendPushToUser(phone, title, body, data)` — slår upp token från DB
+- `sendPushToUsers(phones, title, body, data)` — batch-sändning till flera
+- Auto-rensning av ogiltiga tokens (DeviceNotRegistered)
+
+### 3. Endpoints
+- `POST /api/profile/push-token` — sparar Expo push token (auth required)
+- `POST /api/notifications/send` — manuell push-sändning (auth required)
+
+### 4. Push-triggers (automatiska)
+| Event | Mottagare | Titel |
+|---|---|---|
+| Ny bokning på bevakad restaurang | Bevakare | "Ny bokning tillgänglig!" |
+| Bevakningsmatch (Watch) | Bevakare | "Bevakningsträff!" |
+| Bokning tagen (claim) | Claimer | "Bokning bekräftad — {restaurant}" |
+| Bokning tagen (claim) | Submitter | "Din bokning togs över! +2 credits" |
+| Grace period påminnelse (1 min kvar) | Claimer | "⏰ 1 minut kvar av ångerfristen" |
+| Grace period slutförd | Claimer | "Bokning slutförd" |
+| Credits intjänade | Submitter | "Credits intjänade!" |
+| Credits köpta (dev) | Köpare | "{N} credits köpta!" |
+| Credits köpta (Stripe webhook) | Köpare | "{N} credits köpta!" |
+| Betalning misslyckades | Claimer | "Betalning misslyckades" |
+
+### 5. Mobile-integration
+- Push token registreras vid app-start OCH vid lyckad auth-verifiering
+- Token skickas till `POST /api/profile/push-token` automatiskt
+- Notification tap-handler installerad med data-routing
+- Foreground notifications visas som alert/banner/sound
+
+### Verifiering
+- ✅ TypeScript: 0 fel i backend (`bunx tsc --noEmit`)
+- ✅ TypeScript: 0 fel i mobile (`bunx tsc --noEmit`)
+- ✅ Prisma schema synkad
+- ✅ expo-notifications redan installerat (v0.31.5)
+
+DONE_PUSH_NOTIFICATIONS
+
+---
+
+## DONE_RESX_WINS — ResX Competitive Advantage Features (2026-04-03)
+
+Implementerade alla 6 ResX-konkurrentanalysens vinstmöjligheter.
+
+### 1. Smarta notisfilter på bevakningar
+- **Schema:** `filterOptions String?` (JSON) i Watch-modellen
+- **Backend:** `watches.ts` accepterar `filterOptions` med Zod-validering
+- **Backend:** `matchesWatchFilters()` — kontrollerar tid, veckodag, sällskapsstorlek
+- **Backend:** `reservations.ts` — filtrerar watches med `matchesWatchFilters()` innan push
+- **Mobile:** `add-watch.tsx` — ny UI med:
+  - Tidfilter: Lunch (11–14), Kväll (18–22), Sen kväll (21–00)
+  - Veckodagar: 7 runda knappar (Sön–Lör)
+  - Sällskapsstorlek: 1–8 chips
+- **Mobile:** `alerts.tsx` — filtertaggar visas på varje bevakning (Clock/Calendar/Users ikoner)
+
+### 2. Push-notis deeplink
+- **Mobile:** `_layout.tsx` — `onTapped` handler navigerar till `/restaurant/{restaurantId}`
+- **Backend:** Alla push-notiser inkluderar `restaurantId` i data-objektet
+- Klick på notis → direkt till restaurangsidan, inte startskärmen
+
+### 3. Persistent alerts
+- **Verifierat:** Watch-modellen har ingen expiry/TTL — bevakningar lever för alltid
+- **Mobile:** "Alltid aktiv"-badge (grön) på varje bevakning i alerts.tsx
+- **Mobile:** Info-text i add-watch.tsx: "Bevakningen är aktiv tills du tar bort den"
+
+### 4. Realtidsvalidering av notiser
+- **Backend:** CRON-jobbet gör `db.reservation.findUnique()` direkt innan push
+- **Backend:** Om status !== "completed" → hoppar över push, loggar warning
+- Garanterar att aldrig skicka notis för claimed/expired/cancelled reservationer
+
+### 5. Fördröjd "tagen"-notis
+- **Backend:** `reservations.ts` claim-flöde — submitter-push BORTTAGEN från claim-endpointen
+- **Backend:** `index.ts` CRON — submitter-notisen "Din bokning togs över" skickas EFTER 5 min grace period
+- In-app ActivityAlert skapas fortfarande direkt (för record-keeping)
+- Förhindrar prematura notiser innan ångerfrist gått ut
+
+### 6. Discovery-flöde — "Nya på Reslot"
+- **Backend:** `GET /api/restaurants/new-on-reslot` — restauranger med 1–3 bokningar & recent activity
+- **Mobile:** `useNewOnReslot()` hook
+- **Mobile:** `NewOnReslotSection` komponent i hemskärmen
+  - Horisontell scroll med 180px kort
+  - "Ny"-badge (grön med Sparkles-ikon)
+  - Restaurangnamn, betyg, cuisine
+  - Tap → navigerar till `/restaurant/{id}`
+  - Placerad efter social proof, före "Du missade"
+
+### Verifiering
+- ✅ TypeScript: 0 fel backend (`bunx tsc --noEmit`)
+- ✅ TypeScript: 0 fel mobile (`bunx tsc --noEmit`)
+- ✅ Prisma schema synkat med `db push`
+- ✅ Alla push-notiser innehåller `restaurantId` för deeplinks
+- ✅ Watch filterOptions JSON-format: `{ timeRange?, weekdays?, partySize? }`
+
+DONE_RESX_WINS
+
+---
+
+## DONE_LIABILITY_UX — Liability Model & Cancellation Flow Clarity (2026-04-03)
+
+Kristallklar ansvarsmodell och avbokningsflöde genom hela appen. Baserat på ResX-research — deras svagaste punkt.
+
+### 1. Restaurangsida — Ansvarsövergång-ruta (INNAN checkbox)
+- **Ny komponent:** `liability-transfer-card` — visuell trust-builder
+- **Visuell övergång:** Originalbokare → Du (med pil i warning-färg)
+- **Ikoner:** Users + Shield, tydlig cirkulär design med färgkodning
+- **Text:** "När du tar över bokningen övergår ansvaret för eventuella avbokningsavgifter till dig efter 5 minuters ångerfrist"
+- **Placering:** Efter guarantee badge, före error/checkbox — sista info innan beslut
+- **Villkorlig:** Visas bara för ej-claimade bokningar
+
+### 2. Grace Period Overlay — Förbättrad klarhet
+- **Timer-text:** "Ångra utan avgift" (dynamisk, "Tid ute" vid 0)
+- **Subtitle:** "{restaurangnamn} — du har 5 min att ångra"
+- **Info-rubrik:** "Ångra inom ångerfristen — inga avgifter"
+- **Body:** Utökad med "När ångerfristen löper ut ansvarar du fullt för bokningen"
+- **Stor ångra-knapp:** Redan på plats, förtydligad kontext
+
+### 3. Mina Bokningar — Ansvarsstatus på varje bokning
+- **`getStatusBadge`:** Nu tar `isSubmitter` parameter
+- **Nya statusar:**
+  - Aktiv + "Du ansvarar" (för claims)
+  - Tillgänglig (för egna upplagda)
+  - Under ångerfrist + "5 min att ångra"
+  - Bekräftad + "Ansvar överfört"
+- **Subtext:** Visas bredvid badge med lägre opacity
+
+### 4. Profil — Ansvarspolicy
+- **Ny menyitem:** "Ansvarspolicy" med Shield-ikon i warning-färg
+- **Full modal:** 3-stegs förklaring (Ångerfrist → Bekräftad → No-show)
+- **Färgkodade steg:** Grön (ångerfrist), orange (bekräftad), röd (no-show)
+- **Nyckeltext:** "Vi debiterar dig bara om du inte dyker upp efter att ångerfrist löpt ut"
+- **CTA:** "Jag förstår" — dark button
+
+DONE_LIABILITY_UX

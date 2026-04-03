@@ -46,6 +46,28 @@ restaurantsRouter.get(
   }
 );
 
+// GET /api/restaurants/new-on-reslot - Restaurants that recently got their first booking
+restaurantsRouter.get("/new-on-reslot", async (c) => {
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+  // Find restaurants where timesBookedOnReslot is exactly 1 (first booking ever)
+  // OR recently had their first reservation created
+  const restaurants = await db.restaurant.findMany({
+    where: {
+      timesBookedOnReslot: { gte: 1, lte: 3 },
+      reservations: {
+        some: {
+          createdAt: { gte: sevenDaysAgo },
+        },
+      },
+    },
+    orderBy: { updatedAt: "desc" },
+    take: 10,
+  });
+
+  return c.json({ data: restaurants });
+});
+
 // GET /api/restaurants/:id - Get single restaurant
 restaurantsRouter.get("/:id", async (c) => {
   const id = c.req.param("id");

@@ -52,9 +52,14 @@ const C = {
   grayLight: ThemeC.textTertiary,
 };
 
-// ── Spring configs ──
-const SPRING_PRESS_IN = { damping: 15, stiffness: 300 };
-const SPRING_PRESS_OUT = { damping: 12, stiffness: 200 };
+// ── Spring configs (Emil: punchier press, snappy release) ──
+const SPRING_PRESS_IN = { damping: 14, stiffness: 400 };
+const SPRING_PRESS_OUT = { damping: 10, stiffness: 260 };
+
+// ── Entrance animation helpers ──
+const enterHeading = (delayMs: number) => FadeInDown.delay(delayMs).springify().damping(14).stiffness(130);
+const enterContent = (delayMs: number) => FadeInDown.delay(delayMs).springify().damping(18).stiffness(140);
+const enterFromBottom = (delayMs: number) => FadeInUp.delay(delayMs).springify().damping(16).stiffness(130);
 
 // ── Animated Strip ──
 const CARD_H = 157;
@@ -283,7 +288,7 @@ function PrimaryButton({
           style={{
             fontFamily: FONTS.bold,
             fontSize: 16,
-            color: "#111827",
+            color: "#FFFFFF",
             letterSpacing: -0.2,
           }}
         >
@@ -381,7 +386,7 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
   const progress = useSharedValue(0);
 
   useEffect(() => {
-    progress.value = withSpring((current + 1) / total, { damping: 20, stiffness: 120 });
+    progress.value = withSpring((current + 1) / total, { damping: 16, stiffness: 160 });
   }, [current, total]);
 
   const barStyle = useAnimatedStyle(() => ({
@@ -428,30 +433,30 @@ function SplashStep({ onGetStarted, onExplore }: { onGetStarted: () => void; onE
       </View>
 
       {/* Copy Section */}
-      <View style={{ paddingHorizontal: 24, paddingBottom: 12, marginTop: -24 }}>
-        {/* Logo */}
-        <Animated.View entering={FadeInUp.delay(70).springify().damping(18)} style={{ marginTop: 0 }}>
+      <View style={{ paddingHorizontal: 28, paddingBottom: 12, marginTop: -24 }}>
+        {/* Logo — dramatic entrance, tighter spring for punch */}
+        <Animated.View entering={FadeInUp.delay(50).springify().damping(14).stiffness(140)} style={{ marginTop: 0 }}>
           <Text
             style={{
               fontFamily: FONTS.displayBold,
-              fontSize: 36,
+              fontSize: 38,
               color: C.text,
-              letterSpacing: -1.2,
+              letterSpacing: -1.4,
             }}
           >
             Reslot
           </Text>
         </Animated.View>
 
-        {/* Tagline */}
-        <Animated.View entering={FadeInUp.delay(140).springify().damping(18)} style={{ marginTop: 8 }}>
+        {/* Tagline — 50ms stagger after logo */}
+        <Animated.View entering={FadeInUp.delay(100).springify().damping(16).stiffness(120)} style={{ marginTop: 10 }}>
           <Text
             style={{
               fontFamily: FONTS.displayBold,
-              fontSize: 26,
+              fontSize: 27,
               color: C.text,
-              letterSpacing: -0.6,
-              lineHeight: 34,
+              letterSpacing: -0.7,
+              lineHeight: 35,
             }}
           >
             Din genväg till{"\n"}fullbokade restauranger
@@ -461,8 +466,8 @@ function SplashStep({ onGetStarted, onExplore }: { onGetStarted: () => void; onE
               fontFamily: FONTS.regular,
               fontSize: 15,
               color: C.gray,
-              marginTop: 10,
-              lineHeight: 22,
+              marginTop: 12,
+              lineHeight: 23,
             }}
           >
             Ta över bokningar andra inte kan gå på.{"\n"}Dela dina och tjäna credits.
@@ -470,16 +475,16 @@ function SplashStep({ onGetStarted, onExplore }: { onGetStarted: () => void; onE
         </Animated.View>
       </View>
 
-      {/* Bottom Actions */}
+      {/* Bottom Actions — 50ms after tagline */}
       <Animated.View
-        entering={FadeInUp.delay(220).springify().damping(18)}
-        style={{ paddingHorizontal: 24, paddingBottom: 12 }}
+        entering={FadeInUp.delay(160).springify().damping(16).stiffness(130)}
+        style={{ paddingHorizontal: 28, paddingBottom: 12 }}
       >
         <PrimaryButton
           testID="get-started-btn"
           label="Kom igång"
           onPress={onGetStarted}
-          icon={<ArrowRight size={18} color="#FFFFFF" strokeWidth={2.5} />}
+          icon={<ArrowRight size={18} color="#111827" strokeWidth={2.5} />}
         />
         <GhostButton testID="explore-btn" label="Utforska utan konto" onPress={onExplore} />
       </Animated.View>
@@ -504,7 +509,7 @@ function PhoneStep({
 
   const checkScale = useSharedValue(agreed ? 1 : 0);
   useEffect(() => {
-    checkScale.value = withSpring(agreed ? 1 : 0, { damping: 12, stiffness: 200 });
+    checkScale.value = withSpring(agreed ? 1 : 0, { damping: 14, stiffness: 300 });
   }, [agreed]);
 
   const checkStyle = useAnimatedStyle(() => ({
@@ -524,7 +529,7 @@ function PhoneStep({
 
         <ProgressBar current={0} total={5} />
 
-        <Animated.View entering={FadeInDown.delay(80).springify().damping(18)} style={{ marginTop: 20 }}>
+        <Animated.View entering={enterHeading(60)} style={{ marginTop: 20 }}>
           <Text
             style={{
               fontFamily: FONTS.displayBold,
@@ -549,7 +554,7 @@ function PhoneStep({
           </Text>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(160).springify().damping(18)} style={{ marginTop: 32 }}>
+        <Animated.View entering={enterContent(120)} style={{ marginTop: 32 }}>
           <View
             style={{
               backgroundColor: C.bgInput,
@@ -591,7 +596,7 @@ function PhoneStep({
           </View>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(240).springify().damping(18)} style={{ marginTop: 20 }}>
+        <Animated.View entering={enterContent(180)} style={{ marginTop: 20 }}>
           <Pressable
             testID="sms-checkbox"
             accessibilityLabel="Godkänn villkor för SMS-verifiering"
@@ -652,7 +657,7 @@ function PhoneStep({
           </Animated.View>
         ) : null}
 
-        <Animated.View entering={FadeInUp.delay(300).springify().damping(18)} style={{ paddingBottom: 16 }}>
+        <Animated.View entering={enterFromBottom(240)} style={{ paddingBottom: 16 }}>
           <PrimaryButton
             testID="phone-next-btn"
             label={isLoading ? "Skickar..." : "Skicka kod"}
@@ -763,7 +768,7 @@ function OTPStep({
 
         <ProgressBar current={1} total={5} />
 
-        <Animated.View entering={FadeInDown.delay(80).springify().damping(18)} style={{ marginTop: 20 }}>
+        <Animated.View entering={enterHeading(60)} style={{ marginTop: 20 }}>
           <Text
             style={{
               fontFamily: FONTS.displayBold,
@@ -805,7 +810,7 @@ function OTPStep({
           </Pressable>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(160).springify().damping(18)} style={{ marginTop: 40 }}>
+        <Animated.View entering={enterContent(120)} style={{ marginTop: 40 }}>
           <Animated.View style={[shakeStyle, { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 }]}>
             {code.map((digit, i) => (
               <React.Fragment key={i}>
@@ -829,13 +834,13 @@ function OTPStep({
                     width: 50,
                     height: 58,
                     borderRadius: 14,
-                    backgroundColor: hasError ? C.coralLight : C.bgInput,
+                    backgroundColor: hasError ? "rgba(239,68,68,0.08)" : C.bgInput,
                     textAlign: "center",
                     fontFamily: FONTS.bold,
                     fontSize: 22,
                     color: hasError ? C.error : C.text,
                     borderWidth: digit ? 1.5 : 0,
-                    borderColor: hasError ? C.coralPressed : digit ? C.coralPressed : "transparent",
+                    borderColor: hasError ? "rgba(239,68,68,0.25)" : digit ? C.coralPressed : "transparent",
                   }}
                 />
               </React.Fragment>
@@ -859,7 +864,7 @@ function OTPStep({
           ) : null}
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(240).springify().damping(18)} style={{ marginTop: 24, alignItems: "center" }}>
+        <Animated.View entering={enterContent(180)} style={{ marginTop: 24, alignItems: "center" }}>
           <Pressable
             testID="resend-otp-btn"
             accessibilityLabel="Skicka ny verifieringskod"
@@ -883,7 +888,7 @@ function OTPStep({
 
         <View style={{ flex: 1 }} />
 
-        <Animated.View entering={FadeInUp.delay(300).springify().damping(18)} style={{ paddingBottom: 16 }}>
+        <Animated.View entering={enterFromBottom(240)} style={{ paddingBottom: 16 }}>
           <PrimaryButton
             testID="otp-next-btn"
             label={isLoading ? "Verifierar..." : "Verifiera"}
@@ -923,7 +928,7 @@ function RegisterStep({
 
         <ProgressBar current={2} total={5} />
 
-        <Animated.View entering={FadeInDown.delay(80).springify().damping(18)} style={{ marginTop: 20 }}>
+        <Animated.View entering={enterHeading(60)} style={{ marginTop: 20 }}>
           <Text
             style={{
               fontFamily: FONTS.displayBold,
@@ -949,7 +954,7 @@ function RegisterStep({
         </Animated.View>
 
         <Animated.View
-          entering={FadeInDown.delay(160).springify().damping(18)}
+          entering={enterContent(120)}
           style={{ marginTop: 28, gap: 12 }}
         >
           {/* First name */}
@@ -1061,7 +1066,7 @@ function RegisterStep({
 
         <View style={{ flex: 1 }} />
 
-        <Animated.View entering={FadeInUp.delay(300).springify().damping(18)} style={{ paddingBottom: 16 }}>
+        <Animated.View entering={enterFromBottom(240)} style={{ paddingBottom: 16 }}>
           <PrimaryButton
             testID="register-next-btn"
             label="Fortsätt"
@@ -1088,7 +1093,7 @@ function CityStep({ onSelect, onBack }: { onSelect: (city: string) => void; onBa
     (city: string) => {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setSelected(city);
-      setTimeout(() => onSelect(city), 500);
+      setTimeout(() => onSelect(city), 350);
     },
     [onSelect]
   );
@@ -1101,7 +1106,7 @@ function CityStep({ onSelect, onBack }: { onSelect: (city: string) => void; onBa
 
       <ProgressBar current={3} total={5} />
 
-      <Animated.View entering={FadeInDown.delay(80).springify().damping(18)} style={{ marginTop: 20, marginBottom: 8 }}>
+      <Animated.View entering={enterHeading(60)} style={{ marginTop: 20, marginBottom: 8 }}>
         <Text
           style={{
             fontFamily: FONTS.displayBold,
@@ -1129,7 +1134,7 @@ function CityStep({ onSelect, onBack }: { onSelect: (city: string) => void; onBa
         {cities.map((city, i) => {
           const isSelected = selected === city.name;
           return (
-            <Animated.View key={city.name} entering={FadeInDown.delay(160 + i * 70).springify().damping(18)}>
+            <Animated.View key={city.name} entering={enterContent(120 + i * 55)}>
               <CityCard
                 city={city}
                 isSelected={isSelected}
@@ -1289,15 +1294,15 @@ function CreditsIntroStep({ onContinue, onBack }: { onContinue: () => void; onBa
       <View style={{ flex: 1, justifyContent: "center" }}>
         {/* Animated coin icon */}
         <Animated.View
-          entering={FadeInDown.delay(100).springify().damping(14)}
-          style={{ alignItems: "center", marginBottom: 8 }}
+          entering={enterHeading(60)}
+          style={{ alignItems: "center", marginBottom: 10 }}
         >
           <AnimatedCoinIcon />
         </Animated.View>
 
         <Animated.View
-          entering={FadeInDown.delay(200).springify().damping(18)}
-          style={{ alignItems: "center", marginBottom: 32 }}
+          entering={enterHeading(120)}
+          style={{ alignItems: "center", marginBottom: 28 }}
         >
           <Text
             style={{
@@ -1316,29 +1321,29 @@ function CreditsIntroStep({ onContinue, onBack }: { onContinue: () => void; onBa
               fontSize: 15,
               color: C.gray,
               textAlign: "center",
-              marginTop: 8,
-              lineHeight: 22,
+              marginTop: 10,
+              lineHeight: 23,
             }}
           >
-            En enkel loop — dela, tjäna, ta över
+            Dela, tjäna, ta över — en enkel loop
           </Text>
         </Animated.View>
 
-        {/* Credit flow arrows + rows */}
+        {/* Credit flow: rows with step numbers + connectors */}
         {rows.map((row, i) => {
           const RowIcon = row.icon;
           return (
             <React.Fragment key={i}>
               {i > 0 ? (
                 <Animated.View
-                  entering={FadeInDown.delay(300 + i * 60).springify().damping(18)}
-                  style={{ alignItems: "center", marginVertical: 2 }}
+                  entering={enterContent(200 + i * 60)}
+                  style={{ alignItems: "center", marginVertical: 3 }}
                 >
-                  <View style={{ width: 2, height: 24, backgroundColor: "rgba(201,169,110,0.15)", borderRadius: 1 }} />
+                  <View style={{ width: 2, height: 22, backgroundColor: "rgba(201,169,110,0.20)", borderRadius: 1 }} />
                 </Animated.View>
               ) : null}
               <Animated.View
-                entering={FadeInDown.delay(300 + i * 60).springify().damping(16)}
+                entering={enterContent(200 + i * 60)}
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
@@ -1348,24 +1353,37 @@ function CreditsIntroStep({ onContinue, onBack }: { onContinue: () => void; onBa
                   borderRadius: 16,
                   borderWidth: 0.5,
                   borderColor: C.divider,
-                  gap: 14,
+                  gap: 12,
                   shadowColor: "#000",
                   shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.03,
-                  shadowRadius: 8,
+                  shadowOpacity: 0.04,
+                  shadowRadius: 10,
                 }}
               >
+                {/* Step number */}
                 <View
                   style={{
-                    width: 46,
-                    height: 46,
-                    borderRadius: 13,
+                    width: 24,
+                    height: 24,
+                    borderRadius: 12,
+                    backgroundColor: "rgba(201,169,110,0.10)",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text style={{ fontFamily: FONTS.bold, fontSize: 11, color: C.gold }}>{i + 1}</Text>
+                </View>
+                <View
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 12,
                     backgroundColor: row.iconBg,
                     alignItems: "center",
                     justifyContent: "center",
                   }}
                 >
-                  <RowIcon size={21} color={row.iconColor} strokeWidth={2} />
+                  <RowIcon size={20} color={row.iconColor} strokeWidth={2} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text
@@ -1373,6 +1391,7 @@ function CreditsIntroStep({ onContinue, onBack }: { onContinue: () => void; onBa
                       fontFamily: FONTS.semiBold,
                       fontSize: 15,
                       color: C.text,
+                      letterSpacing: -0.1,
                     }}
                   >
                     {row.title}
@@ -1418,8 +1437,8 @@ function CreditsIntroStep({ onContinue, onBack }: { onContinue: () => void; onBa
 
         {/* Loop indicator */}
         <Animated.View
-          entering={FadeInDown.delay(480).springify().damping(18)}
-          style={{ alignItems: "center", marginTop: 12 }}
+          entering={enterContent(420)}
+          style={{ alignItems: "center", marginTop: 14 }}
         >
           <View
             style={{
@@ -1427,13 +1446,13 @@ function CreditsIntroStep({ onContinue, onBack }: { onContinue: () => void; onBa
               alignItems: "center",
               gap: 6,
               paddingVertical: 8,
-              paddingHorizontal: 14,
+              paddingHorizontal: 16,
               backgroundColor: "rgba(201,169,110,0.08)",
               borderRadius: 20,
             }}
           >
             <Sparkles size={14} color={C.gold} strokeWidth={2} />
-            <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.gold }}>
+            <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.gold, letterSpacing: -0.1 }}>
               Loopen fortsätter — dela mer, ta mer
             </Text>
           </View>
@@ -1441,7 +1460,7 @@ function CreditsIntroStep({ onContinue, onBack }: { onContinue: () => void; onBa
       </View>
 
       <Animated.View
-        entering={FadeInUp.delay(540).springify().damping(18)}
+        entering={enterFromBottom(460)}
         style={{ paddingBottom: 16 }}
       >
         <PrimaryButton
@@ -1454,36 +1473,26 @@ function CreditsIntroStep({ onContinue, onBack }: { onContinue: () => void; onBa
   );
 }
 
-// Animated coin with gentle bounce
+// Animated coin — gentle float + subtle rotation (not frenetic)
 function AnimatedCoinIcon() {
   const y = useSharedValue(0);
   const rotate = useSharedValue(0);
-  const pulseScale = useSharedValue(1);
 
   useEffect(() => {
+    // Slow, elegant float
     y.value = withRepeat(
       withSequence(
-        withSpring(-12, { damping: 6, stiffness: 90 }),
-        withSpring(0, { damping: 6, stiffness: 90 })
+        withTiming(-8, { duration: 1200, easing: Easing.inOut(Easing.quad) }),
+        withTiming(0, { duration: 1200, easing: Easing.inOut(Easing.quad) })
       ),
       -1,
       true
     );
+    // Gentle tilt
     rotate.value = withRepeat(
       withSequence(
-        withSpring(5, { damping: 10, stiffness: 60 }),
-        withSpring(-5, { damping: 10, stiffness: 60 })
-      ),
-      -1,
-      true
-    );
-  }, []);
-
-  useEffect(() => {
-    pulseScale.value = withRepeat(
-      withSequence(
-        withTiming(1.08, { duration: 800, easing: Easing.inOut(Easing.quad) }),
-        withTiming(1, { duration: 800, easing: Easing.inOut(Easing.quad) })
+        withTiming(3, { duration: 1400, easing: Easing.inOut(Easing.quad) }),
+        withTiming(-3, { duration: 1400, easing: Easing.inOut(Easing.quad) })
       ),
       -1,
       true
@@ -1491,7 +1500,7 @@ function AnimatedCoinIcon() {
   }, []);
 
   const coinStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: y.value }, { rotate: `${rotate.value}deg` }, { scale: pulseScale.value }],
+    transform: [{ translateY: y.value }, { rotate: `${rotate.value}deg` }],
   }));
 
   return (
@@ -1499,10 +1508,10 @@ function AnimatedCoinIcon() {
       style={[
         coinStyle,
         {
-          width: 72,
-          height: 72,
-          borderRadius: 36,
-          backgroundColor: "rgba(201,169,110,0.12)",
+          width: 76,
+          height: 76,
+          borderRadius: 38,
+          backgroundColor: "rgba(201,169,110,0.10)",
           alignItems: "center",
           justifyContent: "center",
           marginBottom: 12,
@@ -1511,10 +1520,10 @@ function AnimatedCoinIcon() {
     >
       <View
         style={{
-          width: 52,
-          height: 52,
-          borderRadius: 26,
-          backgroundColor: "rgba(201,169,110,0.18)",
+          width: 54,
+          height: 54,
+          borderRadius: 27,
+          backgroundColor: "rgba(201,169,110,0.16)",
           alignItems: "center",
           justifyContent: "center",
         }}
@@ -1525,53 +1534,107 @@ function AnimatedCoinIcon() {
   );
 }
 
+// ── Floating celebration particle ──
+function FloatingParticle({ emoji, delay: d, startX, startY }: { emoji: string; delay: number; startX: number; startY: number }) {
+  const tY = useSharedValue(0);
+  const tX = useSharedValue(0);
+  const op = useSharedValue(0);
+  const pSc = useSharedValue(0.6);
+  useEffect(() => {
+    const driftX = (Math.random() - 0.5) * 40;
+    op.value = withDelay(d, withSequence(
+      withTiming(1, { duration: 300, easing: Easing.out(Easing.quad) }),
+      withDelay(800, withTiming(0, { duration: 600, easing: Easing.in(Easing.quad) }))
+    ));
+    tY.value = withDelay(d, withTiming(-60 - Math.random() * 40, { duration: 1700, easing: Easing.out(Easing.quad) }));
+    tX.value = withDelay(d, withTiming(driftX, { duration: 1700, easing: Easing.out(Easing.quad) }));
+    pSc.value = withDelay(d, withSpring(1, { damping: 8, stiffness: 120 }));
+  }, []);
+  const pStyle = useAnimatedStyle(() => ({
+    position: "absolute" as const, left: startX, top: startY,
+    transform: [{ translateY: tY.value }, { translateX: tX.value }, { scale: pSc.value }],
+    opacity: op.value,
+  }));
+  return <Animated.View style={pStyle}><Text style={{ fontSize: 20 }}>{emoji}</Text></Animated.View>;
+}
+
 // ==================== STEP 7: WELCOME ====================
-function WelcomeStep({ onContinue, firstName }: { onContinue: () => void; firstName: string }) {
-  const confettiScale = useSharedValue(0);
+function WelcomeStep({ onContinue, firstName, cityName }: { onContinue: () => void; firstName: string; cityName: string }) {
+  // Emil: NEVER animate from scale(0). Start from 0.85 + opacity.
+  const ringScale = useSharedValue(0.85);
+  const ringOpacity = useSharedValue(0);
+  const outerPulse = useSharedValue(1);
 
   useEffect(() => {
+    // Layered haptics: success + light tap 200ms later
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    confettiScale.value = withSpring(1, { damping: 8, stiffness: 80 });
+    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 200);
+    ringScale.value = withSpring(1, { damping: 10, stiffness: 100 });
+    ringOpacity.value = withTiming(1, { duration: 250, easing: Easing.out(Easing.quad) });
+    // Subtle breathing pulse after entrance settles
+    setTimeout(() => {
+      outerPulse.value = withRepeat(
+        withSequence(
+          withTiming(1.04, { duration: 1200, easing: Easing.inOut(Easing.quad) }),
+          withTiming(1, { duration: 1200, easing: Easing.inOut(Easing.quad) })
+        ), -1, true
+      );
+    }, 600);
   }, []);
 
-  const confettiStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: confettiScale.value }],
-    opacity: confettiScale.value,
+  const ringStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: ringScale.value }], opacity: ringOpacity.value,
   }));
+  const outerPulseStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: outerPulse.value }],
+  }));
+
+  const particles = [
+    { emoji: "✨", delay: 200, startX: -30, startY: -20 },
+    { emoji: "🎊", delay: 350, startX: 50, startY: -10 },
+    { emoji: "⭐", delay: 500, startX: -40, startY: 30 },
+    { emoji: "✨", delay: 450, startX: 60, startY: 20 },
+    { emoji: "🎉", delay: 300, startX: 10, startY: -30 },
+  ];
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingHorizontal: 32 }}>
-      {/* Celebration ring */}
-      <Animated.View
-        style={[confettiStyle, { marginBottom: 32 }]}
-      >
-        <View
-          style={{
-            width: 130,
-            height: 130,
-            borderRadius: 65,
-            backgroundColor: C.coralLight,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <View
-            style={{
-              width: 96,
-              height: 96,
-              borderRadius: 48,
-              backgroundColor: C.coralPressed,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Text style={{ fontSize: 40 }}>🎉</Text>
-          </View>
+      {/* Celebration ring + floating particles */}
+      <View style={{ marginBottom: 32, alignItems: "center", justifyContent: "center" }}>
+        <View style={{ position: "absolute", width: 130, height: 130, alignItems: "center", justifyContent: "center" }}>
+          {particles.map((p, i) => <FloatingParticle key={i} {...p} />)}
         </View>
-      </Animated.View>
+        <Animated.View style={outerPulseStyle}>
+          <Animated.View style={ringStyle}>
+            <View
+              style={{
+                width: 130,
+                height: 130,
+                borderRadius: 65,
+                backgroundColor: C.coralLight,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <View
+                style={{
+                  width: 96,
+                  height: 96,
+                  borderRadius: 48,
+                  backgroundColor: C.coralPressed,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text style={{ fontSize: 42 }}>🎉</Text>
+              </View>
+            </View>
+          </Animated.View>
+        </Animated.View>
+      </View>
 
       {/* Welcome text */}
-      <Animated.View entering={FadeInDown.delay(300).springify().damping(16)}>
+      <Animated.View entering={enterHeading(200)}>
         <Text
           style={{
             fontFamily: FONTS.displayBold,
@@ -1585,7 +1648,7 @@ function WelcomeStep({ onContinue, firstName }: { onContinue: () => void; firstN
         </Text>
       </Animated.View>
 
-      <Animated.View entering={FadeInDown.delay(360).springify().damping(18)}>
+      <Animated.View entering={enterContent(260)}>
         <Text
           style={{
             fontFamily: FONTS.regular,
@@ -1602,7 +1665,7 @@ function WelcomeStep({ onContinue, firstName }: { onContinue: () => void; firstN
 
       {/* Social proof */}
       <Animated.View
-        entering={FadeInDown.delay(420).springify().damping(18)}
+        entering={enterContent(320)}
         style={{
           marginTop: 32,
           paddingVertical: 14,
@@ -1627,7 +1690,7 @@ function WelcomeStep({ onContinue, firstName }: { onContinue: () => void; firstN
       </Animated.View>
 
       <Animated.View
-        entering={FadeInDown.delay(480).springify().damping(18)}
+        entering={enterContent(380)}
         style={{
           marginTop: 10,
           paddingVertical: 14,
@@ -1647,18 +1710,18 @@ function WelcomeStep({ onContinue, firstName }: { onContinue: () => void; firstN
             color: C.gold,
           }}
         >
-          2,400+ användare i Stockholm
+          2 400+ användare i {cityName || "Stockholm"}
         </Text>
       </Animated.View>
 
       <View style={{ flex: 1 }} />
 
-      <Animated.View entering={FadeInUp.delay(500).springify().damping(18)} style={{ width: "100%", paddingBottom: 16 }}>
+      <Animated.View entering={enterFromBottom(420)} style={{ width: "100%", paddingBottom: 16 }}>
         <PrimaryButton
           testID="welcome-continue-btn"
           label="Utforska appen"
           onPress={onContinue}
-          icon={<ArrowRight size={18} color="#FFFFFF" strokeWidth={2.5} />}
+          icon={<ArrowRight size={18} color="#111827" strokeWidth={2.5} />}
         />
       </Animated.View>
     </View>
@@ -1851,6 +1914,7 @@ export default function OnboardingScreen() {
         {step === "welcome" ? (
           <WelcomeStep
             firstName={firstName}
+            cityName={useAuthStore.getState().selectedCity}
             onContinue={() => finishOnboarding(useAuthStore.getState().selectedCity)}
           />
         ) : null}

@@ -12,6 +12,7 @@ import { watchesRouter } from "./routes/watches";
 import { creditsRouter } from "./routes/credits";
 import { referralRouter } from "./routes/referral";
 import { savedRestaurantsRouter } from "./routes/saved-restaurants";
+import { notificationsRouter } from "./routes/notifications";
 import { logger } from "hono/logger";
 import { authMiddleware } from "./middleware/auth";
 import { db } from "./db";
@@ -73,6 +74,7 @@ app.use("/api/watches/*", authMiddleware);
 app.use("/api/credits/*", authMiddleware);
 app.use("/api/referral/*", authMiddleware);
 app.use("/api/saved-restaurants/*", authMiddleware);
+app.use("/api/notifications/*", authMiddleware);
 
 // Health check endpoint
 app.get("/health", (c) => c.json({ status: "ok" }));
@@ -88,9 +90,11 @@ app.route("/api/watches", watchesRouter);
 app.route("/api/credits", creditsRouter);
 app.route("/api/referral", referralRouter);
 app.route("/api/saved-restaurants", savedRestaurantsRouter);
+app.route("/api/notifications", notificationsRouter);
 
 // --- Grace Period Auto-Finalize Cron (every 60s) ---
 import { capturePayment } from "./stripe";
+import { sendPushToUser } from "./push";
 
 const GRACE_PERIOD_CRON_INTERVAL = 60 * 1000; // 60 seconds
 let cronRunning = false; // Simple mutex to prevent parallel execution
@@ -102,6 +106,29 @@ setInterval(async () => {
   }
   cronRunning = true;
   try {
+    // Grace period reminder: notify claimers with ~1 minute left
+    const fourMinutesAgo = new Date(Date.now() - 4 * 60 * 1000);
+    const threeMinutesAgo = new Date(Date.now() - 3 * 60 * 1000);
+
+    const aboutToExpire = await db.reservation.findMany({
+      where: {
+        status: "grace_period",
+        claimedAt: { gte: threeMinutesAgo, lt: fourMinutesAgo },
+      },
+      include: { restaurant: true },
+    });
+
+    for (const reservation of aboutToExpire) {
+      if (reservation.claimerPhone) {
+        sendPushToUser(
+          reservation.claimerPhone,
+          "⏰ 1 minut kvar av ångerfristen",
+          `Din ångerfrist för ${reservation.restaurant.name} löper ut snart.`,
+          { type: "grace_reminder", reservationId: reservation.id }
+        ).catch(() => {});
+      }
+    }
+
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
 
     const expiredGracePeriods = await db.reservation.findMany({
@@ -161,6 +188,40 @@ setInterval(async () => {
           },
         });
       });
+
+      // Real-time validation: re-check reservation state before sending push
+      const freshRes = await db.reservation.findUnique({ where: { id: reservation.id } });
+      if (!freshRes || freshRes.status !== "completed") {
+        console.log(`[CRON] Reservation ${reservation.id} state changed, skipping push`);
+        continue;
+      }
+
+      // Push notification: credits awarded to submitter
+      sendPushToUser(
+        reservation.submitterPhone,
+        "Credits intjänade!",
+        "Du fick 2 credits för din delade bokning.",
+        { type: "credits_awarded", reservationId: reservation.id, restaurantId: reservation.restaurantId }
+      ).catch(() => {});
+
+      // DELAYED submitter notification: booking was claimed (sent after grace period, not immediately)
+      const dateStr = new Date(reservation.reservationDate).toLocaleDateString("sv-SE");
+      sendPushToUser(
+        reservation.submitterPhone,
+        "Din bokning togs över! +2 credits",
+        `Din bokning på ${reservation.restaurant.name} den ${dateStr} har tagits över och credits har utbetalats.`,
+        { type: "booking_claimed", reservationId: reservation.id, restaurantId: reservation.restaurantId }
+      ).catch(() => {});
+
+      // Push notification: grace period completed for claimer
+      if (reservation.claimerPhone) {
+        sendPushToUser(
+          reservation.claimerPhone,
+          "Bokning slutförd",
+          `Din bokning på ${reservation.restaurant.name} är nu bekräftad.`,
+          { type: "grace_completed", reservationId: reservation.id, restaurantId: reservation.restaurantId }
+        ).catch(() => {});
+      }
     }
 
     if (expiredGracePeriods.length > 0) {

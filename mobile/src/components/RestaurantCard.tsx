@@ -8,6 +8,7 @@ import {
   Users,
   Eye,
   Heart,
+  Flame,
 } from "lucide-react-native";
 import Animated, {
   FadeInDown,
@@ -16,11 +17,12 @@ import Animated, {
   withSpring,
   withRepeat,
   withTiming,
+  withSequence,
   interpolateColor,
 } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import type { Reservation } from "@/lib/api/types";
-import { C, FONTS, SPACING, RADIUS } from "../lib/theme";
+import { C, FONTS, SPACING, RADIUS, SHADOW } from "../lib/theme";
 import { useSavedRestaurants, useSaveRestaurant, useUnsaveRestaurant } from "@/lib/api/hooks";
 import { useAuthStore } from "@/lib/auth-store";
 
@@ -44,7 +46,48 @@ function PulsingGreenDot({ size = 8 }: { size?: number }) {
           width: size,
           height: size,
           borderRadius: size / 2,
-          backgroundColor: C.success,
+          backgroundColor: C.successBright,
+        },
+      ]}
+    />
+  );
+}
+
+// --- Pulsing Urgency Dot (coral/red) ---
+function PulsingUrgencyDot({ size = 7 }: { size?: number }) {
+  const scale = useSharedValue(1);
+  const dotOpacity = useSharedValue(1);
+  React.useEffect(() => {
+    scale.value = withRepeat(
+      withSequence(
+        withTiming(1.4, { duration: 600 }),
+        withTiming(1, { duration: 600 }),
+      ),
+      -1,
+      false,
+    );
+    dotOpacity.value = withRepeat(
+      withSequence(
+        withTiming(0.4, { duration: 600 }),
+        withTiming(1, { duration: 600 }),
+      ),
+      -1,
+      false,
+    );
+  }, []);
+  const animStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    opacity: dotOpacity.value,
+  }));
+  return (
+    <Animated.View
+      style={[
+        animStyle,
+        {
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          backgroundColor: "#EF4444",
         },
       ]}
     />
@@ -70,7 +113,7 @@ function UrgencyBadge({ reservation }: { reservation: Reservation }) {
           testID="urgency-badge-today"
           style={styles.urgencyBadgeToday}
         >
-          <PulsingGreenDot size={8} />
+          <PulsingGreenDot size={7} />
           <Text style={styles.urgencyBadgeTodayText}>
             Idag kl {reservationTime.slice(0, 5)}
           </Text>
@@ -93,7 +136,8 @@ function UrgencyBadge({ reservation }: { reservation: Reservation }) {
 
   return (
     <View testID="urgency-badge" style={styles.urgencyBadge}>
-      <Clock size={12} color={C.coral} strokeWidth={2} />
+      <PulsingUrgencyDot size={7} />
+      <Flame size={11} color="#EF4444" fill="#EF4444" strokeWidth={0} />
       <Text style={styles.urgencyBadgeText}>
         {hours}h {minutes}m kvar
       </Text>
@@ -143,7 +187,7 @@ export const RestaurantCard = React.memo(function RestaurantCard({
   }));
 
   const handlePressIn = useCallback(() => {
-    scale.value = withSpring(0.95, { damping: 15, stiffness: 300 });
+    scale.value = withSpring(0.97, { damping: 15, stiffness: 300 });
     bgFlash.value = withTiming(1, { duration: 100 });
   }, [scale, bgFlash]);
 
@@ -178,6 +222,10 @@ export const RestaurantCard = React.memo(function RestaurantCard({
     }
   };
 
+  const watcherCount = restaurant.timesBookedOnReslot >= 3
+    ? Math.max(2, Math.floor(restaurant.timesBookedOnReslot * 1.5))
+    : 0;
+
   return (
     <Animated.View
       entering={FadeInDown.delay(index * 50)
@@ -196,29 +244,55 @@ export const RestaurantCard = React.memo(function RestaurantCard({
             styles.cardContainer,
           ]}
         >
-          <View className="flex-row">
-            {/* Left content */}
-            <View style={styles.cardLeftContent}>
-              <View className="flex-row items-center" style={{ gap: 6 }}>
-                <Text
-                  style={styles.restaurantName}
-                  numberOfLines={1}
+          <View style={styles.cardRow}>
+            {/* Left: Large rounded image */}
+            <View style={styles.imageWrapper}>
+              <Image
+                source={{ uri: restaurant.image }}
+                style={styles.thumbnail}
+                cachePolicy="memory-disk"
+                contentFit="cover"
+              />
+              {/* Save button overlay */}
+              {!isGuest && phone ? (
+                <Pressable
+                  testID={`save-restaurant-${restaurant.id}`}
+                  accessibilityLabel={isSaved ? "Ta bort fran sparade" : "Spara restaurang"}
+                  onPress={handleToggleSave}
+                  style={styles.saveButton}
+                  hitSlop={8}
                 >
-                  {restaurant.name}
-                </Text>
-              </View>
+                  <Animated.View style={heartAnimStyle}>
+                    <Heart
+                      size={14}
+                      color={isSaved ? "#FFFFFF" : "rgba(255,255,255,0.9)"}
+                      fill={isSaved ? "#FFFFFF" : "transparent"}
+                      strokeWidth={2}
+                    />
+                  </Animated.View>
+                </Pressable>
+              ) : null}
+              {/* Watcher count on image */}
+              {watcherCount > 0 ? (
+                <View style={styles.watcherOverlay}>
+                  <Eye size={10} color="#FFFFFF" strokeWidth={2.5} />
+                  <Text style={styles.watcherOverlayText}>{watcherCount}</Text>
+                </View>
+              ) : null}
+            </View>
 
+            {/* Right content */}
+            <View style={styles.cardRightContent}>
+              {/* Restaurant name */}
               <Text
-                style={styles.restaurantAddress}
+                style={styles.restaurantName}
                 numberOfLines={1}
               >
-                {restaurant.address}
+                {restaurant.name}
               </Text>
 
-              <View
-                className="flex-row items-center"
-                style={{ marginTop: 6, gap: 4 }}
-              >
+              {/* Rating + cuisine row */}
+              <View style={styles.metaRow}>
                 <Star size={12} color={C.gold} fill={C.gold} strokeWidth={0} />
                 <Text style={styles.ratingText}>
                   {restaurant.rating.toFixed(1)}
@@ -232,75 +306,32 @@ export const RestaurantCard = React.memo(function RestaurantCard({
                 </Text>
               </View>
 
-              <View
-                className="flex-row items-center"
-                style={{ marginTop: 8, gap: 14 }}
+              {/* Address */}
+              <Text
+                style={styles.restaurantAddress}
+                numberOfLines={1}
               >
-                <View className="flex-row items-center" style={{ gap: 4 }}>
-                  <Clock size={13} color={C.textTertiary} strokeWidth={2} />
-                  <Text style={styles.detailText}>
+                {restaurant.address}
+              </Text>
+
+              {/* Time + party size chips */}
+              <View style={styles.chipRow}>
+                <View style={styles.chip}>
+                  <Clock size={12} color={C.textPrimary} strokeWidth={2} />
+                  <Text style={styles.chipText}>
                     {formatTime(reservation.reservationTime)}
                   </Text>
                 </View>
-                <View className="flex-row items-center" style={{ gap: 4 }}>
-                  <Users size={13} color={C.textTertiary} strokeWidth={2} />
-                  <Text style={styles.detailText}>
+                <View style={styles.chip}>
+                  <Users size={12} color={C.textPrimary} strokeWidth={2} />
+                  <Text style={styles.chipText}>
                     {reservation.partySize} gäster
                   </Text>
                 </View>
               </View>
 
-              {restaurant.timesBookedOnReslot >= 3 ? (
-                <View
-                  className="flex-row items-center"
-                  style={styles.watchingBadge}
-                >
-                  <Eye size={11} color={C.info} strokeWidth={2} />
-                  <Text style={styles.watchingText}>
-                    {Math.max(2, Math.floor(restaurant.timesBookedOnReslot * 1.5))} bevakar
-                  </Text>
-                </View>
-              ) : null}
-
+              {/* Urgency badge */}
               <UrgencyBadge reservation={reservation} />
-            </View>
-
-            {/* Right thumbnail + save button */}
-            <View style={{ position: "relative" }}>
-              <Image
-                source={{ uri: restaurant.image }}
-                style={styles.thumbnail}
-                cachePolicy="memory-disk"
-                contentFit="cover"
-              />
-              {!isGuest && phone ? (
-                <Pressable
-                  testID={`save-restaurant-${restaurant.id}`}
-                  accessibilityLabel={isSaved ? "Ta bort fran sparade" : "Spara restaurang"}
-                  onPress={handleToggleSave}
-                  style={{
-                    position: "absolute",
-                    top: 4,
-                    right: 4,
-                    width: 28,
-                    height: 28,
-                    borderRadius: 14,
-                    backgroundColor: "rgba(255,255,255,0.85)",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                  hitSlop={8}
-                >
-                  <Animated.View style={heartAnimStyle}>
-                    <Heart
-                      size={14}
-                      color={isSaved ? C.coral : C.textTertiary}
-                      fill={isSaved ? C.coral : "transparent"}
-                      strokeWidth={2}
-                    />
-                  </Animated.View>
-                </Pressable>
-              ) : null}
             </View>
           </View>
         </Animated.View>
@@ -316,71 +347,113 @@ export const RestaurantCard = React.memo(function RestaurantCard({
 const styles = StyleSheet.create({
   cardContainer: {
     paddingHorizontal: SPACING.lg,
-    paddingVertical: 16,
+    paddingVertical: 14,
   },
-  cardLeftContent: {
+  cardRow: {
+    flexDirection: "row",
+    gap: 14,
+  },
+  imageWrapper: {
+    position: "relative",
+  },
+  cardRightContent: {
     flex: 1,
-    marginRight: 16,
+    justifyContent: "center",
   },
   restaurantName: {
     fontFamily: FONTS.displaySemiBold,
     fontSize: 17,
     color: C.textPrimary,
-    letterSpacing: -0.3,
+    letterSpacing: -0.4,
+  },
+  metaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    marginTop: 4,
   },
   restaurantAddress: {
     fontFamily: FONTS.regular,
-    fontSize: 13,
+    fontSize: 12.5,
     color: C.textTertiary,
     marginTop: 3,
+    letterSpacing: -0.1,
   },
   ratingText: {
     fontFamily: FONTS.semiBold,
-    fontSize: 12,
+    fontSize: 12.5,
     color: C.textPrimary,
   },
   reviewCountText: {
     fontFamily: FONTS.regular,
     fontSize: 12,
     color: C.textTertiary,
-    marginLeft: 2,
   },
   dot: {
     width: 3,
     height: 3,
     borderRadius: 1.5,
     backgroundColor: C.borderLight,
-    marginHorizontal: 6,
+    marginHorizontal: 4,
   },
   cuisineText: {
-    fontFamily: FONTS.regular,
+    fontFamily: FONTS.medium,
     fontSize: 12,
     color: C.textTertiary,
   },
-  detailText: {
-    fontFamily: FONTS.medium,
-    fontSize: 13,
-    color: C.textSecondary,
-    letterSpacing: -0.1,
+  chipRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
+    gap: 8,
   },
-  watchingBadge: {
-    marginTop: 6,
-    backgroundColor: "rgba(59,130,246,0.08)",
-    borderRadius: 6,
+  chip: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: C.bgInput,
+    borderRadius: 8,
     paddingHorizontal: 8,
-    paddingVertical: 3,
-    alignSelf: "flex-start",
+    paddingVertical: 4,
     gap: 4,
   },
-  watchingText: {
-    fontFamily: FONTS.medium,
-    fontSize: 11,
-    color: C.info,
+  chipText: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 12.5,
+    color: C.textPrimary,
+    letterSpacing: -0.1,
+  },
+  watcherOverlay: {
+    position: "absolute",
+    bottom: 6,
+    left: 6,
+    backgroundColor: "rgba(0,0,0,0.55)",
+    borderRadius: 6,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+  },
+  watcherOverlayText: {
+    fontFamily: FONTS.bold,
+    fontSize: 10.5,
+    color: "#FFFFFF",
+  },
+  saveButton: {
+    position: "absolute",
+    top: 6,
+    right: 6,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    alignItems: "center",
+    justifyContent: "center",
   },
   thumbnail: {
-    width: 84,
-    height: 84,
-    borderRadius: RADIUS.md,
+    width: 100,
+    height: 100,
+    borderRadius: RADIUS.lg,
     backgroundColor: C.bgInput,
   },
   divider: {
@@ -392,33 +465,35 @@ const styles = StyleSheet.create({
   urgencyBadgeToday: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: C.successLight,
-    borderRadius: RADIUS.sm,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    backgroundColor: "rgba(34,197,94,0.10)",
+    borderRadius: 8,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
     gap: 6,
-    marginTop: 6,
+    marginTop: 8,
     alignSelf: "flex-start",
   },
   urgencyBadgeTodayText: {
-    fontFamily: FONTS.semiBold,
+    fontFamily: FONTS.bold,
     fontSize: 12,
-    color: C.success,
+    color: "#16A34A",
+    letterSpacing: -0.2,
   },
   urgencyBadge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: C.coralLight,
-    borderRadius: RADIUS.sm,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    backgroundColor: "rgba(239,68,68,0.08)",
+    borderRadius: 8,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
     gap: 4,
-    marginTop: 6,
+    marginTop: 8,
     alignSelf: "flex-start",
   },
   urgencyBadgeText: {
-    fontFamily: FONTS.medium,
+    fontFamily: FONTS.bold,
     fontSize: 12,
-    color: C.coral,
+    color: "#EF4444",
+    letterSpacing: -0.2,
   },
 });

@@ -4,6 +4,7 @@ import { z } from "zod";
 import { db } from "../db";
 import { createCreditsPurchase, getStripe } from "../stripe";
 import { env } from "../env";
+import { sendPushToUser } from "../push";
 
 const creditsRouter = new Hono<{ Variables: { userPhone: string } }>();
 
@@ -46,6 +47,14 @@ creditsRouter.post(
           message: `Du har köpt ${quantity} Reslot credit${quantity > 1 ? "s" : ""} för ${quantity * 39} kr.`,
         },
       });
+
+      // Push notification for credits purchased
+      sendPushToUser(
+        phone,
+        `${quantity} credits köpta!`,
+        `Du har köpt ${quantity} Reslot credit${quantity > 1 ? "s" : ""} för ${quantity * 39} kr.`,
+        { type: "credits_purchased", quantity }
+      ).catch(() => {});
 
       return c.json({ data: { success: true, newBalance: updated.credits, clientSecret: null } });
     }
@@ -110,6 +119,14 @@ creditsRouter.post("/webhook", async (c) => {
         },
       });
 
+      // Push notification for credits purchased via Stripe
+      sendPushToUser(
+        phone,
+        `${qty} credits köpta!`,
+        `Du har köpt ${qty} Reslot credit${qty > 1 ? "s" : ""} för ${qty * 39} kr.`,
+        { type: "credits_purchased", quantity: qty }
+      ).catch(() => {});
+
       console.log(`[STRIPE WEBHOOK] Credits purchase: ${qty} credits for ${phone}`);
     }
 
@@ -157,6 +174,16 @@ creditsRouter.post("/webhook", async (c) => {
             },
           });
         }
+        // Push notification for payment failure
+        if (claimerPhone) {
+          sendPushToUser(
+            claimerPhone,
+            "Betalning misslyckades",
+            "Betalningen för din övertagna bokning kunde inte genomföras. Dina credits har återbetalats.",
+            { type: "payment_failed", reservationId }
+          ).catch(() => {});
+        }
+
         console.log(`[STRIPE WEBHOOK] Payment failed for claim reservation ${reservationId}`);
       }
     }

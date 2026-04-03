@@ -8,6 +8,7 @@ import type {
   ActivityAlert,
   RestaurantAlertWithRestaurant,
   Watch,
+  WatchFilterOptions,
   SavedRestaurant,
 } from "./types";
 
@@ -256,17 +257,20 @@ export function useWatches(phone: string | null | undefined) {
   });
 }
 
+interface AddWatchData {
+  userPhone: string;
+  restaurantId?: string;
+  date?: string;
+  partySize?: number;
+  notes?: string;
+  filterOptions?: WatchFilterOptions;
+}
+
 export function useAddWatch() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: {
-      userPhone: string;
-      restaurantId?: string;
-      date?: string;
-      partySize?: number;
-      notes?: string;
-    }) => api.post<Watch>("/api/watches", data),
-    onSuccess: (_: Watch, variables: { userPhone: string; restaurantId?: string; date?: string; partySize?: number; notes?: string }) => {
+    mutationFn: (data: AddWatchData) => api.post<Watch>("/api/watches", data),
+    onSuccess: (_: Watch, variables: AddWatchData) => {
       queryClient.invalidateQueries({ queryKey: ["watches", variables.userPhone] });
     },
   });
@@ -280,6 +284,15 @@ export function useDeleteWatch() {
     onSuccess: (_: { success: boolean }, variables: { id: string; userPhone: string }) => {
       queryClient.invalidateQueries({ queryKey: ["watches", variables.userPhone] });
     },
+  });
+}
+
+// ─── New on Reslot (discovery) ────────────────────────
+export function useNewOnReslot() {
+  return useQuery({
+    queryKey: ["newOnReslot"],
+    queryFn: () => api.get<Restaurant[]>("/api/restaurants/new-on-reslot"),
+    staleTime: 5 * 60 * 1000,
   });
 }
 

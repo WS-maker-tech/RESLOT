@@ -26,6 +26,9 @@ import {
   Search,
   Eye,
   Trash2,
+  Clock,
+  Calendar,
+  Users,
 } from "lucide-react-native";
 import { useAuthStore } from "@/lib/auth-store";
 import {
@@ -38,7 +41,8 @@ import {
   useWatches,
   useDeleteWatch,
 } from "@/lib/api/hooks";
-import type { ActivityAlert, RestaurantAlertWithRestaurant, Watch } from "@/lib/api/types";
+import type { ActivityAlert, RestaurantAlertWithRestaurant, Watch, WatchFilterOptions } from "@/lib/api/types";
+import { parseWatchFilters } from "@/lib/api/types";
 import Animated, { FadeInDown, ZoomIn } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
@@ -750,30 +754,65 @@ export default function AlertsScreen() {
               </View>
             ) : (
               <View style={{ paddingHorizontal: SPACING.lg, gap: 10, marginTop: 4 }}>
-                {watches.map((watch: Watch, index: number) => (
-                  <Animated.View key={watch.id} entering={FadeInDown.delay(index * 60).springify()}>
-                    <View style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.lg, borderWidth: 0.5, borderColor: C.borderLight, padding: SPACING.md, flexDirection: "row", alignItems: "center", shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1 }}>
-                      <View style={{ flex: 1 }}>
-                        <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.dark }}>
-                          {watch.restaurant?.name ?? "Valfri restaurang"}
-                        </Text>
-                        <View style={{ flexDirection: "row", gap: 12, marginTop: 4, flexWrap: "wrap" }}>
-                          {watch.date ? <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary }}>{watch.date}</Text> : null}
-                          {watch.partySize ? <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary }}>{watch.partySize} pers</Text> : null}
-                          {watch.notes ? <Text numberOfLines={1} style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary }}>{watch.notes}</Text> : null}
+                {watches.map((watch: Watch, index: number) => {
+                  const filters = parseWatchFilters(watch.filterOptions);
+                  const WEEKDAY_LABELS_SHORT = ["Sön", "Mån", "Tis", "Ons", "Tor", "Fre", "Lör"];
+                  return (
+                    <Animated.View key={watch.id} entering={FadeInDown.delay(index * 60).springify()}>
+                      <View style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.lg, borderWidth: 0.5, borderColor: C.borderLight, padding: SPACING.md, shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1 }}>
+                        <View style={{ flexDirection: "row", alignItems: "center" }}>
+                          <View style={{ flex: 1 }}>
+                            <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.dark }}>
+                                {watch.restaurant?.name ?? "Valfri restaurang"}
+                              </Text>
+                              {/* Persistent badge */}
+                              <View style={{ backgroundColor: "rgba(34,197,94,0.10)", borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 }}>
+                                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 9, color: C.success, textTransform: "uppercase", letterSpacing: 0.5 }}>Alltid aktiv</Text>
+                              </View>
+                            </View>
+                            <View style={{ flexDirection: "row", gap: 12, marginTop: 4, flexWrap: "wrap" }}>
+                              {watch.date ? <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary }}>{watch.date}</Text> : null}
+                              {watch.partySize ? <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary }}>{watch.partySize} pers</Text> : null}
+                              {watch.notes ? <Text numberOfLines={1} style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary }}>{watch.notes}</Text> : null}
+                            </View>
+                          </View>
+                          <Pressable
+                            testID={`delete-watch-${watch.id}`}
+                            accessibilityLabel={`Ta bort bevakning för ${watch.restaurant?.name ?? "valfri restaurang"}`}
+                            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); deleteWatch({ id: watch.id, userPhone: phone! }); }}
+                            style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: C.coralLight, alignItems: "center", justifyContent: "center" }}
+                          >
+                            <Trash2 size={15} color={C.coral} strokeWidth={2} />
+                          </Pressable>
                         </View>
+                        {/* Smart filter tags */}
+                        {filters ? (
+                          <View style={{ flexDirection: "row", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
+                            {filters.timeRange ? (
+                              <View style={{ flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: "rgba(59,130,246,0.08)", borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 }}>
+                                <Clock size={11} color="#3B82F6" strokeWidth={2} />
+                                <Text style={{ fontFamily: FONTS.medium, fontSize: 11, color: "#3B82F6" }}>{filters.timeRange[0]}–{filters.timeRange[1]}</Text>
+                              </View>
+                            ) : null}
+                            {filters.weekdays && filters.weekdays.length > 0 ? (
+                              <View style={{ flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: "rgba(126,200,122,0.12)", borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 }}>
+                                <Calendar size={11} color={C.success} strokeWidth={2} />
+                                <Text style={{ fontFamily: FONTS.medium, fontSize: 11, color: C.success }}>{filters.weekdays.map((d) => WEEKDAY_LABELS_SHORT[d]).join(", ")}</Text>
+                              </View>
+                            ) : null}
+                            {filters.partySize ? (
+                              <View style={{ flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: "rgba(224,106,78,0.08)", borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 }}>
+                                <Users size={11} color={C.coral} strokeWidth={2} />
+                                <Text style={{ fontFamily: FONTS.medium, fontSize: 11, color: C.coral }}>{filters.partySize} pers</Text>
+                              </View>
+                            ) : null}
+                          </View>
+                        ) : null}
                       </View>
-                      <Pressable
-                        testID={`delete-watch-${watch.id}`}
-                        accessibilityLabel={`Ta bort bevakning för ${watch.restaurant?.name ?? "valfri restaurang"}`}
-                        onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); deleteWatch({ id: watch.id, userPhone: phone! }); }}
-                        style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: C.coralLight, alignItems: "center", justifyContent: "center" }}
-                      >
-                        <Trash2 size={15} color={C.coral} strokeWidth={2} />
-                      </Pressable>
-                    </View>
-                  </Animated.View>
-                ))}
+                    </Animated.View>
+                  );
+                })}
               </View>
             )}
           </View>

@@ -63,21 +63,21 @@ function ReservationsSkeleton() {
   );
 }
 
-function getStatusBadge(status: string) {
+function getStatusBadge(status: string, isSubmitter: boolean) {
   switch (status) {
     case "active":
-      return { label: "Aktiv", bg: "rgba(74,140,107,0.12)", color: C.success };
+      return { label: isSubmitter ? "Tillgänglig" : "Aktiv", bg: "rgba(74,140,107,0.12)", color: C.success, subtext: isSubmitter ? null : "Du ansvarar" };
     case "grace_period":
-      return { label: "Under ångerfrist", bg: "rgba(245,158,11,0.12)", color: C.warning };
+      return { label: "Under ångerfrist", bg: "rgba(245,158,11,0.12)", color: C.warning, subtext: "5 min att ångra" };
     case "claimed":
     case "completed":
-      return { label: "Övertagen", bg: "rgba(156,163,175,0.12)", color: C.textSecondary };
+      return { label: "Bekräftad", bg: "rgba(126,200,122,0.10)", color: C.coral, subtext: "Ansvar överfört" };
     case "cancelled":
-      return { label: "Avbokad", bg: "rgba(220,38,38,0.1)", color: C.danger };
+      return { label: "Avbokad", bg: "rgba(220,38,38,0.1)", color: C.danger, subtext: null };
     case "expired":
-      return { label: "Utgången", bg: "rgba(156,163,175,0.12)", color: C.textSecondary };
+      return { label: "Utgången", bg: "rgba(156,163,175,0.12)", color: C.textSecondary, subtext: null };
     default:
-      return { label: status, bg: C.bgInput, color: C.textSecondary };
+      return { label: status, bg: C.bgInput, color: C.textSecondary, subtext: null };
   }
 }
 
@@ -85,13 +85,15 @@ function ReservationCard({
   reservation,
   index,
   onCancel,
+  isSubmitter,
 }: {
   reservation: Reservation;
   index: number;
   onCancel?: (id: string) => void;
+  isSubmitter: boolean;
 }) {
   const scale = useSharedValue(1);
-  const status = getStatusBadge(reservation.status);
+  const status = getStatusBadge(reservation.status, isSubmitter);
   const restaurant = reservation.restaurant;
   const router = useRouter();
 
@@ -300,29 +302,43 @@ function ReservationCard({
             </View>
           </View>
 
-          {/* Status badge */}
+          {/* Status badge with liability info */}
           <View style={{ marginTop: 12, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-            <View
-              testID={`reservation-status-${reservation.id}`}
-              style={{
-                alignSelf: "flex-start",
-                backgroundColor: status.bg,
-                paddingHorizontal: 10,
-                paddingVertical: 5,
-                borderRadius: RADIUS.sm,
-              }}
-            >
-              <Text
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+              <View
+                testID={`reservation-status-${reservation.id}`}
                 style={{
-                  fontFamily: FONTS.semiBold,
-                  fontSize: 11,
-                  color: status.color,
-                  letterSpacing: 0.3,
-                  textTransform: "uppercase",
+                  alignSelf: "flex-start",
+                  backgroundColor: status.bg,
+                  paddingHorizontal: 10,
+                  paddingVertical: 5,
+                  borderRadius: RADIUS.sm,
                 }}
               >
-                {status.label}
-              </Text>
+                <Text
+                  style={{
+                    fontFamily: FONTS.semiBold,
+                    fontSize: 11,
+                    color: status.color,
+                    letterSpacing: 0.3,
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {status.label}
+                </Text>
+              </View>
+              {status.subtext ? (
+                <Text
+                  style={{
+                    fontFamily: FONTS.medium,
+                    fontSize: 11,
+                    color: status.color,
+                    opacity: 0.8,
+                  }}
+                >
+                  {status.subtext}
+                </Text>
+              ) : null}
             </View>
             {reservation.status === "active" && (
               <Pressable
@@ -479,7 +495,7 @@ export default function ReservationsScreen() {
                   </Animated.View>
                 </Animated.View>
               ) : submittedReservations.map((reservation: Reservation, index: number) => (
-                <ReservationCard key={reservation.id} reservation={reservation} index={index} onCancel={handleCancel} />
+                <ReservationCard key={reservation.id} reservation={reservation} index={index} onCancel={handleCancel} isSubmitter={true} />
               ))}
             </View>
 
@@ -501,7 +517,7 @@ export default function ReservationsScreen() {
                   </Animated.View>
                 </Animated.View>
               ) : claimedReservations.map((reservation: Reservation, index: number) => (
-                <ReservationCard key={reservation.id} reservation={reservation} index={index} onCancel={handleCancel} />
+                <ReservationCard key={reservation.id} reservation={reservation} index={index} onCancel={handleCancel} isSubmitter={false} />
               ))}
             </View>
           </>

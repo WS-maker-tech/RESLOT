@@ -30,6 +30,7 @@ import {
   CreditCard,
   Undo2,
   Timer,
+  Users,
 } from "lucide-react-native";
 import Animated, {
   FadeInDown,
@@ -61,8 +62,8 @@ import { BookingDetails } from "@/components/BookingDetails";
 import { RestaurantInfo } from "@/components/RestaurantInfo";
 import { ClaimSection } from "@/components/ClaimSection";
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const HERO_HEIGHT = 280;
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
+const HERO_HEIGHT = 380;
 
 // Swedish day/month formatting
 const MONTHS_SV = [
@@ -90,30 +91,30 @@ const ConfettiParticle = React.memo(function ConfettiParticle({ delay, color, st
   const scale = useSharedValue(0);
 
   useEffect(() => {
-    const xDrift = (Math.random() - 0.5) * 180;
-    scale.value = withDelay(delay, withSpring(1, { damping: 8, stiffness: 200 }));
+    const xDrift = (Math.random() - 0.5) * 260;
+    scale.value = withDelay(delay, withSpring(1, { damping: 6, stiffness: 300 }));
     translateY.value = withDelay(
       delay,
-      withTiming(300 + Math.random() * 140, { duration: 1600, easing: Easing.out(Easing.quad) })
+      withTiming(350 + Math.random() * 200, { duration: 2200, easing: Easing.out(Easing.cubic) })
     );
     translateX.value = withDelay(
       delay,
-      withTiming(xDrift, { duration: 1600, easing: Easing.out(Easing.quad) })
+      withTiming(xDrift, { duration: 2200, easing: Easing.out(Easing.cubic) })
     );
     rotate.value = withDelay(
       delay,
-      withTiming(360 * (Math.random() > 0.5 ? 1 : -1) * (1 + Math.random()), { duration: 1600 })
+      withTiming(720 * (Math.random() > 0.5 ? 1 : -1) * (1 + Math.random()), { duration: 2200 })
     );
-    opacity.value = withDelay(delay + 900, withTiming(0, { duration: 700 }));
+    opacity.value = withDelay(delay + 1200, withTiming(0, { duration: 900 }));
   }, []);
 
   const style = useAnimatedStyle(() => ({
     position: "absolute" as const,
     top: -10,
     left: startX,
-    width: Math.random() > 0.5 ? 8 : 6,
-    height: Math.random() > 0.5 ? 10 : 7,
-    borderRadius: Math.random() > 0.5 ? 2 : 4,
+    width: 5 + Math.random() * 7,
+    height: 6 + Math.random() * 8,
+    borderRadius: Math.random() > 0.6 ? 2 : Math.random() > 0.3 ? 6 : 1,
     backgroundColor: color,
     opacity: opacity.value,
     transform: [
@@ -160,12 +161,12 @@ const SuccessOverlay = React.memo(function SuccessOverlay({
 
   if (!visible) return null;
 
-  const confettiColors = [C.coral, C.gold, C.success, "#3B82F6", "#A855F7", "#F472B6", "#FBBF24"];
-  const particles = Array.from({ length: 30 }, (_, i) => ({
+  const confettiColors = [C.coral, C.gold, "#3B82F6", "#A855F7", "#F472B6", "#FBBF24", "#34D399", "#FB923C", "#818CF8"];
+  const particles = Array.from({ length: 55 }, (_, i) => ({
     id: i,
-    delay: Math.random() * 400,
+    delay: Math.random() * 600,
     color: confettiColors[i % confettiColors.length],
-    startX: SCREEN_WIDTH * 0.15 + Math.random() * SCREEN_WIDTH * 0.7,
+    startX: SCREEN_WIDTH * 0.05 + Math.random() * SCREEN_WIDTH * 0.9,
   }));
 
   return (
@@ -182,51 +183,53 @@ const SuccessOverlay = React.memo(function SuccessOverlay({
         zIndex: 200,
       }}
     >
-      {/* Confetti */}
-      <View style={{ position: "absolute", top: "25%", left: 0, right: 0 }}>
+      {/* Confetti burst */}
+      <View style={{ position: "absolute", top: "18%", left: 0, right: 0 }}>
         {particles.map((p) => (
           <ConfettiParticle key={p.id} delay={p.delay} color={p.color} startX={p.startX} />
         ))}
       </View>
 
-      {/* Success circle */}
+      {/* Success circle — pistachio glow */}
       <Animated.View
-        entering={ZoomIn.springify().damping(10).stiffness(150)}
+        entering={ZoomIn.springify().damping(8).stiffness(120)}
         style={{
-          width: 100,
-          height: 100,
-          borderRadius: 50,
-          backgroundColor: C.success,
+          width: 120,
+          height: 120,
+          borderRadius: 60,
+          backgroundColor: C.coral,
           alignItems: "center",
           justifyContent: "center",
-          ...SHADOW.elevated,
-          shadowColor: C.success,
-          shadowOpacity: 0.35,
+          shadowColor: C.coral,
+          shadowOffset: { width: 0, height: 0 },
+          shadowOpacity: 0.5,
+          shadowRadius: 30,
+          elevation: 12,
         }}
       >
-        <Check size={50} color="#FFFFFF" strokeWidth={3} />
+        <Check size={58} color="#FFFFFF" strokeWidth={3} />
       </Animated.View>
 
       <Animated.Text
-        entering={FadeInDown.delay(200).springify()}
+        entering={FadeInDown.delay(180).springify()}
         style={{
           fontFamily: FONTS.displayBold,
-          fontSize: 26,
+          fontSize: 30,
           color: "#FFFFFF",
-          marginTop: 22,
-          letterSpacing: -0.6,
+          marginTop: 26,
+          letterSpacing: -0.8,
         }}
       >
         Bokning övertagen!
       </Animated.Text>
 
       <Animated.Text
-        entering={FadeInDown.delay(260).springify()}
+        entering={FadeInDown.delay(240).springify()}
         style={{
           fontFamily: FONTS.bold,
-          fontSize: 20,
+          fontSize: 22,
           color: "#FFFFFF",
-          marginTop: 14,
+          marginTop: 12,
           letterSpacing: -0.4,
           textAlign: "center",
           paddingHorizontal: 32,
@@ -236,29 +239,42 @@ const SuccessOverlay = React.memo(function SuccessOverlay({
       </Animated.Text>
 
       <Animated.Text
-        entering={FadeInDown.delay(320).springify()}
+        entering={FadeInDown.delay(300).springify()}
         style={{
           fontFamily: FONTS.medium,
-          fontSize: 15,
-          color: "rgba(255,255,255,0.8)",
-          marginTop: 6,
+          fontSize: 16,
+          color: "rgba(255,255,255,0.85)",
+          marginTop: 8,
           textAlign: "center",
         }}
       >
         {reservationDate} · {reservationTime}
       </Animated.Text>
 
-      <Animated.Text
-        entering={FadeInDown.delay(380).springify()}
+      <Animated.View
+        entering={FadeInDown.delay(360).springify()}
         style={{
-          fontFamily: FONTS.regular,
-          fontSize: 14,
-          color: "rgba(255,255,255,0.6)",
-          marginTop: 4,
+          backgroundColor: "rgba(126,200,122,0.20)",
+          borderRadius: RADIUS.full,
+          paddingHorizontal: 16,
+          paddingVertical: 8,
+          marginTop: 14,
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 6,
         }}
       >
-        Ångerfristen börjar nu
-      </Animated.Text>
+        <Shield size={14} color="rgba(255,255,255,0.9)" strokeWidth={2} />
+        <Text
+          style={{
+            fontFamily: FONTS.semiBold,
+            fontSize: 13,
+            color: "rgba(255,255,255,0.9)",
+          }}
+        >
+          5 min ångerfrist aktiv
+        </Text>
+      </Animated.View>
 
       {/* Share button */}
       <Animated.View
@@ -380,76 +396,79 @@ const GracePeriodOverlay = React.memo(function GracePeriodOverlay({
       }}
     >
       <Animated.View
-        entering={FadeInDown.springify().damping(14)}
+        entering={FadeInDown.springify().damping(12)}
         style={{
           backgroundColor: C.bgCard,
-          borderRadius: RADIUS.xl,
-          padding: 28,
-          marginHorizontal: 24,
+          borderRadius: 24,
+          padding: 30,
+          marginHorizontal: 20,
           alignItems: "center",
-          width: SCREEN_WIDTH - 48,
+          width: SCREEN_WIDTH - 40,
           ...SHADOW.elevated,
+          shadowOpacity: 0.18,
+          shadowRadius: 24,
         }}
       >
-        {/* Success badge */}
+        {/* Success badge — pistachio */}
         <Animated.View
-          entering={ZoomIn.springify().damping(10)}
+          entering={ZoomIn.springify().damping(8)}
           style={{
-            width: 52,
-            height: 52,
-            borderRadius: 26,
-            backgroundColor: C.success,
+            width: 56,
+            height: 56,
+            borderRadius: 28,
+            backgroundColor: C.coral,
             alignItems: "center",
             justifyContent: "center",
-            marginBottom: 14,
-            shadowColor: C.success,
+            marginBottom: 16,
+            shadowColor: C.coral,
             shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.25,
-            shadowRadius: 10,
+            shadowOpacity: 0.3,
+            shadowRadius: 12,
+            elevation: 6,
           }}
         >
-          <Check size={26} color="#FFFFFF" strokeWidth={3} />
+          <Check size={28} color="#FFFFFF" strokeWidth={3} />
         </Animated.View>
 
         <Text
           testID="grace-period-title"
           style={{
             fontFamily: FONTS.displayBold,
-            fontSize: 22,
+            fontSize: 24,
             color: C.textPrimary,
             textAlign: "center",
-            letterSpacing: -0.5,
-            marginBottom: 3,
+            letterSpacing: -0.6,
+            marginBottom: 4,
           }}
         >
           Bokning övertagen!
         </Text>
         <Text
           style={{
-            fontFamily: FONTS.regular,
-            fontSize: 14,
+            fontFamily: FONTS.medium,
+            fontSize: 15,
             color: C.textSecondary,
             textAlign: "center",
-            lineHeight: 20,
-            marginBottom: 22,
+            lineHeight: 21,
+            marginBottom: 24,
           }}
         >
-          {restaurantName}
-        </Text>
+          {restaurantName} — du har 5 min att ångra
+          </Text>
 
-        {/* Countdown ring */}
+        {/* Countdown ring — larger, clearer */}
         <Animated.View
           testID="grace-period-countdown"
           style={[
             {
-              width: 144,
-              height: 144,
-              borderRadius: 72,
+              width: 160,
+              height: 160,
+              borderRadius: 80,
               backgroundColor: ringBg,
               alignItems: "center",
               justifyContent: "center",
-              marginBottom: 18,
-              borderWidth: 3,
+              marginBottom: 20,
+              borderWidth: 4,
               borderColor: ringBorder,
             },
             ringPulseStyle,
@@ -458,7 +477,7 @@ const GracePeriodOverlay = React.memo(function GracePeriodOverlay({
           <Text
             style={{
               fontFamily: FONTS.bold,
-              fontSize: 40,
+              fontSize: 44,
               color: isUrgent ? C.error : C.dark,
               letterSpacing: 2,
             }}
@@ -467,25 +486,25 @@ const GracePeriodOverlay = React.memo(function GracePeriodOverlay({
           </Text>
           <Text
             style={{
-              fontFamily: FONTS.medium,
-              fontSize: 11,
+              fontFamily: FONTS.semiBold,
+              fontSize: 12,
               color: isUrgent ? C.error : C.textTertiary,
               textTransform: "uppercase",
-              letterSpacing: 1,
-              marginTop: 2,
+              letterSpacing: 1.5,
+              marginTop: 4,
             }}
           >
-            Ångerfrist
+            {secondsLeft > 0 ? "Ångra utan avgift" : "Tid ute"}
           </Text>
         </Animated.View>
 
-        {/* Progress bar */}
+        {/* Progress bar — thicker */}
         <View
           style={{
             width: "100%",
-            height: 4,
+            height: 6,
             backgroundColor: "rgba(0,0,0,0.06)",
-            borderRadius: 2,
+            borderRadius: 3,
             marginBottom: 18,
             overflow: "hidden",
           }}
@@ -494,27 +513,77 @@ const GracePeriodOverlay = React.memo(function GracePeriodOverlay({
             style={{
               width: `${progress * 100}%`,
               height: "100%",
-              backgroundColor: isUrgent ? C.error : C.success,
-              borderRadius: 2,
+              backgroundColor: isUrgent ? C.error : C.coral,
+              borderRadius: 3,
             }}
           />
         </View>
 
-        {/* Info text */}
-        <Text
-          style={{
-            fontFamily: FONTS.regular,
-            fontSize: 13,
-            color: C.textSecondary,
-            textAlign: "center",
-            lineHeight: 19,
-            marginBottom: 18,
-          }}
-        >
-          Du kan ångra utan kostnad innan tiden går ut.{"\n"}Credits och avgift återbetalas.
-        </Text>
+        {/* Info text — clearer */}
+        <View style={{
+          backgroundColor: "rgba(59,130,246,0.05)",
+          borderRadius: RADIUS.md,
+          padding: 14,
+          marginBottom: 20,
+          width: "100%",
+          borderWidth: 1,
+          borderColor: "rgba(59,130,246,0.10)",
+        }}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 4 }}>
+            <Shield size={14} color={C.info} strokeWidth={2.5} />
+            <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: C.info }}>
+              Ångra inom ångerfristen — inga avgifter
+            </Text>
+          </View>
+          <Text
+            style={{
+              fontFamily: FONTS.regular,
+              fontSize: 13,
+              color: C.textSecondary,
+              lineHeight: 19,
+            }}
+          >
+            Du kan ångra utan kostnad innan tiden går ut. Credits och avgift återbetalas direkt. När ångerfristen löper ut ansvarar du fullt för bokningen.
+          </Text>
+        </View>
 
-        {/* Cancel button */}
+        {/* Done button — primary, pistachio */}
+        <Pressable
+          testID="grace-period-done-button"
+          accessibilityLabel="Klar, gå vidare"
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            onDone();
+          }}
+          style={({ pressed }) => ({
+            backgroundColor: C.coral,
+            borderRadius: RADIUS.lg,
+            paddingVertical: 16,
+            paddingHorizontal: 24,
+            width: "100%",
+            alignItems: "center",
+            justifyContent: "center",
+            transform: [{ scale: pressed ? 0.97 : 1 }],
+            shadowColor: C.coral,
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.3,
+            shadowRadius: 14,
+            elevation: 6,
+          })}
+        >
+          <Text
+            style={{
+              fontFamily: FONTS.bold,
+              fontSize: 16,
+              color: C.dark,
+              letterSpacing: -0.2,
+            }}
+          >
+            Klar — gå till bokning
+          </Text>
+        </Pressable>
+
+        {/* Cancel button — secondary */}
         <Pressable
           testID="cancel-claim-button"
           accessibilityLabel="Ångra övertagande"
@@ -524,15 +593,16 @@ const GracePeriodOverlay = React.memo(function GracePeriodOverlay({
           }}
           disabled={cancelPending}
           style={({ pressed }) => ({
-            backgroundColor: pressed ? "rgba(239,68,68,0.14)" : "rgba(239,68,68,0.07)",
+            backgroundColor: "transparent",
             borderRadius: RADIUS.lg,
-            paddingVertical: 15,
+            paddingVertical: 14,
             paddingHorizontal: 24,
             width: "100%",
             alignItems: "center",
             flexDirection: "row",
             justifyContent: "center",
             gap: 8,
+            marginTop: 8,
             transform: [{ scale: pressed ? 0.97 : 1 }],
           })}
         >
@@ -540,11 +610,11 @@ const GracePeriodOverlay = React.memo(function GracePeriodOverlay({
             <ActivityIndicator size="small" color={C.error} />
           ) : (
             <>
-              <Undo2 size={16} color={C.error} strokeWidth={2.5} />
+              <Undo2 size={15} color={C.error} strokeWidth={2.5} />
               <Text
                 style={{
-                  fontFamily: FONTS.semiBold,
-                  fontSize: 15,
+                  fontFamily: FONTS.medium,
+                  fontSize: 14,
                   color: C.error,
                 }}
               >
@@ -552,37 +622,6 @@ const GracePeriodOverlay = React.memo(function GracePeriodOverlay({
               </Text>
             </>
           )}
-        </Pressable>
-
-        {/* Done button */}
-        <Pressable
-          testID="grace-period-done-button"
-          accessibilityLabel="Klar, gå vidare"
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-            onDone();
-          }}
-          style={({ pressed }) => ({
-            backgroundColor: pressed ? C.success : C.dark,
-            borderRadius: RADIUS.lg,
-            paddingVertical: 15,
-            paddingHorizontal: 24,
-            width: "100%",
-            alignItems: "center",
-            justifyContent: "center",
-            marginTop: 10,
-            transform: [{ scale: pressed ? 0.97 : 1 }],
-          })}
-        >
-          <Text
-            style={{
-              fontFamily: FONTS.semiBold,
-              fontSize: 15,
-              color: "#FFFFFF",
-            }}
-          >
-            Klar
-          </Text>
         </Pressable>
       </Animated.View>
     </View>
@@ -777,7 +816,7 @@ export default function RestaurantDetailScreen() {
   if (isLoading) {
     return (
       <View style={{ flex: 1, backgroundColor: C.bg }}>
-        {/* Skeleton hero */}
+        {/* Skeleton hero — matches new 380px height */}
         <View style={{ height: HERO_HEIGHT, backgroundColor: C.bgInput }} />
         <View style={{ paddingHorizontal: SPACING.lg, paddingTop: 20 }}>
           <View style={{ width: "70%", height: 28, backgroundColor: C.bgInput, borderRadius: 8, marginBottom: 10 }} />
@@ -936,7 +975,7 @@ export default function RestaurantDetailScreen() {
         onScroll={scrollHandler}
         scrollEventThrottle={16}
       >
-        {/* Hero Image — 280px */}
+        {/* Hero Image — full-width, dramatic */}
         <View style={{ height: HERO_HEIGHT, overflow: "hidden" }}>
           <Animated.View style={[{ width: "100%", height: "100%" }, heroStyle]}>
             <Image
@@ -947,29 +986,56 @@ export default function RestaurantDetailScreen() {
               cachePolicy="memory-disk"
             />
           </Animated.View>
-          {/* Gradient overlays — top + bottom */}
+          {/* Top gradient — deeper for header readability */}
           <LinearGradient
-            colors={["rgba(0,0,0,0.25)", "transparent"]}
+            colors={["rgba(0,0,0,0.45)", "rgba(0,0,0,0.15)", "transparent"]}
+            locations={[0, 0.4, 1]}
             style={{
               position: "absolute",
               top: 0,
               left: 0,
               right: 0,
-              height: 100,
+              height: 140,
             }}
           />
+          {/* Bottom gradient — rich cinematic fade */}
           <LinearGradient
-            colors={["transparent", "rgba(0,0,0,0.04)", "rgba(0,0,0,0.40)"]}
-            locations={[0.25, 0.55, 1]}
+            colors={["transparent", "rgba(0,0,0,0.06)", "rgba(0,0,0,0.55)"]}
+            locations={[0.2, 0.5, 1]}
             style={{
               position: "absolute",
               bottom: 0,
               left: 0,
               right: 0,
-              height: HERO_HEIGHT * 0.6,
+              height: HERO_HEIGHT * 0.65,
             }}
           />
-          {/* Bottom hero overlay: party size + time chip */}
+          {/* Restaurant name overlay on hero */}
+          <View
+            style={{
+              position: "absolute",
+              bottom: 50,
+              left: SPACING.lg,
+              right: SPACING.lg,
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: FONTS.displayBold,
+                fontSize: 28,
+                color: "#FFFFFF",
+                letterSpacing: -0.8,
+                lineHeight: 34,
+                textShadowColor: "rgba(0,0,0,0.3)",
+                textShadowOffset: { width: 0, height: 1 },
+                textShadowRadius: 4,
+              }}
+              numberOfLines={2}
+            >
+              {r.name}
+            </Text>
+          </View>
+          {/* Bottom hero chips: party size + time */}
           <View
             style={{
               position: "absolute",
@@ -980,30 +1046,73 @@ export default function RestaurantDetailScreen() {
               gap: 8,
             }}
           >
-            <View style={{ backgroundColor: "rgba(255,255,255,0.92)", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, flexDirection: "row", alignItems: "center", gap: 5 }}>
-              <Users size={13} color={C.dark} strokeWidth={2} />
-              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textPrimary }}>{reservation.partySize} pers</Text>
+            <View style={{
+              backgroundColor: "rgba(255,255,255,0.95)",
+              borderRadius: RADIUS.sm,
+              paddingHorizontal: 12,
+              paddingVertical: 7,
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 6,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 6,
+              elevation: 3,
+            }}>
+              <Users size={14} color={C.dark} strokeWidth={2.2} />
+              <Text style={{ fontFamily: FONTS.bold, fontSize: 13, color: C.textPrimary }}>{reservation.partySize} pers</Text>
             </View>
-            <View style={{ backgroundColor: "rgba(255,255,255,0.92)", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, flexDirection: "row", alignItems: "center", gap: 5 }}>
-              <Clock size={13} color={C.dark} strokeWidth={2} />
-              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textPrimary }}>{displayTime}</Text>
+            <View style={{
+              backgroundColor: "rgba(255,255,255,0.95)",
+              borderRadius: RADIUS.sm,
+              paddingHorizontal: 12,
+              paddingVertical: 7,
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 6,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 6,
+              elevation: 3,
+            }}>
+              <Clock size={14} color={C.dark} strokeWidth={2.2} />
+              <Text style={{ fontFamily: FONTS.bold, fontSize: 13, color: C.textPrimary }}>{displayTime}</Text>
+            </View>
+            <View style={{
+              backgroundColor: "rgba(255,255,255,0.95)",
+              borderRadius: RADIUS.sm,
+              paddingHorizontal: 12,
+              paddingVertical: 7,
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 6,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 6,
+              elevation: 3,
+            }}>
+              <Calendar size={14} color={C.dark} strokeWidth={2.2} />
+              <Text style={{ fontFamily: FONTS.bold, fontSize: 13, color: C.textPrimary }}>{displayDate}</Text>
             </View>
           </View>
         </View>
 
-        {/* Restaurant name + info */}
+        {/* Restaurant info */}
         <Animated.View
           entering={FadeInDown.springify().damping(16)}
-          style={{ paddingHorizontal: SPACING.lg, paddingTop: 20 }}
+          style={{ paddingHorizontal: SPACING.lg, paddingTop: 18 }}
         >
           <Text
             testID="restaurant-name"
             style={{
               fontFamily: FONTS.displayBold,
-              fontSize: 30,
+              fontSize: 24,
               color: C.textPrimary,
-              letterSpacing: -0.8,
-              lineHeight: 38,
+              letterSpacing: -0.6,
+              lineHeight: 30,
             }}
             numberOfLines={2}
           >
@@ -1122,7 +1231,7 @@ export default function RestaurantDetailScreen() {
           seatTypeLabel={reservation.seatType ? seatTypeLabel : null}
         />
 
-        {/* Cost breakdown — BEFORE claim */}
+        {/* Cost breakdown — IMPOSSIBLE TO MISS */}
         <Animated.View
           entering={FadeInDown.delay(200).springify()}
           style={{ paddingHorizontal: SPACING.lg, paddingTop: 24 }}
@@ -1132,77 +1241,110 @@ export default function RestaurantDetailScreen() {
             style={{
               backgroundColor: C.bgCard,
               borderRadius: RADIUS.xl,
-              padding: 22,
-              borderWidth: 0.5,
-              borderColor: C.borderLight,
-              borderLeftWidth: 3,
-              borderLeftColor: "rgba(201,169,110,0.4)",
-              ...SHADOW.card,
+              padding: 24,
+              borderWidth: 1.5,
+              borderColor: "rgba(201,169,110,0.25)",
+              ...SHADOW.elevated,
             }}
           >
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 18 }}>
+            {/* Header */}
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 20 }}>
               <View
                 style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 8,
-                  backgroundColor: "rgba(201,169,110,0.10)",
+                  width: 38,
+                  height: 38,
+                  borderRadius: 10,
+                  backgroundColor: "rgba(201,169,110,0.12)",
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
-                <CreditCard size={16} color={C.gold} strokeWidth={2} />
+                <CreditCard size={18} color={C.gold} strokeWidth={2} />
               </View>
-              <Text style={{ fontFamily: FONTS.displayBold, fontSize: 17, color: C.textPrimary, letterSpacing: -0.3 }}>
-                Kostnad
-              </Text>
-            </View>
-
-            {/* Credits row */}
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-              <Text style={{ fontFamily: FONTS.regular, fontSize: 15, color: C.textSecondary }}>Bokning</Text>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                <Sparkles size={13} color={C.gold} strokeWidth={2} />
-                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.gold }}>2 credits</Text>
+              <View>
+                <Text style={{ fontFamily: FONTS.displayBold, fontSize: 18, color: C.textPrimary, letterSpacing: -0.3 }}>
+                  Kostnad
+                </Text>
+                <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary, marginTop: 1 }}>
+                  Dras vid övertagande
+                </Text>
               </View>
             </View>
 
-            {/* Service fee row */}
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-              <Text style={{ fontFamily: FONTS.regular, fontSize: 15, color: C.textSecondary }}>Serviceavgift</Text>
-              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.textPrimary }}>29 kr</Text>
+            {/* Credits row — highlighted */}
+            <View style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              backgroundColor: "rgba(201,169,110,0.06)",
+              borderRadius: RADIUS.md,
+              paddingVertical: 14,
+              paddingHorizontal: 16,
+              marginBottom: 8,
+            }}>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                <Sparkles size={16} color={C.gold} strokeWidth={2} />
+                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 16, color: C.textPrimary }}>Bokning</Text>
+              </View>
+              <Text style={{ fontFamily: FONTS.bold, fontSize: 18, color: C.gold }}>2 credits</Text>
             </View>
 
-            {/* Divider */}
-            <View style={{ height: 1, backgroundColor: C.divider, marginBottom: 14 }} />
+            {/* Service fee row — highlighted */}
+            <View style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              backgroundColor: "rgba(0,0,0,0.025)",
+              borderRadius: RADIUS.md,
+              paddingVertical: 14,
+              paddingHorizontal: 16,
+              marginBottom: 16,
+            }}>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                <CreditCard size={16} color={C.textSecondary} strokeWidth={2} />
+                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 16, color: C.textPrimary }}>Serviceavgift</Text>
+              </View>
+              <Text style={{ fontFamily: FONTS.bold, fontSize: 18, color: C.textPrimary }}>29 kr</Text>
+            </View>
 
-            {/* Total */}
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 17, color: C.textPrimary }}>Totalt</Text>
-              <Text style={{ fontFamily: FONTS.bold, fontSize: 18, color: C.textPrimary }}>2 credits + 29 kr</Text>
+            {/* Total — big and bold */}
+            <View style={{
+              backgroundColor: C.dark,
+              borderRadius: RADIUS.lg,
+              paddingVertical: 16,
+              paddingHorizontal: 18,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 14,
+            }}>
+              <Text style={{ fontFamily: FONTS.bold, fontSize: 16, color: "rgba(255,255,255,0.7)" }}>Totalt</Text>
+              <Text style={{ fontFamily: FONTS.bold, fontSize: 20, color: "#FFFFFF", letterSpacing: -0.3 }}>2 credits + 29 kr</Text>
             </View>
 
             {/* Balance */}
             <View
               style={{
-                backgroundColor: hasEnoughCredits ? C.successBg : "rgba(239,68,68,0.06)",
+                backgroundColor: hasEnoughCredits ? "rgba(126,200,122,0.08)" : "rgba(239,68,68,0.06)",
                 borderRadius: RADIUS.md,
-                paddingVertical: 11,
-                paddingHorizontal: 14,
+                paddingVertical: 12,
+                paddingHorizontal: 16,
                 flexDirection: "row",
                 justifyContent: "space-between",
                 alignItems: "center",
+                borderWidth: 1,
+                borderColor: hasEnoughCredits ? "rgba(126,200,122,0.15)" : "rgba(239,68,68,0.12)",
               }}
             >
-              <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.textSecondary }}>Ditt saldo</Text>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                <Sparkles size={11} color={hasEnoughCredits ? C.success : C.error} strokeWidth={2} />
+              <Text style={{ fontFamily: FONTS.medium, fontSize: 14, color: C.textSecondary }}>Ditt saldo</Text>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
+                <Sparkles size={13} color={hasEnoughCredits ? C.coral : C.error} strokeWidth={2} />
                 <Text
                   testID="user-credits-balance"
                   style={{
                     fontFamily: FONTS.bold,
-                    fontSize: 14,
-                    color: hasEnoughCredits ? C.success : C.error,
+                    fontSize: 16,
+                    color: hasEnoughCredits ? C.coral : C.error,
                   }}
                 >
                   {userCredits} credits
@@ -1217,18 +1359,19 @@ export default function RestaurantDetailScreen() {
                 onPress={handleBuyCredits}
                 style={({ pressed }) => ({
                   backgroundColor: C.gold,
-                  borderRadius: RADIUS.md,
-                  paddingVertical: 13,
+                  borderRadius: RADIUS.lg,
+                  paddingVertical: 15,
                   alignItems: "center",
-                  marginTop: 12,
+                  marginTop: 14,
                   transform: [{ scale: pressed ? 0.97 : 1 }],
                   shadowColor: C.gold,
-                  shadowOffset: { width: 0, height: 4 },
-                  shadowOpacity: 0.2,
-                  shadowRadius: 10,
+                  shadowOffset: { width: 0, height: 6 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 14,
+                  elevation: 6,
                 })}
               >
-                <Text style={{ fontFamily: FONTS.bold, fontSize: 14, color: "#FFFFFF" }}>
+                <Text style={{ fontFamily: FONTS.bold, fontSize: 15, color: "#FFFFFF" }}>
                   Köp credits — 39 kr/st
                 </Text>
               </Pressable>
@@ -1236,7 +1379,7 @@ export default function RestaurantDetailScreen() {
           </View>
         </Animated.View>
 
-        {/* Grace period info */}
+        {/* Grace period info — prominent */}
         <Animated.View
           entering={FadeInDown.delay(260).springify()}
           style={{ paddingHorizontal: SPACING.lg, paddingTop: 14 }}
@@ -1244,48 +1387,48 @@ export default function RestaurantDetailScreen() {
           <View
             testID="grace-period-info"
             style={{
-              backgroundColor: "rgba(59,130,246,0.06)",
-              borderRadius: RADIUS.lg,
-              padding: 16,
+              backgroundColor: "rgba(126,200,122,0.06)",
+              borderRadius: RADIUS.xl,
+              padding: 18,
               flexDirection: "row",
               alignItems: "flex-start",
-              gap: 12,
-              borderWidth: 1,
-              borderColor: "rgba(59,130,246,0.12)",
+              gap: 14,
+              borderWidth: 1.5,
+              borderColor: "rgba(126,200,122,0.18)",
             }}
           >
             <View
               style={{
-                width: 32,
-                height: 32,
-                borderRadius: 8,
-                backgroundColor: "rgba(59,130,246,0.12)",
+                width: 36,
+                height: 36,
+                borderRadius: 10,
+                backgroundColor: "rgba(126,200,122,0.15)",
                 alignItems: "center",
                 justifyContent: "center",
                 flexShrink: 0,
               }}
             >
-              <Shield size={16} color={C.info} strokeWidth={2} />
+              <Shield size={18} color={C.coral} strokeWidth={2.2} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.info, marginBottom: 3 }}>
+              <Text style={{ fontFamily: FONTS.bold, fontSize: 15, color: C.dark, marginBottom: 4 }}>
                 5 minuters ångerfrist
               </Text>
               <Text
                 style={{
                   fontFamily: FONTS.regular,
                   fontSize: 13,
-                  color: C.info,
+                  color: C.textSecondary,
                   lineHeight: 19,
                 }}
               >
-                Du kan ångra gratis inom 5 minuter efter övertagandet. Inga avgifter under ångerfristen.
+                Ångra gratis inom 5 min efter övertagande. Credits och serviceavgift återbetalas direkt.
               </Text>
             </View>
           </View>
         </Animated.View>
 
-        {/* Guarantee badge */}
+        {/* Guarantee badge — pistachio accent */}
         <Animated.View
           entering={FadeInDown.delay(310).springify()}
           style={{ paddingHorizontal: SPACING.lg, paddingTop: 10 }}
@@ -1293,18 +1436,27 @@ export default function RestaurantDetailScreen() {
           <View
             testID="guarantee-badge"
             style={{
-              backgroundColor: C.successBg,
+              backgroundColor: "rgba(126,200,122,0.06)",
               borderRadius: RADIUS.lg,
               padding: 14,
               flexDirection: "row",
               alignItems: "center",
               gap: 10,
               borderWidth: 1,
-              borderColor: C.successLight,
+              borderColor: "rgba(126,200,122,0.15)",
             }}
           >
-            <Check size={16} color={C.success} strokeWidth={2.5} />
-            <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.success, flex: 1 }}>
+            <View style={{
+              width: 26,
+              height: 26,
+              borderRadius: 13,
+              backgroundColor: "rgba(126,200,122,0.15)",
+              alignItems: "center",
+              justifyContent: "center",
+            }}>
+              <Check size={14} color={C.coral} strokeWidth={3} />
+            </View>
+            <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: C.dark, flex: 1 }}>
               Om bordet inte finns — 2 credits tillbaka
             </Text>
           </View>
@@ -1322,6 +1474,126 @@ export default function RestaurantDetailScreen() {
             <Text style={{ fontFamily: FONTS.regular, fontSize: 15, color: C.textSecondary, lineHeight: 23 }}>
               {r.description}
             </Text>
+          </Animated.View>
+        ) : null}
+
+        {/* Liability transfer — trust builder */}
+        {!isClaimed ? (
+          <Animated.View
+            entering={FadeInDown.delay(370).springify()}
+            style={{ paddingHorizontal: SPACING.lg, paddingTop: 16 }}
+          >
+            <View
+              testID="liability-transfer-card"
+              style={{
+                backgroundColor: "rgba(245,158,11,0.04)",
+                borderRadius: RADIUS.xl,
+                padding: 20,
+                borderWidth: 1.5,
+                borderColor: "rgba(245,158,11,0.15)",
+              }}
+            >
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 16 }}>
+                <View
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 10,
+                    backgroundColor: "rgba(245,158,11,0.12)",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Shield size={18} color={C.warning} strokeWidth={2.2} />
+                </View>
+                <Text style={{ fontFamily: FONTS.displayBold, fontSize: 16, color: C.dark, letterSpacing: -0.3 }}>
+                  Ansvarsövergång
+                </Text>
+              </View>
+
+              {/* Visual transfer: original booker → you */}
+              <View style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 12,
+                backgroundColor: "rgba(0,0,0,0.025)",
+                borderRadius: RADIUS.lg,
+                paddingVertical: 16,
+                paddingHorizontal: 14,
+                marginBottom: 14,
+              }}>
+                {/* Original booker */}
+                <View style={{ alignItems: "center", flex: 1 }}>
+                  <View style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 22,
+                    backgroundColor: "rgba(156,163,175,0.12)",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: 6,
+                  }}>
+                    <Users size={20} color={C.textTertiary} strokeWidth={2} />
+                  </View>
+                  <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textTertiary }}>
+                    Originalbokare
+                  </Text>
+                </View>
+
+                {/* Arrow */}
+                <View style={{ alignItems: "center", paddingBottom: 18 }}>
+                  <View style={{
+                    width: 40,
+                    height: 2,
+                    backgroundColor: C.warning,
+                    borderRadius: 1,
+                  }} />
+                  <View style={{
+                    position: "absolute",
+                    right: -2,
+                    top: -4,
+                    width: 0,
+                    height: 0,
+                    borderTopWidth: 5,
+                    borderBottomWidth: 5,
+                    borderLeftWidth: 8,
+                    borderTopColor: "transparent",
+                    borderBottomColor: "transparent",
+                    borderLeftColor: C.warning,
+                  }} />
+                </View>
+
+                {/* You */}
+                <View style={{ alignItems: "center", flex: 1 }}>
+                  <View style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 22,
+                    backgroundColor: "rgba(126,200,122,0.15)",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: 6,
+                    borderWidth: 2,
+                    borderColor: "rgba(126,200,122,0.3)",
+                  }}>
+                    <Users size={20} color={C.coral} strokeWidth={2} />
+                  </View>
+                  <Text style={{ fontFamily: FONTS.bold, fontSize: 12, color: C.coral }}>
+                    Du
+                  </Text>
+                </View>
+              </View>
+
+              <Text style={{
+                fontFamily: FONTS.regular,
+                fontSize: 13,
+                color: C.textSecondary,
+                lineHeight: 20,
+              }}>
+                När du tar över bokningen övergår ansvaret för eventuella avbokningsavgifter till dig efter 5 minuters ångerfrist. Under ångerfristen kan du ångra kostnadsfritt.
+              </Text>
+            </View>
           </Animated.View>
         ) : null}
 
@@ -1404,50 +1676,59 @@ export default function RestaurantDetailScreen() {
           </Pressable>
         ) : null}
 
-        {/* CTA Button */}
+        {/* CTA Button — premium pistachio + black text */}
         <Animated.View style={btnStyle}>
           <Pressable
             testID="claim-button"
             accessibilityLabel="Ta över bokning"
             onPress={handleClaim}
             onPressIn={() => {
-              scaleBtn.value = withSpring(0.96, { damping: 15, stiffness: 300 });
+              scaleBtn.value = withSpring(0.97, { damping: 14, stiffness: 280 });
             }}
             onPressOut={() => {
-              scaleBtn.value = withSpring(1, { damping: 12, stiffness: 200 });
+              scaleBtn.value = withSpring(1, { damping: 10, stiffness: 180 });
             }}
             disabled={claimMutation.isPending || isClaimed || !hasEnoughCredits}
             style={{
               backgroundColor: isClaimed
-                ? C.success
+                ? C.coral
                 : !hasEnoughCredits
                 ? C.textTertiary
                 : accepted
                 ? C.coral
-                : "rgba(0,0,0,0.08)",
+                : "rgba(0,0,0,0.06)",
               borderRadius: RADIUS.lg,
-              paddingVertical: 16,
+              paddingVertical: 18,
               alignItems: "center",
               justifyContent: "center",
               flexDirection: "row",
-              gap: 8,
+              gap: 10,
               ...(accepted && !isClaimed && hasEnoughCredits
                 ? {
                     shadowColor: C.coral,
-                    shadowOffset: { width: 0, height: 8 },
-                    shadowOpacity: 0.35,
-                    shadowRadius: 20,
-                    elevation: 10,
+                    shadowOffset: { width: 0, height: 10 },
+                    shadowOpacity: 0.4,
+                    shadowRadius: 24,
+                    elevation: 12,
+                  }
+                : {}),
+              ...(isClaimed
+                ? {
+                    shadowColor: C.coral,
+                    shadowOffset: { width: 0, height: 6 },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 16,
+                    elevation: 8,
                   }
                 : {}),
             }}
           >
             {claimMutation.isPending ? (
-              <ActivityIndicator size="small" color="#FFFFFF" />
+              <ActivityIndicator size="small" color={C.dark} />
             ) : isClaimed ? (
               <>
-                <Check size={18} color="#FFFFFF" strokeWidth={2.5} />
-                <Text style={{ fontFamily: FONTS.bold, fontSize: 16, color: "#FFFFFF" }}>
+                <Check size={20} color={C.dark} strokeWidth={2.5} />
+                <Text style={{ fontFamily: FONTS.bold, fontSize: 17, color: C.dark, letterSpacing: -0.2 }}>
                   Bokning övertagen
                 </Text>
               </>
@@ -1460,10 +1741,11 @@ export default function RestaurantDetailScreen() {
                 style={{
                   fontFamily: FONTS.bold,
                   fontSize: 17,
-                  color: accepted ? "#FFFFFF" : C.textTertiary,
+                  color: accepted ? C.dark : C.textTertiary,
+                  letterSpacing: -0.2,
                 }}
               >
-                Ta över — 2 credits + 29 kr
+                Ta över bokning — 2 credits + 29 kr
               </Text>
             )}
           </Pressable>

@@ -2,12 +2,21 @@ import React, { useState } from "react";
 import { View, Text, ScrollView, Pressable, TextInput, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { ChevronLeft } from "lucide-react-native";
+import { ChevronLeft, Clock, Calendar, Users } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useAddWatch, useRestaurants } from "@/lib/api/hooks";
 import { useAuthStore } from "@/lib/auth-store";
-import { C, FONTS, SPACING, RADIUS, SHADOW, ICON } from "@/lib/theme";
+import type { WatchFilterOptions } from "@/lib/api/types";
+import { C, FONTS, SPACING, RADIUS, ICON } from "@/lib/theme";
+
+const WEEKDAY_LABELS = ["Sön", "Mån", "Tis", "Ons", "Tor", "Fre", "Lör"];
+const TIME_PRESETS = [
+  { label: "Lunch (11–14)", range: ["11:00", "14:00"] as [string, string] },
+  { label: "Kväll (18–22)", range: ["18:00", "22:00"] as [string, string] },
+  { label: "Sen kväll (21–00)", range: ["21:00", "23:59"] as [string, string] },
+];
+const PARTY_SIZES = [1, 2, 3, 4, 5, 6, 7, 8];
 
 export default function AddWatchScreen() {
   const router = useRouter();
@@ -17,18 +26,38 @@ export default function AddWatchScreen() {
 
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string | null>(null);
   const [date, setDate] = useState("");
-  const [partySize, setPartySize] = useState("");
   const [notes, setNotes] = useState("");
+
+  // Smart filter state
+  const [selectedTimeRange, setSelectedTimeRange] = useState<[string, string] | null>(null);
+  const [selectedWeekdays, setSelectedWeekdays] = useState<number[]>([]);
+  const [selectedPartySize, setSelectedPartySize] = useState<number | null>(null);
+
+  const toggleWeekday = (day: number) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setSelectedWeekdays((prev) =>
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
+    );
+  };
 
   const handleAdd = () => {
     if (!phone) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+    const filterOptions: WatchFilterOptions = {};
+    if (selectedTimeRange) filterOptions.timeRange = selectedTimeRange;
+    if (selectedWeekdays.length > 0) filterOptions.weekdays = selectedWeekdays;
+    if (selectedPartySize) filterOptions.partySize = selectedPartySize;
+
+    const hasFilters = Object.keys(filterOptions).length > 0;
+
     addWatch({
       userPhone: phone,
       restaurantId: selectedRestaurantId ?? undefined,
       date: date || undefined,
-      partySize: partySize ? parseInt(partySize) : undefined,
+      partySize: selectedPartySize ?? undefined,
       notes: notes || undefined,
+      filterOptions: hasFilters ? filterOptions : undefined,
     }, {
       onSuccess: () => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -51,9 +80,10 @@ export default function AddWatchScreen() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 80 }}>
         <Animated.View entering={FadeInDown.springify()}>
           <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary, lineHeight: 20, marginBottom: 24 }}>
-            Välj vad du vill bevaka. Du får en notis när en matchande bokning dyker upp.
+            Välj vad du vill bevaka. Du får en notis när en matchande bokning dyker upp. Bevakningen är aktiv tills du tar bort den.
           </Text>
 
+          {/* Restaurant picker */}
           <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textTertiary, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Restaurang (valfritt)</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -20, marginBottom: 20, flexGrow: 0 }} contentContainerStyle={{ paddingHorizontal: 20, gap: 8 }}>
             <Pressable
@@ -75,14 +105,112 @@ export default function AddWatchScreen() {
             ))}
           </ScrollView>
 
-          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textTertiary, letterSpacing: 1, textTransform: "uppercase", marginBottom: 8 }}>Datum (valfritt)</Text>
+          {/* Smart Filter: Time Range */}
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 12 }}>
+            <Clock size={14} color={C.textTertiary} strokeWidth={2} />
+            <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textTertiary, letterSpacing: 1, textTransform: "uppercase" }}>Tid på dagen</Text>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -20, marginBottom: 20, flexGrow: 0 }} contentContainerStyle={{ paddingHorizontal: 20, gap: 8 }}>
+            <Pressable
+              testID="time-filter-any"
+              accessibilityLabel="Valfri tid"
+              onPress={() => { setSelectedTimeRange(null); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }}
+              style={{ paddingHorizontal: 14, paddingVertical: 8, borderRadius: RADIUS.full, backgroundColor: !selectedTimeRange ? C.coral : C.bgCard, borderWidth: 0.5, borderColor: !selectedTimeRange ? C.coral : C.borderLight }}
+            >
+              <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: !selectedTimeRange ? "#111827" : C.textSecondary }}>Valfri tid</Text>
+            </Pressable>
+            {TIME_PRESETS.map((preset) => {
+              const isSelected = selectedTimeRange?.[0] === preset.range[0] && selectedTimeRange?.[1] === preset.range[1];
+              return (
+                <Pressable
+                  key={preset.label}
+                  testID={`time-filter-${preset.label}`}
+                  accessibilityLabel={preset.label}
+                  onPress={() => { setSelectedTimeRange(isSelected ? null : preset.range); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }}
+                  style={{ paddingHorizontal: 14, paddingVertical: 8, borderRadius: RADIUS.full, backgroundColor: isSelected ? C.coral : C.bgCard, borderWidth: 0.5, borderColor: isSelected ? C.coral : C.borderLight }}
+                >
+                  <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: isSelected ? "#111827" : C.textSecondary }}>{preset.label}</Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+
+          {/* Smart Filter: Weekdays */}
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 12 }}>
+            <Calendar size={14} color={C.textTertiary} strokeWidth={2} />
+            <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textTertiary, letterSpacing: 1, textTransform: "uppercase" }}>Veckodagar</Text>
+          </View>
+          <View style={{ flexDirection: "row", gap: 6, marginBottom: 20, flexWrap: "wrap" }}>
+            {WEEKDAY_LABELS.map((label, index) => {
+              const isSelected = selectedWeekdays.includes(index);
+              return (
+                <Pressable
+                  key={label}
+                  testID={`weekday-${index}`}
+                  accessibilityLabel={label}
+                  onPress={() => toggleWeekday(index)}
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 22,
+                    backgroundColor: isSelected ? C.coral : C.bgCard,
+                    borderWidth: 0.5,
+                    borderColor: isSelected ? C.coral : C.borderLight,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: isSelected ? "#111827" : C.textSecondary }}>{label}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+
+          {/* Smart Filter: Party Size */}
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 12 }}>
+            <Users size={14} color={C.textTertiary} strokeWidth={2} />
+            <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textTertiary, letterSpacing: 1, textTransform: "uppercase" }}>Antal personer</Text>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -20, marginBottom: 20, flexGrow: 0 }} contentContainerStyle={{ paddingHorizontal: 20, gap: 8 }}>
+            <Pressable
+              testID="party-size-any"
+              accessibilityLabel="Valfritt antal"
+              onPress={() => { setSelectedPartySize(null); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }}
+              style={{ paddingHorizontal: 14, paddingVertical: 8, borderRadius: RADIUS.full, backgroundColor: !selectedPartySize ? C.coral : C.bgCard, borderWidth: 0.5, borderColor: !selectedPartySize ? C.coral : C.borderLight }}
+            >
+              <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: !selectedPartySize ? "#111827" : C.textSecondary }}>Alla</Text>
+            </Pressable>
+            {PARTY_SIZES.map((size) => {
+              const isSelected = selectedPartySize === size;
+              return (
+                <Pressable
+                  key={size}
+                  testID={`party-size-${size}`}
+                  accessibilityLabel={`${size} personer`}
+                  onPress={() => { setSelectedPartySize(isSelected ? null : size); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }}
+                  style={{ width: 44, height: 36, borderRadius: RADIUS.full, backgroundColor: isSelected ? C.coral : C.bgCard, borderWidth: 0.5, borderColor: isSelected ? C.coral : C.borderLight, alignItems: "center", justifyContent: "center" }}
+                >
+                  <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: isSelected ? "#111827" : C.textSecondary }}>{size}</Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+
+          {/* Date (optional) */}
+          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textTertiary, letterSpacing: 1, textTransform: "uppercase", marginBottom: 8 }}>Specifikt datum (valfritt)</Text>
           <TextInput value={date} onChangeText={setDate} placeholder="t.ex. 2026-04-15" placeholderTextColor={C.textTertiary} style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.md, paddingHorizontal: 16, paddingVertical: 13, fontFamily: FONTS.regular, fontSize: 15, color: C.textPrimary, borderWidth: 0.5, borderColor: C.borderLight, marginBottom: 16 }} />
 
-          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textTertiary, letterSpacing: 1, textTransform: "uppercase", marginBottom: 8 }}>Antal personer (valfritt)</Text>
-          <TextInput value={partySize} onChangeText={setPartySize} keyboardType="numeric" placeholder="t.ex. 2" placeholderTextColor={C.textTertiary} style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.md, paddingHorizontal: 16, paddingVertical: 13, fontFamily: FONTS.regular, fontSize: 15, color: C.textPrimary, borderWidth: 0.5, borderColor: C.borderLight, marginBottom: 16 }} />
-
+          {/* Notes */}
           <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textTertiary, letterSpacing: 1, textTransform: "uppercase", marginBottom: 8 }}>Anteckningar (valfritt)</Text>
-          <TextInput value={notes} onChangeText={setNotes} placeholder="t.ex. Kvällsbokning föredras" placeholderTextColor={C.textTertiary} multiline style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.md, paddingHorizontal: 16, paddingVertical: 13, fontFamily: FONTS.regular, fontSize: 15, color: C.textPrimary, borderWidth: 0.5, borderColor: C.borderLight, minHeight: 80, marginBottom: 32 }} />
+          <TextInput value={notes} onChangeText={setNotes} placeholder="t.ex. Uteservering föredras" placeholderTextColor={C.textTertiary} multiline style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.md, paddingHorizontal: 16, paddingVertical: 13, fontFamily: FONTS.regular, fontSize: 15, color: C.textPrimary, borderWidth: 0.5, borderColor: C.borderLight, minHeight: 80, marginBottom: 12 }} />
+
+          {/* Persistent alert info */}
+          <View style={{ backgroundColor: "rgba(59,130,246,0.06)", borderRadius: RADIUS.md, padding: 14, marginBottom: 24, flexDirection: "row", alignItems: "center", gap: 10 }}>
+            <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: C.success }} />
+            <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.textSecondary, flex: 1, lineHeight: 18 }}>
+              Bevakningen är aktiv tills du tar bort den — den försvinner aldrig automatiskt.
+            </Text>
+          </View>
 
           <Pressable
             testID="add-watch-submit"

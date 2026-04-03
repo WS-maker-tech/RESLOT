@@ -24,6 +24,7 @@ import {
   AlertTriangle,
   Clock,
   Heart,
+  Shield,
 } from "lucide-react-native";
 import Animated, {
   FadeInDown,
@@ -165,6 +166,7 @@ export default function ProfileScreen() {
   const router = useRouter();
   const [showComingSoon, setShowComingSoon] = useState(false);
   const [comingSoonTitle, setComingSoonTitle] = useState("");
+  const [showLiabilityPolicy, setShowLiabilityPolicy] = useState(false);
 
   const { data: profile, isLoading, error, refetch } = useProfile(
     phone || ""
@@ -739,12 +741,23 @@ export default function ProfileScreen() {
                   index={1}
                 />
                 <MenuItem
+                  icon={Shield}
+                  label="Ansvarspolicy"
+                  color={C.warning}
+                  bgColor="rgba(245, 158, 11, 0.10)"
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setShowLiabilityPolicy(true);
+                  }}
+                  index={2}
+                />
+                <MenuItem
                   icon={HelpCircle}
                   label="Hjälp"
                   color={C.gold}
                   bgColor="rgba(201, 169, 110, 0.1)"
                   onPress={handleSupportPress}
-                  index={2}
+                  index={3}
                 />
                 <MenuItem
                   icon={LogOut}
@@ -753,13 +766,130 @@ export default function ProfileScreen() {
                   bgColor={C.coralLight}
                   isLast
                   onPress={handleLogoutPress}
-                  index={3}
+                  index={4}
                 />
               </View>
             </Animated.View>
           </>
         )}
       </ScrollView>
+
+      {/* Liability Policy Modal */}
+      <Modal
+        visible={showLiabilityPolicy}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowLiabilityPolicy(false)}
+      >
+        <Pressable
+          testID="liability-policy-backdrop"
+          accessibilityLabel="Stäng ansvarspolicy"
+          style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)", alignItems: "center", justifyContent: "center" }}
+          onPress={() => setShowLiabilityPolicy(false)}
+        >
+          <Pressable
+            testID="liability-policy-modal"
+            accessibilityLabel="Ansvarspolicy"
+            onPress={() => {}}
+            style={{
+              backgroundColor: "#FFFFFF",
+              borderRadius: 20,
+              padding: 28,
+              marginHorizontal: 24,
+              maxHeight: "80%",
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 6 },
+              shadowOpacity: 0.12,
+              shadowRadius: 16,
+              elevation: 6,
+            }}
+          >
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 20 }}>
+              <View
+                style={{
+                  width: 42,
+                  height: 42,
+                  borderRadius: 12,
+                  backgroundColor: "rgba(245,158,11,0.12)",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Shield size={22} color="#F59E0B" strokeWidth={2} />
+              </View>
+              <Text
+                style={{
+                  fontFamily: "PlusJakartaSans_700Bold",
+                  fontSize: 20,
+                  color: "#111827",
+                  letterSpacing: -0.4,
+                }}
+              >
+                Ansvarspolicy
+              </Text>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text style={{ fontFamily: "PlusJakartaSans_700Bold", fontSize: 15, color: "#111827", marginBottom: 8 }}>
+                Hur fungerar ansvar på Reslot?
+              </Text>
+              <Text style={{ fontFamily: "PlusJakartaSans_400Regular", fontSize: 14, color: "#6B7280", lineHeight: 22, marginBottom: 16 }}>
+                När du tar över en bokning via Reslot, övergår ansvaret för den bokningen gradvis till dig. Så här fungerar det:
+              </Text>
+
+              <View style={{ backgroundColor: "rgba(126,200,122,0.06)", borderRadius: 12, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: "rgba(126,200,122,0.15)" }}>
+                <Text style={{ fontFamily: "PlusJakartaSans_600SemiBold", fontSize: 14, color: "#7EC87A", marginBottom: 4 }}>
+                  1. Ångerfrist (5 minuter)
+                </Text>
+                <Text style={{ fontFamily: "PlusJakartaSans_400Regular", fontSize: 13, color: "#6B7280", lineHeight: 20 }}>
+                  Direkt efter övertagande har du 5 minuter att ångra dig helt kostnadsfritt. Credits och serviceavgift återbetalas omedelbart.
+                </Text>
+              </View>
+
+              <View style={{ backgroundColor: "rgba(245,158,11,0.05)", borderRadius: 12, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: "rgba(245,158,11,0.12)" }}>
+                <Text style={{ fontFamily: "PlusJakartaSans_600SemiBold", fontSize: 14, color: "#F59E0B", marginBottom: 4 }}>
+                  2. Bekräftad bokning
+                </Text>
+                <Text style={{ fontFamily: "PlusJakartaSans_400Regular", fontSize: 13, color: "#6B7280", lineHeight: 20 }}>
+                  Efter att ångerfristen löpt ut är bokningen din. Du förväntas dyka upp på utsatt tid och datum.
+                </Text>
+              </View>
+
+              <View style={{ backgroundColor: "rgba(239,68,68,0.04)", borderRadius: 12, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: "rgba(239,68,68,0.10)" }}>
+                <Text style={{ fontFamily: "PlusJakartaSans_600SemiBold", fontSize: 14, color: "#EF4444", marginBottom: 4 }}>
+                  3. No-show
+                </Text>
+                <Text style={{ fontFamily: "PlusJakartaSans_400Regular", fontSize: 13, color: "#6B7280", lineHeight: 20 }}>
+                  Om du inte dyker upp efter att ångerfristen löpt ut kan restaurangen debitera en no-show-avgift. Denna avgift sätts av restaurangen, inte av Reslot.
+                </Text>
+              </View>
+
+              <View style={{ backgroundColor: "rgba(0,0,0,0.025)", borderRadius: 12, padding: 14 }}>
+                <Text style={{ fontFamily: "PlusJakartaSans_500Medium", fontSize: 13, color: "#6B7280", lineHeight: 20, textAlign: "center" }}>
+                  Vi debiterar dig bara om du inte dyker upp efter att ångerfristen löpt ut. Du har alltid möjlighet att ångra inom 5 minuter.
+                </Text>
+              </View>
+            </ScrollView>
+
+            <Pressable
+              testID="liability-policy-close"
+              accessibilityLabel="Stäng"
+              onPress={() => setShowLiabilityPolicy(false)}
+              style={{
+                marginTop: 20,
+                backgroundColor: "#111827",
+                borderRadius: 12,
+                paddingVertical: 14,
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ fontFamily: "PlusJakartaSans_600SemiBold", fontSize: 15, color: "#FFFFFF" }}>
+                Jag förstår
+              </Text>
+            </Pressable>
+          </Pressable>
+        </Pressable>
+      </Modal>
 
       {/* Coming Soon Modal */}
       <Modal

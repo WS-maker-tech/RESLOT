@@ -9,6 +9,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useAuthStore } from '@/lib/auth-store';
 import { useFonts } from 'expo-font';
 import { registerForPushNotificationsAsync, setupNotificationHandlers } from '@/lib/notifications';
+import { router as expoRouter } from 'expo-router';
 
 // react-native-keyboard-controller is native-only; skip on web
 const KeyboardProvider =
@@ -103,6 +104,19 @@ function RootLayoutNav() {
       .then((res) => {
         if (res.ok) {
           setLoggedIn(true);
+          // Register push token on successful auth verification
+          registerForPushNotificationsAsync().then((token) => {
+            if (token && baseUrl) {
+              fetch(`${baseUrl}/api/profile/push-token`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${sessionToken}`,
+                },
+                body: JSON.stringify({ token }),
+              }).catch(() => {});
+            }
+          });
         } else {
           logout();
         }
@@ -155,11 +169,40 @@ export default function RootLayout() {
     registerForPushNotificationsAsync().then((token) => {
       if (token) {
         console.log("[Notifications] Push token:", token);
-        // Token will be sent to backend via useSavePushToken hook in authenticated contexts
+        // Save token to backend if user is authenticated
+        const { sessionToken } = useAuthStore.getState();
+        if (sessionToken) {
+          const baseUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+          if (baseUrl) {
+            fetch(`${baseUrl}/api/profile/push-token`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${sessionToken}`,
+              },
+              body: JSON.stringify({ token }),
+            }).catch((err) => console.error("[Notifications] Failed to save push token:", err));
+          }
+        }
       }
     });
 
-    const cleanup = setupNotificationHandlers();
+    const cleanup = setupNotificationHandlers({
+      onTapped: (response) => {
+        const data = response.notification.request.content.data;
+        console.log("[Notifications] Tapped, data:", data);
+        // Deeplink: navigate to restaurant page when notification is tapped
+        if (data?.restaurantId && typeof data.restaurantId === "string") {
+          setTimeout(() => {
+            try {
+              expoRouter.push(`/restaurant/${data.restaurantId}`);
+            } catch (e) {
+              console.log("[Notifications] Deeplink navigation failed:", e);
+            }
+          }, 500); // Small delay to ensure navigation stack is ready
+        }
+      },
+    });
     notificationCleanupRef.current = cleanup;
 
     return () => {

@@ -4,6 +4,8 @@ import { z } from "zod";
 import { db } from "../db";
 import { authMiddleware } from "../middleware/auth";
 import { createClaimPreAuth, cancelPreAuth, capturePayment, getOrCreateStripeCustomer, createNoShowFeeCharge } from "../stripe";
+import { sendPushToUser, sendPushToUsers } from "../push";
+import { matchesWatchFilters } from "./watches";
 
 const reservationsRouter = new Hono();
 
@@ -239,6 +241,38 @@ reservationsRouter.post(
       });
     }
 
+    // Push notify users watching this restaurant
+    if (alerts.length > 0) {
+      const watcherPhones = alerts.map((a) => a.userPhone);
+      sendPushToUsers(
+        watcherPhones,
+        "Ny bokning tillgänglig!",
+        `En bokning på ${restaurant.name} för ${body.partySize} pers den ${body.reservationTime} har lagts upp.`,
+        { type: "watch_match", restaurantId: body.restaurantId, reservationId: reservation.id }
+      ).catch(() => {});
+    }
+
+    // Also check watches (bevakningar) for matching criteria with smart filters
+    const matchingWatches = await db.watch.findMany({
+      where: { restaurantId: body.restaurantId },
+    });
+    const watchPhones = matchingWatches
+      .filter((w) => matchesWatchFilters(w, {
+        reservationTime: body.reservationTime,
+        reservationDate: new Date(body.reservationDate),
+        partySize: body.partySize,
+      }))
+      .map((w) => w.userPhone)
+      .filter((p) => p !== submitterPhone);
+    if (watchPhones.length > 0) {
+      sendPushToUsers(
+        watchPhones,
+        "Bevakningsträff!",
+        `En bokning på ${restaurant.name} matchar din bevakning.`,
+        { type: "watch_match", restaurantId: body.restaurantId, reservationId: reservation.id }
+      ).catch(() => {});
+    }
+
     return c.json({ data: reservation }, 201);
   }
 );
@@ -444,6 +478,18 @@ reservationsRouter.post(
         reservation.submitterPhone,
         `Reslot: Din bokning på ${reservation.restaurant.name} den ${dateStr} har tagits över. Credits kommer inom 5 min.`
       );
+
+      // Push notification to claimer immediately
+      sendPushToUser(
+        claimerPhone,
+        `Bokning bekräftad — ${reservation.restaurant.name}`,
+        `Du har tagit över bokningen för ${reservation.partySize} pers den ${dateStr} kl ${reservation.reservationTime}. Ångerfrist: 5 min.`,
+        { type: "claim_confirmed", reservationId: id, restaurantId: reservation.restaurantId }
+      ).catch(() => {});
+
+      // DELAYED: Submitter push notification is sent AFTER grace period (5 min)
+      // via the CRON job in index.ts — not immediately, to avoid premature alerts
+      // In-app ActivityAlert above is still created immediately for record-keeping
 
       return c.json({
         data: {

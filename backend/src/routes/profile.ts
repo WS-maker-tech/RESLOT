@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { db } from "../db";
+import { sendPushNotification } from "../push";
 
 const profileRouter = new Hono<{ Variables: { userPhone: string } }>();
 
@@ -68,6 +69,30 @@ profileRouter.put(
     });
 
     return c.json({ data: profile });
+  }
+);
+
+// POST /api/profile/push-token - Save push notification token
+profileRouter.post(
+  "/push-token",
+  zValidator("json", z.object({ token: z.string().min(1) })),
+  async (c) => {
+    const phone = c.get("userPhone");
+    const { token } = c.req.valid("json");
+
+    await db.userProfile.upsert({
+      where: { phone },
+      update: { pushToken: token },
+      create: {
+        phone,
+        firstName: "",
+        lastName: "",
+        email: "",
+        pushToken: token,
+      },
+    });
+
+    return c.json({ data: { success: true } });
   }
 );
 
