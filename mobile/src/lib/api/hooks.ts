@@ -53,7 +53,7 @@ export function useReservation(id: string) {
     queryKey: ["reservation", id],
     queryFn: () => api.get<Reservation>(`/api/reservations/${id}`),
     enabled: !!id,
-    staleTime: 30 * 1000,
+    staleTime: 5 * 60 * 1000,
   });
 }
 
@@ -74,7 +74,7 @@ export function useReservations(params?: {
       const qs = queryParams.toString();
       return api.get<Reservation[]>(`/api/reservations${qs ? `?${qs}` : ""}`);
     },
-    staleTime: 30 * 1000,
+    staleTime: 5 * 60 * 1000,
   });
 }
 
@@ -97,7 +97,7 @@ export function useMyReservations(phone: string) {
     queryFn: () =>
       api.get<Reservation[]>(`/api/reservations/mine`),
     enabled: !!phone,
-    staleTime: 30 * 1000,
+    staleTime: 5 * 60 * 1000,
   });
 }
 
@@ -197,7 +197,7 @@ export function useActivityAlerts(phone: string) {
     queryFn: () =>
       api.get<ActivityAlert[]>(`/api/alerts`),
     enabled: !!phone,
-    staleTime: 30 * 1000,
+    staleTime: 5 * 60 * 1000,
   });
 }
 
@@ -318,7 +318,7 @@ export function useCardStatus(phone: string | null | undefined) {
     queryKey: ["cardStatus", phone],
     queryFn: () => api.get<CardStatus>("/api/credits/card-status"),
     enabled: !!phone,
-    staleTime: 30 * 1000,
+    staleTime: 5 * 60 * 1000,
   });
 }
 
