@@ -1,0 +1,54 @@
+{
+  "name": "Karma",
+  "url": "https://karma.life",
+  "fetchDate": "2026-04-01",
+  "colors": {
+    "primary": "#000000",
+    "secondary": "#FFFFFF",
+    "accent": "#purple-700",
+    "backgrounds": {
+      "canvas": "#FFFFFF",
+      "darkMode": "#000000",
+      "neutralLight": "#F5F5F5"
+    },
+    "text": {
+      "dark": "#262626",
+      "light": "#FFFFFF"
+    },
+    "gradients": true
+  },
+  "typography": {
+    "fontFamilies": ["MODERN_SANS", "system-ui", "Segoe UI", "Roboto", "Helvetica", "Arial", "sans-serif"],
+    "headingPrimary": { "size": "24px", "weight": "bold", "alignment": "center" },
+    "headingSecondary": { "size": "20px", "weight": "bold" },
+    "bodyText": { "weight": "normal" }
+  },
+  "trustElements": {
+    "partnerLogos": ["Kasai", "Bröd & Salt", "Stureplansgruppen", "AG", "Liseberg", "Urban Deli", "Miss Voon", "Popina", "Vidbynäs", "Svenska Brasserier", "Tugg", "John Scotts", "Guilty Pleasure"],
+    "testimonials": 4,
+    "quantifiedResults": ["30% increase in average check", "Reduced staff stress", "Better guest experience", "Improved drink sales"],
+    "uptimeClaim": "99.9% Uptime, 100% Peace of Mind",
+    "founded": "Founded in 2015 in Stockholm"
+  },
+  "conversionPsychology": {
+    "primaryCta": "Learn more",
+    "secondaryCta": "Talk to sales",
+    "demoCta": "Supercharge your restaurant in just a few minutes",
+    "demoOffer": "15-minute personalized demo, no commitment",
+    "valuePropositions": ["All-in-one, affordable platform", "Built for restaurant's bottom line", "99.9% uptime guarantee", "Trusted by leading Nordic restaurants"],
+    "urgencyTactics": ["Beta badges on new features", "Recent funding announcement (Feb 2026)"]
+  },
+  "onboardingPatterns": {
+    "demoFlow": ["15-minute personalized demo", "See specific use cases", "Learn about pricing"],
+    "frictionReduction": "No commitment required",
+    "progressiveDisclosure": "Product feature exploration before commitment"
+  },
+  "uniqueDesignPatterns": {
+    "heroSections": "Wide variant with dark background, gradient support",
+    "logoCarousel": "Continuous scrolling partner logos",
+    "featureShowcase": "Grid with product imagery, 10+ features, hot badges",
+    "testimonialCarousel": "Multi-testimonial section with named quotes",
+    "navigation": "Sticky header with support and login"
+  },
+  "appStorePresence": null
+}

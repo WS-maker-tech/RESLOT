@@ -1,14 +1,59 @@
-import { useState, useEffect } from 'react';
-import { View } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { Platform, View, Text, Pressable } from 'react-native';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Redirect, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { useAuthStore } from '@/lib/auth-store';
+import { useFonts } from 'expo-font';
+import { registerForPushNotificationsAsync, setupNotificationHandlers } from '@/lib/notifications';
 
+// react-native-keyboard-controller is native-only; skip on web
+const KeyboardProvider =
+  Platform.OS !== 'web'
+    ? require('react-native-keyboard-controller').KeyboardProvider
+    : ({ children }: { children: React.ReactNode }) => children;
+
+
+// Error Boundary to catch rendering crashes
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error("[ErrorBoundary]", error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#FAFAF8", padding: 32 }}>
+          <Text style={{ fontFamily: "PlusJakartaSans_700Bold", fontSize: 20, color: "#111827", marginBottom: 8, letterSpacing: -0.3 }}>
+            Något gick fel
+          </Text>
+          <Text style={{ fontFamily: "PlusJakartaSans_400Regular", fontSize: 14, color: "#6B7280", textAlign: "center", marginBottom: 24 }}>
+            Appen stötte på ett oväntat fel. Försök igen.
+          </Text>
+          <Pressable
+            onPress={() => this.setState({ hasError: false, error: null })}
+            style={{ backgroundColor: "#7EC87A", borderRadius: 16, paddingHorizontal: 24, paddingVertical: 12 }}
+          >
+            <Text style={{ fontFamily: "PlusJakartaSans_700Bold", fontSize: 15, color: "#111827" }}>Försök igen</Text>
+          </Pressable>
+        </View>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 export const unstable_settings = {
   initialRouteName: '(tabs)',
@@ -26,7 +71,7 @@ const ReslotTheme = {
     card: '#FAFAF8',
     text: '#111827',
     border: 'rgba(0,0,0,0.06)',
-    primary: '#E06A4E',
+    primary: '#7EC87A',
   },
 };
 
@@ -88,6 +133,13 @@ function RootLayoutNav() {
             title: "Reslot credits",
           }}
         />
+        <Stack.Screen name="account-settings" options={{ presentation: "modal", headerShown: false }} />
+        <Stack.Screen name="payment" options={{ presentation: "modal", headerShown: false }} />
+        <Stack.Screen name="invite" options={{ presentation: "modal", headerShown: false }} />
+        <Stack.Screen name="support" options={{ presentation: "modal", headerShown: false }} />
+        <Stack.Screen name="add-watch" options={{ presentation: "modal", headerShown: false }} />
+        <Stack.Screen name="booking-confirmation" options={{ headerShown: false, animation: "slide_from_right" }} />
+        <Stack.Screen name="map" options={{ headerShown: false, animation: "slide_from_right" }} />
       </Stack>
       {!hasCompletedOnboarding ? <Redirect href="/onboarding" /> : null}
     </ThemeProvider>
@@ -95,16 +147,40 @@ function RootLayoutNav() {
 }
 
 export default function RootLayout() {
+  const [fontsLoaded] = useFonts({});
+  const notificationCleanupRef = useRef<(() => void) | null>(null);
+
+  // Set up push notifications on mount
+  useEffect(() => {
+    registerForPushNotificationsAsync().then((token) => {
+      if (token) {
+        console.log("[Notifications] Push token:", token);
+        // Token will be sent to backend via useSavePushToken hook in authenticated contexts
+      }
+    });
+
+    const cleanup = setupNotificationHandlers();
+    notificationCleanupRef.current = cleanup;
+
+    return () => {
+      notificationCleanupRef.current?.();
+    };
+  }, []);
+
+  if (!fontsLoaded) return null;
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <KeyboardProvider>
-          <View style={{ flex: 1 }} onLayout={() => SplashScreen.hideAsync()}>
-            <StatusBar style="dark" />
-            <RootLayoutNav />
-          </View>
-        </KeyboardProvider>
-      </GestureHandlerRootView>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <KeyboardProvider>
+            <View style={{ flex: 1 }} onLayout={() => SplashScreen.hideAsync()}>
+              <StatusBar style="dark" />
+              <RootLayoutNav />
+            </View>
+          </KeyboardProvider>
+        </GestureHandlerRootView>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }

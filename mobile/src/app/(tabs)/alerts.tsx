@@ -1,15 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   View,
   Text,
   ScrollView,
-  Image,
   Pressable,
   Modal,
-  ActivityIndicator,
   TextInput,
   Keyboard,
+  StyleSheet,
 } from "react-native";
+import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Bell,
@@ -24,6 +24,8 @@ import {
   Check,
   AlertCircle,
   Search,
+  Eye,
+  Trash2,
 } from "lucide-react-native";
 import { useAuthStore } from "@/lib/auth-store";
 import {
@@ -33,20 +35,40 @@ import {
   useRemoveRestaurantAlert,
   useRestaurants,
   useMarkAlertsRead,
+  useWatches,
+  useDeleteWatch,
 } from "@/lib/api/hooks";
-import type { ActivityAlert, RestaurantAlertWithRestaurant } from "@/lib/api/types";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import type { ActivityAlert, RestaurantAlertWithRestaurant, Watch } from "@/lib/api/types";
+import Animated, { FadeInDown, ZoomIn } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
+import { C, FONTS, SPACING, RADIUS, ICON } from "../../lib/theme";
+import { Skeleton } from "@/components/Skeleton";
+
+function AlertsSkeleton() {
+  return (
+    <View style={{ paddingHorizontal: SPACING.lg, paddingTop: 12, gap: 12 }}>
+      {[0, 1, 2].map((i) => (
+        <View key={i} style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.md, padding: 14, flexDirection: "row", alignItems: "center", gap: 12 }}>
+          <Skeleton width={40} height={40} style={{ borderRadius: RADIUS.md }} />
+          <View style={{ flex: 1, gap: 6 }}>
+            <Skeleton width="70%" height={14} />
+            <Skeleton width="50%" height={12} />
+          </View>
+        </View>
+      ))}
+    </View>
+  );
+}
 
 const ALERT_ICONS: Record<
   ActivityAlert["type"],
   { icon: typeof Flame; color: string; bg: string }
 > = {
-  drop: { icon: Flame, color: "#E06A4E", bg: "rgba(224, 106, 78, 0.10)" },
-  claim: { icon: CheckCircle2, color: "#8B9E7E", bg: "rgba(139, 158, 126, 0.10)" },
-  token: { icon: Coins, color: "#C9A96E", bg: "rgba(201, 169, 110, 0.10)" },
-  premium: { icon: Crown, color: "#C9A96E", bg: "rgba(201, 169, 110, 0.10)" },
+  drop: { icon: Flame, color: C.coral, bg: C.coralLight },
+  claim: { icon: CheckCircle2, color: C.success, bg: C.successLight },
+  credit: { icon: Coins, color: C.gold, bg: "rgba(201, 169, 110, 0.10)" },
+  premium: { icon: Crown, color: C.gold, bg: "rgba(201, 169, 110, 0.10)" },
 };
 
 function RestaurantAlertCard({
@@ -63,17 +85,20 @@ function RestaurantAlertCard({
   const restaurant = alert.restaurant;
 
   return (
-    <Animated.View entering={FadeInDown.delay(index * 60).duration(400).springify()}>
+    <Animated.View entering={FadeInDown.delay(index * 60).springify()}>
       <Pressable
         testID={`restaurant-alert-${alert.id}`}
+        accessibilityLabel={`Visa bevakning för ${restaurant.name}`}
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           onPress?.(restaurant.id);
         }}
         style={{
-          backgroundColor: "#FFFFFF",
-          borderRadius: 14,
-          padding: 14,
+          backgroundColor: C.bgCard,
+          borderRadius: RADIUS.md,
+          borderWidth: 0.5,
+          borderColor: C.borderLight,
+          padding: 16,
           marginBottom: 10,
           shadowColor: "#000",
           shadowOffset: { width: 0, height: 1 },
@@ -89,9 +114,9 @@ function RestaurantAlertCard({
           <View style={{ flex: 1, marginRight: 12 }}>
             <Text
               style={{
-                fontFamily: "PlusJakartaSans_600SemiBold",
+                fontFamily: FONTS.displaySemiBold,
                 fontSize: 15,
-                color: "#111827",
+                color: C.dark,
                 letterSpacing: -0.2,
               }}
               numberOfLines={1}
@@ -100,22 +125,22 @@ function RestaurantAlertCard({
             </Text>
             <Text
               style={{
-                fontFamily: "PlusJakartaSans_400Regular",
+                fontFamily: FONTS.regular,
                 fontSize: 13,
-                color: "#9CA3AF",
-                marginTop: 3,
+                color: C.textTertiary,
+                marginTop: 4,
               }}
               numberOfLines={1}
             >
               {restaurant.address}
             </Text>
             <View className="flex-row items-center" style={{ marginTop: 5, gap: 4 }}>
-              <Star size={11} color="#C9A96E" fill="#C9A96E" strokeWidth={0} />
+              <Star size={11} color={C.gold} fill={C.gold} strokeWidth={0} />
               <Text
                 style={{
-                  fontFamily: "PlusJakartaSans_600SemiBold",
+                  fontFamily: FONTS.semiBold,
                   fontSize: 12,
-                  color: "#111827",
+                  color: C.dark,
                 }}
               >
                 {restaurant.rating.toFixed(1)}
@@ -125,15 +150,15 @@ function RestaurantAlertCard({
                   width: 3,
                   height: 3,
                   borderRadius: 1.5,
-                  backgroundColor: "#D1D5DB",
+                  backgroundColor: C.textTertiary,
                   marginHorizontal: 4,
                 }}
               />
               <Text
                 style={{
-                  fontFamily: "PlusJakartaSans_400Regular",
+                  fontFamily: FONTS.regular,
                   fontSize: 12,
-                  color: "#9CA3AF",
+                  color: C.textTertiary,
                 }}
               >
                 {restaurant.cuisine}
@@ -143,20 +168,26 @@ function RestaurantAlertCard({
           <Image
             source={{ uri: restaurant.image }}
             style={{
-              width: 56,
-              height: 56,
-              borderRadius: 12,
-              backgroundColor: "#F0F0EE",
+              width: 60,
+              height: 60,
+              borderRadius: RADIUS.md,
+              backgroundColor: C.bgInput,
             }}
-            resizeMode="cover"
+            contentFit="cover"
+            cachePolicy="memory-disk"
           />
         </View>
         {onRemove ? (
           <Pressable
-            onPress={() => onRemove(alert.id)}
+            testID={`remove-alert-${alert.id}`}
+            accessibilityLabel={`Ta bort bevakning för ${restaurant.name}`}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              onRemove(alert.id);
+            }}
             style={{ marginLeft: 12, padding: 8 }}
           >
-            <X size={16} color="#9CA3AF" strokeWidth={2} />
+            <X size={16} color={C.textTertiary} strokeWidth={2} />
           </Pressable>
         ) : null}
       </Pressable>
@@ -169,15 +200,16 @@ function AlertItem({ alert, index }: { alert: ActivityAlert; index: number }) {
   const IconComponent = config.icon;
 
   return (
-    <Animated.View entering={FadeInDown.delay((index + 2) * 60).duration(400).springify()}>
+    <Animated.View entering={FadeInDown.delay((index + 2) * 60).springify()}>
       <Pressable
         testID={`alert-${alert.id}`}
+        accessibilityLabel={`Händelse: ${alert.title}`}
         className="flex-row items-start rounded-xl p-4"
         style={{
-          backgroundColor: alert.read ? "#FFFFFF" : "rgba(224, 106, 78, 0.05)",
+          backgroundColor: alert.read ? C.bgCard : "rgba(224,106,78,0.04)",
           marginBottom: 8,
           borderWidth: alert.read ? 0 : 1,
-          borderColor: alert.read ? "transparent" : "rgba(224,106,78,0.15)",
+          borderColor: alert.read ? "transparent" : "rgba(224,106,78,0.12)",
           shadowColor: "#000",
           shadowOffset: { width: 0, height: 1 },
           shadowOpacity: alert.read ? 0.02 : 0.04,
@@ -190,21 +222,21 @@ function AlertItem({ alert, index }: { alert: ActivityAlert; index: number }) {
           style={{
             width: 40,
             height: 40,
-            borderRadius: 12,
+            borderRadius: RADIUS.md,
             backgroundColor: config.bg,
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          <IconComponent size={18} color={config.color} strokeWidth={2.2} />
+          <IconComponent size={18} color={config.color} strokeWidth={ICON.strokeWidth} />
         </View>
         <View className="ml-3 flex-1">
           <View className="flex-row items-center justify-between">
             <Text
               style={{
-                fontFamily: "PlusJakartaSans_600SemiBold",
+                fontFamily: FONTS.semiBold,
                 fontSize: 14,
-                color: "#111827",
+                color: C.dark,
                 flex: 1,
               }}
               numberOfLines={1}
@@ -217,7 +249,7 @@ function AlertItem({ alert, index }: { alert: ActivityAlert; index: number }) {
                   width: 7,
                   height: 7,
                   borderRadius: 4,
-                  backgroundColor: "#E06A4E",
+                  backgroundColor: C.coral,
                   marginLeft: 8,
                 }}
               />
@@ -225,9 +257,9 @@ function AlertItem({ alert, index }: { alert: ActivityAlert; index: number }) {
           </View>
           <Text
             style={{
-              fontFamily: "PlusJakartaSans_400Regular",
+              fontFamily: FONTS.regular,
               fontSize: 13,
-              color: "#6B7280",
+              color: C.textSecondary,
               marginTop: 3,
               lineHeight: 18,
             }}
@@ -237,9 +269,9 @@ function AlertItem({ alert, index }: { alert: ActivityAlert; index: number }) {
           </Text>
           <Text
             style={{
-              fontFamily: "PlusJakartaSans_400Regular",
+              fontFamily: FONTS.regular,
               fontSize: 11,
-              color: "#9CA3AF",
+              color: C.textTertiary,
               marginTop: 6,
             }}
           >
@@ -254,6 +286,7 @@ function AlertItem({ alert, index }: { alert: ActivityAlert; index: number }) {
 export default function AlertsScreen() {
   const phone = useAuthStore((s) => s.phoneNumber);
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState<"activity" | "watches">("activity");
   const [showAddAlert, setShowAddAlert] = useState(false);
   const [addedIds, setAddedIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -263,13 +296,15 @@ export default function AlertsScreen() {
     data: activityAlerts = [],
     isLoading: alertsLoading,
     error: alertsError,
-  } = useActivityAlerts(phone || "test@reslot.se");
+    refetch: alertsRefetch,
+  } = useActivityAlerts(phone || "");
 
   // Fetch restaurant alerts
   const {
     data: restaurantAlerts = [],
     isLoading: restaurantAlertsLoading,
-  } = useRestaurantAlerts(phone || "test@reslot.se");
+    refetch: restaurantAlertsRefetch,
+  } = useRestaurantAlerts(phone || "");
 
   // Fetch all restaurants for add modal
   const { data: allRestaurants = [] } = useRestaurants();
@@ -279,9 +314,14 @@ export default function AlertsScreen() {
   const removeAlertMutation = useRemoveRestaurantAlert();
   const markReadMutation = useMarkAlertsRead();
 
-  const unreadCount = (activityAlerts as ActivityAlert[]).filter((a) => !a.read).length;
+  // Watches
+  const { data: watches = [], isLoading: watchesLoading, refetch: watchesRefetch } = useWatches(phone);
+  const { mutate: deleteWatch } = useDeleteWatch();
+
+  const unreadCount = useMemo(() => (activityAlerts as ActivityAlert[]).filter((a) => !a.read).length, [activityAlerts]);
+  const filteredActivityAlerts = useMemo(() => (activityAlerts as ActivityAlert[]).filter((a) => a.type !== "premium"), [activityAlerts]);
   const totalAlerts = restaurantAlerts.length;
-  const enabledAlerts = (restaurantAlerts as RestaurantAlertWithRestaurant[]).filter((a) => a.enabled).length;
+  const enabledAlerts = useMemo(() => (restaurantAlerts as RestaurantAlertWithRestaurant[]).filter((a) => a.enabled).length, [restaurantAlerts]);
 
   const handleRemoveAlert = async (alertId: string) => {
     try {
@@ -295,7 +335,7 @@ export default function AlertsScreen() {
   const handleAddAlert = async (restaurantId: string) => {
     try {
       await addAlertMutation.mutateAsync({
-        userPhone: phone || "test@reslot.se",
+        userPhone: phone || "",
         restaurantId,
       });
       setAddedIds((prev) => [...prev, restaurantId]);
@@ -309,63 +349,82 @@ export default function AlertsScreen() {
     if (unreadCount === 0) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     try {
-      await markReadMutation.mutateAsync({ phone: phone || "test@reslot.se" });
+      await markReadMutation.mutateAsync({ phone: phone || "" });
     } catch (err) {
-      // silently ignore
+      console.error("[Alerts] Mark read failed:", err);
     }
   };
 
   const handleRestaurantAlertPress = (restaurantId: string) => {
-    // Navigate to find the first active reservation for this restaurant
-    // For now navigate to the home page — the restaurant doesn't have its own page
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     router.push("/");
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#FAFAF8" }}>
-      <SafeAreaView edges={["top"]} style={{ backgroundColor: "#FAFAF8" }}>
-        <View className="flex-row items-center justify-between px-5 pt-2 pb-4">
+    <View style={{ flex: 1, backgroundColor: C.bg }}>
+      <SafeAreaView edges={["top"]} style={{ backgroundColor: C.bg }}>
+        <View className="flex-row items-center justify-between px-5 pt-2 pb-2">
           <View>
             <Text
+              testID="alerts-header"
               style={{
-                fontFamily: "PlusJakartaSans_700Bold",
-                fontSize: 26,
-                color: "#111827",
-                letterSpacing: -0.8,
+                fontFamily: FONTS.displayBold,
+                fontSize: 24,
+                color: C.dark,
+                letterSpacing: -0.5,
               }}
             >
-              Aviseringar
+              Bevakningar
             </Text>
-            {unreadCount > 0 ? (
+            {unreadCount > 0 && activeTab === "activity" ? (
               <Text
+                testID="unread-count"
                 style={{
-                  fontFamily: "PlusJakartaSans_400Regular",
+                  fontFamily: FONTS.regular,
                   fontSize: 13,
-                  color: "#E06A4E",
+                  color: C.coral,
                   marginTop: 2,
                 }}
               >
-                {unreadCount} {unreadCount > 1 ? "nya aviseringar" : "ny avisering"}
+                {unreadCount} {unreadCount > 1 ? "nya händelser" : "ny händelse"}
               </Text>
             ) : null}
           </View>
-          <Pressable
-            testID="mark-all-read-button"
-            onPress={handleMarkAllRead}
-            className="rounded-full px-3.5 py-2"
-            style={{ backgroundColor: "rgba(0,0,0,0.04)" }}
-          >
-            <Text
-              style={{
-                fontFamily: "PlusJakartaSans_500Medium",
-                fontSize: 12,
-                color: "#6B7280",
-              }}
+          {activeTab === "activity" ? (
+            <Pressable
+              testID="mark-all-read-button"
+              accessibilityLabel="Markera alla händelser som lästa"
+              onPress={handleMarkAllRead}
+              className="rounded-full px-3.5 py-2"
+              style={{ backgroundColor: "rgba(0,0,0,0.04)" }}
             >
-              Markera alla som lästa
-            </Text>
-          </Pressable>
+              <Text
+                style={{
+                  fontFamily: FONTS.medium,
+                  fontSize: 12,
+                  color: C.textSecondary,
+                }}
+              >
+                Markera alla som lästa
+              </Text>
+            </Pressable>
+          ) : null}
+        </View>
+        {/* Tab navigation */}
+        <View style={{ flexDirection: "row", backgroundColor: "rgba(0,0,0,0.05)", borderRadius: RADIUS.md, padding: 3, marginHorizontal: SPACING.lg, marginBottom: SPACING.sm }}>
+          {(["activity", "watches"] as const).map((tab) => (
+            <Pressable
+              key={tab}
+              testID={`tab-${tab}`}
+              accessibilityLabel={tab === "activity" ? "Visa aktivitet" : "Visa mina bevakningar"}
+              onPress={() => { setActiveTab(tab); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }}
+              style={{ flex: 1, paddingVertical: 8, borderRadius: 10, backgroundColor: activeTab === tab ? C.bgCard : "transparent", alignItems: "center" }}
+            >
+              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: activeTab === tab ? C.dark : C.textTertiary }}>
+                {tab === "activity" ? "Aktivitet" : "Mina bevakningar"}
+              </Text>
+            </Pressable>
+          ))}
         </View>
       </SafeAreaView>
 
@@ -376,49 +435,58 @@ export default function AlertsScreen() {
         contentContainerStyle={{ paddingBottom: 120, paddingTop: 4 }}
       >
         {alertsLoading ? (
-          <View style={{ alignItems: "center", justifyContent: "center", paddingTop: 60 }}>
-            <ActivityIndicator size="large" color="#E06A4E" />
-            <Text style={{ fontFamily: "PlusJakartaSans_400Regular", fontSize: 14, color: "#9CA3AF", marginTop: 12 }}>
-              Hämtar aviseringar...
-            </Text>
-          </View>
+          <AlertsSkeleton />
         ) : alertsError ? (
-          <View style={{ alignItems: "center", justifyContent: "center", paddingTop: 60 }}>
-            <AlertCircle size={40} color="#E06A4E" strokeWidth={1.5} />
-            <Text style={{ fontFamily: "PlusJakartaSans_600SemiBold", fontSize: 15, color: "#111827", marginTop: 12 }}>
+          <View testID="alerts-error" style={{ alignItems: "center", justifyContent: "center", paddingTop: 60 }}>
+            <AlertCircle size={40} color={C.coral} strokeWidth={ICON.strokeWidth} />
+            <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.dark, marginTop: 12 }}>
               Något gick fel
             </Text>
+            <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textTertiary, marginTop: SPACING.xs, textAlign: "center", paddingHorizontal: SPACING.lg }}>
+              Kunde inte ladda bevakningar. Försök igen senare.
+            </Text>
+            <Pressable
+              testID="alerts-retry-button"
+              accessibilityLabel="Försök igen"
+              onPress={() => { alertsRefetch(); restaurantAlertsRefetch(); watchesRefetch(); }}
+              style={{ marginTop: SPACING.md, backgroundColor: C.coral, borderRadius: RADIUS.md, paddingVertical: 12, paddingHorizontal: 28 }}
+            >
+              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: "#FFFFFF" }}>
+                Försök igen
+              </Text>
+            </Pressable>
           </View>
-        ) : (
+        ) : activeTab === "activity" ? (
           <>
             {/* Restaurant Alerts Section */}
-            <Animated.View entering={FadeInDown.delay(0).duration(400).springify()}>
+            <Animated.View entering={FadeInDown.springify()}>
               <View className="px-5" style={{ marginBottom: 8 }}>
                 <View className="flex-row items-center justify-between" style={{ marginBottom: 12 }}>
                   <View className="flex-row items-center" style={{ gap: 8 }}>
                     <Text
+                      testID="restaurant-alerts-header"
                       style={{
-                        fontFamily: "PlusJakartaSans_600SemiBold",
+                        fontFamily: FONTS.displaySemiBold,
                         fontSize: 16,
-                        color: "#111827",
+                        color: C.dark,
                         letterSpacing: -0.2,
                       }}
                     >
-                      Restaurangaviseringar
+                      Restaurangbevakningar
                     </Text>
                     <View
                       style={{
-                        backgroundColor: "rgba(224, 106, 78, 0.10)",
+                        backgroundColor: C.coralLight,
                         paddingHorizontal: 8,
                         paddingVertical: 3,
-                        borderRadius: 8,
+                        borderRadius: RADIUS.sm,
                       }}
                     >
                       <Text
                         style={{
-                          fontFamily: "PlusJakartaSans_600SemiBold",
+                          fontFamily: FONTS.semiBold,
                           fontSize: 11,
-                          color: "#E06A4E",
+                          color: C.coral,
                         }}
                       >
                         {enabledAlerts} / {totalAlerts}
@@ -428,7 +496,17 @@ export default function AlertsScreen() {
                 </View>
 
                 {restaurantAlertsLoading ? (
-                  <ActivityIndicator size="small" color="#E06A4E" />
+                  <View testID="restaurant-alerts-loading" style={{ gap: 8 }}>
+                    {[0, 1].map((i) => (
+                      <View key={i} style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.md, padding: 14, flexDirection: "row", alignItems: "center", gap: 12 }}>
+                        <Skeleton width={56} height={56} style={{ borderRadius: RADIUS.md }} />
+                        <View style={{ flex: 1, gap: 6 }}>
+                          <Skeleton width="60%" height={14} />
+                          <Skeleton width="80%" height={12} />
+                        </View>
+                      </View>
+                    ))}
+                  </View>
                 ) : restaurantAlerts && restaurantAlerts.length > 0 ? (
                   (restaurantAlerts as RestaurantAlertWithRestaurant[]).map((alert, index) => (
                     <RestaurantAlertCard
@@ -444,6 +522,7 @@ export default function AlertsScreen() {
                 {/* Add alert button */}
                 <Pressable
                   testID="add-alert-button"
+                  accessibilityLabel="Lägg till restaurangbevakning"
                   onPress={() => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     setShowAddAlert(true);
@@ -453,10 +532,10 @@ export default function AlertsScreen() {
                     alignItems: "center",
                     paddingVertical: 12,
                     paddingHorizontal: 14,
-                    backgroundColor: "#FFFFFF",
-                    borderRadius: 14,
+                    backgroundColor: C.bgCard,
+                    borderRadius: RADIUS.md,
                     borderWidth: 1,
-                    borderColor: "rgba(0,0,0,0.06)",
+                    borderColor: C.borderLight,
                     marginBottom: 4,
                     shadowColor: "#000",
                     shadowOffset: { width: 0, height: 1 },
@@ -471,24 +550,24 @@ export default function AlertsScreen() {
                       width: 34,
                       height: 34,
                       borderRadius: 10,
-                      backgroundColor: "rgba(224, 106, 78, 0.10)",
+                      backgroundColor: C.coralLight,
                       alignItems: "center",
                       justifyContent: "center",
                     }}
                   >
-                    <Plus size={16} color="#E06A4E" strokeWidth={2.5} />
+                    <Plus size={16} color={C.coral} strokeWidth={ICON.strokeWidth} />
                   </View>
                   <Text
                     style={{
-                      fontFamily: "PlusJakartaSans_600SemiBold",
+                      fontFamily: FONTS.semiBold,
                       fontSize: 14,
-                      color: "#111827",
+                      color: C.dark,
                       flex: 1,
                     }}
                   >
-                    Lägg till avisering
+                    Lägg till bevakning
                   </Text>
-                  <ChevronRight size={16} color="#D1D5DB" strokeWidth={2} />
+                  <ChevronRight size={16} color={C.textTertiary} strokeWidth={2} />
                 </Pressable>
               </View>
             </Animated.View>
@@ -497,8 +576,8 @@ export default function AlertsScreen() {
             <View
               style={{
                 height: 0.5,
-                backgroundColor: "rgba(0,0,0,0.06)",
-                marginHorizontal: 20,
+                backgroundColor: C.borderLight,
+                marginHorizontal: SPACING.lg,
                 marginTop: 12,
                 marginBottom: 16,
               }}
@@ -507,10 +586,11 @@ export default function AlertsScreen() {
             {/* Recent Activity Section */}
             <View className="px-5" style={{ marginBottom: 8 }}>
               <Text
+                testID="recent-activity-header"
                 style={{
-                  fontFamily: "PlusJakartaSans_600SemiBold",
+                  fontFamily: FONTS.displaySemiBold,
                   fontSize: 16,
-                  color: "#111827",
+                  color: C.dark,
                   letterSpacing: -0.2,
                   marginBottom: 12,
                 }}
@@ -520,51 +600,183 @@ export default function AlertsScreen() {
             </View>
 
             <View className="px-5">
-              {(activityAlerts as ActivityAlert[])
-                .filter((a) => a.type !== "premium")
+              {filteredActivityAlerts
                 .map((alert, index) => (
                   <AlertItem key={alert.id} alert={alert} index={index} />
                 ))}
             </View>
 
             {/* Empty state for activity if needed */}
-            {(activityAlerts as ActivityAlert[]).filter((a) => a.type !== "premium").length === 0 ? (
-              <View className="items-center justify-center" style={{ paddingTop: 40 }}>
-                <View
+            {filteredActivityAlerts.length === 0 ? (
+              <View
+                testID="empty-activity"
+                style={{ alignItems: "center", justifyContent: "center", paddingTop: 40 }}
+              >
+                <Animated.View
+                  entering={ZoomIn.delay(100).springify()}
                   style={{
-                    width: 56,
-                    height: 56,
-                    borderRadius: 16,
-                    backgroundColor: "rgba(0,0,0,0.03)",
+                    width: 64,
+                    height: 64,
+                    borderRadius: 32,
+                    backgroundColor: C.coralLight,
                     alignItems: "center",
                     justifyContent: "center",
                     marginBottom: 16,
                   }}
                 >
-                  <Bell size={24} color="#D1D5DB" strokeWidth={1.5} />
-                </View>
-                <Text
+                  <Bell size={28} color={C.coral} strokeWidth={ICON.strokeWidth} />
+                </Animated.View>
+                <Animated.Text
+                  entering={FadeInDown.delay(200).springify()}
                   style={{
-                    fontFamily: "PlusJakartaSans_600SemiBold",
-                    fontSize: 15,
-                    color: "#111827",
+                    fontFamily: FONTS.displayBold,
+                    fontSize: 17,
+                    color: C.dark,
+                    letterSpacing: -0.3,
                   }}
                 >
                   Inga händelser än
-                </Text>
-                <Text
+                </Animated.Text>
+                <Animated.Text
+                  entering={FadeInDown.delay(300).springify()}
                   style={{
-                    fontFamily: "PlusJakartaSans_400Regular",
-                    fontSize: 13,
-                    color: "#9CA3AF",
-                    marginTop: 4,
+                    fontFamily: FONTS.regular,
+                    fontSize: 14,
+                    color: C.textTertiary,
+                    marginTop: 6,
+                    textAlign: "center",
+                    paddingHorizontal: 40,
+                    lineHeight: 20,
                   }}
                 >
-                  Här visas dina senaste aktiviteter.
-                </Text>
+                  Här visas dina händelser — när du lägger upp eller tar över bokningar
+                </Animated.Text>
               </View>
             ) : null}
           </>
+        ) : (
+          <View style={{ flex: 1 }}>
+            <Pressable
+              testID="add-watch-button"
+              accessibilityLabel="Lägg till bevakning"
+              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/add-watch"); }}
+              style={{ marginHorizontal: SPACING.lg, marginTop: SPACING.md, marginBottom: SPACING.sm, backgroundColor: C.coral, borderRadius: RADIUS.md, paddingVertical: 14, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 }}
+            >
+              <Plus size={18} color="#FFFFFF" strokeWidth={ICON.strokeWidth} />
+              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: "#FFFFFF" }}>Lägg till bevakning</Text>
+            </Pressable>
+
+            {watchesLoading ? (
+              <View testID="watches-loading" style={{ paddingHorizontal: SPACING.lg, marginTop: SPACING.md, gap: 10 }}>
+                {[0, 1, 2].map((i) => (
+                  <View key={i} style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.lg, padding: SPACING.md, flexDirection: "row", alignItems: "center", gap: 12 }}>
+                    <View style={{ flex: 1, gap: 6 }}>
+                      <Skeleton width="50%" height={15} />
+                      <Skeleton width="30%" height={12} />
+                    </View>
+                    <Skeleton width={32} height={32} style={{ borderRadius: 16 }} />
+                  </View>
+                ))}
+              </View>
+            ) : watches.length === 0 ? (
+              <View
+                testID="empty-watches"
+                style={{ alignItems: "center", paddingTop: 60 }}
+              >
+                <Animated.View
+                  entering={ZoomIn.delay(100).springify()}
+                  style={{
+                    width: 64,
+                    height: 64,
+                    borderRadius: 32,
+                    backgroundColor: "rgba(59, 130, 246, 0.10)",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: 16,
+                  }}
+                >
+                  <Eye size={28} color={C.info} strokeWidth={ICON.strokeWidth} />
+                </Animated.View>
+                <Animated.Text
+                  entering={FadeInDown.delay(200).springify()}
+                  style={{
+                    fontFamily: FONTS.displayBold,
+                    fontSize: 17,
+                    color: C.dark,
+                    letterSpacing: -0.3,
+                  }}
+                >
+                  Inga bevakningar
+                </Animated.Text>
+                <Animated.Text
+                  entering={FadeInDown.delay(300).springify()}
+                  style={{
+                    fontFamily: FONTS.regular,
+                    fontSize: 14,
+                    color: C.textTertiary,
+                    marginTop: 6,
+                    textAlign: "center",
+                    paddingHorizontal: 40,
+                    lineHeight: 20,
+                  }}
+                >
+                  Bevaka restauranger för att få notiser om lediga bord
+                </Animated.Text>
+                <Animated.View entering={FadeInDown.delay(400).springify()}>
+                  <Pressable
+                    testID="empty-watches-cta"
+                    accessibilityLabel="Lägg till bevakning"
+                    onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      router.push("/add-watch");
+                    }}
+                    style={{
+                      marginTop: 20,
+                      backgroundColor: C.coral,
+                      borderRadius: RADIUS.md,
+                      paddingVertical: 14,
+                      paddingHorizontal: 28,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 8,
+                    }}
+                  >
+                    <Plus size={16} color="#FFFFFF" strokeWidth={ICON.strokeWidth} />
+                    <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: "#FFFFFF" }}>
+                      Lägg till bevakning
+                    </Text>
+                  </Pressable>
+                </Animated.View>
+              </View>
+            ) : (
+              <View style={{ paddingHorizontal: SPACING.lg, gap: 10, marginTop: 4 }}>
+                {watches.map((watch: Watch, index: number) => (
+                  <Animated.View key={watch.id} entering={FadeInDown.delay(index * 60).springify()}>
+                    <View style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.lg, borderWidth: 0.5, borderColor: C.borderLight, padding: SPACING.md, flexDirection: "row", alignItems: "center", shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1 }}>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.dark }}>
+                          {watch.restaurant?.name ?? "Valfri restaurang"}
+                        </Text>
+                        <View style={{ flexDirection: "row", gap: 12, marginTop: 4, flexWrap: "wrap" }}>
+                          {watch.date ? <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary }}>{watch.date}</Text> : null}
+                          {watch.partySize ? <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary }}>{watch.partySize} pers</Text> : null}
+                          {watch.notes ? <Text numberOfLines={1} style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary }}>{watch.notes}</Text> : null}
+                        </View>
+                      </View>
+                      <Pressable
+                        testID={`delete-watch-${watch.id}`}
+                        accessibilityLabel={`Ta bort bevakning för ${watch.restaurant?.name ?? "valfri restaurang"}`}
+                        onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); deleteWatch({ id: watch.id, userPhone: phone! }); }}
+                        style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: C.coralLight, alignItems: "center", justifyContent: "center" }}
+                      >
+                        <Trash2 size={15} color={C.coral} strokeWidth={2} />
+                      </Pressable>
+                    </View>
+                  </Animated.View>
+                ))}
+              </View>
+            )}
+          </View>
         )}
       </ScrollView>
 
@@ -575,34 +787,35 @@ export default function AlertsScreen() {
         presentationStyle="pageSheet"
         onRequestClose={() => setShowAddAlert(false)}
       >
-        <View style={{ flex: 1, backgroundColor: "#FAFAF8" }}>
-          <SafeAreaView edges={["top"]} style={{ backgroundColor: "#FAFAF8" }}>
+        <View style={{ flex: 1, backgroundColor: C.bg }}>
+          <SafeAreaView edges={["top"]} style={{ backgroundColor: C.bg }}>
             <View
               style={{
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "space-between",
-                paddingHorizontal: 20,
+                paddingHorizontal: SPACING.lg,
                 paddingTop: 4,
                 paddingBottom: 14,
               }}
             >
               <View>
                 <Text
+                  testID="add-alert-modal-header"
                   style={{
-                    fontFamily: "PlusJakartaSans_700Bold",
+                    fontFamily: FONTS.displayBold,
                     fontSize: 20,
-                    color: "#111827",
+                    color: C.dark,
                     letterSpacing: -0.4,
                   }}
                 >
-                  Lägg till avisering
+                  Lägg till bevakning
                 </Text>
                 <Text
                   style={{
-                    fontFamily: "PlusJakartaSans_400Regular",
+                    fontFamily: FONTS.regular,
                     fontSize: 13,
-                    color: "#9CA3AF",
+                    color: C.textTertiary,
                     marginTop: 2,
                   }}
                 >
@@ -610,38 +823,43 @@ export default function AlertsScreen() {
                 </Text>
               </View>
               <Pressable
-                onPress={() => setShowAddAlert(false)}
+                testID="close-add-alert-modal"
+                accessibilityLabel="Stäng dialogrutan"
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setShowAddAlert(false);
+                }}
                 style={{
                   width: 36,
                   height: 36,
                   borderRadius: 18,
-                  backgroundColor: "rgba(17,24,39,0.05)",
+                  backgroundColor: "rgba(0,0,0,0.05)",
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
-                <X size={17} color="#374151" strokeWidth={2.5} />
+                <X size={17} color={C.textSecondary} strokeWidth={ICON.strokeWidth} />
               </Pressable>
             </View>
           </SafeAreaView>
 
-          <View style={{ height: 0.5, backgroundColor: "rgba(0,0,0,0.07)" }} />
+          <View style={{ height: 0.5, backgroundColor: C.divider }} />
 
           {/* Search Bar */}
-          <View style={{ paddingHorizontal: 20, paddingTop: 12, paddingBottom: 8 }}>
+          <View style={{ paddingHorizontal: SPACING.lg, paddingTop: 12, paddingBottom: 8 }}>
             <View
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                backgroundColor: "#FAFAF8",
-                borderRadius: 12,
+                backgroundColor: C.bg,
+                borderRadius: RADIUS.md,
                 paddingHorizontal: 14,
                 height: 44,
                 borderWidth: 1,
-                borderColor: searchQuery ? "rgba(224,106,78,0.20)" : "rgba(0,0,0,0.08)",
+                borderColor: searchQuery ? C.coralPressed : C.divider,
               }}
             >
-              <Search size={16} color="#9CA3AF" strokeWidth={2} />
+              <Search size={16} color={C.textTertiary} strokeWidth={2} />
               <TextInput
                 testID="restaurant-search"
                 value={searchQuery}
@@ -650,19 +868,20 @@ export default function AlertsScreen() {
                 placeholderTextColor="#D1D5DB"
                 style={{
                   flex: 1,
-                  fontFamily: "PlusJakartaSans_400Regular",
+                  fontFamily: FONTS.regular,
                   fontSize: 15,
-                  color: "#111827",
+                  color: C.dark,
                   marginLeft: 10,
                 }}
               />
               {searchQuery ? (
                 <Pressable
                   testID="clear-search"
+                  accessibilityLabel="Rensa sökning"
                   onPress={() => setSearchQuery("")}
                   hitSlop={8}
                 >
-                  <X size={16} color="#9CA3AF" strokeWidth={2.5} />
+                  <X size={16} color={C.textTertiary} strokeWidth={ICON.strokeWidth} />
                 </Pressable>
               ) : null}
             </View>
@@ -670,107 +889,112 @@ export default function AlertsScreen() {
 
           <ScrollView
             style={{ flex: 1 }}
-            contentContainerStyle={{ padding: 20, gap: 10 }}
+            contentContainerStyle={{ padding: SPACING.lg, gap: 10 }}
             showsVerticalScrollIndicator={false}
             onScrollBeginDrag={() => Keyboard.dismiss()}
           >
             {allRestaurants && allRestaurants.length > 0 ? (
               (() => {
+                const lowerQuery = searchQuery.toLowerCase();
                 const filtered = allRestaurants.filter((r: any) =>
-                  r.name.toLowerCase().includes(searchQuery.toLowerCase())
+                  r.name.toLowerCase().includes(lowerQuery)
                 );
                 return filtered.length > 0 ? (
-                  filtered.map((restaurant: any) => {
+                  filtered.map((restaurant: any, index: number) => {
                     const alreadyAdded =
                       restaurantAlerts.some((a: RestaurantAlertWithRestaurant) => a.restaurantId === restaurant.id) ||
                       addedIds.includes(restaurant.id);
                     return (
-                      <Pressable
-                        key={restaurant.id}
-                        onPress={() => {
-                          if (!alreadyAdded) {
-                            handleAddAlert(restaurant.id);
-                          }
-                        }}
-                        style={{
-                          backgroundColor: "#FFFFFF",
-                          borderRadius: 14,
-                          padding: 14,
-                          flexDirection: "row",
-                          alignItems: "center",
-                          borderWidth: 1,
-                          borderColor: alreadyAdded
-                            ? "rgba(139,158,126,0.30)"
-                            : "rgba(0,0,0,0.06)",
-                          opacity: alreadyAdded ? 0.6 : 1,
-                        }}
-                      >
-                        <Image
-                          source={{ uri: restaurant.image }}
-                          style={{
-                            width: 48,
-                            height: 48,
-                            borderRadius: 10,
-                            backgroundColor: "#F0F0EE",
-                            marginRight: 12,
+                      <Animated.View key={restaurant.id} entering={FadeInDown.delay(index * 60).springify()}>
+                        <Pressable
+                          testID={`add-restaurant-${restaurant.id}`}
+                          accessibilityLabel={`Lägg till bevakning för ${restaurant.name}`}
+                          onPress={() => {
+                            if (!alreadyAdded) {
+                              handleAddAlert(restaurant.id);
+                            }
                           }}
-                          resizeMode="cover"
-                        />
-                        <View style={{ flex: 1 }}>
-                          <Text
-                            style={{
-                              fontFamily: "PlusJakartaSans_600SemiBold",
-                              fontSize: 15,
-                              color: "#111827",
-                              letterSpacing: -0.2,
-                            }}
-                            numberOfLines={1}
-                          >
-                            {restaurant.name}
-                          </Text>
-                          <View style={{ flexDirection: "row", alignItems: "center", marginTop: 3, gap: 4 }}>
-                            <Star size={11} color="#C9A96E" fill="#C9A96E" strokeWidth={0} />
-                            <Text
-                              style={{
-                                fontFamily: "PlusJakartaSans_500Medium",
-                                fontSize: 12,
-                                color: "#9CA3AF",
-                              }}
-                            >
-                              {restaurant.rating.toFixed(1)} · {restaurant.cuisine}
-                            </Text>
-                          </View>
-                        </View>
-                        <View
                           style={{
-                            width: 28,
-                            height: 28,
-                            borderRadius: 14,
-                            backgroundColor: alreadyAdded
-                              ? "rgba(139,158,126,0.15)"
-                              : "rgba(224,106,78,0.08)",
+                            backgroundColor: C.bgCard,
+                            borderRadius: RADIUS.md,
+                            padding: 14,
+                            flexDirection: "row",
                             alignItems: "center",
-                            justifyContent: "center",
-                            marginLeft: 10,
+                            borderWidth: 1,
+                            borderColor: alreadyAdded
+                              ? "rgba(74,140,107,0.30)"
+                              : C.borderLight,
+                            opacity: alreadyAdded ? 0.6 : 1,
                           }}
                         >
-                          {alreadyAdded ? (
-                            <Check size={14} color="#8B9E7E" strokeWidth={2.5} />
-                          ) : (
-                            <Plus size={14} color="#E06A4E" strokeWidth={2.5} />
-                          )}
-                        </View>
-                      </Pressable>
+                          <Image
+                            source={{ uri: restaurant.image }}
+                            style={{
+                              width: 48,
+                              height: 48,
+                              borderRadius: 10,
+                              backgroundColor: C.bgInput,
+                              marginRight: 12,
+                            }}
+                            contentFit="cover"
+            cachePolicy="memory-disk"
+                          />
+                          <View style={{ flex: 1 }}>
+                            <Text
+                              style={{
+                                fontFamily: FONTS.semiBold,
+                                fontSize: 15,
+                                color: C.dark,
+                                letterSpacing: -0.2,
+                              }}
+                              numberOfLines={1}
+                            >
+                              {restaurant.name}
+                            </Text>
+                            <View style={{ flexDirection: "row", alignItems: "center", marginTop: 3, gap: 4 }}>
+                              <Star size={11} color={C.gold} fill={C.gold} strokeWidth={0} />
+                              <Text
+                                style={{
+                                  fontFamily: FONTS.medium,
+                                  fontSize: 12,
+                                  color: C.textTertiary,
+                                }}
+                              >
+                                {restaurant.rating.toFixed(1)} · {restaurant.cuisine}
+                              </Text>
+                            </View>
+                          </View>
+                          <View
+                            style={{
+                              width: 28,
+                              height: 28,
+                              borderRadius: 14,
+                              backgroundColor: alreadyAdded
+                                ? "rgba(74,140,107,0.15)"
+                                : C.coralLight,
+                              alignItems: "center",
+                              justifyContent: "center",
+                              marginLeft: 10,
+                            }}
+                          >
+                            {alreadyAdded ? (
+                              <Check size={14} color={C.success} strokeWidth={ICON.strokeWidth} />
+                            ) : (
+                              <Plus size={14} color={C.coral} strokeWidth={ICON.strokeWidth} />
+                            )}
+                          </View>
+                        </Pressable>
+                      </Animated.View>
                     );
                   })
                 ) : (
-                  <Text style={{ fontFamily: "PlusJakartaSans_400Regular", fontSize: 14, color: "#9CA3AF", textAlign: "center", paddingTop: 40 }}>
+                  <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textTertiary, textAlign: "center", paddingTop: 40 }}>
                     Inga restauranger matchar "{searchQuery}"
                   </Text>
                 );
               })()
             ) : (
-              <Text style={{ fontFamily: "PlusJakartaSans_400Regular", fontSize: 14, color: "#9CA3AF", textAlign: "center", paddingTop: 20 }}>
+              <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textTertiary, textAlign: "center", paddingTop: 20 }}>
                 Hämtar restauranger...
               </Text>
             )}

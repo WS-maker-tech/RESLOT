@@ -5,6 +5,7 @@ import { LogIn } from "lucide-react-native";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { useAuthStore } from "@/lib/auth-store";
+import { C, FONTS, SPACING, RADIUS, ICON } from "@/lib/theme";
 
 interface LoginGateProps {
   title: string;
@@ -25,7 +26,7 @@ export function LoginGate({ title, subtitle }: LoginGateProps) {
     <View
       style={{
         flex: 1,
-        backgroundColor: "#FAFAF8",
+        backgroundColor: C.bg,
         alignItems: "center",
         justifyContent: "center",
         paddingHorizontal: 40,
@@ -33,27 +34,27 @@ export function LoginGate({ title, subtitle }: LoginGateProps) {
     >
       {/* Icon */}
       <Animated.View
-        entering={FadeInDown.delay(100).duration(500)}
+        entering={FadeInDown.delay(100).springify()}
         style={{
           width: 72,
           height: 72,
           borderRadius: 36,
-          backgroundColor: "rgba(224,106,78,0.08)",
+          backgroundColor: C.coralLight,
           alignItems: "center",
           justifyContent: "center",
-          marginBottom: 24,
+          marginBottom: SPACING.xl,
         }}
       >
-        <LogIn size={32} color="#E06A4E" strokeWidth={1.5} />
+        <LogIn size={32} color={C.coral} strokeWidth={ICON.strokeWidth} />
       </Animated.View>
 
       {/* Text */}
-      <Animated.View entering={FadeInDown.delay(200).duration(500)} style={{ alignItems: "center" }}>
+      <Animated.View entering={FadeInDown.delay(200).springify()} style={{ alignItems: "center" }}>
         <Text
           style={{
-            fontFamily: "PlusJakartaSans_700Bold",
+            fontFamily: FONTS.displayBold,
             fontSize: 22,
-            color: "#111827",
+            color: C.textPrimary,
             textAlign: "center",
             letterSpacing: -0.4,
             marginBottom: 10,
@@ -63,9 +64,9 @@ export function LoginGate({ title, subtitle }: LoginGateProps) {
         </Text>
         <Text
           style={{
-            fontFamily: "PlusJakartaSans_400Regular",
+            fontFamily: FONTS.regular,
             fontSize: 15,
-            color: "#9CA3AF",
+            color: C.textTertiary,
             textAlign: "center",
             lineHeight: 22,
           }}
@@ -75,22 +76,22 @@ export function LoginGate({ title, subtitle }: LoginGateProps) {
       </Animated.View>
 
       {/* CTA */}
-      <Animated.View entering={FadeInUp.delay(350).duration(500)} style={{ width: "100%", marginTop: 36 }}>
+      <Animated.View entering={FadeInUp.delay(350).springify()} style={{ width: "100%", marginTop: 36 }}>
         <Pressable
           testID="login-gate-btn"
           onPress={handleLogin}
           style={{
-            backgroundColor: "#111827",
-            borderRadius: 28,
-            paddingVertical: 16,
+            backgroundColor: C.coral,
+            borderRadius: RADIUS.full,
+            paddingVertical: SPACING.md,
             alignItems: "center",
           }}
         >
           <Text
             style={{
-              fontFamily: "PlusJakartaSans_700Bold",
+              fontFamily: FONTS.bold,
               fontSize: 16,
-              color: "#FFFFFF",
+              color: "#111827",
               letterSpacing: -0.2,
             }}
           >
@@ -100,16 +101,16 @@ export function LoginGate({ title, subtitle }: LoginGateProps) {
       </Animated.View>
 
       {/* Ghost link */}
-      <Animated.View entering={FadeInUp.delay(450).duration(500)} style={{ marginTop: 16 }}>
+      <Animated.View entering={FadeInUp.delay(450).springify()} style={{ marginTop: SPACING.md }}>
         <Pressable
           testID="create-account-btn"
           onPress={handleLogin}
         >
           <Text
             style={{
-              fontFamily: "PlusJakartaSans_500Medium",
+              fontFamily: FONTS.medium,
               fontSize: 14,
-              color: "#E06A4E",
+              color: C.coral,
             }}
           >
             Skapa konto

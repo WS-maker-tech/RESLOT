@@ -18,14 +18,15 @@ model Restaurant {
   priceLevel         Int
   image              String
   description        String
-  tags               String   // JSON stringified array
+  tags               String
   timesBookedOnReslot Int     @default(0)
-  seatType           String   // "Inomhus" | "Utomhus" | "Båda"
+  demandMultiplier    Float   @default(1.0)  // Dynamic pricing: multiplier based on restaurant demand
+  seatType           String
   instagram          String?
   website            String?
-  vibeTags           String   // JSON stringified array
-  goodForTags        String   // JSON stringified array
-  foodTags           String   // JSON stringified array
+  vibeTags           String
+  goodForTags        String
+  foodTags           String
   latitude           Float?
   longitude          Float?
   isExclusive        Boolean  @default(false)
@@ -33,42 +34,87 @@ model Restaurant {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
-  reservations     Reservation[]
-  restaurantAlerts RestaurantAlert[]
+  reservations       Reservation[]
+  restaurantAlerts   RestaurantAlert[]
+  watches            Watch[]
+  savedByUsers       SavedRestaurant[]
 }
 
 model Reservation {
-  id                  String   @id @default(cuid())
-  restaurantId        String
-  restaurant          Restaurant @relation(fields: [restaurantId], references: [id])
-  submitterPhone      String
-  submitterFirstName  String
-  submitterLastName   String
-  reservationDate     DateTime
-  reservationTime     String   // "19:00" format
-  partySize           Int
-  seatType            String
-  nameOnReservation   String
-  status              String   @default("active") // "active" | "claimed" | "expired" | "cancelled"
-  claimerPhone        String?
-  cancelFee           Float?
-  prepaidAmount       Float?
-  verificationLink    String?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  id                       String   @id @default(cuid())
+  restaurantId             String
+  restaurant               Restaurant @relation(fields: [restaurantId], references: [id])
+  submitterPhone           String
+  submitterFirstName       String
+  submitterLastName        String
+  reservationDate          DateTime
+  reservationTime          String
+  partySize                Int
+  seatType                 String
+  nameOnReservation        String
+  status                   String   @default("active") // active, claimed, grace_period, completed, cancelled, no_show, resold
+  claimerPhone             String?
+  claimedAt                DateTime?
+  graceDeadline            DateTime?
+  creditStatus             String   @default("none") // none, pending, awarded, reverted
+  serviceFee               Float?
+  stripePaymentIntentId    String?
+  captureStatus            String   @default("none") // none, pending, captured, failed
+  cancelFee                Float?
+  prepaidAmount            Float?
+  verificationLink         String?
+  extraInfo                String?
+  cancellationWindowHours  Int?
+  creditCost               Int      @default(2)     // Dynamic pricing: credit cost for claiming (default 2)
+  noShowFeeCharged         Boolean  @default(false)
+  noShowFeePaymentIntentId String?
+  resoldFromId             String?  // ID of the original reservation if this was created via resale
+  version                  Int      @default(0) // Optimistic locking
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+
+  noShowReports            NoShowReport[]
+
+  @@index([status])
+  @@index([submitterPhone])
+  @@index([claimerPhone])
+  @@index([restaurantId])
+  @@index([reservationDate])
+  @@index([status, claimedAt])
 }
 
 model UserProfile {
-  id           String   @id @default(cuid())
-  phone        String   @unique
-  firstName    String
-  lastName     String
-  email        String
-  avatar       String?
-  tokens       Int      @default(0)
-  selectedCity String   @default("Stockholm")
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id                String   @id @default(cuid())
+  phone             String   @unique
+  firstName         String
+  lastName          String
+  email             String
+  avatar            String?
+  credits           Int      @default(0)
+  selectedCity      String   @default("Stockholm")
+  dateOfBirth       String?
+  emailVerified     Boolean  @default(false)
+  phoneVerified     Boolean  @default(true)
+  referralCode      String?  @unique
+  referralUsed      String?
+  stripeCustomerId  String?  @unique
+  isDeleted         Boolean  @default(false)
+  deletedAt         DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Watch {
+  id           String     @id @default(cuid())
+  userPhone    String
+  restaurantId String?
+  restaurant   Restaurant? @relation(fields: [restaurantId], references: [id])
+  date         String?
+  partySize    Int?
+  notes        String?
+  createdAt    DateTime   @default(now())
+
+  @@index([userPhone])
 }
 
 model RestaurantAlert {
@@ -83,12 +129,15 @@ model RestaurantAlert {
 model ActivityAlert {
   id           String   @id @default(cuid())
   userPhone    String
-  type         String   // "drop" | "claim" | "token" | "premium"
+  type         String
   title        String
   message      String
   read         Boolean  @default(false)
   restaurantId String?
   createdAt    DateTime @default(now())
+
+  @@index([userPhone])
+  @@index([userPhone, read])
 }
 
 model OtpCode {
@@ -98,6 +147,8 @@ model OtpCode {
   used      Boolean  @default(false)
   expiresAt DateTime
   createdAt DateTime @default(now())
+
+  @@index([phone, used])
 }
 
 model Session {
@@ -106,4 +157,46 @@ model Session {
   token     String   @unique
   expiresAt DateTime
   createdAt DateTime @default(now())
+}
+
+model NoShowReport {
+  id            String   @id @default(cuid())
+  reservationId String
+  reservation   Reservation @relation(fields: [reservationId], references: [id])
+  reporterPhone String
+  reason        String
+  evidenceUrl   String?
+  status        String   @default("pending") // pending, confirmed, rejected
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model ProcessedEvent {
+  id        String   @id // Stripe event ID
+  type      String   // event type (e.g. payment_intent.succeeded)
+  createdAt DateTime @default(now())
+}
+
+model SavedRestaurant {
+  id           String     @id @default(cuid())
+  userPhone    String
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  createdAt    DateTime   @default(now())
+
+  @@unique([userPhone, restaurantId])
+  @@index([userPhone])
+}
+
+model EmailVerification {
+  id        String   @id @default(cuid())
+  phone     String
+  email     String
+  code      String
+  used      Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([phone, used])
+  @@index([email, used])
 }

@@ -1,0 +1,50 @@
+{
+  "name": "Planta",
+  "url": "https://getplanta.com",
+  "fetchDate": "2026-04-01",
+  "colors": {
+    "primary": "Green (brand-inferred from 'green tools for green thumbs')",
+    "secondary": "#FFFFFF",
+    "note": "Exact hex codes not available from markup"
+  },
+  "typography": {
+    "fontFamilies": "Not exposed in markup",
+    "headingTags": "h4 for feature sections",
+    "note": "Specific sizing not extractable"
+  },
+  "trustElements": {
+    "userCount": "7M+ plant lovers",
+    "plantsCared": "30M+ plants collectively",
+    "origin": "Made in Sweden",
+    "pressPage": "/press available"
+  },
+  "conversionPsychology": {
+    "primaryCta": "Download now",
+    "secondaryCta": "Buy now",
+    "ctaPlacement": "Hero section (above fold) and navigation",
+    "valuePropositions": [
+      "Individual care schedule and reminders",
+      "Smart algorithms with 30+ parameters",
+      "Plant identification via photo",
+      "Light meter for room assessment"
+    ],
+    "urgencyTactics": "None detected",
+    "premiumModel": "12-month offer available (/offer/planta_offer_12m)"
+  },
+  "onboardingPatterns": {
+    "frictionReduction": "Direct download links for iOS/Android",
+    "progressiveDisclosure": "Feature showcase before download",
+    "personalization": "Session-based user tracking"
+  },
+  "uniqueDesignPatterns": {
+    "community": "Discussion forums for plant enthusiasts",
+    "careSharing": "Share plant care schedules with friends/family",
+    "drPlanta": "Plant diagnosis and treatment planning",
+    "phoneMockups": "Product demonstration via device imagery"
+  },
+  "appStorePresence": {
+    "ios": "https://link.getplanta.com/dVZ0syUMSb",
+    "android": "https://link.getplanta.com/LXyYoGQW0D",
+    "userMetric": "7M+ users"
+  }
+}

@@ -23,6 +23,12 @@ const request = async <T>(
     headers,
   });
 
+  // Handle token rotation: if server sends new token, update store
+  const newToken = response.headers.get("x-new-token");
+  if (newToken) {
+    useAuthStore.getState().setSessionToken(newToken);
+  }
+
   // 1. Handle 204 No Content
   if (response.status === 204) {
     return undefined as T;

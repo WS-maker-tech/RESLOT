@@ -4,37 +4,29 @@ import {
   Text,
   Pressable,
   TextInput,
-  Image,
   Dimensions,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
-  FlatList,
 } from "react-native";
+import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import {
   ChevronLeft,
   Pencil,
   Check,
-  Search,
-  Bell,
-  MessageCircle,
-  Award,
-  Utensils,
-  Users,
-  Clock,
-  CalendarCheck,
   Coins,
-  Gift,
+  Upload,
+  ArrowDownLeft,
+  ArrowRight,
+  Sparkles,
+  ChevronRight,
+  Users,
 } from "lucide-react-native";
 import Animated, {
   FadeIn,
   FadeInDown,
   FadeInUp,
-  FadeOut,
-  SlideInRight,
-  SlideOutLeft,
   useSharedValue,
   useAnimatedStyle,
   withSpring,
@@ -43,35 +35,33 @@ import Animated, {
   withDelay,
   withRepeat,
   Easing,
-  interpolate,
-  Extrapolation,
 } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
-import { useFonts } from "expo-font";
 import { useAuthStore } from "@/lib/auth-store";
+import { C as ThemeC, FONTS } from "../lib/theme";
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get("window");
 
-// --- Colors (Light theme matching main app) ---
+// --- Colors ---
 const C = {
-  bg: "#FAFAF8",
-  bgCard: "#FFFFFF",
-  bgInput: "#F0F0EE",
-  orange: "#E06A4E",
-  gold: "#C9A96E",
-  text: "#111827",
-  gray: "#6B7280",
-  grayLight: "#9CA3AF",
-  divider: "rgba(0,0,0,0.07)",
+  ...ThemeC,
+  orange: ThemeC.coral,
+  text: ThemeC.textPrimary,
+  gray: ThemeC.textSecondary,
+  grayLight: ThemeC.textTertiary,
 };
 
-// ── Animated Strip ──────────────────────────────────────────────
+// ── Spring configs ──
+const SPRING_PRESS_IN = { damping: 15, stiffness: 300 };
+const SPRING_PRESS_OUT = { damping: 12, stiffness: 200 };
+
+// ── Animated Strip ──
 const CARD_H = 157;
 const CARD_GAP = 9;
-const CARD_STEP = CARD_H + CARD_GAP; // 166px
-const STRIP_HALF = 6 * CARD_STEP; // 996px — seamless half-point
-const STRIP_H = SCREEN_H * 0.60;
+const CARD_STEP = CARD_H + CARD_GAP;
+const STRIP_HALF = 6 * CARD_STEP;
+const STRIP_H = SCREEN_H * 0.58;
 const COL_W = (SCREEN_W - CARD_GAP * 2) / 3;
 
 type StripCard = { name: string; meta: string; image: string };
@@ -118,7 +108,8 @@ function RestaurantStripCard({ card }: { card: StripCard }) {
       <Image
         source={{ uri: card.image }}
         style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}
-        resizeMode="cover"
+        contentFit="cover"
+        cachePolicy="memory-disk"
       />
       <LinearGradient
         colors={["transparent", "rgba(0,0,0,0.72)"]}
@@ -126,13 +117,13 @@ function RestaurantStripCard({ card }: { card: StripCard }) {
       />
       <View style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: 8 }}>
         <Text
-          style={{ fontFamily: "PlusJakartaSans_600SemiBold", fontSize: 11, color: "#FFFFFF", lineHeight: 14 }}
+          style={{ fontFamily: FONTS.semiBold, fontSize: 11, color: "#FFFFFF", lineHeight: 14 }}
           numberOfLines={1}
         >
           {card.name}
         </Text>
         <Text
-          style={{ fontFamily: "PlusJakartaSans_400Regular", fontSize: 9, color: "rgba(255,255,255,0.70)", lineHeight: 12, marginTop: 2 }}
+          style={{ fontFamily: FONTS.regular, fontSize: 9, color: "rgba(255,255,255,0.70)", lineHeight: 12, marginTop: 2 }}
           numberOfLines={1}
         >
           {card.meta}
@@ -195,6 +186,7 @@ function AnimatedColumn({
   );
 }
 
+// ── Pulsing availability dot ──
 function PulsingDot() {
   const scale = useSharedValue(1);
   const opacity = useSharedValue(0.85);
@@ -228,23 +220,16 @@ function PulsingDot() {
       <Animated.View
         style={[
           rippleStyle,
-          { position: "absolute", width: 8, height: 8, borderRadius: 4, backgroundColor: "#4CAF50" },
+          { position: "absolute", width: 8, height: 8, borderRadius: 4, backgroundColor: C.success },
         ]}
       />
-      <View style={{ width: 7, height: 7, borderRadius: 3.5, backgroundColor: "#4CAF50" }} />
+      <View style={{ width: 7, height: 7, borderRadius: 3.5, backgroundColor: C.success }} />
     </View>
   );
 }
 
 // --- Step Enum ---
-type Step =
-  | "splash"
-  | "phone"
-  | "otp"
-  | "register"
-  | "onboard"
-  | "welcome"
-  | "city";
+type Step = "splash" | "phone" | "otp" | "register" | "city" | "credits_intro" | "welcome";
 
 // --- Shared Button ---
 function PrimaryButton({
@@ -252,10 +237,72 @@ function PrimaryButton({
   onPress,
   disabled,
   testID,
+  icon,
 }: {
   label: string;
   onPress: () => void;
   disabled?: boolean;
+  testID?: string;
+  icon?: React.ReactNode;
+}) {
+  const scale = useSharedValue(1);
+  const btnStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+  return (
+    <Animated.View style={btnStyle}>
+      <Pressable
+        testID={testID}
+        accessibilityLabel={label}
+        onPress={() => {
+          if (disabled) return;
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          onPress();
+        }}
+        onPressIn={() => {
+          scale.value = withSpring(0.96, SPRING_PRESS_IN);
+        }}
+        onPressOut={() => {
+          scale.value = withSpring(1, SPRING_PRESS_OUT);
+        }}
+        style={{
+          backgroundColor: disabled ? C.coralPressed : C.orange,
+          borderRadius: 28,
+          paddingVertical: 17,
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "row",
+          gap: 8,
+          shadowColor: disabled ? "transparent" : C.orange,
+          shadowOffset: { width: 0, height: 8 },
+          shadowOpacity: disabled ? 0 : 0.25,
+          shadowRadius: 16,
+        }}
+      >
+        <Text
+          style={{
+            fontFamily: FONTS.bold,
+            fontSize: 16,
+            color: "#111827",
+            letterSpacing: -0.2,
+          }}
+        >
+          {label}
+        </Text>
+        {icon ?? null}
+      </Pressable>
+    </Animated.View>
+  );
+}
+
+// --- Secondary / Ghost button ---
+function GhostButton({
+  label,
+  onPress,
+  testID,
+}: {
+  label: string;
+  onPress: () => void;
   testID?: string;
 }) {
   const scale = useSharedValue(1);
@@ -266,30 +313,24 @@ function PrimaryButton({
     <Animated.View style={btnStyle}>
       <Pressable
         testID={testID}
+        accessibilityLabel={label}
         onPress={() => {
-          if (disabled) return;
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           onPress();
         }}
         onPressIn={() => {
-          scale.value = withSpring(0.97, { damping: 15 });
+          scale.value = withSpring(0.97, SPRING_PRESS_IN);
         }}
         onPressOut={() => {
-          scale.value = withSpring(1, { damping: 12 });
+          scale.value = withSpring(1, SPRING_PRESS_OUT);
         }}
-        style={{
-          backgroundColor: disabled ? "rgba(232,114,74,0.4)" : C.orange,
-          borderRadius: 28,
-          paddingVertical: 17,
-          alignItems: "center",
-        }}
+        style={{ alignItems: "center", paddingVertical: 14 }}
       >
         <Text
           style={{
-            fontFamily: "PlusJakartaSans_700Bold",
-            fontSize: 16,
-            color: "#FFFFFF",
-            letterSpacing: -0.2,
+            fontFamily: FONTS.medium,
+            fontSize: 15,
+            color: C.orange,
           }}
         >
           {label}
@@ -301,41 +342,64 @@ function PrimaryButton({
 
 // --- Back Arrow ---
 function BackArrow({ onPress }: { onPress: () => void }) {
+  const scale = useSharedValue(1);
+  const btnStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
   return (
-    <Pressable
-      testID="back-button"
-      onPress={() => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        onPress();
-      }}
-      style={{
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <ChevronLeft size={24} color={C.text} strokeWidth={2} />
-    </Pressable>
+    <Animated.View style={btnStyle}>
+      <Pressable
+        testID="back-button"
+        accessibilityLabel="Gå tillbaka"
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          onPress();
+        }}
+        onPressIn={() => {
+          scale.value = withSpring(0.9, SPRING_PRESS_IN);
+        }}
+        onPressOut={() => {
+          scale.value = withSpring(1, SPRING_PRESS_OUT);
+        }}
+        style={{
+          width: 42,
+          height: 42,
+          borderRadius: 21,
+          backgroundColor: "rgba(0,0,0,0.04)",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <ChevronLeft size={22} color={C.text} strokeWidth={2.2} />
+      </Pressable>
+    </Animated.View>
   );
 }
 
-// --- Progress Dots ---
-function ProgressDots({ current, total }: { current: number; total: number }) {
+// --- Progress Bar ---
+function ProgressBar({ current, total }: { current: number; total: number }) {
+  const progress = useSharedValue(0);
+
+  useEffect(() => {
+    progress.value = withSpring((current + 1) / total, { damping: 20, stiffness: 120 });
+  }, [current, total]);
+
+  const barStyle = useAnimatedStyle(() => ({
+    width: `${progress.value * 100}%`,
+  }));
+
   return (
-    <View style={{ flexDirection: "row", justifyContent: "center", gap: 8 }}>
-      {Array.from({ length: total }).map((_, i) => (
-        <View
-          key={i}
-          style={{
-            width: i === current ? 24 : 8,
-            height: 8,
-            borderRadius: 4,
-            backgroundColor: i === current ? C.orange : "rgba(0,0,0,0.10)",
-          }}
-        />
-      ))}
+    <View style={{ height: 3, backgroundColor: "rgba(0,0,0,0.06)", borderRadius: 1.5, marginBottom: 8 }}>
+      <Animated.View
+        style={[
+          barStyle,
+          {
+            height: 3,
+            backgroundColor: C.orange,
+            borderRadius: 1.5,
+          },
+        ]}
+      />
     </View>
   );
 }
@@ -344,48 +408,46 @@ function ProgressDots({ current, total }: { current: number; total: number }) {
 function SplashStep({ onGetStarted, onExplore }: { onGetStarted: () => void; onExplore: () => void }) {
   return (
     <View style={{ flex: 1 }}>
-      {/* ── Animated Restaurant Strip ── */}
+      {/* Animated Restaurant Strip */}
       <View style={{ height: STRIP_H, flexDirection: "row", gap: CARD_GAP, overflow: "hidden" }}>
         <AnimatedColumn cards={STRIP_COL_A} direction="down" durationSec={30} startOffsetSec={9} />
         <AnimatedColumn cards={STRIP_COL_B} direction="up" durationSec={23} startOffsetSec={4} />
         <AnimatedColumn cards={STRIP_COL_C} direction="down" durationSec={37} startOffsetSec={22} />
 
-        {/* Top fade: cream → transparent */}
         <LinearGradient
           colors={[C.bg, "transparent"]}
-          style={{ position: "absolute", top: 0, left: 0, right: 0, height: 90 }}
+          style={{ position: "absolute", top: 0, left: 0, right: 0, height: 80 }}
           pointerEvents="none"
         />
-        {/* Bottom fade: transparent → cream (fully solid at 40%) */}
         <LinearGradient
           colors={["transparent", C.bg, C.bg]}
-          locations={[0, 0.4, 1]}
-          style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 320 }}
+          locations={[0, 0.35, 1]}
+          style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 160 }}
           pointerEvents="none"
         />
       </View>
 
-      {/* ── Copy Section ── */}
-      <View style={{ flex: 1, paddingHorizontal: 24 }}>
-        {/* Availability indicator */}
+      {/* Copy Section */}
+      <View style={{ paddingHorizontal: 24, paddingBottom: 12 }}>
+        {/* Availability */}
         <Animated.View
-          entering={FadeInUp.delay(0).springify().damping(18)}
-          style={{ flexDirection: "row", alignItems: "center", gap: 7, marginTop: 4 }}
+          entering={FadeInUp.springify().damping(18)}
+          style={{ flexDirection: "row", alignItems: "center", gap: 7 }}
         >
           <PulsingDot />
-          <Text style={{ fontFamily: "PlusJakartaSans_500Medium", fontSize: 13, color: "#4CAF50" }}>
-            16 bord tillgängliga ikväll
+          <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.success }}>
+            Bokningar tillgängliga nu
           </Text>
         </Animated.View>
 
         {/* Logo */}
-        <Animated.View entering={FadeInUp.delay(150).springify().damping(18)} style={{ marginTop: 14 }}>
+        <Animated.View entering={FadeInUp.delay(70).springify().damping(18)} style={{ marginTop: 14 }}>
           <Text
             style={{
-              fontFamily: "PlusJakartaSans_700Bold",
-              fontSize: 32,
+              fontFamily: FONTS.displayBold,
+              fontSize: 36,
               color: C.text,
-              letterSpacing: -1,
+              letterSpacing: -1.2,
             }}
           >
             Reslot
@@ -393,53 +455,44 @@ function SplashStep({ onGetStarted, onExplore }: { onGetStarted: () => void; onE
         </Animated.View>
 
         {/* Tagline */}
-        <Animated.View entering={FadeInUp.delay(300).springify().damping(18)} style={{ marginTop: 10 }}>
+        <Animated.View entering={FadeInUp.delay(140).springify().damping(18)} style={{ marginTop: 8 }}>
           <Text
             style={{
-              fontFamily: "PlusJakartaSans_700Bold",
-              fontSize: 27,
+              fontFamily: FONTS.displayBold,
+              fontSize: 26,
               color: C.text,
-              letterSpacing: -0.5,
+              letterSpacing: -0.6,
               lineHeight: 34,
             }}
           >
-            Bra bord går fort.
+            Din genväg till{"\n"}fullbokade restauranger
           </Text>
           <Text
             style={{
-              fontFamily: "PlusJakartaSans_400Regular",
+              fontFamily: FONTS.regular,
               fontSize: 15,
               color: C.gray,
-              marginTop: 8,
+              marginTop: 10,
               lineHeight: 22,
             }}
           >
-            Hitta och dela restaurangbokningar i din stad.
+            Ta över bokningar andra inte kan gå på.{"\n"}Dela dina och tjäna credits.
           </Text>
         </Animated.View>
       </View>
 
-      {/* ── Bottom Actions ── */}
+      {/* Bottom Actions */}
       <Animated.View
-        entering={FadeInUp.delay(450).springify().damping(18)}
-        style={{ paddingHorizontal: 24, paddingBottom: 16 }}
+        entering={FadeInUp.delay(220).springify().damping(18)}
+        style={{ paddingHorizontal: 24, paddingBottom: 12 }}
       >
-        <PrimaryButton testID="get-started-btn" label="Kom igång" onPress={onGetStarted} />
-        <Pressable
-          testID="explore-btn"
-          onPress={onExplore}
-          style={{ alignItems: "center", marginTop: 16 }}
-        >
-          <Text
-            style={{
-              fontFamily: "PlusJakartaSans_500Medium",
-              fontSize: 15,
-              color: C.orange,
-            }}
-          >
-            Utforska restauranger
-          </Text>
-        </Pressable>
+        <PrimaryButton
+          testID="get-started-btn"
+          label="Kom igång"
+          onPress={onGetStarted}
+          icon={<ArrowRight size={18} color="#FFFFFF" strokeWidth={2.5} />}
+        />
+        <GhostButton testID="explore-btn" label="Utforska utan konto" onPress={onExplore} />
       </Animated.View>
     </View>
   );
@@ -460,54 +513,68 @@ function PhoneStep({
   const [phone, setPhone] = useState("");
   const [agreed, setAgreed] = useState(false);
 
+  const checkScale = useSharedValue(agreed ? 1 : 0);
+  useEffect(() => {
+    checkScale.value = withSpring(agreed ? 1 : 0, { damping: 12, stiffness: 200 });
+  }, [agreed]);
+
+  const checkStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: checkScale.value }],
+    opacity: checkScale.value,
+  }));
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <View style={{ flex: 1, paddingHorizontal: 24 }}>
-        <BackArrow onPress={onBack} />
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 8 }}>
+          <BackArrow onPress={onBack} />
+        </View>
 
-        <Animated.View entering={FadeInDown.delay(100).duration(400)} style={{ marginTop: 24 }}>
+        <ProgressBar current={0} total={5} />
+
+        <Animated.View entering={FadeInDown.delay(80).springify().damping(18)} style={{ marginTop: 20 }}>
           <Text
             style={{
-              fontFamily: "PlusJakartaSans_700Bold",
-              fontSize: 24,
+              fontFamily: FONTS.displayBold,
+              fontSize: 28,
               color: C.text,
-              textAlign: "center",
-              letterSpacing: -0.5,
-              lineHeight: 32,
+              letterSpacing: -0.8,
+              lineHeight: 36,
             }}
           >
             Logga in eller{"\n"}skapa konto
           </Text>
-        </Animated.View>
-
-        <Animated.View entering={FadeInDown.delay(200).duration(400)} style={{ marginTop: 40 }}>
           <Text
             style={{
-              fontFamily: "PlusJakartaSans_500Medium",
+              fontFamily: FONTS.regular,
               fontSize: 15,
               color: C.gray,
-              marginBottom: 12,
+              marginTop: 8,
+              lineHeight: 22,
             }}
           >
-            Ange ditt telefonnummer
+            Vi skickar en verifieringskod via SMS
           </Text>
+        </Animated.View>
+
+        <Animated.View entering={FadeInDown.delay(160).springify().damping(18)} style={{ marginTop: 32 }}>
           <View
             style={{
               backgroundColor: C.bgInput,
-              borderRadius: 14,
+              borderRadius: 16,
               flexDirection: "row",
               alignItems: "center",
               paddingHorizontal: 16,
-              height: 56,
+              height: 58,
             }}
           >
             <Text style={{ fontSize: 20, marginRight: 8 }}>🇸🇪</Text>
             <Text
               style={{
-                fontFamily: "PlusJakartaSans_600SemiBold",
+                fontFamily: FONTS.semiBold,
                 fontSize: 16,
                 color: C.text,
                 marginRight: 8,
@@ -520,13 +587,14 @@ function PhoneStep({
               testID="phone-input"
               value={phone}
               onChangeText={setPhone}
-              placeholder="070-123 45 67"
-              placeholderTextColor="#9CA3AF"
+              placeholder="70 123 45 67"
+              placeholderTextColor={C.grayLight}
               style={{
                 flex: 1,
-                fontFamily: "PlusJakartaSans_400Regular",
-                fontSize: 16,
+                fontFamily: FONTS.regular,
+                fontSize: 17,
                 color: C.text,
+                letterSpacing: 0.5,
               }}
               keyboardType="phone-pad"
               autoFocus
@@ -534,9 +602,10 @@ function PhoneStep({
           </View>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(300).duration(400)} style={{ marginTop: 24 }}>
+        <Animated.View entering={FadeInDown.delay(240).springify().damping(18)} style={{ marginTop: 20 }}>
           <Pressable
             testID="sms-checkbox"
+            accessibilityLabel="Godkänn villkor för SMS-verifiering"
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               setAgreed(!agreed);
@@ -545,32 +614,33 @@ function PhoneStep({
           >
             <View
               style={{
-                width: 22,
-                height: 22,
-                borderRadius: 6,
+                width: 24,
+                height: 24,
+                borderRadius: 7,
                 borderWidth: 1.5,
-                borderColor: agreed ? C.orange : "rgba(0,0,0,0.20)",
-                backgroundColor: agreed ? C.orange : "transparent",
+                borderColor: agreed ? C.coral : "rgba(0,0,0,0.18)",
+                backgroundColor: agreed ? C.coral : "transparent",
                 alignItems: "center",
                 justifyContent: "center",
                 marginTop: 1,
               }}
             >
-              {agreed ? <Check size={13} color="#FFF" strokeWidth={3} /> : null}
+              <Animated.View style={checkStyle}>
+                <Check size={14} color="#FFF" strokeWidth={3} />
+              </Animated.View>
             </View>
             <Text
               style={{
-                fontFamily: "PlusJakartaSans_400Regular",
+                fontFamily: FONTS.regular,
                 fontSize: 13,
                 color: C.gray,
                 flex: 1,
                 lineHeight: 20,
               }}
             >
-              Jag godkänner att ta emot SMS-aviseringar om mina bokningar och viktiga
-              uppdateringar.{" "}
-              <Text style={{ color: C.orange }}>Villkor</Text> och{" "}
-              <Text style={{ color: C.orange }}>Integritetspolicy</Text>.
+              Jag godkänner att ta emot SMS-aviseringar.{" "}
+              <Text style={{ color: C.orange, fontFamily: FONTS.medium }}>Villkor</Text> och{" "}
+              <Text style={{ color: C.orange, fontFamily: FONTS.medium }}>Integritetspolicy</Text>.
             </Text>
           </Pressable>
         </Animated.View>
@@ -581,9 +651,9 @@ function PhoneStep({
           <Animated.View entering={FadeIn.duration(200)} style={{ paddingBottom: 12 }}>
             <Text
               style={{
-                fontFamily: "PlusJakartaSans_500Medium",
+                fontFamily: FONTS.medium,
                 fontSize: 13,
-                color: error.startsWith("DEV:") ? C.gold : C.orange,
+                color: error.startsWith("DEV:") ? C.gold : C.error,
                 textAlign: "center",
                 lineHeight: 18,
               }}
@@ -593,12 +663,12 @@ function PhoneStep({
           </Animated.View>
         ) : null}
 
-        <Animated.View entering={FadeInUp.delay(400).duration(400)} style={{ paddingBottom: 16 }}>
+        <Animated.View entering={FadeInUp.delay(300).springify().damping(18)} style={{ paddingBottom: 16 }}>
           <PrimaryButton
             testID="phone-next-btn"
-            label={isLoading ? "Skickar..." : "Nästa"}
+            label={isLoading ? "Skickar..." : "Skicka kod"}
             onPress={() => onNext(phone)}
-            disabled={phone.length < 6 || !!isLoading}
+            disabled={phone.length < 6 || !agreed || !!isLoading}
           />
         </Animated.View>
       </View>
@@ -612,6 +682,7 @@ function OTPStep({
   onNext,
   onBack,
   onEditPhone,
+  onResend,
   isLoading,
   error,
 }: {
@@ -619,11 +690,13 @@ function OTPStep({
   onNext: (code: string) => void;
   onBack: () => void;
   onEditPhone: () => void;
+  onResend: () => void;
   isLoading?: boolean;
   error?: string | null;
 }) {
   const [code, setCode] = useState<string[]>(["", "", "", "", "", ""]);
   const [hasError, setHasError] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
   const inputRefs = useRef<(TextInput | null)[]>([]);
   const shakeX = useSharedValue(0);
 
@@ -631,18 +704,31 @@ function OTPStep({
     transform: [{ translateX: shakeX.value }],
   }));
 
+  // Resend cooldown timer
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [resendCooldown]);
+
   const triggerShake = useCallback(() => {
     shakeX.value = withSequence(
-      withTiming(10, { duration: 55 }),
-      withTiming(-10, { duration: 55 }),
-      withTiming(6, { duration: 55 }),
-      withTiming(-6, { duration: 55 }),
-      withTiming(0, { duration: 55 })
+      withTiming(12, { duration: 50 }),
+      withTiming(-12, { duration: 50 }),
+      withTiming(8, { duration: 50 }),
+      withTiming(-8, { duration: 50 }),
+      withTiming(4, { duration: 50 }),
+      withTiming(0, { duration: 50 })
     );
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     setHasError(true);
     setTimeout(() => setHasError(false), 2000);
   }, [shakeX]);
+
+  // Trigger shake when error prop changes
+  useEffect(() => {
+    if (error) triggerShake();
+  }, [error]);
 
   const handleChange = useCallback(
     (text: string, index: number) => {
@@ -667,11 +753,14 @@ function OTPStep({
     [code]
   );
 
-  const isFull = code.every((c) => c.length === 1);
+  const handleResend = useCallback(() => {
+    if (resendCooldown > 0) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onResend();
+    setResendCooldown(30);
+  }, [resendCooldown, onResend]);
 
-  const handleNext = useCallback(() => {
-    onNext(code.join(""));
-  }, [code, onNext]);
+  const isFull = code.every((c) => c.length === 1);
 
   return (
     <KeyboardAvoidingView
@@ -679,62 +768,62 @@ function OTPStep({
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <View style={{ flex: 1, paddingHorizontal: 24 }}>
-        <BackArrow onPress={onBack} />
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 8 }}>
+          <BackArrow onPress={onBack} />
+        </View>
 
-        <Animated.View entering={FadeInDown.delay(100).duration(400)} style={{ marginTop: 24, alignItems: "center" }}>
+        <ProgressBar current={1} total={5} />
+
+        <Animated.View entering={FadeInDown.delay(80).springify().damping(18)} style={{ marginTop: 20 }}>
           <Text
             style={{
-              fontFamily: "PlusJakartaSans_700Bold",
-              fontSize: 22,
+              fontFamily: FONTS.displayBold,
+              fontSize: 28,
               color: C.text,
-              textAlign: "center",
+              letterSpacing: -0.8,
             }}
           >
-            Vi skickade en kod till
+            Verifiera ditt nummer
           </Text>
           <Pressable
             testID="edit-phone"
-            onPress={onEditPhone}
-            style={{ flexDirection: "row", alignItems: "center", marginTop: 6, gap: 6 }}
+            accessibilityLabel="Ändra telefonnummer"
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              onEditPhone();
+            }}
+            style={{ flexDirection: "row", alignItems: "center", marginTop: 8, gap: 6 }}
           >
             <Text
               style={{
-                fontFamily: "PlusJakartaSans_600SemiBold",
-                fontSize: 17,
+                fontFamily: FONTS.medium,
+                fontSize: 15,
+                color: C.gray,
+              }}
+            >
+              Kod skickad till{" "}
+            </Text>
+            <Text
+              style={{
+                fontFamily: FONTS.semiBold,
+                fontSize: 15,
                 color: C.orange,
               }}
             >
               +46 {phone}
             </Text>
-            <Pencil size={14} color={C.orange} strokeWidth={2} />
+            <Pencil size={13} color={C.orange} strokeWidth={2} />
           </Pressable>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(200).duration(400)} style={{ marginTop: 40 }}>
-          <Text
-            style={{
-              fontFamily: "PlusJakartaSans_500Medium",
-              fontSize: 15,
-              color: C.text,
-              marginBottom: 16,
-            }}
-          >
-            Ange koden du fick
-          </Text>
-          <Animated.View style={[shakeStyle, { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6 }]}>
+        <Animated.View entering={FadeInDown.delay(160).springify().damping(18)} style={{ marginTop: 40 }}>
+          <Animated.View style={[shakeStyle, { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 }]}>
             {code.map((digit, i) => (
               <React.Fragment key={i}>
                 {i === 3 ? (
-                  <Text
-                    style={{
-                      fontFamily: "PlusJakartaSans_400Regular",
-                      fontSize: 18,
-                      color: C.grayLight,
-                      marginHorizontal: 2,
-                    }}
-                  >
-                    -
-                  </Text>
+                  <View style={{ width: 16, alignItems: "center" }}>
+                    <View style={{ width: 10, height: 2, borderRadius: 1, backgroundColor: C.grayLight }} />
+                  </View>
                 ) : null}
                 <TextInput
                   ref={(ref) => {
@@ -746,60 +835,79 @@ function OTPStep({
                   onKeyPress={({ nativeEvent }) => handleKeyPress(nativeEvent.key, i)}
                   keyboardType="number-pad"
                   maxLength={1}
+                  autoFocus={i === 0}
                   style={{
-                    width: 44,
-                    height: 52,
-                    borderRadius: 12,
-                    backgroundColor: hasError ? "rgba(224,106,78,0.12)" : C.bgInput,
+                    width: 50,
+                    height: 58,
+                    borderRadius: 14,
+                    backgroundColor: hasError ? C.coralLight : C.bgInput,
                     textAlign: "center",
-                    fontFamily: "PlusJakartaSans_700Bold",
-                    fontSize: 20,
-                    color: hasError ? C.orange : C.text,
-                    borderWidth: hasError ? 1 : 0,
-                    borderColor: hasError ? "rgba(224,106,78,0.4)" : "transparent",
+                    fontFamily: FONTS.bold,
+                    fontSize: 22,
+                    color: hasError ? C.error : C.text,
+                    borderWidth: digit ? 1.5 : 0,
+                    borderColor: hasError ? C.coralPressed : digit ? C.coralPressed : "transparent",
                   }}
                 />
               </React.Fragment>
             ))}
           </Animated.View>
+
           {hasError || error ? (
-            <Text
-              style={{
-                fontFamily: "PlusJakartaSans_500Medium",
-                fontSize: 13,
-                color: C.orange,
-                textAlign: "center",
-                marginTop: 12,
-              }}
-            >
-              {error ?? "Fel kod. Försök igen."}
-            </Text>
+            <Animated.View entering={FadeIn.springify()}>
+              <Text
+                style={{
+                  fontFamily: FONTS.medium,
+                  fontSize: 13,
+                  color: C.error,
+                  textAlign: "center",
+                  marginTop: 14,
+                }}
+              >
+                {error ?? "Fel kod — försök igen"}
+              </Text>
+            </Animated.View>
           ) : null}
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(300).duration(400)} style={{ marginTop: 20 }}>
-          <Text style={{ fontFamily: "PlusJakartaSans_400Regular", fontSize: 14, color: C.gray }}>
-            Fick du ingen kod?{" "}
+        <Animated.View entering={FadeInDown.delay(240).springify().damping(18)} style={{ marginTop: 24, alignItems: "center" }}>
+          <Pressable
+            testID="resend-otp-btn"
+            accessibilityLabel="Skicka ny verifieringskod"
+            onPress={handleResend}
+            disabled={resendCooldown > 0}
+            style={{ paddingVertical: 8, paddingHorizontal: 16 }}
+          >
             <Text
-              style={{ color: C.orange, fontFamily: "PlusJakartaSans_600SemiBold" }}
-              onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+              style={{
+                fontFamily: FONTS.medium,
+                fontSize: 14,
+                color: resendCooldown > 0 ? C.grayLight : C.orange,
+              }}
             >
-              Skicka igen
+              {resendCooldown > 0
+                ? `Skicka igen om ${resendCooldown}s`
+                : "Skicka ny kod"}
             </Text>
-          </Text>
+          </Pressable>
         </Animated.View>
 
         <View style={{ flex: 1 }} />
 
-        <Animated.View entering={FadeInUp.delay(400).duration(400)} style={{ paddingBottom: 16 }}>
-          <PrimaryButton testID="otp-next-btn" label={isLoading ? "Verifierar..." : "Nästa"} onPress={handleNext} disabled={!isFull || !!isLoading} />
+        <Animated.View entering={FadeInUp.delay(300).springify().damping(18)} style={{ paddingBottom: 16 }}>
+          <PrimaryButton
+            testID="otp-next-btn"
+            label={isLoading ? "Verifierar..." : "Verifiera"}
+            onPress={() => onNext(code.join(""))}
+            disabled={!isFull || !!isLoading}
+          />
         </Animated.View>
       </View>
     </KeyboardAvoidingView>
   );
 }
 
-// ==================== STEP 4: REGISTER ====================
+// ==================== STEP 4: REGISTER (Name + Email) ====================
 function RegisterStep({
   onNext,
   onBack,
@@ -810,9 +918,9 @@ function RegisterStep({
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
   const [email, setEmail] = useState("");
-  const [agreed, setAgreed] = useState(false);
 
-  const canContinue = first.trim() && last.trim() && email.trim() && agreed;
+  const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const canContinue = first.trim().length >= 2 && last.trim().length >= 2 && isValidEmail;
 
   return (
     <KeyboardAvoidingView
@@ -820,139 +928,154 @@ function RegisterStep({
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <View style={{ flex: 1, paddingHorizontal: 24 }}>
-        <BackArrow onPress={onBack} />
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 8 }}>
+          <BackArrow onPress={onBack} />
+        </View>
 
-        <Animated.View entering={FadeInDown.delay(100).duration(400)} style={{ marginTop: 24 }}>
+        <ProgressBar current={2} total={5} />
+
+        <Animated.View entering={FadeInDown.delay(80).springify().damping(18)} style={{ marginTop: 20 }}>
           <Text
             style={{
-              fontFamily: "PlusJakartaSans_700Bold",
-              fontSize: 22,
+              fontFamily: FONTS.displayBold,
+              fontSize: 28,
               color: C.text,
-              textAlign: "center",
-              lineHeight: 30,
+              letterSpacing: -0.8,
+              lineHeight: 36,
             }}
           >
-            Välkommen till Reslot!{"\n"}Låt oss registrera dig.
+            Berätta lite om dig
+          </Text>
+          <Text
+            style={{
+              fontFamily: FONTS.regular,
+              fontSize: 15,
+              color: C.gray,
+              marginTop: 8,
+              lineHeight: 22,
+            }}
+          >
+            Så att restaurangen vet vem som kommer
           </Text>
         </Animated.View>
 
         <Animated.View
-          entering={FadeInDown.delay(200).duration(400)}
-          style={{
-            marginTop: 32,
-            backgroundColor: C.bgInput,
-            borderRadius: 16,
-            overflow: "hidden",
-          }}
+          entering={FadeInDown.delay(160).springify().damping(18)}
+          style={{ marginTop: 28, gap: 12 }}
         >
           {/* First name */}
-          <View style={{ paddingHorizontal: 16, paddingVertical: 14 }}>
-            <Text style={{ fontFamily: "PlusJakartaSans_500Medium", fontSize: 12, color: C.grayLight, marginBottom: 4 }}>
+          <View>
+            <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.gray, marginBottom: 6, marginLeft: 4 }}>
               Förnamn
             </Text>
-            <TextInput
-              testID="first-name-input"
-              value={first}
-              onChangeText={setFirst}
-              placeholder="Ditt förnamn"
-              placeholderTextColor="#9CA3AF"
-              style={{
-                fontFamily: "PlusJakartaSans_400Regular",
-                fontSize: 16,
-                color: C.text,
-              }}
-              autoCapitalize="words"
-            />
-          </View>
-          <View style={{ height: 0.5, backgroundColor: C.divider, marginLeft: 16 }} />
-          {/* Last name */}
-          <View style={{ paddingHorizontal: 16, paddingVertical: 14 }}>
-            <Text style={{ fontFamily: "PlusJakartaSans_500Medium", fontSize: 12, color: C.grayLight, marginBottom: 4 }}>
-              Efternamn
-            </Text>
-            <TextInput
-              testID="last-name-input"
-              value={last}
-              onChangeText={setLast}
-              placeholder="Ditt efternamn"
-              placeholderTextColor="#9CA3AF"
-              style={{
-                fontFamily: "PlusJakartaSans_400Regular",
-                fontSize: 16,
-                color: C.text,
-              }}
-              autoCapitalize="words"
-            />
-          </View>
-          <View style={{ height: 0.5, backgroundColor: C.divider, marginLeft: 16 }} />
-          {/* Email */}
-          <View style={{ paddingHorizontal: 16, paddingVertical: 14 }}>
-            <Text style={{ fontFamily: "PlusJakartaSans_500Medium", fontSize: 12, color: C.grayLight, marginBottom: 4 }}>
-              E-post
-            </Text>
-            <TextInput
-              testID="email-input"
-              value={email}
-              onChangeText={setEmail}
-              placeholder="hej@reslot.se"
-              placeholderTextColor="#9CA3AF"
-              style={{
-                fontFamily: "PlusJakartaSans_400Regular",
-                fontSize: 16,
-                color: C.text,
-              }}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          </View>
-        </Animated.View>
-
-        <Animated.View entering={FadeInDown.delay(300).duration(400)} style={{ marginTop: 24 }}>
-          <Pressable
-            testID="terms-checkbox"
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              setAgreed(!agreed);
-            }}
-            style={{ flexDirection: "row", alignItems: "flex-start", gap: 12 }}
-          >
             <View
               style={{
-                width: 22,
-                height: 22,
-                borderRadius: 6,
-                borderWidth: 1.5,
-                borderColor: agreed ? C.orange : "rgba(0,0,0,0.20)",
-                backgroundColor: agreed ? C.orange : "transparent",
-                alignItems: "center",
+                backgroundColor: C.bgInput,
+                borderRadius: 14,
+                paddingHorizontal: 16,
+                height: 52,
                 justifyContent: "center",
-                marginTop: 1,
               }}
             >
-              {agreed ? <Check size={13} color="#FFF" strokeWidth={3} /> : null}
+              <TextInput
+                testID="first-name-input"
+                value={first}
+                onChangeText={setFirst}
+                placeholder="Anna"
+                placeholderTextColor={C.grayLight}
+                style={{
+                  fontFamily: FONTS.regular,
+                  fontSize: 16,
+                  color: C.text,
+                }}
+                autoCapitalize="words"
+                autoFocus
+              />
             </View>
-            <Text
+          </View>
+
+          {/* Last name */}
+          <View>
+            <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.gray, marginBottom: 6, marginLeft: 4 }}>
+              Efternamn
+            </Text>
+            <View
               style={{
-                fontFamily: "PlusJakartaSans_400Regular",
-                fontSize: 13,
-                color: C.gray,
-                flex: 1,
-                lineHeight: 20,
+                backgroundColor: C.bgInput,
+                borderRadius: 14,
+                paddingHorizontal: 16,
+                height: 52,
+                justifyContent: "center",
               }}
             >
-              Genom att registrera dig godkänner du våra{" "}
-              <Text style={{ color: C.orange }}>Villkor</Text> och{" "}
-              <Text style={{ color: C.orange }}>Integritetspolicy</Text>.
+              <TextInput
+                testID="last-name-input"
+                value={last}
+                onChangeText={setLast}
+                placeholder="Andersson"
+                placeholderTextColor={C.grayLight}
+                style={{
+                  fontFamily: FONTS.regular,
+                  fontSize: 16,
+                  color: C.text,
+                }}
+                autoCapitalize="words"
+              />
+            </View>
+          </View>
+
+          {/* Email */}
+          <View>
+            <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.gray, marginBottom: 6, marginLeft: 4 }}>
+              E-postadress
             </Text>
-          </Pressable>
+            <View
+              style={{
+                backgroundColor: C.bgInput,
+                borderRadius: 14,
+                paddingHorizontal: 16,
+                height: 52,
+                justifyContent: "center",
+              }}
+            >
+              <TextInput
+                testID="email-input"
+                value={email}
+                onChangeText={setEmail}
+                placeholder="anna@exempel.se"
+                placeholderTextColor={C.grayLight}
+                style={{
+                  fontFamily: FONTS.regular,
+                  fontSize: 16,
+                  color: C.text,
+                }}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoComplete="email"
+              />
+            </View>
+            {email.length > 0 && !isValidEmail ? (
+              <Text
+                style={{
+                  fontFamily: FONTS.regular,
+                  fontSize: 12,
+                  color: C.error,
+                  marginTop: 4,
+                  marginLeft: 4,
+                }}
+              >
+                Ange en giltig e-postadress
+              </Text>
+            ) : null}
+          </View>
         </Animated.View>
 
         <View style={{ flex: 1 }} />
 
-        <Animated.View entering={FadeInUp.delay(400).duration(400)} style={{ paddingBottom: 16 }}>
+        <Animated.View entering={FadeInUp.delay(300).springify().damping(18)} style={{ paddingBottom: 16 }}>
           <PrimaryButton
             testID="register-next-btn"
-            label="Nästa"
+            label="Fortsätt"
             onPress={() => onNext(first.trim(), last.trim(), email.trim())}
             disabled={!canContinue}
           />
@@ -962,472 +1085,593 @@ function RegisterStep({
   );
 }
 
-// ==================== STEP 5-7: ONBOARDING CAROUSEL ====================
-interface OnboardSlide {
-  title: string;
-  icon: typeof Utensils;
-  iconBg: string;
-  mockItems: { label: string; sub: string; icon: typeof Clock }[];
-  body: string;
-  nextLabel: string;
-}
+// ==================== STEP 5: CITY ====================
+function CityStep({ onSelect, onBack }: { onSelect: (city: string) => void; onBack: () => void }) {
+  const [selected, setSelected] = useState<string | null>(null);
+  const cities = [
+    { name: "Stockholm", emoji: "🏛️", count: "" },
+    { name: "Göteborg", emoji: "⛵", count: "" },
+    { name: "Malmö", emoji: "🌉", count: "" },
+    { name: "Uppsala", emoji: "🎓", count: "" },
+  ];
 
-const ONBOARD_SLIDES: OnboardSlide[] = [
-  {
-    title: "Hitta bord",
-    icon: Search,
-    iconBg: "rgba(212,169,110,0.15)",
-    mockItems: [
-      { label: "Frantzén", sub: "Ikväll · 20:00 · 2 gäster", icon: Clock },
-      { label: "Ekstedt", sub: "Imorgon · 18:30 · 3 gäster", icon: Users },
-      { label: "Sushi Sho", sub: "Ikväll · 18:00 · 2 gäster", icon: CalendarCheck },
-    ],
-    body: "Bläddra bland lediga bord delade av Reslot-communityn. Ser du något du gillar — tryck för att ta över det direkt.",
-    nextLabel: "Nästa: Dela bokning",
-  },
-  {
-    title: "Dela bokning",
-    icon: Utensils,
-    iconBg: "rgba(232,114,74,0.15)",
-    mockItems: [
-      { label: "Restaurang", sub: "Frantzén", icon: Utensils },
-      { label: "Antal gäster", sub: "2 personer", icon: Users },
-      { label: "Tid", sub: "Lördag 20:00", icon: Clock },
-    ],
-    body: "Kan du inte gå? Dela din bokning — undvik avbokningsavgifter och hjälp någon annan få ett toppbord.",
-    nextLabel: "Nästa: Tjäna poäng",
-  },
-  {
-    title: "Tjäna poäng",
-    icon: Coins,
-    iconBg: "rgba(212,169,110,0.15)",
-    mockItems: [
-      { label: "Dela bokning", sub: "+2 tokens", icon: Gift },
-      { label: "Ta över bord", sub: "+1 token", icon: Award },
-      { label: "Bjud in en vän", sub: "+5 tokens", icon: Users },
-    ],
-    body: "Dela och ta bord för att samla poäng. Lös in dem mot förmåner som extra notiser och Premium-access.",
-    nextLabel: "Kom igång",
-  },
-];
-
-// --- Animated Dots for carousel ---
-function AnimatedDots({ currentPage }: { currentPage: number }) {
-  return (
-    <View style={{ flexDirection: "row", justifyContent: "center", gap: 8 }}>
-      {ONBOARD_SLIDES.map((_, i) => {
-        const isActive = i === currentPage;
-        return (
-          <Animated.View
-            key={i}
-            style={{
-              width: isActive ? 24 : 8,
-              height: 8,
-              borderRadius: 4,
-              backgroundColor: isActive ? C.orange : "rgba(0,0,0,0.10)",
-            }}
-          />
-        );
-      })}
-    </View>
+  const handleSelect = useCallback(
+    (city: string) => {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setSelected(city);
+      setTimeout(() => onSelect(city), 500);
+    },
+    [onSelect]
   );
-}
 
-// --- Single slide item rendered inside FlatList ---
-function CarouselSlideItem({
-  slide,
-  pageKey,
-}: {
-  slide: OnboardSlide;
-  pageKey: string;
-}) {
   return (
-    <View
-      style={{
-        width: SCREEN_W,
-        flex: 1,
-        paddingHorizontal: 24,
-        justifyContent: "center",
-        paddingTop: 16,
-        paddingBottom: 8,
-      }}
-    >
-      {/* Title */}
-      <Animated.View key={`title-${pageKey}`} entering={FadeInDown.delay(0).duration(420)}>
+    <View style={{ flex: 1, paddingHorizontal: 24 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 8 }}>
+        <BackArrow onPress={onBack} />
+      </View>
+
+      <ProgressBar current={3} total={5} />
+
+      <Animated.View entering={FadeInDown.delay(80).springify().damping(18)} style={{ marginTop: 20, marginBottom: 8 }}>
         <Text
           style={{
-            fontFamily: "PlusJakartaSans_700Bold",
-            fontSize: 36,
+            fontFamily: FONTS.displayBold,
+            fontSize: 28,
             color: C.text,
-            textAlign: "center",
-            lineHeight: 44,
             letterSpacing: -0.8,
           }}
         >
-          {slide.title}
+          Var bor du?
         </Text>
-      </Animated.View>
-
-      {/* Mock card */}
-      <Animated.View
-        key={`card-${pageKey}`}
-        entering={FadeInDown.delay(100).duration(440)}
-        style={{
-          backgroundColor: C.bgCard,
-          borderRadius: 20,
-          padding: 20,
-          marginTop: 28,
-          borderWidth: 1,
-          borderColor: "rgba(0,0,0,0.06)",
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 8 },
-          shadowOpacity: 0.08,
-          shadowRadius: 16,
-        }}
-      >
-        {slide.mockItems.map((item, i) => {
-          const ItemIcon = item.icon;
-          return (
-            <View key={i}>
-              <View style={{ flexDirection: "row", alignItems: "center", paddingVertical: 14, gap: 14 }}>
-                <View
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 10,
-                    backgroundColor: "rgba(0,0,0,0.04)",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <ItemIcon size={17} color={C.gold} strokeWidth={1.8} />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text
-                    style={{
-                      fontFamily: "PlusJakartaSans_600SemiBold",
-                      fontSize: 14,
-                      color: C.text,
-                    }}
-                  >
-                    {item.label}
-                  </Text>
-                  <Text
-                    style={{
-                      fontFamily: "PlusJakartaSans_400Regular",
-                      fontSize: 12,
-                      color: C.gray,
-                      marginTop: 2,
-                    }}
-                  >
-                    {item.sub}
-                  </Text>
-                </View>
-              </View>
-              {i < slide.mockItems.length - 1 ? (
-                <View style={{ height: 0.5, backgroundColor: C.divider }} />
-              ) : null}
-            </View>
-          );
-        })}
-      </Animated.View>
-
-      {/* Body */}
-      <Animated.View
-        key={`body-${pageKey}`}
-        entering={FadeInDown.delay(200).duration(460)}
-        style={{ marginTop: 28 }}
-      >
         <Text
           style={{
-            fontFamily: "PlusJakartaSans_400Regular",
-            fontSize: 16,
+            fontFamily: FONTS.regular,
+            fontSize: 15,
             color: C.gray,
-            textAlign: "center",
-            lineHeight: 24,
+            marginTop: 8,
+            lineHeight: 22,
           }}
         >
-          {slide.body}
+          Vi visar bokningar nära dig
         </Text>
       </Animated.View>
-    </View>
-  );
-}
 
-// --- OnboardingCarousel: single "onboard" step with horizontal pager ---
-function OnboardingCarousel({ onDone, onSkip }: { onDone: () => void; onSkip: () => void }) {
-  const [currentPage, setCurrentPage] = useState(0);
-  const flatListRef = useRef<FlatList<OnboardSlide>>(null);
-
-  const handleScroll = useCallback(
-    (event: { nativeEvent: { contentOffset: { x: number } } }) => {
-      const page = Math.round(event.nativeEvent.contentOffset.x / SCREEN_W);
-      if (page !== currentPage && page >= 0 && page < ONBOARD_SLIDES.length) {
-        setCurrentPage(page);
-      }
-    },
-    [currentPage]
-  );
-
-  const goToNext = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    if (currentPage < ONBOARD_SLIDES.length - 1) {
-      const nextPage = currentPage + 1;
-      flatListRef.current?.scrollToIndex({ index: nextPage, animated: true });
-      setCurrentPage(nextPage);
-    } else {
-      onDone();
-    }
-  }, [currentPage, onDone]);
-
-  const isLast = currentPage === ONBOARD_SLIDES.length - 1;
-  const currentSlide = ONBOARD_SLIDES[currentPage];
-  const pageKey = String(currentPage);
-
-  return (
-    <View style={{ flex: 1 }}>
-      <FlatList
-        ref={flatListRef}
-        data={ONBOARD_SLIDES}
-        keyExtractor={(_, i) => String(i)}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onMomentumScrollEnd={handleScroll}
-        scrollEventThrottle={16}
-        style={{ flex: 1 }}
-        renderItem={({ item, index }) => (
-          <CarouselSlideItem
-            slide={item}
-            pageKey={index === currentPage ? pageKey : `static-${index}`}
-          />
-        )}
-        getItemLayout={(_, index) => ({
-          length: SCREEN_W,
-          offset: SCREEN_W * index,
-          index,
+      <View style={{ marginTop: 24, gap: 10 }}>
+        {cities.map((city, i) => {
+          const isSelected = selected === city.name;
+          return (
+            <Animated.View key={city.name} entering={FadeInDown.delay(160 + i * 70).springify().damping(18)}>
+              <CityCard
+                city={city}
+                isSelected={isSelected}
+                onPress={() => handleSelect(city.name)}
+              />
+            </Animated.View>
+          );
         })}
-      />
-
-      {/* Fixed bottom: dots + button + skip */}
-      <View style={{ paddingHorizontal: 24, paddingBottom: 16, backgroundColor: C.bg, zIndex: 10, borderTopColor: C.divider, borderTopWidth: 0.5 }}>
-        <View style={{ height: 12 }} />
-        <AnimatedDots currentPage={currentPage} />
-        <View style={{ height: 20 }} />
-        <PrimaryButton
-          testID={`onboard-next-${currentPage}`}
-          label={currentSlide.nextLabel}
-          onPress={goToNext}
-        />
-        {!isLast ? (
-          <Pressable
-            testID="skip-onboarding"
-            onPress={onSkip}
-            style={{ alignItems: "center", marginTop: 16 }}
-          >
-            <Text
-              style={{
-                fontFamily: "PlusJakartaSans_500Medium",
-                fontSize: 14,
-                color: C.gray,
-              }}
-            >
-              Hoppa över intro
-            </Text>
-          </Pressable>
-        ) : null}
       </View>
     </View>
   );
 }
 
-// ==================== STEP 8: WELCOME ====================
-function WelcomeStep({ onContinue, firstName }: { onContinue: () => void; firstName: string }) {
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingHorizontal: 32 }}>
-      {/* Logo */}
-      <Animated.View entering={FadeInDown.delay(200).duration(600)}>
-        <Text
-          style={{
-            fontFamily: "PlusJakartaSans_700Bold",
-            fontSize: 32,
-            color: C.text,
-            textAlign: "center",
-            letterSpacing: -1,
-          }}
-        >
-          Reslot
-        </Text>
-      </Animated.View>
+function CityCard({
+  city,
+  isSelected,
+  onPress,
+}: {
+  city: { name: string; emoji: string; count: string };
+  isSelected: boolean;
+  onPress: () => void;
+}) {
+  const scale = useSharedValue(1);
+  const cardStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
 
-      {/* Gold illustration: fork + spoon handoff */}
-      <Animated.View
-        entering={FadeInDown.delay(400).duration(600)}
+  return (
+    <Animated.View style={cardStyle}>
+      <Pressable
+        testID={`city-${city.name}`}
+        accessibilityLabel={city.name}
+        onPress={onPress}
+        onPressIn={() => {
+          scale.value = withSpring(0.97, SPRING_PRESS_IN);
+        }}
+        onPressOut={() => {
+          scale.value = withSpring(1, SPRING_PRESS_OUT);
+        }}
         style={{
-          marginTop: 40,
-          marginBottom: 20,
+          flexDirection: "row",
           alignItems: "center",
+          paddingVertical: 16,
+          paddingHorizontal: 16,
+          backgroundColor: isSelected ? C.coralLight : C.bgCard,
+          borderRadius: 16,
+          borderWidth: 1.5,
+          borderColor: isSelected ? C.orange : C.divider,
+          gap: 14,
         }}
       >
         <View
           style={{
-            width: 160,
-            height: 160,
-            borderRadius: 80,
-            borderWidth: 1.5,
-            borderColor: "rgba(17,24,39,0.15)",
+            width: 44,
+            height: 44,
+            borderRadius: 12,
+            backgroundColor: isSelected ? C.coralLight : "rgba(0,0,0,0.03)",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Text style={{ fontSize: 22 }}>{city.emoji}</Text>
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text
+            style={{
+              fontFamily: FONTS.semiBold,
+              fontSize: 17,
+              color: isSelected ? C.orange : C.text,
+              letterSpacing: -0.2,
+            }}
+          >
+            {city.name}
+          </Text>
+          {city.count ? (
+            <Text
+              style={{
+                fontFamily: FONTS.regular,
+                fontSize: 13,
+                color: C.gray,
+                marginTop: 2,
+              }}
+            >
+              {city.count}
+            </Text>
+          ) : null}
+        </View>
+        {isSelected ? (
+          <Animated.View entering={FadeIn.springify()}>
+            <View
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: 14,
+                backgroundColor: C.orange,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Check size={16} color="#FFF" strokeWidth={3} />
+            </View>
+          </Animated.View>
+        ) : (
+          <ChevronRight size={18} color={C.grayLight} strokeWidth={2} />
+        )}
+      </Pressable>
+    </Animated.View>
+  );
+}
+
+// ==================== STEP 6: CREDITS INTRO ====================
+function CreditsIntroStep({ onContinue, onBack }: { onContinue: () => void; onBack: () => void }) {
+  const rows = [
+    {
+      icon: Upload,
+      iconBg: C.coralLight,
+      iconColor: C.orange,
+      title: "Dela din bokning",
+      subtitle: "Kan du inte gå? Lägg upp den på Reslot",
+      badge: "+2 credits",
+      badgeBg: C.successLight,
+      badgeColor: C.success,
+      step: 0,
+    },
+    {
+      icon: Coins,
+      iconBg: "rgba(201,169,110,0.12)",
+      iconColor: C.gold,
+      title: "Tjäna credits",
+      subtitle: "Få credits när någon tar över din bokning",
+      badge: null as string | null,
+      badgeBg: undefined as string | undefined,
+      badgeColor: undefined as string | undefined,
+      step: 1,
+    },
+    {
+      icon: ArrowDownLeft,
+      iconBg: C.successLight,
+      iconColor: C.success,
+      title: "Ta över en bokning",
+      subtitle: "Använd credits för fullbokade restauranger",
+      badge: "−2 credits",
+      badgeBg: C.coralLight,
+      badgeColor: C.orange,
+      step: 2,
+    },
+  ];
+
+  return (
+    <View style={{ flex: 1, paddingHorizontal: 24 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 8 }}>
+        <BackArrow onPress={onBack} />
+      </View>
+
+      <ProgressBar current={4} total={5} />
+
+      <View style={{ flex: 1, justifyContent: "center" }}>
+        {/* Animated coin icon */}
+        <Animated.View
+          entering={FadeInDown.delay(100).springify().damping(14)}
+          style={{ alignItems: "center", marginBottom: 8 }}
+        >
+          <AnimatedCoinIcon />
+        </Animated.View>
+
+        <Animated.View
+          entering={FadeInDown.delay(200).springify().damping(18)}
+          style={{ alignItems: "center", marginBottom: 32 }}
+        >
+          <Text
+            style={{
+              fontFamily: FONTS.displayBold,
+              fontSize: 28,
+              color: C.text,
+              textAlign: "center",
+              letterSpacing: -0.8,
+            }}
+          >
+            Så fungerar credits
+          </Text>
+          <Text
+            style={{
+              fontFamily: FONTS.regular,
+              fontSize: 15,
+              color: C.gray,
+              textAlign: "center",
+              marginTop: 8,
+              lineHeight: 22,
+            }}
+          >
+            En enkel loop — dela, tjäna, ta över
+          </Text>
+        </Animated.View>
+
+        {/* Credit flow arrows + rows */}
+        {rows.map((row, i) => {
+          const RowIcon = row.icon;
+          return (
+            <React.Fragment key={i}>
+              {i > 0 ? (
+                <Animated.View
+                  entering={FadeInDown.delay(300 + i * 60).springify().damping(18)}
+                  style={{ alignItems: "center", marginVertical: 2 }}
+                >
+                  <View style={{ width: 2, height: 24, backgroundColor: "rgba(201,169,110,0.15)", borderRadius: 1 }} />
+                </Animated.View>
+              ) : null}
+              <Animated.View
+                entering={FadeInDown.delay(300 + i * 60).springify().damping(16)}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  paddingVertical: 14,
+                  paddingHorizontal: 16,
+                  backgroundColor: C.bgCard,
+                  borderRadius: 16,
+                  borderWidth: 0.5,
+                  borderColor: C.divider,
+                  gap: 14,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.03,
+                  shadowRadius: 8,
+                }}
+              >
+                <View
+                  style={{
+                    width: 46,
+                    height: 46,
+                    borderRadius: 13,
+                    backgroundColor: row.iconBg,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <RowIcon size={21} color={row.iconColor} strokeWidth={2} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text
+                    style={{
+                      fontFamily: FONTS.semiBold,
+                      fontSize: 15,
+                      color: C.text,
+                    }}
+                  >
+                    {row.title}
+                  </Text>
+                  <Text
+                    style={{
+                      fontFamily: FONTS.regular,
+                      fontSize: 13,
+                      color: C.gray,
+                      marginTop: 2,
+                      lineHeight: 18,
+                    }}
+                  >
+                    {row.subtitle}
+                  </Text>
+                </View>
+                {row.badge ? (
+                  <View
+                    style={{
+                      paddingHorizontal: 10,
+                      paddingVertical: 5,
+                      borderRadius: 10,
+                      backgroundColor: row.badgeBg,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: FONTS.bold,
+                        fontSize: 12,
+                        color: row.badgeColor,
+                      }}
+                    >
+                      {row.badge}
+                    </Text>
+                  </View>
+                ) : (
+                  <Coins size={20} color={C.gold} strokeWidth={2} />
+                )}
+              </Animated.View>
+            </React.Fragment>
+          );
+        })}
+
+        {/* Loop indicator */}
+        <Animated.View
+          entering={FadeInDown.delay(480).springify().damping(18)}
+          style={{ alignItems: "center", marginTop: 12 }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 6,
+              paddingVertical: 8,
+              paddingHorizontal: 14,
+              backgroundColor: "rgba(201,169,110,0.08)",
+              borderRadius: 20,
+            }}
+          >
+            <Sparkles size={14} color={C.gold} strokeWidth={2} />
+            <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.gold }}>
+              Loopen fortsätter — dela mer, ta mer
+            </Text>
+          </View>
+        </Animated.View>
+      </View>
+
+      <Animated.View
+        entering={FadeInUp.delay(540).springify().damping(18)}
+        style={{ paddingBottom: 16 }}
+      >
+        <PrimaryButton
+          testID="credits-intro-continue-btn"
+          label="Jag förstår — fortsätt"
+          onPress={onContinue}
+        />
+      </Animated.View>
+    </View>
+  );
+}
+
+// Animated coin with gentle bounce
+function AnimatedCoinIcon() {
+  const y = useSharedValue(0);
+  const rotate = useSharedValue(0);
+  const pulseScale = useSharedValue(1);
+
+  useEffect(() => {
+    y.value = withRepeat(
+      withSequence(
+        withSpring(-12, { damping: 6, stiffness: 90 }),
+        withSpring(0, { damping: 6, stiffness: 90 })
+      ),
+      -1,
+      true
+    );
+    rotate.value = withRepeat(
+      withSequence(
+        withSpring(5, { damping: 10, stiffness: 60 }),
+        withSpring(-5, { damping: 10, stiffness: 60 })
+      ),
+      -1,
+      true
+    );
+  }, []);
+
+  useEffect(() => {
+    pulseScale.value = withRepeat(
+      withSequence(
+        withTiming(1.08, { duration: 800, easing: Easing.inOut(Easing.quad) }),
+        withTiming(1, { duration: 800, easing: Easing.inOut(Easing.quad) })
+      ),
+      -1,
+      true
+    );
+  }, []);
+
+  const coinStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: y.value }, { rotate: `${rotate.value}deg` }, { scale: pulseScale.value }],
+  }));
+
+  return (
+    <Animated.View
+      style={[
+        coinStyle,
+        {
+          width: 72,
+          height: 72,
+          borderRadius: 36,
+          backgroundColor: "rgba(201,169,110,0.12)",
+          alignItems: "center",
+          justifyContent: "center",
+          marginBottom: 12,
+        },
+      ]}
+    >
+      <View
+        style={{
+          width: 52,
+          height: 52,
+          borderRadius: 26,
+          backgroundColor: "rgba(201,169,110,0.18)",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Coins size={28} color={C.gold} strokeWidth={2} />
+      </View>
+    </Animated.View>
+  );
+}
+
+// ==================== STEP 7: WELCOME ====================
+function WelcomeStep({ onContinue, firstName }: { onContinue: () => void; firstName: string }) {
+  const confettiScale = useSharedValue(0);
+
+  useEffect(() => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    confettiScale.value = withSpring(1, { damping: 8, stiffness: 80 });
+  }, []);
+
+  const confettiStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: confettiScale.value }],
+    opacity: confettiScale.value,
+  }));
+
+  return (
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingHorizontal: 32 }}>
+      {/* Celebration ring */}
+      <Animated.View
+        style={[confettiStyle, { marginBottom: 32 }]}
+      >
+        <View
+          style={{
+            width: 130,
+            height: 130,
+            borderRadius: 65,
+            backgroundColor: C.coralLight,
             alignItems: "center",
             justifyContent: "center",
           }}
         >
           <View
             style={{
-              width: 120,
-              height: 120,
-              borderRadius: 60,
-              borderWidth: 1,
-              borderColor: "rgba(17,24,39,0.10)",
+              width: 96,
+              height: 96,
+              borderRadius: 48,
+              backgroundColor: C.coralPressed,
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <Utensils size={48} color={C.text} strokeWidth={1.2} />
+            <Text style={{ fontSize: 40 }}>🎉</Text>
           </View>
         </View>
       </Animated.View>
 
-      {/* Heading */}
-      <Animated.View entering={FadeInDown.delay(600).duration(600)}>
+      {/* Welcome text */}
+      <Animated.View entering={FadeInDown.delay(300).springify().damping(16)}>
         <Text
           style={{
-            fontFamily: "PlusJakartaSans_700Bold",
-            fontSize: 42,
+            fontFamily: FONTS.displayBold,
+            fontSize: 34,
             color: C.text,
             textAlign: "center",
             letterSpacing: -1,
           }}
         >
-          Välkommen!
+          Välkommen{firstName ? `,\n${firstName}` : null}!
         </Text>
       </Animated.View>
 
-      <Animated.View entering={FadeInDown.delay(750).duration(500)}>
+      <Animated.View entering={FadeInDown.delay(360).springify().damping(18)}>
         <Text
           style={{
-            fontFamily: "PlusJakartaSans_400Regular",
+            fontFamily: FONTS.regular,
             fontSize: 16,
             color: C.gray,
             textAlign: "center",
-            marginTop: 16,
+            marginTop: 14,
             lineHeight: 24,
           }}
         >
-          Ditt konto är klart — låt oss{"\n"}hitta ditt nästa favoritbord.
+          Ditt konto är redo. Börja utforska{"\n"}bokningar i din stad.
+        </Text>
+      </Animated.View>
+
+      {/* Social proof */}
+      <Animated.View
+        entering={FadeInDown.delay(420).springify().damping(18)}
+        style={{
+          marginTop: 32,
+          paddingVertical: 14,
+          paddingHorizontal: 20,
+          backgroundColor: C.successBg,
+          borderRadius: 14,
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 10,
+        }}
+      >
+        <PulsingDot />
+        <Text
+          style={{
+            fontFamily: FONTS.medium,
+            fontSize: 14,
+            color: C.success,
+          }}
+        >
+          Bokningar delas varje dag
+        </Text>
+      </Animated.View>
+
+      <Animated.View
+        entering={FadeInDown.delay(480).springify().damping(18)}
+        style={{
+          marginTop: 10,
+          paddingVertical: 14,
+          paddingHorizontal: 20,
+          backgroundColor: "rgba(201,169,110,0.08)",
+          borderRadius: 14,
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 10,
+        }}
+      >
+        <Users size={14} color={C.gold} strokeWidth={2} />
+        <Text
+          style={{
+            fontFamily: FONTS.medium,
+            fontSize: 14,
+            color: C.gold,
+          }}
+        >
+          2,400+ användare i Stockholm
         </Text>
       </Animated.View>
 
       <View style={{ flex: 1 }} />
 
-      <Animated.View entering={FadeInUp.delay(900).duration(500)} style={{ width: "100%", paddingBottom: 16 }}>
-        <PrimaryButton testID="welcome-continue-btn" label="Utforska appen" onPress={onContinue} />
+      <Animated.View entering={FadeInUp.delay(500).springify().damping(18)} style={{ width: "100%", paddingBottom: 16 }}>
+        <PrimaryButton
+          testID="welcome-continue-btn"
+          label="Utforska appen"
+          onPress={onContinue}
+          icon={<ArrowRight size={18} color="#FFFFFF" strokeWidth={2.5} />}
+        />
       </Animated.View>
-    </View>
-  );
-}
-
-// ==================== STEP 9: CITY ====================
-function CityStep({
-  onSelect,
-}: {
-  onSelect: (city: string) => void;
-}) {
-  const [selected, setSelected] = useState<string | null>(null);
-  const cities = ["Stockholm", "Göteborg", "Malmö", "Uppsala"];
-
-  const handleSelect = useCallback(
-    (city: string) => {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      setSelected(city);
-      setTimeout(() => onSelect(city), 400);
-    },
-    [onSelect]
-  );
-
-  return (
-    <View style={{ flex: 1, justifyContent: "center", paddingHorizontal: 24 }}>
-      <Animated.View entering={FadeInDown.delay(100).duration(500)} style={{ alignItems: "center", marginBottom: 8 }}>
-        <Text
-          style={{
-            fontFamily: "PlusJakartaSans_700Bold",
-            fontSize: 26,
-            color: C.text,
-            textAlign: "center",
-            letterSpacing: -0.5,
-          }}
-        >
-          Välj din stad
-        </Text>
-      </Animated.View>
-      <Animated.View entering={FadeInDown.delay(200).duration(500)} style={{ alignItems: "center", marginBottom: 36 }}>
-        <Text
-          style={{
-            fontFamily: "PlusJakartaSans_400Regular",
-            fontSize: 14,
-            color: C.gray,
-            textAlign: "center",
-            lineHeight: 20,
-          }}
-        >
-          Välj din hemstad för att alltid se{"\n"}bokningar nära dig.
-        </Text>
-      </Animated.View>
-
-      {cities.map((city, i) => {
-        const isSelected = selected === city;
-        return (
-          <Animated.View key={city} entering={FadeInDown.delay(300 + i * 80).duration(400)}>
-            <Pressable
-              testID={`city-${city}`}
-              onPress={() => handleSelect(city)}
-              style={{
-                paddingVertical: 20,
-                borderBottomWidth: i < cities.length - 1 ? 0.5 : 0,
-                borderBottomColor: C.divider,
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <Text
-                style={{
-                  fontFamily: "PlusJakartaSans_600SemiBold",
-                  fontSize: 20,
-                  color: isSelected ? C.orange : C.text,
-                  letterSpacing: -0.3,
-                }}
-              >
-                {city}
-              </Text>
-              {isSelected ? (
-                <Animated.View entering={FadeIn.duration(200)}>
-                  <View
-                    style={{
-                      width: 28,
-                      height: 28,
-                      borderRadius: 14,
-                      backgroundColor: C.orange,
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Check size={16} color="#FFF" strokeWidth={3} />
-                  </View>
-                </Animated.View>
-              ) : null}
-            </Pressable>
-          </Animated.View>
-        );
-      })}
     </View>
   );
 }
@@ -1435,7 +1679,6 @@ function CityStep({
 // ==================== MAIN FLOW CONTROLLER ====================
 export default function OnboardingScreen() {
   const [step, setStep] = useState<Step>("splash");
-  const [phone, setPhone] = useState("");
   const [firstName, setFirstName] = useState("");
   const router = useRouter();
   const setOnboardingComplete = useAuthStore((s) => s.setOnboardingComplete);
@@ -1448,11 +1691,6 @@ export default function OnboardingScreen() {
   const [sendingOtp, setSendingOtp] = useState(false);
   const [verifyingOtp, setVerifyingOtp] = useState(false);
   const [storedPhone, setStoredPhone] = useState("");
-  const [storedFirstName, setStoredFirstName] = useState("");
-  const [storedLastName, setStoredLastName] = useState("");
-  const [storedEmail, setStoredEmail] = useState("");
-
-  const [fontsLoaded] = useFonts({});
 
   const handleSendOtp = useCallback(async (phoneInput: string) => {
     setSendingOtp(true);
@@ -1466,9 +1704,8 @@ export default function OnboardingScreen() {
       });
       const json = await res.json();
       if (json.error) throw new Error(json.error.message);
-      setPhone(phoneInput);
-      setPhoneNumber(phoneInput);
       setStoredPhone(phoneInput);
+      setPhoneNumber(phoneInput);
       if (json.data?.dev) {
         setOtpError("DEV: Använd kod 000000 för att logga in");
       }
@@ -1480,6 +1717,27 @@ export default function OnboardingScreen() {
     }
   }, [setPhoneNumber]);
 
+  const handleResendOtp = useCallback(async () => {
+    if (!storedPhone) return;
+    setOtpError(null);
+    try {
+      const baseUrl = process.env.EXPO_PUBLIC_BACKEND_URL!;
+      const res = await fetch(`${baseUrl}/api/auth/send-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: storedPhone }),
+      });
+      const json = await res.json();
+      if (json.error) throw new Error(json.error.message);
+      if (json.data?.dev) {
+        setOtpError("DEV: Använd kod 000000 för att logga in");
+      }
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch (err: any) {
+      setOtpError(err.message ?? "Kunde inte skicka ny kod.");
+    }
+  }, [storedPhone]);
+
   const handleVerifyOtp = useCallback(async (code: string): Promise<boolean> => {
     setVerifyingOtp(true);
     setOtpError(null);
@@ -1488,13 +1746,7 @@ export default function OnboardingScreen() {
       const res = await fetch(`${baseUrl}/api/auth/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          phone: storedPhone,
-          code,
-          firstName: storedFirstName || undefined,
-          lastName: storedLastName || undefined,
-          email: storedEmail || undefined,
-        }),
+        body: JSON.stringify({ phone: storedPhone, code }),
       });
       const json = await res.json();
       if (json.error) throw new Error(json.error.message);
@@ -1509,7 +1761,7 @@ export default function OnboardingScreen() {
     } finally {
       setVerifyingOtp(false);
     }
-  }, [storedPhone, storedFirstName, storedLastName, storedEmail]);
+  }, [storedPhone]);
 
   const finishOnboarding = useCallback(
     (city: string) => {
@@ -1521,18 +1773,20 @@ export default function OnboardingScreen() {
   );
 
   const skipToApp = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setGuestMode();
     router.replace("/(tabs)");
   }, [router, setGuestMode]);
-
-  if (!fontsLoaded) return null;
 
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>
       <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1 }}>
         {step === "splash" ? (
           <SplashStep
-            onGetStarted={() => setStep("phone")}
+            onGetStarted={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              setStep("phone");
+            }}
             onExplore={skipToApp}
           />
         ) : null}
@@ -1548,13 +1802,17 @@ export default function OnboardingScreen() {
 
         {step === "otp" ? (
           <OTPStep
-            phone={storedPhone || phone}
+            phone={storedPhone}
             onNext={async (code: string) => {
               const ok = await handleVerifyOtp(code);
-              if (ok) setStep("register");
+              if (ok) {
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                setStep("register");
+              }
             }}
             onBack={() => setStep("phone")}
             onEditPhone={() => setStep("phone")}
+            onResend={handleResendOtp}
             isLoading={verifyingOtp}
             error={otpError}
           />
@@ -1563,9 +1821,6 @@ export default function OnboardingScreen() {
         {step === "register" ? (
           <RegisterStep
             onNext={async (first: string, last: string, email: string) => {
-              setStoredFirstName(first);
-              setStoredLastName(last);
-              setStoredEmail(email);
               setFirstName(first);
               setUserInfo(first, last, email);
               const baseUrl = process.env.EXPO_PUBLIC_BACKEND_URL!;
@@ -1577,28 +1832,38 @@ export default function OnboardingScreen() {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${sessionToken}`,
                   },
-                  body: JSON.stringify({ firstName: first, lastName: last, email, phone: storedPhone || phone }),
+                  body: JSON.stringify({ firstName: first, lastName: last, email, phone: storedPhone }),
                 }).catch(() => {});
               }
-              setStep("onboard");
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setStep("city");
             }}
             onBack={() => setStep("otp")}
           />
         ) : null}
 
-        {step === "onboard" ? (
-          <OnboardingCarousel
-            onDone={() => setStep("welcome")}
-            onSkip={() => setStep("welcome")}
+        {step === "city" ? (
+          <CityStep
+            onSelect={(city) => {
+              setStep("credits_intro");
+              setSelectedCity(city);
+            }}
+            onBack={() => setStep("register")}
+          />
+        ) : null}
+
+        {step === "credits_intro" ? (
+          <CreditsIntroStep
+            onContinue={() => setStep("welcome")}
+            onBack={() => setStep("city")}
           />
         ) : null}
 
         {step === "welcome" ? (
-          <WelcomeStep firstName={firstName} onContinue={() => setStep("city")} />
-        ) : null}
-
-        {step === "city" ? (
-          <CityStep onSelect={finishOnboarding} />
+          <WelcomeStep
+            firstName={firstName}
+            onContinue={() => finishOnboarding(useAuthStore.getState().selectedCity)}
+          />
         ) : null}
       </SafeAreaView>
     </View>

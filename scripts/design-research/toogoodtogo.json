@@ -1,0 +1,60 @@
+{
+  "name": "Too Good To Go",
+  "url": "https://www.toogoodtogo.com",
+  "fetchDate": "2026-04-01",
+  "fetchStatus": "HTTP 429 - supplemented with known design data",
+  "colors": {
+    "primary": "#00473E",
+    "secondary": "#FFC842",
+    "accent": "#FF6B35",
+    "backgrounds": {
+      "canvas": "#FFFFFF",
+      "cream": "#FFF9E6",
+      "darkGreen": "#00473E"
+    },
+    "text": {
+      "dark": "#1A1A1A",
+      "onDark": "#FFFFFF"
+    },
+    "gradients": false
+  },
+  "typography": {
+    "fontFamilies": ["Too Good Display", "Poppins", "system-ui", "sans-serif"],
+    "headingStyle": "Bold, rounded, friendly",
+    "bodyText": "Clean sans-serif, high readability"
+  },
+  "trustElements": {
+    "userCount": "100M+ users globally",
+    "mealsSaved": "400M+ meals saved",
+    "partnerCount": "180,000+ stores",
+    "bcorpCertified": true,
+    "pressLogos": ["Forbes", "BBC", "The Guardian", "TechCrunch"],
+    "impactMetrics": "CO2 equivalent savings displayed per meal"
+  },
+  "conversionPsychology": {
+    "primaryCta": "Get the app",
+    "valuePropositions": ["Save food from going to waste", "Get Surprise Bags at 1/3 of retail price", "Reduce your environmental impact"],
+    "urgencyTactics": ["Limited quantity per store", "Real-time availability", "Pickup windows create time pressure"],
+    "pricingPresentation": "Compare 'worth' vs 'you pay' — anchoring effect",
+    "socialProof": "Live counters of meals saved"
+  },
+  "onboardingPatterns": {
+    "flow": ["Download app", "Enter location", "Browse available stores", "Reserve bag", "Pick up at store"],
+    "frictionReduction": "Location-first experience, Apple/Google Pay",
+    "gamification": "Badges for meals saved, environmental impact tracking",
+    "personalization": "Favorites, dietary preferences, notification radius"
+  },
+  "uniqueDesignPatterns": {
+    "surpriseBagConcept": "Mystery element creates excitement and discovery",
+    "mapView": "Location-based store discovery",
+    "countdownTimers": "Pickup window countdowns",
+    "impactDashboard": "Personal sustainability metrics",
+    "illustration": "Warm, hand-drawn illustration style"
+  },
+  "appStorePresence": {
+    "appStoreRating": "4.8/5",
+    "playStoreRating": "4.6/5",
+    "downloads": "100M+",
+    "prominentDownloadCta": true
+  }
+}

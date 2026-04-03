@@ -3,9 +3,12 @@ import { api } from "./api";
 import type {
   Restaurant,
   Reservation,
+  MissedReservation,
   UserProfile,
   ActivityAlert,
   RestaurantAlertWithRestaurant,
+  Watch,
+  SavedRestaurant,
 } from "./types";
 
 // ─── Restaurants ───────────────────────────────────────
@@ -25,6 +28,7 @@ export function useRestaurants(params?: {
       const qs = queryParams.toString();
       return api.get<Restaurant[]>(`/api/restaurants${qs ? `?${qs}` : ""}`);
     },
+    staleTime: 5 * 60 * 1000,
   });
 }
 
@@ -36,6 +40,7 @@ export function useRestaurant(id: string) {
         `/api/restaurants/${id}`
       ),
     enabled: !!id,
+    staleTime: 5 * 60 * 1000,
   });
 }
 
@@ -44,6 +49,7 @@ export function useReservation(id: string) {
     queryKey: ["reservation", id],
     queryFn: () => api.get<Reservation>(`/api/reservations/${id}`),
     enabled: !!id,
+    staleTime: 30 * 1000,
   });
 }
 
@@ -64,6 +70,19 @@ export function useReservations(params?: {
       const qs = queryParams.toString();
       return api.get<Reservation[]>(`/api/reservations${qs ? `?${qs}` : ""}`);
     },
+    staleTime: 30 * 1000,
+  });
+}
+
+// ─── Missed Reservations (loss aversion) ─────────────
+export function useMissedReservations(city?: string) {
+  return useQuery({
+    queryKey: ["missedReservations", city],
+    queryFn: async () => {
+      const qs = city ? `?city=${encodeURIComponent(city)}` : "";
+      return api.get<MissedReservation[]>(`/api/reservations/missed${qs}`);
+    },
+    staleTime: 2 * 60 * 1000,
   });
 }
 
@@ -72,8 +91,9 @@ export function useMyReservations(phone: string) {
   return useQuery({
     queryKey: ["myReservations", phone],
     queryFn: () =>
-      api.get<Reservation[]>(`/api/reservations/mine?phone=${encodeURIComponent(phone)}`),
+      api.get<Reservation[]>(`/api/reservations/mine`),
     enabled: !!phone,
+    staleTime: 30 * 1000,
   });
 }
 
@@ -94,6 +114,8 @@ export function useSubmitReservation() {
       cancelFee?: number;
       prepaidAmount?: number;
       verificationLink?: string;
+      cancellationWindowHours?: number;
+      extraInfo?: string;
     }) => api.post<Reservation>("/api/reservations", body),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["reservations"] });
@@ -138,30 +160,29 @@ export function useCancelReservation() {
   });
 }
 
+// ─── Cancel Claim (grace period) ─────────────────────
+export function useCancelClaim() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (reservationId: string) =>
+      api.post<Reservation>(`/api/reservations/${reservationId}/cancel-claim`, {}),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["reservations"] });
+      qc.invalidateQueries({ queryKey: ["myReservations"] });
+      qc.invalidateQueries({ queryKey: ["profile"] });
+      qc.invalidateQueries({ queryKey: ["reservation"] });
+    },
+  });
+}
+
 // ─── Profile ──────────────────────────────────────────
 export function useProfile(phone: string) {
   return useQuery({
     queryKey: ["profile", phone],
     queryFn: () =>
-      api.get<UserProfile>(`/api/profile?phone=${encodeURIComponent(phone)}`),
+      api.get<UserProfile>(`/api/profile`),
     enabled: !!phone,
-  });
-}
-
-export function useUpdateProfile() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (body: {
-      phone: string;
-      firstName?: string;
-      lastName?: string;
-      email?: string;
-      avatar?: string;
-      selectedCity?: string;
-    }) => api.put<UserProfile>("/api/profile", body),
-    onSuccess: (_, vars) => {
-      qc.invalidateQueries({ queryKey: ["profile", vars.phone] });
-    },
+    staleTime: 60 * 1000,
   });
 }
 
@@ -170,10 +191,9 @@ export function useActivityAlerts(phone: string) {
   return useQuery({
     queryKey: ["activityAlerts", phone],
     queryFn: () =>
-      api.get<ActivityAlert[]>(
-        `/api/alerts?phone=${encodeURIComponent(phone)}`
-      ),
+      api.get<ActivityAlert[]>(`/api/alerts`),
     enabled: !!phone,
+    staleTime: 30 * 1000,
   });
 }
 
@@ -193,10 +213,9 @@ export function useRestaurantAlerts(phone: string) {
   return useQuery({
     queryKey: ["restaurantAlerts", phone],
     queryFn: () =>
-      api.get<RestaurantAlertWithRestaurant[]>(
-        `/api/alerts/restaurant-alerts?phone=${encodeURIComponent(phone)}`
-      ),
+      api.get<RestaurantAlertWithRestaurant[]>(`/api/alerts/restaurant-alerts`),
     enabled: !!phone,
+    staleTime: 60 * 1000,
   });
 }
 
@@ -226,3 +245,118 @@ export function useRemoveRestaurantAlert() {
     },
   });
 }
+
+// ---- Watches (bevakningar) ----
+export function useWatches(phone: string | null | undefined) {
+  return useQuery({
+    queryKey: ["watches", phone],
+    queryFn: () => api.get<Watch[]>(`/api/watches`),
+    enabled: !!phone,
+    staleTime: 60 * 1000,
+  });
+}
+
+export function useAddWatch() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: {
+      userPhone: string;
+      restaurantId?: string;
+      date?: string;
+      partySize?: number;
+      notes?: string;
+    }) => api.post<Watch>("/api/watches", data),
+    onSuccess: (_: Watch, variables: { userPhone: string; restaurantId?: string; date?: string; partySize?: number; notes?: string }) => {
+      queryClient.invalidateQueries({ queryKey: ["watches", variables.userPhone] });
+    },
+  });
+}
+
+export function useDeleteWatch() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id }: { id: string; userPhone: string }) =>
+      api.delete<{ success: boolean }>(`/api/watches/${id}`),
+    onSuccess: (_: { success: boolean }, variables: { id: string; userPhone: string }) => {
+      queryClient.invalidateQueries({ queryKey: ["watches", variables.userPhone] });
+    },
+  });
+}
+
+// ---- Credits purchase ----
+export function usePurchaseCredits() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { phone: string; quantity: number }) =>
+      api.post<{ success: boolean; newBalance: number }>("/api/credits/purchase", data),
+    onSuccess: (_: { success: boolean; newBalance: number }, variables: { phone: string; quantity: number }) => {
+      queryClient.invalidateQueries({ queryKey: ["profile", variables.phone] });
+    },
+  });
+}
+
+// ---- Referral ----
+export function useReferralCode(phone: string | null | undefined) {
+  return useQuery({
+    queryKey: ["referralCode", phone],
+    queryFn: () => api.get<{ referralCode: string }>(`/api/referral/code`),
+    enabled: !!phone,
+    staleTime: 10 * 60 * 1000,
+  });
+}
+
+export function useUseReferralCode() {
+  return useMutation({
+    mutationFn: (data: { phone: string; referralCode: string }) =>
+      api.post<{ success: boolean }>("/api/referral/use", data),
+  });
+}
+
+// ─── Push Notifications ──────────────────────────────
+export function useSavePushToken() {
+  return useMutation({
+    mutationFn: (data: { token: string }) =>
+      api.post<{ success: boolean }>("/api/profile/push-token", data),
+  });
+}
+
+// ─── Support ─────────────────────────────────────────
+export function useSubmitSupportMessage() {
+  return useMutation({
+    mutationFn: (data: { message: string; phone?: string; email?: string }) =>
+      api.post<{ success: boolean }>("/api/support", data),
+  });
+}
+
+// ─── Saved Restaurants ───────────────────────────────
+export function useSavedRestaurants(phone: string | null | undefined) {
+  return useQuery({
+    queryKey: ["savedRestaurants", phone],
+    queryFn: () => api.get<SavedRestaurant[]>("/api/saved-restaurants"),
+    enabled: !!phone,
+    staleTime: 60 * 1000,
+  });
+}
+
+export function useSaveRestaurant() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { restaurantId: string }) =>
+      api.post<SavedRestaurant>("/api/saved-restaurants", data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["savedRestaurants"] });
+    },
+  });
+}
+
+export function useUnsaveRestaurant() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (restaurantId: string) =>
+      api.delete<{ success: boolean }>(`/api/saved-restaurants/${restaurantId}`),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["savedRestaurants"] });
+    },
+  });
+}
+

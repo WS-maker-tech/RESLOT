@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, ScrollView, Pressable, LayoutAnimation, Platform, UIManager } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ChevronRight, MessageCircle } from "lucide-react-native";
+import { useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
 import Animated, {
   FadeInDown,
@@ -9,43 +10,44 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
 } from "react-native-reanimated";
+import { C, FONTS, SPACING, RADIUS, SHADOW, ICON } from "@/lib/theme";
 
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-const DARK = "#111827";
-const BG = "#FAFAF8";
-const CORAL = "#E06A4E";
-
 const FAQ_ITEMS = [
   {
     q: "Hur fungerar Reslot?",
-    a: "Reslot är en marknadsplats för restaurangbokningar. Du kan lägga upp bokningar du inte längre kan använda, och andra kan ta över dem mot credits.",
+    a: "Reslot är en marknadsplats där användare delar restaurangbokningar de själva inte kan använda. Du kan ta över en bokning med Reslot credits. Vi samarbetar inte med restauranger och hanterar inte bokningar själva, allt delas mellan användare i appen.",
   },
   {
     q: "Vad är Reslot credits?",
-    a: "Credits är Reslots valuta. Du tjänar credits när du lägger upp bokningar. Du använder credits för att ta över andras bokningar. Credits kan även köpas i appen.",
+    a: "Credits är det du använder för att ta över en bokning. Du kan få credits genom att lägga upp bokningar, bjuda in vänner eller köpa dem i appen.",
   },
   {
-    q: "Hur tar jag över en bokning?",
-    a: "Hitta en bokning som passar dig på Hem-flödet, tryck på den och välj 'Ta över bokning'. Du behöver credits och godkänna villkoren.",
+    q: "När betalar jag något?",
+    a: "Du betalar inget när du lägger in kortuppgifter. Betalning sker bara om du bryter mot bokningens villkor, till exempel om du inte dyker upp i tid.",
   },
   {
-    q: "Vad händer om jag inte kan gå?",
-    a: "Du kan lägga upp bokningen i flödet igen. Tänk på att du ansvarar för bokningen tills någon annan tar över den.",
+    q: "Varför behöver jag lägga in kortuppgifter?",
+    a: "Kortuppgifter används som en säkerhet. Det gör att bokningar tas på allvar och minskar risken för att bord står tomma.",
   },
   {
-    q: "Hur tjänar jag credits?",
-    a: "Du tjänar credits när du lägger upp en bokning och den tas över av någon annan. Du kan också köpa credits eller bjuda in vänner.",
+    q: "Vad händer om jag inte kan gå på bokningen?",
+    a: "Du kan avboka enligt restaurangens regler. Om du avbokar för sent eller inte dyker upp kan du bli debiterad.",
   },
   {
-    q: "Är mina betalningsuppgifter säkra?",
-    a: "Ja. Vi använder Stripe för säker betalningshantering. Vi drar aldrig pengar utan din vetskap.",
+    q: "Kan jag ångra en bokning jag tagit över?",
+    a: "Ja, så länge du avbokar inom avbokningsfönstret. Efter det gäller restaurangens villkor.",
   },
   {
-    q: "Kan jag lägga upp vilken restaurang som helst?",
-    a: "Ja, du kan lägga upp bokningar från restauranger som finns i Reslots databas. Kontakta support om din restaurang saknas.",
+    q: "Hur fungerar bevakningar?",
+    a: "Du kan spara bevakningar för restauranger eller tider du är intresserad av. När en matchande bokning dyker upp får du en notis.",
+  },
+  {
+    q: "Hur får jag fler credits?",
+    a: "Du kan få credits genom att lägga upp en bokning, bjuda in en vän eller köpa fler i appen.",
   },
 ];
 
@@ -54,11 +56,13 @@ function AnimatedPressable({
   onPress,
   style,
   testID,
+  accessibilityLabel,
 }: {
   children: React.ReactNode;
   onPress: () => void;
   style?: object;
   testID?: string;
+  accessibilityLabel?: string;
 }) {
   const scale = useSharedValue(1);
   const animStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
@@ -66,6 +70,7 @@ function AnimatedPressable({
   return (
     <Pressable
       testID={testID}
+      accessibilityLabel={accessibilityLabel}
       onPressIn={() => { scale.value = withSpring(0.97, { damping: 15, stiffness: 300 }); }}
       onPressOut={() => { scale.value = withSpring(1, { damping: 12, stiffness: 200 }); }}
       onPress={onPress}
@@ -77,6 +82,11 @@ function AnimatedPressable({
 
 function FaqItem({ question, answer, delay }: { question: string; answer: string; delay: number }) {
   const [open, setOpen] = React.useState(false);
+  const chevronRotation = useSharedValue(0);
+
+  const chevronStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${chevronRotation.value}deg` }],
+  }));
 
   const handlePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -85,25 +95,23 @@ function FaqItem({ question, answer, delay }: { question: string; answer: string
       create: { type: "easeInEaseOut", property: "opacity" },
       update: { type: "spring", springDamping: 0.8 },
     });
+    chevronRotation.value = withSpring(open ? 0 : 90, { damping: 14, stiffness: 180 });
     setOpen((v) => !v);
   };
 
   return (
-    <Animated.View entering={FadeInDown.delay(delay).duration(400).springify()}>
+    <Animated.View entering={FadeInDown.delay(delay).springify()}>
       <AnimatedPressable
         testID={`faq-item-${question.slice(0, 10)}`}
+        accessibilityLabel={`Fråga: ${question}`}
         onPress={handlePress}
         style={{
-          backgroundColor: "#FFFFFF",
-          borderRadius: 16,
+          backgroundColor: C.bgCard,
+          borderRadius: RADIUS.lg,
           borderWidth: 0.5,
-          borderColor: "rgba(0,0,0,0.07)",
+          borderColor: C.divider,
           overflow: "hidden",
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 1 },
-          shadowOpacity: 0.04,
-          shadowRadius: 4,
-          elevation: 1,
+          ...SHADOW.card,
         }}
       >
         <View
@@ -116,9 +124,9 @@ function FaqItem({ question, answer, delay }: { question: string; answer: string
         >
           <Text
             style={{
-              fontFamily: "PlusJakartaSans_600SemiBold",
+              fontFamily: FONTS.semiBold,
               fontSize: 14,
-              color: DARK,
+              color: C.textPrimary,
               flex: 1,
               marginRight: 12,
               letterSpacing: -0.1,
@@ -131,17 +139,18 @@ function FaqItem({ question, answer, delay }: { question: string; answer: string
               width: 28,
               height: 28,
               borderRadius: 8,
-              backgroundColor: open ? "rgba(224,106,78,0.1)" : "rgba(0,0,0,0.04)",
+              backgroundColor: open ? C.coralLight : "rgba(0,0,0,0.04)",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <ChevronRight
-              size={14}
-              color={open ? CORAL : "#9CA3AF"}
-              strokeWidth={2.5}
-              style={{ transform: [{ rotate: open ? "90deg" : "0deg" }] }}
-            />
+            <Animated.View style={chevronStyle}>
+              <ChevronRight
+                size={14}
+                color={open ? C.coral : C.textTertiary}
+                strokeWidth={2.5}
+              />
+            </Animated.View>
           </View>
         </View>
         {open ? (
@@ -150,14 +159,14 @@ function FaqItem({ question, answer, delay }: { question: string; answer: string
               paddingHorizontal: 16,
               paddingBottom: 16,
               borderTopWidth: 0.5,
-              borderTopColor: "rgba(0,0,0,0.06)",
+              borderTopColor: C.borderLight,
             }}
           >
             <Text
               style={{
-                fontFamily: "PlusJakartaSans_400Regular",
+                fontFamily: FONTS.regular,
                 fontSize: 13,
-                color: "#6B7280",
+                color: C.textSecondary,
                 lineHeight: 20,
                 marginTop: 12,
               }}
@@ -172,21 +181,22 @@ function FaqItem({ question, answer, delay }: { question: string; answer: string
 }
 
 export default function FaqScreen() {
+  const router = useRouter();
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: BG }} edges={["bottom"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }} edges={["bottom"]}>
       <ScrollView
         contentContainerStyle={{ paddingBottom: 48 }}
         showsVerticalScrollIndicator={false}
       >
         <Animated.View
-          entering={FadeInDown.delay(0).duration(400).springify()}
-          style={{ paddingHorizontal: 20, paddingTop: 28, paddingBottom: 6 }}
+          entering={FadeInDown.springify()}
+          style={{ paddingHorizontal: SPACING.lg, paddingTop: SPACING.xl, paddingBottom: 6 }}
         >
           <Text
             style={{
-              fontFamily: "PlusJakartaSans_700Bold",
+              fontFamily: FONTS.displayBold,
               fontSize: 28,
-              color: DARK,
+              color: C.textPrimary,
               letterSpacing: -0.8,
             }}
           >
@@ -194,9 +204,9 @@ export default function FaqScreen() {
           </Text>
           <Text
             style={{
-              fontFamily: "PlusJakartaSans_400Regular",
+              fontFamily: FONTS.regular,
               fontSize: 14,
-              color: "#9CA3AF",
+              color: C.textTertiary,
               marginTop: 5,
             }}
           >
@@ -204,27 +214,27 @@ export default function FaqScreen() {
           </Text>
         </Animated.View>
 
-        <View style={{ marginTop: 20, paddingHorizontal: 20, gap: 8 }}>
+        <View style={{ marginTop: SPACING.lg, paddingHorizontal: SPACING.lg, gap: SPACING.sm }}>
           {FAQ_ITEMS.map((item, i) => (
             <FaqItem key={i} question={item.q} answer={item.a} delay={80 + i * 40} />
           ))}
         </View>
 
         <Animated.View
-          entering={FadeInDown.delay(80 + FAQ_ITEMS.length * 40 + 40).duration(400).springify()}
+          entering={FadeInDown.delay(80 + FAQ_ITEMS.length * 40 + 40).springify()}
           style={{
-            marginHorizontal: 20,
+            marginHorizontal: SPACING.lg,
             marginTop: 32,
             borderTopWidth: 0.5,
-            borderTopColor: "rgba(0,0,0,0.08)",
+            borderTopColor: C.divider,
             paddingTop: 24,
           }}
         >
           <Text
             style={{
-              fontFamily: "PlusJakartaSans_500Medium",
+              fontFamily: FONTS.medium,
               fontSize: 14,
-              color: "#6B7280",
+              color: C.textSecondary,
               textAlign: "center",
               marginBottom: 12,
             }}
@@ -233,30 +243,32 @@ export default function FaqScreen() {
           </Text>
           <AnimatedPressable
             testID="contact-support-button"
+            accessibilityLabel="Kontakta support"
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              router.push("/support");
             }}
             style={{
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "center",
               gap: 8,
-              backgroundColor: DARK,
+              backgroundColor: C.dark,
               paddingVertical: 14,
-              borderRadius: 14,
-              shadowColor: DARK,
+              borderRadius: RADIUS.md,
+              shadowColor: C.dark,
               shadowOffset: { width: 0, height: 4 },
               shadowOpacity: 0.15,
               shadowRadius: 10,
               elevation: 3,
             }}
           >
-            <MessageCircle size={16} color="#FFFFFF" strokeWidth={2} />
+            <MessageCircle size={16} color={C.bgCard} strokeWidth={2} />
             <Text
               style={{
-                fontFamily: "PlusJakartaSans_600SemiBold",
+                fontFamily: FONTS.semiBold,
                 fontSize: 15,
-                color: "#FFFFFF",
+                color: C.bgCard,
               }}
             >
               Kontakta support

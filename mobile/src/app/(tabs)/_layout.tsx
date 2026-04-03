@@ -14,6 +14,7 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
   withTiming,
+  withSequence,
 } from "react-native-reanimated";
 import {
   useFonts,
@@ -22,9 +23,11 @@ import {
   PlusJakartaSans_600SemiBold,
   PlusJakartaSans_700Bold,
 } from "@expo-google-fonts/plus-jakarta-sans";
+
 import * as SplashScreen from "expo-splash-screen";
 import { useActivityAlerts } from "@/lib/api/hooks";
 import { useAuthStore } from "@/lib/auth-store";
+import { C, FONTS } from "@/lib/theme";
 import type { ActivityAlert } from "@/lib/api/types";
 
 function TabIcon({
@@ -41,10 +44,17 @@ function TabIcon({
   const scale = useSharedValue(focused ? 1.05 : 0.92);
 
   useEffect(() => {
-    scale.value = withSpring(focused ? 1.08 : 0.92, {
-      damping: 14,
-      stiffness: 220,
-    });
+    if (focused) {
+      scale.value = withSequence(
+        withSpring(1.25, { damping: 8, stiffness: 400 }),
+        withSpring(1.08, { damping: 14, stiffness: 220 })
+      );
+    } else {
+      scale.value = withSpring(0.92, {
+        damping: 14,
+        stiffness: 220,
+      });
+    }
   }, [focused, scale]);
 
   const animStyle = useAnimatedStyle(() => ({
@@ -55,21 +65,21 @@ function TabIcon({
     return (
       <View
         style={{
-          backgroundColor: "#E06A4E",
+          backgroundColor: C.coral,
           width: 48,
           height: 48,
           borderRadius: 24,
           alignItems: "center",
           justifyContent: "center",
           marginTop: -12,
-          shadowColor: "#E06A4E",
+          shadowColor: C.coral,
           shadowOffset: { width: 0, height: 4 },
           shadowOpacity: 0.3,
           shadowRadius: 10,
           elevation: 6,
         }}
       >
-        <Icon size={24} color="#FFFFFF" strokeWidth={2.5} />
+        <Icon size={24} color="#FFFFFF" strokeWidth={2} />
       </View>
     );
   }
@@ -97,9 +107,9 @@ export default function TabLayout() {
   const splashOpacity = useSharedValue(1);
   const phone = useAuthStore((s) => s.phoneNumber);
 
-  const { data: activityAlerts = [] } = useActivityAlerts(phone || "test@reslot.se");
+  const { data: activityAlerts = [] } = useActivityAlerts(phone || "");
   const unreadCount = (activityAlerts as ActivityAlert[]).filter((a) => !a.read).length;
-  const badgeCount = unreadCount > 0 ? unreadCount : undefined;
+  const badgeCount = unreadCount > 0 ? (unreadCount > 99 ? "99+" : unreadCount) : undefined;
 
   const splashStyle = useAnimatedStyle(() => ({
     opacity: splashOpacity.value,
@@ -119,7 +129,7 @@ export default function TabLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <View className="flex-1" style={{ backgroundColor: "#FAFAF8" }}>
+    <View className="flex-1" style={{ backgroundColor: C.bg }}>
       {showSplash ? (
         <Animated.View
           style={[
@@ -129,7 +139,7 @@ export default function TabLayout() {
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: "#FAFAF8",
+              backgroundColor: C.bg,
               zIndex: 999,
               alignItems: "center",
               justifyContent: "center",
@@ -139,58 +149,58 @@ export default function TabLayout() {
         >
           <Text
             style={{
-              fontFamily: "PlusJakartaSans_700Bold",
-              fontSize: 28,
-              color: "#111827",
-              letterSpacing: -0.5,
+              fontFamily: FONTS.displayBold,
+              fontSize: 32,
+              color: C.textPrimary,
+              letterSpacing: -0.8,
             }}
           >
             Reslot
           </Text>
           <Text
             style={{
-              fontFamily: "PlusJakartaSans_400Regular",
+              fontFamily: FONTS.regular,
               fontSize: 15,
-              color: "#9CA3AF",
+              color: C.textTertiary,
               marginTop: 12,
               letterSpacing: 0.2,
             }}
           >
-            Bra saker händer i sista minuten.
+            Din genväg till fullbokade restauranger.
           </Text>
         </Animated.View>
       ) : null}
       <Tabs
         screenOptions={{
           headerShown: false,
-          tabBarActiveTintColor: "#111827",
-          tabBarInactiveTintColor: "#9CA3AF",
+          tabBarActiveTintColor: C.dark,
+          tabBarInactiveTintColor: C.textSecondary,
           tabBarShowLabel: true,
           tabBarLabelStyle: {
-            fontFamily: "PlusJakartaSans_500Medium",
+            fontFamily: FONTS.semiBold,
             fontSize: 10,
-            marginTop: 2,
+            marginTop: 4,
           },
           tabBarStyle: {
             position: "absolute",
             bottom: 0,
             left: 0,
             right: 0,
-            backgroundColor: "transparent",
+            backgroundColor: "rgba(250,250,248,0.97)",
             borderTopWidth: 0.5,
-            borderTopColor: "rgba(0,0,0,0.06)",
-            height: 88,
-            paddingTop: 8,
-            paddingBottom: 28,
+            borderTopColor: C.divider,
+            height: 72,
+            paddingTop: 6,
+            paddingBottom: 8,
             elevation: 0,
             shadowColor: "#000",
-            shadowOffset: { width: 0, height: -4 },
-            shadowOpacity: 0.05,
-            shadowRadius: 16,
+            shadowOffset: { width: 0, height: -2 },
+            shadowOpacity: 0.06,
+            shadowRadius: 12,
           },
           tabBarBackground: () => (
             <BlurView
-              intensity={85}
+              intensity={60}
               tint="light"
               style={StyleSheet.absoluteFill}
             />
@@ -249,7 +259,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="alerts"
           options={{
-            title: "Notiser",
+            title: "Bevakningar",
             tabBarIcon: ({
               color,
               focused,
@@ -259,9 +269,10 @@ export default function TabLayout() {
             }) => <TabIcon icon={Bell} color={color} focused={focused} />,
             tabBarBadge: badgeCount,
             tabBarBadgeStyle: {
-              backgroundColor: "#E06A4E",
+              backgroundColor: C.coral,
+              color: "#FFFFFF",
               fontSize: 10,
-              fontFamily: "PlusJakartaSans_600SemiBold",
+              fontFamily: FONTS.semiBold,
               minWidth: 18,
               height: 18,
               lineHeight: 18,

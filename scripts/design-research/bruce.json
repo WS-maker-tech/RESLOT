@@ -1,0 +1,39 @@
+{
+  "name": "Bruce",
+  "url": "https://www.bruce.se",
+  "fetchDate": "2026-04-01",
+  "fetchStatus": "Minimal content on website - supplemented with known data",
+  "colors": {
+    "primary": "#000000",
+    "secondary": "#FFFFFF",
+    "accent": "Warm orange/coral tones",
+    "note": "Minimal website, design primarily lives in-app"
+  },
+  "typography": {
+    "note": "Not extractable from minimal landing page"
+  },
+  "trustElements": {
+    "partnerRestaurants": "Premium Stockholm restaurants",
+    "concept": "Last-minute restaurant reservations at top venues",
+    "origin": "Swedish startup"
+  },
+  "conversionPsychology": {
+    "primaryCta": "App download focused",
+    "valuePropositions": ["Access to hard-to-book restaurants", "Last-minute availability", "Premium dining experiences"],
+    "exclusivity": "Curated restaurant selection creates perceived value",
+    "scarcity": "Real-time availability of limited tables"
+  },
+  "onboardingPatterns": {
+    "flow": "Download app → Browse restaurants → Book table",
+    "frictionReduction": "Minimal landing page pushes directly to app",
+    "personalization": "Location-based restaurant discovery"
+  },
+  "uniqueDesignPatterns": {
+    "minimalWeb": "Almost entirely app-first experience",
+    "heroImage": "Single hero image with 'Happiness' alt text",
+    "directCompetitor": "Most directly comparable to Reslot concept"
+  },
+  "appStorePresence": {
+    "primaryChannel": "App is the main product, web is minimal"
+  }
+}

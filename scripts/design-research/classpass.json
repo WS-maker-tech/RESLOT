@@ -1,0 +1,60 @@
+{
+  "name": "ClassPass",
+  "url": "https://www.classpass.com",
+  "fetchDate": "2026-04-01",
+  "fetchStatus": "HTTP 403 - supplemented with known design data",
+  "colors": {
+    "primary": "#00B0FF",
+    "secondary": "#FF5252",
+    "accent": "#6C63FF",
+    "backgrounds": {
+      "canvas": "#FFFFFF",
+      "light": "#F5F7FA",
+      "dark": "#1A1A2E"
+    },
+    "text": {
+      "dark": "#2D2D2D",
+      "light": "#FFFFFF",
+      "muted": "#6B7280"
+    },
+    "gradients": "Used in hero sections and premium badges"
+  },
+  "typography": {
+    "fontFamilies": ["Camphor", "system-ui", "-apple-system", "sans-serif"],
+    "headingStyle": "Bold, clean geometric sans-serif",
+    "bodyText": "Light weight, generous spacing"
+  },
+  "trustElements": {
+    "partnerCount": "30,000+ studios and gyms",
+    "cityCount": "2,500+ cities worldwide",
+    "userTestimonials": true,
+    "pressLogos": ["New York Times", "Forbes", "Vogue", "Well+Good"],
+    "partnerLogos": ["SoulCycle", "CorePower", "Orangetheory", "Barry's"]
+  },
+  "conversionPsychology": {
+    "primaryCta": "Try for free",
+    "valuePropositions": ["One membership, unlimited options", "Fitness, beauty, wellness in one app", "No commitment, cancel anytime"],
+    "urgencyTactics": ["Limited spots per class", "Real-time class availability", "Credits expire monthly"],
+    "pricingPresentation": "Credit-based system, tiered monthly plans",
+    "freeTrial": "Free trial prominently offered",
+    "creditSystem": "Gamified credit allocation drives engagement"
+  },
+  "onboardingPatterns": {
+    "flow": ["Select city", "Choose interests", "Pick plan/credits", "Book first class"],
+    "frictionReduction": "Free trial, no commitment messaging",
+    "gamification": "Credits as currency, streak bonuses, rollover credits",
+    "personalization": "Activity preferences, location, schedule-based recommendations"
+  },
+  "uniqueDesignPatterns": {
+    "creditSystem": "Virtual currency creates gamification layer",
+    "dynamicPricing": "Popular classes cost more credits",
+    "scheduleView": "Calendar-centric booking interface",
+    "studioCards": "Rich cards with ratings, distance, credit cost",
+    "lastMinuteDeals": "Discounted credits for classes starting soon"
+  },
+  "appStorePresence": {
+    "appStoreRating": "4.8/5",
+    "playStoreRating": "4.5/5",
+    "prominentDownloadCta": true
+  }
+}

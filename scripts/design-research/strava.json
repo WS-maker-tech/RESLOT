@@ -1,0 +1,56 @@
+{
+  "name": "Strava",
+  "url": "https://www.strava.com",
+  "fetchDate": "2026-04-01",
+  "colors": {
+    "primary": "#FC4C02",
+    "secondary": "#FFFFFF",
+    "accent": "#FC4C02",
+    "backgrounds": {
+      "canvas": "#FFFFFF",
+      "lightGray": "#F5F5F5"
+    },
+    "text": {
+      "dark": "#2D2D2D",
+      "light": "#FFFFFF"
+    },
+    "gradients": false
+  },
+  "typography": {
+    "fontFamilies": ["system-ui", "sans-serif"],
+    "headingStyle": "Bold, clean sans-serif",
+    "bodyText": "Standard weight, high readability"
+  },
+  "trustElements": {
+    "userCount": "100M+ active people",
+    "communityFocus": "Join over 100 million active people on Strava for free",
+    "brandAssociations": ["Nike", "Apple", "Google"],
+    "socialMedia": ["Facebook", "Twitter", "Instagram", "YouTube", "LinkedIn"]
+  },
+  "conversionPsychology": {
+    "primaryCta": "Join Us Now",
+    "ctaVariants": ["Join Us Now", "Sign Up With Google/Apple/Email", "Start free trial", "Subscribe now"],
+    "valuePropositions": ["Community-Powered Motivation", "Track your progress and cheer each other on", "A no BS network", "The ultimate athlete resource"],
+    "freemiumHook": "Free to join, optional subscription",
+    "urgencyTactics": "Limited-time trial offers",
+    "pricingPresentation": "Free tier prominent, subscription savings highlighted"
+  },
+  "onboardingPatterns": {
+    "entryPoints": ["Google auth", "Apple auth", "Email registration"],
+    "frictionReduction": "Multi-auth options reduce form friction",
+    "gamification": ["Segments", "Leaderboards", "Challenges", "Local Legend achievements"],
+    "personalization": "Activity type selection (Running, Cycling, Walking, Hiking)"
+  },
+  "uniqueDesignPatterns": {
+    "activityFeed": "Social network centered on athletic activities",
+    "segmentLeaderboards": "Competitive comparison on real-world courses",
+    "localLegend": "Recognition for frequent segment participation",
+    "beacon": "Real-time location sharing for safety",
+    "relativeEffort": "Proprietary performance comparison metric",
+    "privateZones": "Location privacy at start/end points"
+  },
+  "appStorePresence": {
+    "platforms": ["iPhone (App Store)", "Android (Google Play)", "Web"],
+    "downloadCta": "Download buttons for both stores"
+  }
+}

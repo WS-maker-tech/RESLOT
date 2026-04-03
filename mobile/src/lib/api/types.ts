@@ -11,12 +11,12 @@ export interface Restaurant {
   priceLevel: number;
   image: string;
   description: string;
-  tags: string; // JSON string array
+  tags: string;
   timesBookedOnReslot: number;
   seatType: string;
   instagram: string | null;
   website: string | null;
-  vibeTags: string; // JSON string array of {label, count}
+  vibeTags: string;
   goodForTags: string;
   foodTags: string;
   latitude: number | null;
@@ -38,11 +38,17 @@ export interface Reservation {
   partySize: number;
   seatType: string;
   nameOnReservation: string;
-  status: "active" | "claimed" | "expired" | "cancelled";
+  status: "active" | "claimed" | "grace_period" | "completed" | "expired" | "cancelled";
   claimerPhone: string | null;
   cancelFee: number | null;
   prepaidAmount: number | null;
   verificationLink: string | null;
+  extraInfo: string | null;
+  cancellationWindowHours: number | null;
+  claimedAt: string | null;
+  gracePeriodEndsAt: string | null;
+  creditStatus: "none" | "pending" | "awarded" | "reverted";
+  serviceFee: number;
   createdAt: string;
   updatedAt: string;
   restaurant: Restaurant;
@@ -55,8 +61,12 @@ export interface UserProfile {
   lastName: string;
   email: string;
   avatar: string | null;
-  tokens: number;
+  credits: number;
   selectedCity: string;
+  dateOfBirth: string | null;
+  emailVerified: boolean;
+  phoneVerified: boolean;
+  referralCode: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -64,7 +74,7 @@ export interface UserProfile {
 export interface ActivityAlert {
   id: string;
   userPhone: string;
-  type: "drop" | "claim" | "token" | "premium";
+  type: "drop" | "claim" | "credit" | "premium";
   title: string;
   message: string;
   read: boolean;
@@ -81,24 +91,38 @@ export interface RestaurantAlertWithRestaurant {
   restaurant: Restaurant;
 }
 
+export interface Watch {
+  id: string;
+  userPhone: string;
+  restaurantId: string | null;
+  date: string | null;
+  partySize: number | null;
+  notes: string | null;
+  createdAt: string;
+  restaurant: Restaurant | null;
+}
+
+export interface MissedReservation extends Reservation {
+  timeToClaim: number | null;
+}
+
+export interface SavedRestaurant {
+  id: string;
+  userPhone: string;
+  restaurantId: string;
+  restaurant: Restaurant;
+  createdAt: string;
+}
+
 export interface TagWithCount {
   label: string;
   count: number;
 }
 
-// Helper to parse JSON string fields
 export function parseTags(jsonStr: string): string[] {
-  try {
-    return JSON.parse(jsonStr);
-  } catch {
-    return [];
-  }
+  try { return JSON.parse(jsonStr); } catch { return []; }
 }
 
 export function parseTagsWithCount(jsonStr: string): TagWithCount[] {
-  try {
-    return JSON.parse(jsonStr);
-  } catch {
-    return [];
-  }
+  try { return JSON.parse(jsonStr); } catch { return []; }
 }

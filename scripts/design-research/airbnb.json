@@ -1,0 +1,87 @@
+{
+  "name": "Airbnb",
+  "url": "https://www.airbnb.com",
+  "fetchDate": "2026-04-01",
+  "colors": {
+    "primary": {
+      "rausch": "#FF385C",
+      "rauschProduct": "#E00B41"
+    },
+    "premium": {
+      "plus": "#92174D",
+      "luxe": "#460479"
+    },
+    "neutrals": {
+      "black": "#000000",
+      "darkGrey": "#222222",
+      "mediumGrey": "#6A6A6A",
+      "lightGrey": "#B0B0B0",
+      "extraLight": "#DDDDDD",
+      "nearWhite": "#F7F7F7",
+      "white": "#FFFFFF"
+    },
+    "semantic": {
+      "error": "#C13515",
+      "warning": "#E07912",
+      "success": "#008A05",
+      "info": "#428BFF"
+    },
+    "gradients": {
+      "rausch": "linear-gradient(to right, #E61E4D 0%, #E31C5F 50%, #D70466 100%)",
+      "plus": "linear-gradient(to right, #BD1E59 0%, #92174D 50%, #861453 100%)",
+      "luxe": "linear-gradient(to right, #59086E 0%, #460479 50%, #440589 100%)"
+    }
+  },
+  "typography": {
+    "fontFamily": "Airbnb Cereal VF, Circular, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, sans-serif",
+    "fontWeights": { "thin": 100, "light": 300, "book": 400, "medium": 500, "semibold": 600, "bold": 700, "black": 900 },
+    "displaySizes": {
+      "medium40": { "size": "2.5rem", "lineHeight": "2.75rem", "weight": 600 },
+      "medium48": { "size": "3rem", "lineHeight": "3.375rem", "weight": 600 },
+      "medium60": { "size": "3.75rem", "lineHeight": "4.25rem", "weight": 600 }
+    },
+    "headingSizes": {
+      "title32": { "size": "2rem", "lineHeight": "2.25rem", "weight": 600 },
+      "title22": { "size": "1.375rem", "lineHeight": "1.625rem", "weight": 600 },
+      "title18": { "size": "1.125rem", "lineHeight": "1.5rem", "weight": 600 }
+    },
+    "bodySizes": {
+      "large": { "size": "1.125rem", "lineHeight": "1.75rem" },
+      "regular": { "size": "1rem", "lineHeight": "1.375rem" },
+      "small": { "size": "0.875rem", "lineHeight": "1.125rem" }
+    }
+  },
+  "trustElements": {
+    "note": "Trust built through platform mechanics (reviews, verified hosts) rather than landing page badges"
+  },
+  "conversionPsychology": {
+    "primaryCta": "Become a host",
+    "searchFirst": "Search-dominant pattern — location, dates, guests",
+    "valueProposition": "Browse vacation rentals, cabins, beach houses, unique stays"
+  },
+  "onboardingPatterns": {
+    "entryPoint": "Log in or sign up in header",
+    "progressiveDisclosure": "Search expands: location → dates → guest count",
+    "personalization": "Locale and language detection",
+    "frictionReduction": "Pre-filled country data, streamlined navigation"
+  },
+  "uniqueDesignPatterns": {
+    "animations": {
+      "springCurves": "Configurable durations (451-762ms)",
+      "standardCurve": "cubic-bezier(0.2, 0, 0, 1)",
+      "enterCurve": "cubic-bezier(0.1, 0.9, 0.2, 1)"
+    },
+    "microInteractions": "Multi-layer shadow effects, active state transforms (0.1s)",
+    "navigation": "Hierarchical header with search prominence",
+    "designTokens": "150+ CSS custom properties"
+  },
+  "appStorePresence": {
+    "note": "Not visible on landing page, deep-linked from app"
+  },
+  "technical": {
+    "errorTracking": "Bugsnag",
+    "performanceMetrics": ["FID", "LCP", "INP"],
+    "analytics": "Google Tag Manager",
+    "accessibility": "Skip-to-content, ARIA patterns, focus-visible states"
+  }
+}

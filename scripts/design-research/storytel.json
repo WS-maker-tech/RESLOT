@@ -1,0 +1,61 @@
+{
+  "name": "Storytel",
+  "url": "https://www.storytel.com/se",
+  "fetchDate": "2026-04-01",
+  "colors": {
+    "primary": "Dark/brand-specific (custom palette)",
+    "secondary": "#FFFFFF",
+    "backgrounds": {
+      "canvas": "#FFFFFF",
+      "dark": "Brand dark"
+    },
+    "text": {
+      "dark": "Dark gray/black",
+      "light": "#FFFFFF"
+    },
+    "ctaButtons": "Inverted styling (dark background)"
+  },
+  "typography": {
+    "fontFamilies": ["Storytel Euclid"],
+    "weights": [300, 400, 500, 600],
+    "weightMapping": { "300": "Light", "400": "Regular", "500": "Medium", "600": "Semibold" },
+    "multilingualSupport": ["Latin", "Cyrillic", "Korean (Gothic A1)", "Thai (Bai Jamjuree)", "Arabic (Tajawal)", "Hebrew (Arimo)"]
+  },
+  "trustElements": {
+    "catalogSize": "1 miljon stories",
+    "languageCount": 10,
+    "contentUpdates": "Exklusiva nyheter varje vecka",
+    "ratings": "4.0-4.7 star scale on individual titles",
+    "awards": "Storytel Awards: Thriller, Children, Young Adult, Non-fiction, Feel-good, Fiction",
+    "kidsMode": "Barnsäker miljö (child-safe environment)",
+    "corporate": "Investor relations, sustainability, whistleblowing portal"
+  },
+  "conversionPsychology": {
+    "primaryCta": "Starta erbjudandet (Start offer)",
+    "secondaryCta": "Prova nu (Try now)",
+    "pricingStrategy": "Tiered: Premium (most popular), Unlimited, Family, Flex",
+    "urgencyTactics": "Halva priset – från 49.50 kr/månad (50% off)",
+    "studentHook": "50% student discount, lifetime",
+    "promotionalPricing": "50% for 2 months on Premium",
+    "cancelAnytime": "Avsluta när du vill",
+    "campaignCodes": "Support for promo codes"
+  },
+  "onboardingPatterns": {
+    "entryPoints": ["Navbar login", "Hero CTA", "Pricing section CTA"],
+    "progressiveDisclosure": "Price plans shown before commitment with feature comparisons",
+    "personalization": "Kids Mode selection post-signup",
+    "frictionReduction": "Cancel anytime messaging prominent"
+  },
+  "uniqueDesignPatterns": {
+    "carouselNavigation": "Horizontal scrolling book carousels with 'Visa alla' expansion",
+    "bookPreview": "Provlyssna (preview listening) feature",
+    "curatedLists": ["Most listened now", "Most awaited", "All-time popular", "First picks"],
+    "ratingSystem": "Star ratings with audiobook/ebook format icons",
+    "languageSwitcher": "Country-specific URLs in footer"
+  },
+  "appStorePresence": {
+    "ios": "iTunes (ID 348177651)",
+    "android": "Google Play",
+    "features": "Offline listening, library management, Kids Mode"
+  }
+}
