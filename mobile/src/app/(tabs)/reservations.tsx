@@ -614,12 +614,12 @@ export default function ReservationsScreen() {
   const handleCancel = useCallback(
     (reservationId: string) => {
       Alert.alert(
-        "Avbryt bokning?",
+        "Lämna bordet?",
         "Är du säker? Detta kan inte ångras.",
         [
           { text: "Behåll", style: "cancel" },
           {
-            text: "Avbryt bokning",
+            text: "Lämna bordet",
             style: "destructive",
             onPress: async () => {
               try {
@@ -639,8 +639,8 @@ export default function ReservationsScreen() {
   if (isGuest) {
     return (
       <LoginGate
-        title="Dina bokningar"
-        subtitle="Logga in för att se och hantera dina upplagda och övertagna bokningar."
+        title="Dina bord"
+        subtitle="Logga in för att se dina bord."
       />
     );
   }

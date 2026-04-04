@@ -1528,7 +1528,7 @@ export default function HomeScreen() {
                     lineHeight: 22,
                   }}
                 >
-                  Nya bokningar dyker upp hela tiden.{"\n"}Bevaka en restaurang så pingar vi dig!
+                  Inga bord just nu.{"\n"}Sätt en bevakning — vi hör av oss direkt.
                 </Text>
               </Animated.View>
 

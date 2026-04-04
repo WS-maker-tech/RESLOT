@@ -29,7 +29,7 @@ export default function InviteScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     Share.share({
       message: `Prova Reslot — ta över restaurangbokningar i sista minuten! Använd min kod ${referralCode} när du registrerar dig så får vi båda 1 credit.`,
-      title: "Prova Reslot",
+      title: "Snappa ett bord",
     }).catch(() => {});
   };
 
@@ -81,9 +81,9 @@ export default function InviteScreen() {
         <Animated.View entering={FadeInDown.delay(160).springify()} style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.lg, padding: SPACING.md, marginTop: SPACING.lg, borderWidth: 0.5, borderColor: C.divider, gap: 10 }}>
           <Text style={{ fontFamily: FONTS.displayBold, fontSize: 15, color: C.textPrimary, marginBottom: 6, letterSpacing: -0.3 }}>Hur det fungerar</Text>
           {[
-            "Din vän registrerar sig på Reslot",
+            "Din vän skapar ett konto",
             "Din vän anger din inbjudningskod",
-            "Ni får båda 1 Reslot credit",
+            "Ni får vardera 1 credit",
           ].map((step, i) => (
             <View key={i} style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
               <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: C.coralLight, alignItems: "center", justifyContent: "center" }}>

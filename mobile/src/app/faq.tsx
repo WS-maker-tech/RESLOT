@@ -19,11 +19,11 @@ if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental
 const FAQ_ITEMS = [
   {
     q: "Hur fungerar Reslot?",
-    a: "Reslot är en marknadsplats där användare delar restaurangbokningar de själva inte kan använda. Du kan ta över en bokning med Reslot credits. Vi samarbetar inte med restauranger och hanterar inte bokningar själva, allt delas mellan användare i appen.",
+    a: "Reslot låter dig ta över restaurangbokningar från andra som inte kan gå. Inget samarbete med restauranger — allt sker direkt mellan användare.",
   },
   {
     q: "Vad är Reslot credits?",
-    a: "Credits är det du använder för att ta över en bokning. Du kan få credits genom att lägga upp bokningar, bjuda in vänner eller köpa dem i appen.",
+    a: "Credits är din valuta i Reslot. Lägg upp ett bord, bjud in en vän eller köp credits — sedan snappas bord.",
   },
   {
     q: "När betalar jag något?",
@@ -47,7 +47,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Hur får jag fler credits?",
-    a: "Du kan få credits genom att lägga upp en bokning, bjuda in en vän eller köpa fler i appen.",
+    a: "Lägg upp ett bord (+2), bjud in en vän (+1) eller köp direkt i appen.",
   },
 ];
 

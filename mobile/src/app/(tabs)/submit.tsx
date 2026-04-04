@@ -483,7 +483,7 @@ export default function SubmitScreen() {
                   paddingHorizontal: 16,
                 }}
               >
-                {selectedRestaurant?.name} är nu listad på Reslot.{"\n"}Du tjänar 2 credits när någon tar över den.
+                {selectedRestaurant?.name} är uppe.{"\n"}Du får 2 credits när någon tar bordet.
               </Text>
               <Pressable
                 testID="submit-another-button"

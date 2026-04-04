@@ -460,7 +460,7 @@ function SplashStep({ onGetStarted, onExplore }: { onGetStarted: () => void; onE
               lineHeight: 35,
             }}
           >
-            Din genväg till{"\n"}fullbokade restauranger
+            Bord som andra{"\n"}inte kan ta
           </Text>
           <Text
             style={{
@@ -471,7 +471,7 @@ function SplashStep({ onGetStarted, onExplore }: { onGetStarted: () => void; onE
               lineHeight: 23,
             }}
           >
-            Ta över bokningar andra inte kan gå på.{"\n"}Dela dina och tjäna credits.
+            Någon kan inte gå på Frantzén.{"\n"}Nu kan du.
           </Text>
         </Animated.View>
       </View>
@@ -483,7 +483,7 @@ function SplashStep({ onGetStarted, onExplore }: { onGetStarted: () => void; onE
       >
         <PrimaryButton
           testID="get-started-btn"
-          label="Kom igång"
+          label="Visa mig borden"
           onPress={onGetStarted}
           icon={<ArrowRight size={18} color="#111827" strokeWidth={2.5} />}
         />
@@ -540,7 +540,7 @@ function PhoneStep({
               lineHeight: 36,
             }}
           >
-            Logga in eller{"\n"}skapa konto
+            Ditt nummer —{"\n"}det räcker
           </Text>
           <Text
             style={{
@@ -1253,8 +1253,8 @@ function CreditsIntroStep({ onContinue, onBack }: { onContinue: () => void; onBa
       icon: Upload,
       iconBg: C.coralLight,
       iconColor: C.orange,
-      title: "Dela din bokning",
-      subtitle: "T.ex. Frantzén kl 20:00 → lägg upp på Reslot",
+      title: "Ledigtt bord? Lägg upp det.",
+      subtitle: "Tar 30 sekunder. Borden hittar nya ägare.",
       badge: "+2 credits",
       badgeBg: C.successLight,
       badgeColor: C.success,
@@ -1264,8 +1264,8 @@ function CreditsIntroStep({ onContinue, onBack }: { onContinue: () => void; onBa
       icon: Coins,
       iconBg: "rgba(201,169,110,0.12)",
       iconColor: C.gold,
-      title: "Tjäna credits",
-      subtitle: "Någon tar över ditt Frantzén-bord → +2 credits",
+      title: "Du tjänar — de vinner",
+      subtitle: "Någon tar ditt bord. Du får 2 credits. Alla glada.",
       badge: null as string | null,
       badgeBg: undefined as string | undefined,
       badgeColor: undefined as string | undefined,
@@ -1275,8 +1275,8 @@ function CreditsIntroStep({ onContinue, onBack }: { onContinue: () => void; onBa
       icon: ArrowDownLeft,
       iconBg: C.successLight,
       iconColor: C.success,
-      title: "Ta över en bokning",
-      subtitle: "Använd credits → ta över bord på Ekstedt",
+      title: "Snappa ett bord",
+      subtitle: "Använd dina credits. Ta bordet. Njut av kvällen.",
       badge: "−2 credits",
       badgeBg: C.coralLight,
       badgeColor: C.orange,
@@ -1476,7 +1476,7 @@ function CreditsIntroStep({ onContinue, onBack }: { onContinue: () => void; onBa
         </Pressable>
         <PrimaryButton
           testID="credits-intro-continue-btn"
-          label="Jag förstår — fortsätt"
+          label="Fattat — kör!"
           onPress={onContinue}
         />
       </Animated.View>
@@ -1719,7 +1719,7 @@ function WelcomeStep({ onContinue, firstName, cityName }: { onContinue: () => vo
             lineHeight: 24,
           }}
         >
-          Ditt konto är redo. Börja utforska{"\n"}bokningar i din stad.
+          Du är inne.{"\n"}Borden väntar.
         </Text>
       </Animated.View>
 
@@ -1771,7 +1771,7 @@ function WelcomeStep({ onContinue, firstName, cityName }: { onContinue: () => vo
       <Animated.View entering={enterFromBottom(420)} style={{ width: "100%", paddingBottom: 16 }}>
         <PrimaryButton
           testID="welcome-continue-btn"
-          label="Utforska appen"
+          label="Visa mig borden"
           onPress={onContinue}
           icon={<ArrowRight size={18} color="#111827" strokeWidth={2.5} />}
         />

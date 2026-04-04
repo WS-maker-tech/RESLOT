@@ -255,7 +255,7 @@ export default function ProfileScreen() {
     return (
       <LoginGate
         title="Din profil"
-        subtitle="Logga in för att se din profil, dina credits och dina inställningar."
+        subtitle="Logga in för att se din profil."
       />
     );
   }
