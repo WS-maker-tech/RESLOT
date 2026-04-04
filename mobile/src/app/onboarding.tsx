@@ -1837,9 +1837,10 @@ export default function OnboardingScreen() {
     setVerifyingOtp(true);
     setOtpError(null);
     try {
-      // DEV BYPASS: accept any code (remove before production)
+      // DEV BYPASS: accept any code, set dev token (remove before production)
       if (code === code) { // always true in dev
         useAuthStore.getState().setPhoneNumber(storedPhone);
+        useAuthStore.getState().setSessionToken(`dev:${storedPhone}`);
         return true;
       }
       const { data, error } = await supabase.auth.verifyOtp({

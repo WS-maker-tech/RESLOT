@@ -19,6 +19,23 @@ export const authMiddleware = createMiddleware<{
 
   const token = authHeader.slice(7);
 
+  // DEV BYPASS: acceptera dev-token på format "dev:+46XXXXXXXXX"
+  if (token.startsWith("dev:")) {
+    const phone = token.slice(4);
+    if (phone) {
+      const existing = await db.userProfile.findUnique({ where: { phone } });
+      if (!existing) {
+        await db.userProfile.create({
+          data: { phone, firstName: "", lastName: "", email: "", phoneVerified: true, credits: 2 },
+        });
+      }
+      c.set("userPhone", phone);
+      c.set("supabaseUserId", phone);
+      await next();
+      return;
+    }
+  }
+
   // Verify the Supabase JWT and get the user
   const {
     data: { user },
