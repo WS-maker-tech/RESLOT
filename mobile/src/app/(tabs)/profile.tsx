@@ -717,7 +717,11 @@ export default function ProfileScreen() {
                         {idx > 0 ? <View style={{ height: 0.5, backgroundColor: C.divider, marginLeft: 54 }} /> : null}
                         <View style={{ flexDirection: "row", alignItems: "center", padding: 14, gap: 12 }}>
                           <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: isSubmitter ? C.coralLight : C.successLight, alignItems: "center", justifyContent: "center" }}>
-                            <Text style={{ fontSize: 14 }}>{isSubmitter ? "📤" : "📥"}</Text>
+                            <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: isSubmitter ? "rgba(255,107,107,0.12)" : "rgba(126,200,122,0.12)", alignItems: "center", justifyContent: "center" }}>
+                              {isSubmitter
+                                ? <ArrowUpRight size={12} color="#FF6B6B" strokeWidth={2.5} />
+                                : <ArrowDownLeft size={12} color="#7EC87A" strokeWidth={2.5} />}
+                            </View>
                           </View>
                           <View style={{ flex: 1 }}>
                             <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.textPrimary }} numberOfLines={1}>

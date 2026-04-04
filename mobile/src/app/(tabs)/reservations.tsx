@@ -23,7 +23,7 @@ import {
   Check,
   X,
   Send,
-} from "lucide-react-native";
+, UtensilsCrossed } from "lucide-react-native";
 import { useAuthStore } from "@/lib/auth-store";
 import { LoginGate } from "@/components/LoginGate";
 import { useMyReservations, useCancelReservation, useSubmitFeedback } from "@/lib/api/hooks";
@@ -734,7 +734,7 @@ export default function ReservationsScreen() {
               {claimedReservations.length === 0 ? (
                 <Animated.View entering={FadeInDown.delay(100).springify()} style={{ paddingHorizontal: SPACING.lg, paddingVertical: 32, alignItems: "center" }}>
                   <Animated.View entering={ZoomIn.springify().delay(150)} style={{ width: 64, height: 64, borderRadius: 20, backgroundColor: C.successLight, alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
-                    <Text style={{ fontSize: 28 }}>🍽️</Text>
+                    <UtensilsCrossed size={28} color={C.grayLight} strokeWidth={1.5} />
                   </Animated.View>
                   <Animated.View entering={FadeInDown.delay(200).springify()}>
                     <Text style={{ fontFamily: FONTS.displayBold, fontSize: 17, color: C.textPrimary, textAlign: "center", letterSpacing: -0.2 }}>Hitta ditt nästa bord</Text>

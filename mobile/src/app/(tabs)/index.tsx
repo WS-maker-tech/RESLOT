@@ -30,7 +30,7 @@ import {
   Sparkles,
   Star,
   MapPin,
-} from "lucide-react-native";
+, UtensilsCrossed } from "lucide-react-native";
 import Animated, {
   FadeInDown,
   ZoomIn,
@@ -1502,7 +1502,7 @@ export default function HomeScreen() {
                   marginBottom: 24,
                 }}
               >
-                <Text style={{ fontSize: 38 }}>🍽️</Text>
+                <UtensilsCrossed size={38} color={C.grayLight} strokeWidth={1.5} />
               </Animated.View>
               <Animated.View entering={FadeInDown.delay(220).springify()}>
                 <Text

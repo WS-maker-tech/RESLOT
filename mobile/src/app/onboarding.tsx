@@ -1545,28 +1545,45 @@ function AnimatedCoinIcon() {
   );
 }
 
-// ── Floating celebration particle ──
-function FloatingParticle({ emoji, delay: d, startX, startY }: { emoji: string; delay: number; startX: number; startY: number }) {
+// ── Floating celebration particle (geometric, no emoji) ──
+const PARTICLE_SHAPES = [
+  { shape: "circle", color: "#7EC87A" },
+  { shape: "square", color: "#FF6B6B" },
+  { shape: "circle", color: "#111827" },
+  { shape: "square", color: "#7EC87A" },
+  { shape: "circle", color: "#FF6B6B" },
+];
+function FloatingParticle({ index, delay: d, startX, startY }: { index: number; delay: number; startX: number; startY: number }) {
   const tY = useSharedValue(0);
   const tX = useSharedValue(0);
   const op = useSharedValue(0);
-  const pSc = useSharedValue(0.6);
+  const pSc = useSharedValue(0.4);
+  const rot = useSharedValue(0);
+  const { shape, color } = PARTICLE_SHAPES[index % PARTICLE_SHAPES.length];
   useEffect(() => {
     const driftX = (Math.random() - 0.5) * 40;
     op.value = withDelay(d, withSequence(
       withTiming(1, { duration: 300, easing: Easing.out(Easing.quad) }),
       withDelay(800, withTiming(0, { duration: 600, easing: Easing.in(Easing.quad) }))
     ));
-    tY.value = withDelay(d, withTiming(-60 - Math.random() * 40, { duration: 1700, easing: Easing.out(Easing.quad) }));
+    tY.value = withDelay(d, withTiming(-70 - Math.random() * 40, { duration: 1700, easing: Easing.out(Easing.quad) }));
     tX.value = withDelay(d, withTiming(driftX, { duration: 1700, easing: Easing.out(Easing.quad) }));
     pSc.value = withDelay(d, withSpring(1, { damping: 8, stiffness: 120 }));
+    rot.value = withDelay(d, withTiming(shape === "square" ? 45 : 0, { duration: 1700 }));
   }, []);
   const pStyle = useAnimatedStyle(() => ({
     position: "absolute" as const, left: startX, top: startY,
-    transform: [{ translateY: tY.value }, { translateX: tX.value }, { scale: pSc.value }],
+    transform: [{ translateY: tY.value }, { translateX: tX.value }, { scale: pSc.value }, { rotate: `${rot.value}deg` }],
     opacity: op.value,
   }));
-  return <Animated.View style={pStyle}><Text style={{ fontSize: 20 }}>{emoji}</Text></Animated.View>;
+  const size = 8 + (index % 3) * 3;
+  return (
+    <Animated.View style={[pStyle, {
+      width: size, height: size,
+      borderRadius: shape === "circle" ? size / 2 : 2,
+      backgroundColor: color,
+    }]} />
+  );
 }
 
 function SocialProofCounter({ cityName }: { cityName: string }) {
@@ -1631,11 +1648,11 @@ function WelcomeStep({ onContinue, firstName, cityName }: { onContinue: () => vo
   }));
 
   const particles = [
-    { emoji: "✨", delay: 200, startX: -30, startY: -20 },
-    { emoji: "🎊", delay: 350, startX: 50, startY: -10 },
-    { emoji: "⭐", delay: 500, startX: -40, startY: 30 },
-    { emoji: "✨", delay: 450, startX: 60, startY: 20 },
-    { emoji: "🎉", delay: 300, startX: 10, startY: -30 },
+    { index: 0, delay: 200, startX: -30, startY: -20 },
+    { index: 1, delay: 350, startX: 50, startY: -10 },
+    { index: 2, delay: 500, startX: -40, startY: 30 },
+    { index: 3, delay: 450, startX: 60, startY: 20 },
+    { index: 4, delay: 300, startX: 10, startY: -30 },
   ];
 
   return (
@@ -1667,7 +1684,9 @@ function WelcomeStep({ onContinue, firstName, cityName }: { onContinue: () => vo
                   justifyContent: "center",
                 }}
               >
-                <Text style={{ fontSize: 42 }}>🎉</Text>
+                <View style={{ width: 42, height: 42, borderRadius: 21, backgroundColor: C.pistachio, alignItems: "center", justifyContent: "center" }}>
+                  <Check size={22} color={C.dark} strokeWidth={2.5} />
+                </View>
               </View>
             </View>
           </Animated.View>

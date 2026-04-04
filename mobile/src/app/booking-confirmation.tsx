@@ -579,7 +579,7 @@ export default function BookingConfirmationScreen() {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                       try {
                         await Share.share({
-                          message: `Jag har bokat bord på ${restaurant.name} den ${formatDate(reservation.reservationDate)} kl ${formatTime(reservation.reservationTime)}! 🍽️`,
+                          message: `Jag har bokat bord på ${restaurant.name} den ${formatDate(reservation.reservationDate)} kl ${formatTime(reservation.reservationTime)}!`,
                         });
                       } catch {}
                     }}
