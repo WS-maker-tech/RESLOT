@@ -103,12 +103,14 @@ export const RestaurantInfo = React.memo(function RestaurantInfo({
         {website ? (
           <Pressable
             testID="website-link"
-            accessibilityLabel="Öppna webbsida"
+            accessibilityLabel="Besök hemsida"
             onPress={onOpenWebsite}
-            style={({ pressed }) => [styles.link, { opacity: pressed ? 0.6 : 1 }]}
+            style={({ pressed }) => [styles.pillLink, { opacity: pressed ? 0.7 : 1 }]}
           >
-            <Globe size={14} color={C.textTertiary} strokeWidth={2} />
-            <Text style={styles.linkText}>Webbsida</Text>
+            <Globe size={13} color={C.textSecondary} strokeWidth={2} />
+            <Text style={styles.pillLinkText}>
+              {website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}
+            </Text>
           </Pressable>
         ) : null}
         {instagram ? (
@@ -116,10 +118,10 @@ export const RestaurantInfo = React.memo(function RestaurantInfo({
             testID="instagram-link"
             accessibilityLabel="Öppna Instagram"
             onPress={onOpenInstagram}
-            style={({ pressed }) => [styles.link, { opacity: pressed ? 0.6 : 1 }]}
+            style={({ pressed }) => [styles.pillLink, { opacity: pressed ? 0.7 : 1 }]}
           >
-            <Instagram size={14} color={C.textTertiary} strokeWidth={2} />
-            <Text style={styles.linkText}>@{instagram}</Text>
+            <Instagram size={13} color={C.textSecondary} strokeWidth={2} />
+            <Text style={styles.pillLinkText}>@{instagram}</Text>
           </Pressable>
         ) : null}
       </View>
@@ -225,12 +227,16 @@ const styles = StyleSheet.create({
     gap: 12,
     marginTop: 14,
   },
-  link: {
+  pillLink: {
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
+    backgroundColor: "rgba(0,0,0,0.04)",
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
   },
-  linkText: {
+  pillLinkText: {
     fontFamily: FONTS.medium,
     fontSize: 12,
     color: C.textSecondary,

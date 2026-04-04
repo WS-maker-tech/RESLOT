@@ -14,7 +14,8 @@ import {
 } from "react-native";
 import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter, Stack } from "expo-router";
+import Head from "expo-router/head";
 import {
   Star,
   Clock,
@@ -35,6 +36,7 @@ import {
   Flag,
   X,
   AlertTriangle,
+  ChevronRight,
 } from "lucide-react-native";
 import Animated, {
   FadeInDown,
@@ -54,6 +56,7 @@ import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   useReservation,
+  useReservations,
   useClaimReservation,
   useCancelClaim,
   useProfile,
@@ -697,6 +700,18 @@ export default function RestaurantDetailScreen() {
   const userCredits = profile?.credits ?? 0;
   const hasEnoughCredits = userCredits >= 2;
 
+  // Fetch other reservations in same neighborhood for internal linking
+  const neighborhood = reservation?.restaurant?.neighborhood;
+  const { data: neighborhoodReservations } = useReservations({
+    neighborhood: neighborhood ?? undefined,
+  });
+  const otherReservations = useMemo(() => {
+    if (!neighborhoodReservations || !reservation) return [];
+    return neighborhoodReservations
+      .filter((res) => res.id !== reservation.id && res.status === "active")
+      .slice(0, 3);
+  }, [neighborhoodReservations, reservation]);
+
   // These useMemo hooks MUST be before any early returns to satisfy Rules of Hooks
   const restaurant = reservation?.restaurant;
   const tags = useMemo(() => parseTags(restaurant?.tags ?? "[]"), [restaurant?.tags]);
@@ -953,6 +968,22 @@ export default function RestaurantDetailScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>
+      {/* Meta / screen title for SEO + web */}
+      <Stack.Screen
+        options={{
+          title: `${r.name} — Reslot`,
+          headerShown: false,
+        }}
+      />
+      {Platform.OS === "web" ? (
+        <Head>
+          <title>{r.name} — Reslot</title>
+          <meta property="og:title" content={`${r.name} — Reslot`} />
+          {r.description ? <meta property="og:description" content={r.description} /> : null}
+          {r.image ? <meta property="og:image" content={r.image} /> : null}
+        </Head>
+      ) : null}
+
       {/* Success confetti overlay */}
       <SuccessOverlay
         visible={showSuccessAnim}
@@ -1239,22 +1270,28 @@ export default function RestaurantDetailScreen() {
             </View>
           ) : null}
 
-          {/* Links */}
-          <View style={{ flexDirection: "row", gap: 12, marginTop: 14 }}>
+          {/* Links — pill style */}
+          <View style={{ flexDirection: "row", gap: 8, marginTop: 14, flexWrap: "wrap" }}>
             {r.website ? (
               <Pressable
                 testID="website-link"
-                accessibilityLabel="Öppna webbsida"
+                accessibilityLabel="Besök hemsida"
                 onPress={handleOpenWebsite}
                 style={({ pressed }) => ({
                   flexDirection: "row",
                   alignItems: "center",
                   gap: 5,
-                  opacity: pressed ? 0.6 : 1,
+                  backgroundColor: "rgba(0,0,0,0.04)",
+                  borderRadius: 20,
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                  opacity: pressed ? 0.7 : 1,
                 })}
               >
-                <Globe size={14} color={C.textTertiary} strokeWidth={2} />
-                <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.textSecondary }}>Webbsida</Text>
+                <Globe size={13} color={C.textSecondary} strokeWidth={2} />
+                <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.textSecondary }}>
+                  {r.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}
+                </Text>
               </Pressable>
             ) : null}
             {r.instagram ? (
@@ -1266,10 +1303,14 @@ export default function RestaurantDetailScreen() {
                   flexDirection: "row",
                   alignItems: "center",
                   gap: 5,
-                  opacity: pressed ? 0.6 : 1,
+                  backgroundColor: "rgba(0,0,0,0.04)",
+                  borderRadius: 20,
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                  opacity: pressed ? 0.7 : 1,
                 })}
               >
-                <Instagram size={14} color={C.textTertiary} strokeWidth={2} />
+                <Instagram size={13} color={C.textSecondary} strokeWidth={2} />
                 <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.textSecondary }}>@{r.instagram}</Text>
               </Pressable>
             ) : null}
@@ -1748,6 +1789,56 @@ export default function RestaurantDetailScreen() {
                 Rapportera problem
               </Text>
             </Pressable>
+          </Animated.View>
+        ) : null}
+
+        {/* Internal linking — other reservations in same neighborhood */}
+        {otherReservations.length > 0 && neighborhood ? (
+          <Animated.View
+            entering={FadeInDown.delay(420).springify()}
+            style={{ paddingHorizontal: SPACING.lg, paddingTop: 28, paddingBottom: 24 }}
+          >
+            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+              <Text style={{ fontFamily: FONTS.displayBold, fontSize: 17, color: C.textPrimary, letterSpacing: -0.3 }}>
+                Andra bord i {neighborhood}
+              </Text>
+              <ChevronRight size={18} color={C.textTertiary} strokeWidth={2} />
+            </View>
+            {otherReservations.map((res) => (
+              <Pressable
+                key={res.id}
+                testID={`neighborhood-reservation-${res.id}`}
+                accessibilityLabel={`Visa ${res.restaurant.name}`}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  router.push(`/restaurant/${res.id}`);
+                }}
+                style={({ pressed }) => ({
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 12,
+                  paddingVertical: 10,
+                  opacity: pressed ? 0.7 : 1,
+                  borderBottomWidth: 0.5,
+                  borderBottomColor: C.divider,
+                })}
+              >
+                <Image
+                  source={{ uri: res.restaurant.image }}
+                  style={{ width: 48, height: 48, borderRadius: RADIUS.md }}
+                  contentFit="cover"
+                />
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.textPrimary, letterSpacing: -0.2 }} numberOfLines={1}>
+                    {res.restaurant.name}
+                  </Text>
+                  <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textSecondary, marginTop: 2 }}>
+                    {formatReservationDate(res.reservationDate)} kl {res.reservationTime.substring(0, 5)} · {res.partySize} pers
+                  </Text>
+                </View>
+                <ChevronRight size={16} color={C.textTertiary} strokeWidth={2} />
+              </Pressable>
+            ))}
           </Animated.View>
         ) : null}
       </Animated.ScrollView>
