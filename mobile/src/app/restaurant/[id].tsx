@@ -675,7 +675,7 @@ export default function RestaurantDetailScreen() {
 
   // Parallax hero
   const heroStyle = useAnimatedStyle(() => {
-    const translateY = interpolate(scrollY.value, [-100, 0, HERO_HEIGHT], [-50, 0, 80], Extrapolation.CLAMP);
+    const translateY = interpolate(scrollY.value, [0, 200], [0, -60], Extrapolation.CLAMP);
     const scale = interpolate(scrollY.value, [-100, 0], [1.2, 1], Extrapolation.CLAMP);
     return { transform: [{ translateY }, { scale }] };
   });
@@ -805,7 +805,11 @@ export default function RestaurantDetailScreen() {
   const handleOpenMap = useCallback(() => {
     if (!reservation) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    Linking.openURL(`https://maps.apple.com/?q=${encodeURIComponent(reservation.restaurant.address)}`);
+    const addr = encodeURIComponent(reservation.restaurant.address);
+    const url = Platform.OS === "android"
+      ? `https://www.google.com/maps/search/?api=1&query=${addr}`
+      : `https://maps.apple.com/?q=${addr}`;
+    Linking.openURL(url);
   }, [reservation]);
 
   const handleOpenWebsite = useCallback(() => {
@@ -1241,15 +1245,19 @@ ${shareUrl}`,
           {/* Rating + cuisine row */}
           <View style={{ flexDirection: "row", alignItems: "center", flexWrap: "wrap", marginTop: 10, gap: 6 }}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 3 }}>
-              {[1, 2, 3, 4, 5].map((s) => (
-                <Star
-                  key={s}
-                  size={13}
-                  color={C.gold}
-                  fill={r.rating >= s ? C.gold : "transparent"}
-                  strokeWidth={2}
-                />
-              ))}
+              {[0, 1, 2, 3, 4].map((i) => {
+                const fill = Math.min(1, Math.max(0, r.rating - i));
+                return (
+                  <View key={i} style={{ width: 13, height: 13 }}>
+                    <Star size={13} color={C.gold} fill="transparent" strokeWidth={2} />
+                    {fill > 0 && (
+                      <View style={{ position: "absolute", top: 0, left: 0, width: 13 * fill, height: 13, overflow: "hidden" }}>
+                        <Star size={13} color={C.gold} fill={C.gold} strokeWidth={2} />
+                      </View>
+                    )}
+                  </View>
+                );
+              })}
             </View>
             <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: C.gold }}>
               {r.rating}
@@ -1289,7 +1297,7 @@ ${shareUrl}`,
           {/* Tags row */}
           {(tags.length > 0 || vibeTags.length > 0) ? (
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 14 }}>
-              {tags.map((tag: string) => (
+              {tags.filter((tag: string) => tag && tag.trim()).map((tag: string) => (
                 <View key={tag} style={{ backgroundColor: C.successLight, borderRadius: 16, paddingHorizontal: 10, paddingVertical: 5 }}>
                   <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.success }}>{tag}</Text>
                 </View>
