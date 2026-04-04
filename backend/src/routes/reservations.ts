@@ -246,8 +246,8 @@ reservationsRouter.post(
       const watcherPhones = alerts.map((a) => a.userPhone);
       sendPushToUsers(
         watcherPhones,
-        "Ny bokning tillgänglig!",
-        `En bokning på ${restaurant.name} för ${body.partySize} pers den ${body.reservationTime} har lagts upp.`,
+        `${restaurant.name} har ett bord`,
+        `${restaurant.name} har just lagt upp ett bord — kl ${body.reservationTime.substring(0, 5)} ikväll. Snappa det.`,
         { type: "watch_match", restaurantId: body.restaurantId, reservationId: reservation.id }
       ).catch(() => {});
     }
@@ -267,8 +267,8 @@ reservationsRouter.post(
     if (watchPhones.length > 0) {
       sendPushToUsers(
         watchPhones,
-        "Bevakningsträff!",
-        `En bokning på ${restaurant.name} matchar din bevakning.`,
+        `${restaurant.name} — din bevakning matchade`,
+        `${restaurant.name} har just lagt upp ett bord som matchar din bevakning. Snappa det.`,
         { type: "watch_match", restaurantId: body.restaurantId, reservationId: reservation.id }
       ).catch(() => {});
     }
@@ -494,8 +494,8 @@ reservationsRouter.post(
       // Push notification to claimer immediately
       sendPushToUser(
         claimerPhone,
-        `Bokning bekräftad — ${reservation.restaurant.name}`,
-        `Du har tagit över bokningen för ${reservation.partySize} pers den ${dateStr} kl ${reservation.reservationTime}. Ångerfrist: 5 min.`,
+        `Du är inne`,
+        `Bordet på ${reservation.restaurant.name} väntar kl ${reservation.reservationTime.substring(0, 5)}. Du har 5 min ångerfrist.`,
         { type: "claim_confirmed", reservationId: id, restaurantId: reservation.restaurantId }
       ).catch(() => {});
 

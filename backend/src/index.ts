@@ -143,8 +143,8 @@ setInterval(async () => {
       if (reservation.claimerPhone) {
         sendPushToUser(
           reservation.claimerPhone,
-          "⏰ 1 minut kvar av ångerfristen",
-          `Din ångerfrist för ${reservation.restaurant.name} löper ut snart.`,
+          "Ångerfristen löper ut",
+          `Ångerfristen löper ut om 1 minut. Fortfarande nöjd?`,
           { type: "grace_reminder", reservationId: reservation.id }
         ).catch(() => {});
       }
@@ -220,8 +220,8 @@ setInterval(async () => {
       // Push notification: credits awarded to submitter
       sendPushToUser(
         reservation.submitterPhone,
-        "Credits intjänade!",
-        "Du fick 2 credits för din delade bokning.",
+        "+2 credits",
+        `Tack! Du fick 2 credits för bokningen på ${reservation.restaurant.name}.`,
         { type: "credits_awarded", reservationId: reservation.id, restaurantId: reservation.restaurantId }
       ).catch(() => {});
 
@@ -229,8 +229,8 @@ setInterval(async () => {
       const dateStr = new Date(reservation.reservationDate).toLocaleDateString("sv-SE");
       sendPushToUser(
         reservation.submitterPhone,
-        "Din bokning togs över! +2 credits",
-        `Din bokning på ${reservation.restaurant.name} den ${dateStr} har tagits över och credits har utbetalats.`,
+        `Bordet på ${reservation.restaurant.name} är överlåtet`,
+        `Någon tog bordet på ${reservation.restaurant.name}. Dina 2 credits är utbetalade.`,
         { type: "booking_claimed", reservationId: reservation.id, restaurantId: reservation.restaurantId }
       ).catch(() => {});
 
@@ -238,8 +238,8 @@ setInterval(async () => {
       if (reservation.claimerPhone) {
         sendPushToUser(
           reservation.claimerPhone,
-          "Bokning slutförd",
-          `Din bokning på ${reservation.restaurant.name} är nu bekräftad.`,
+          `Bordet är ditt`,
+          `Bokningen på ${reservation.restaurant.name} är bekräftad. Vi ses där!`,
           { type: "grace_completed", reservationId: reservation.id, restaurantId: reservation.restaurantId }
         ).catch(() => {});
       }

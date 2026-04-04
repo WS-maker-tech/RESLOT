@@ -25,6 +25,8 @@ import {
   CalendarPlus,
   QrCode,
   Copy,
+  ShieldCheck,
+  Coins,
 } from "lucide-react-native";
 import Animated, {
   FadeInDown,
@@ -373,13 +375,10 @@ export default function BookingConfirmationScreen() {
             testID="back-button"
             accessibilityLabel="Gå tillbaka"
             onPress={handleGoBack}
-            style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: "rgba(0,0,0,0.04)", alignItems: "center", justifyContent: "center", marginRight: 12 }}
+            style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: "rgba(0,0,0,0.04)", alignItems: "center", justifyContent: "center" }}
           >
             <ChevronLeft size={20} color={C.textSecondary} strokeWidth={2} />
           </Pressable>
-          <Text style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: C.textPrimary, letterSpacing: -0.4 }}>
-            Bokningsbekräftelse
-          </Text>
         </View>
       </SafeAreaView>
 
@@ -493,8 +492,82 @@ export default function BookingConfirmationScreen() {
               </View>
             </Animated.View>
 
+            {/* Cost breakdown */}
+            <Animated.View entering={FadeInDown.delay(100).springify()} style={{ marginTop: SPACING.lg }}>
+              <View
+                testID="cost-breakdown-card"
+                style={{
+                  backgroundColor: C.bgCard,
+                  borderRadius: RADIUS.xl,
+                  borderWidth: 0.5,
+                  borderColor: C.borderLight,
+                  padding: SPACING.lg,
+                  ...SHADOW.card,
+                }}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+                    <View style={{ width: 32, height: 32, borderRadius: 9, backgroundColor: "rgba(201,169,110,0.10)", alignItems: "center", justifyContent: "center" }}>
+                      <Coins size={16} color={C.gold} strokeWidth={2} />
+                    </View>
+                    <Text style={{ fontFamily: FONTS.regular, fontSize: 15, color: C.textPrimary }}>2 credits</Text>
+                  </View>
+                  <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.textPrimary }}>2 st</Text>
+                </View>
+
+                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                  <Text style={{ fontFamily: FONTS.regular, fontSize: 15, color: C.textSecondary, paddingLeft: 42 }}>Serviceavgift</Text>
+                  <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.textPrimary }}>29 kr</Text>
+                </View>
+
+                <View style={{ height: 0.5, backgroundColor: C.divider, marginBottom: 12 }} />
+
+                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                  <Text style={{ fontFamily: FONTS.bold, fontSize: 16, color: C.textPrimary, paddingLeft: 42 }}>Totalt</Text>
+                  <Text style={{ fontFamily: FONTS.bold, fontSize: 16, color: C.textPrimary }}>2 credits + 29 kr</Text>
+                </View>
+              </View>
+            </Animated.View>
+
+            {/* Ångerfrist notice */}
+            <Animated.View entering={FadeInDown.delay(160).springify()} style={{ marginTop: SPACING.md }}>
+              <Text
+                testID="angerfrist-notice"
+                style={{
+                  fontFamily: FONTS.regular,
+                  fontSize: 13,
+                  color: C.textTertiary,
+                  textAlign: "center",
+                  lineHeight: 19,
+                }}
+              >
+                5 minuter att ångra — inga frågor
+              </Text>
+            </Animated.View>
+
+            {/* Reslot-garanti badge */}
+            <Animated.View entering={FadeInDown.delay(220).springify()} style={{ marginTop: SPACING.md }}>
+              <View
+                testID="reslot-garanti-badge"
+                style={{
+                  backgroundColor: C.coralLight,
+                  borderRadius: RADIUS.lg,
+                  paddingVertical: 12,
+                  paddingHorizontal: SPACING.md,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 10,
+                }}
+              >
+                <ShieldCheck size={18} color={C.coral} strokeWidth={2} />
+                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: C.textSecondary, flex: 1, lineHeight: 19 }}>
+                  Fungerar inte överlåtelsen? Credits tillbaka.
+                </Text>
+              </View>
+            </Animated.View>
+
             {/* Grace period / celebration */}
-            <Animated.View entering={FadeInDown.delay(120).springify()} style={{ marginTop: SPACING.lg }}>
+            <Animated.View entering={FadeInDown.delay(280).springify()} style={{ marginTop: SPACING.lg }}>
               {graceExpired ? (
                 <CelebrationView />
               ) : (
@@ -507,7 +580,7 @@ export default function BookingConfirmationScreen() {
 
             {/* Action buttons - shown after grace period */}
             {graceExpired && !cancelSuccess ? (
-              <Animated.View entering={FadeInDown.delay(200).springify()} style={{ marginTop: SPACING.lg, gap: 10 }}>
+              <Animated.View entering={FadeInDown.delay(360).springify()} style={{ marginTop: SPACING.lg, gap: 10 }}>
                 {/* Reference number */}
                 <View
                   style={{
@@ -606,7 +679,7 @@ export default function BookingConfirmationScreen() {
 
             {/* Cancel button during grace period */}
             {!graceExpired ? (
-              <Animated.View entering={FadeInDown.delay(200).springify()} style={{ marginTop: SPACING.lg }}>
+              <Animated.View entering={FadeInDown.delay(340).springify()} style={{ marginTop: SPACING.lg }}>
                 <Pressable
                   testID="cancel-claim-button"
                   accessibilityLabel="Ångra övertagande"
@@ -631,7 +704,7 @@ export default function BookingConfirmationScreen() {
                     <>
                       <Undo2 size={18} color={C.error} strokeWidth={2} />
                       <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.error }}>
-                        Ångra övertagande
+                        Ångra — få tillbaka credits
                       </Text>
                     </>
                   )}
@@ -640,7 +713,7 @@ export default function BookingConfirmationScreen() {
             ) : null}
 
             {/* Helpful info */}
-            <Animated.View entering={FadeInDown.delay(280).springify()} style={{ marginTop: SPACING.xl }}>
+            <Animated.View entering={FadeInDown.delay(420).springify()} style={{ marginTop: SPACING.xl }}>
               <View
                 style={{
                   backgroundColor: C.coralLight,
