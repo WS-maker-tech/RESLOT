@@ -48,7 +48,7 @@ import Animated, {
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import * as Haptics from "expo-haptics";
 import { useQuery } from "@tanstack/react-query";
-import { useReservations, useRestaurants, useProfile, useMissedReservations, useNewOnReslot } from "@/lib/api/hooks";
+import { useReservations, useProfile, useMissedReservations, useNewOnReslot } from "@/lib/api/hooks";
 import { api } from "@/lib/api/api";
 import { useAuthStore } from "@/lib/auth-store";
 import type { Reservation, MissedReservation, Restaurant } from "@/lib/api/types";
@@ -1192,7 +1192,6 @@ export default function HomeScreen() {
   const [showCityPicker, setShowCityPicker] = useState<boolean>(false);
   const [showSearch, setShowSearch] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [selectedCuisine, setSelectedCuisine] = useState<string>("Alla");
 
   const phone = useAuthStore((s) => s.phoneNumber);
 
@@ -1238,45 +1237,16 @@ export default function HomeScreen() {
     isLoading: profileLoading,
   } = useProfile(phone || "");
 
-  // Social proof stats
-  const { data: stats } = useQuery({
-    queryKey: ["reservation-stats"],
-    queryFn: () => api.get<{ weeklyReservations: number }>("/api/reservations/stats"),
-  });
-
-  // Fetch restaurants for popular section
-  const { data: allRestaurants = [] } = useRestaurants({ city: selectedCity });
-
-  // Extract unique cuisines from reservations
-  const cuisines = useMemo(() => {
-    const set = new Set(reservations.map((r: Reservation) => r.restaurant?.cuisine).filter(Boolean));
-    return ["Alla", ...Array.from(set).sort()];
-  }, [reservations]);
-
-  const onCuisineSelect = useCallback((cuisine: string) => {
-    setSelectedCuisine(cuisine);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-  }, []);
-
   // Memoized filtering for performance
   const filteredReservations = useMemo(() => {
     return reservations.filter((res: Reservation) => {
       if (activeFilter && activeFilter !== "Alla" && res.restaurant?.neighborhood !== activeFilter) return false;
-      if (selectedCuisine !== "Alla" && res.restaurant?.cuisine !== selectedCuisine) return false;
       if (searchQuery) {
         return res.restaurant?.name?.toLowerCase().includes(searchQuery.toLowerCase());
       }
       return true;
     });
-  }, [reservations, activeFilter, selectedCuisine, searchQuery]);
-
-  // Popular restaurants sorted by timesBookedOnReslot
-  const popularRestaurants = useMemo(() => {
-    return allRestaurants
-      .filter((r: Restaurant) => r.timesBookedOnReslot > 0)
-      .sort((a: Restaurant, b: Restaurant) => b.timesBookedOnReslot - a.timesBookedOnReslot)
-      .slice(0, 5);
-  }, [allRestaurants]);
+  }, [reservations, activeFilter, searchQuery]);
 
   const isLoading = reservationsLoading || profileLoading;
 
@@ -1348,47 +1318,7 @@ export default function HomeScreen() {
           days={DAYS}
         />
         <FilterChips active={activeFilter} onSelect={onFilterSelect} city={selectedCity} />
-        {/* Cuisine filter chips */}
-        {cuisines.length > 1 ? (
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: SPACING.lg, paddingVertical: 4, alignItems: "center" }}
-            style={{ flexGrow: 0 }}
-          >
-            {cuisines.map((cuisine: string) => {
-              const isActive = selectedCuisine === cuisine;
-              return (
-                <Pressable
-                  key={cuisine}
-                  testID={`cuisine-filter-${cuisine}`}
-                  accessibilityLabel={`Filtrera på ${cuisine}`}
-                  onPress={() => onCuisineSelect(cuisine)}
-                  style={{
-                    marginRight: 6,
-                    borderRadius: 16,
-                    paddingHorizontal: 12,
-                    paddingVertical: 7,
-                    backgroundColor: isActive ? C.coral : C.bgCard,
-                    borderWidth: isActive ? 0 : 1,
-                    borderColor: C.borderLight,
-                    minHeight: 32,
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontFamily: isActive ? FONTS.semiBold : FONTS.medium,
-                      fontSize: 12,
-                      color: isActive ? "#111827" : C.textSecondary,
-                    }}
-                  >
-                    {cuisine}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </ScrollView>
-        ) : null}
+        
         {/* Hard break line right at categories bottom */}
         <View
           style={{
@@ -1499,182 +1429,7 @@ export default function HomeScreen() {
               </Animated.View>
             ) : null}
 
-            {/* Social proof banner with count-up */}
-            <Animated.View entering={FadeInDown.delay(200).springify()}>
-              <CountUpText
-                value={stats?.weeklyReservations ?? 24}
-                suffix={`bokningar delade denna vecka i ${selectedCity}`}
-                city={selectedCity}
-              />
-            </Animated.View>
 
-            {/* Populärt just nu section */}
-            {popularRestaurants.length > 0 ? (
-              <Animated.View
-                testID="popular-section"
-                entering={FadeInDown.delay(120).springify()}
-                style={{ marginBottom: 8 }}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    paddingHorizontal: SPACING.lg,
-                    marginBottom: 12,
-                    marginTop: 6,
-                  }}
-                >
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-                    <View
-                      style={{
-                        width: 28,
-                        height: 28,
-                        borderRadius: 8,
-                        backgroundColor: "rgba(245,158,11,0.10)",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <TrendingUp size={15} color={C.warning} strokeWidth={2} />
-                    </View>
-                    <View>
-                      <Text
-                        style={{
-                          fontFamily: FONTS.displayBold,
-                          fontSize: 17,
-                          color: C.dark,
-                          letterSpacing: -0.4,
-                        }}
-                      >
-                        Populärt just nu
-                      </Text>
-                      <Text
-                        style={{
-                          fontFamily: FONTS.regular,
-                          fontSize: 12,
-                          color: C.textTertiary,
-                          marginTop: 0,
-                        }}
-                      >
-                        Mest bokade restauranger
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={{ paddingHorizontal: SPACING.lg, paddingBottom: 6 }}
-                  style={{ flexGrow: 0 }}
-                >
-                  {popularRestaurants.map((restaurant: Restaurant, index: number) => {
-                    // Find first active reservation for this restaurant
-                    const activeRes = reservations.find(
-                      (r: Reservation) => r.restaurantId === restaurant.id && r.status === "active"
-                    );
-                    return (
-                      <Animated.View key={restaurant.id} entering={FadeInDown.delay(index * 70).springify()}>
-                        <Pressable
-                          testID={`popular-restaurant-${index}`}
-                          accessibilityLabel={`Visa ${restaurant.name}`}
-                          onPress={() => {
-                            if (activeRes) {
-                              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                              router.push(`/restaurant/${activeRes.id}`);
-                            }
-                          }}
-                          style={{
-                            width: 180,
-                            marginRight: 12,
-                            borderRadius: RADIUS.lg,
-                            backgroundColor: C.bgCard,
-                            overflow: "hidden",
-                            shadowColor: "#000",
-                            shadowOffset: { width: 0, height: 4 },
-                            shadowOpacity: 0.08,
-                            shadowRadius: 12,
-                            elevation: 3,
-                            opacity: activeRes ? 1 : 0.7,
-                          }}
-                        >
-                          <Image
-                            source={{ uri: restaurant.image }}
-                            style={{ width: 180, height: 110, backgroundColor: C.bgInput }}
-                            contentFit="cover"
-                            cachePolicy="memory-disk"
-                          />
-                          {/* Booked badge */}
-                          <View
-                            style={{
-                              position: "absolute",
-                              top: 8,
-                              left: 8,
-                              backgroundColor: "rgba(245,158,11,0.90)",
-                              borderRadius: 6,
-                              paddingHorizontal: 8,
-                              paddingVertical: 3,
-                              flexDirection: "row",
-                              alignItems: "center",
-                              gap: 4,
-                            }}
-                          >
-                            <TrendingUp size={10} color="#111827" strokeWidth={2.5} />
-                            <Text
-                              style={{
-                                fontFamily: FONTS.bold,
-                                fontSize: 10,
-                                color: "#111827",
-                                letterSpacing: 0.3,
-                              }}
-                            >
-                              {restaurant.timesBookedOnReslot}x bokad
-                            </Text>
-                          </View>
-                          <View style={{ padding: 12, gap: 2 }}>
-                            <Text
-                              style={{
-                                fontFamily: FONTS.displaySemiBold,
-                                fontSize: 14,
-                                color: C.dark,
-                                letterSpacing: -0.3,
-                              }}
-                              numberOfLines={1}
-                            >
-                              {restaurant.name}
-                            </Text>
-                            <View style={{ flexDirection: "row", alignItems: "center", gap: 4, marginTop: 2 }}>
-                              <Star size={11} color={C.gold} fill={C.gold} strokeWidth={0} />
-                              <Text
-                                style={{
-                                  fontFamily: FONTS.medium,
-                                  fontSize: 12,
-                                  color: C.textSecondary,
-                                }}
-                              >
-                                {restaurant.rating.toFixed(1)}
-                              </Text>
-                              <View style={{ width: 3, height: 3, borderRadius: 1.5, backgroundColor: C.borderLight }} />
-                              <Text
-                                style={{
-                                  fontFamily: FONTS.medium,
-                                  fontSize: 12,
-                                  color: C.textSecondary,
-                                }}
-                                numberOfLines={1}
-                              >
-                                {restaurant.cuisine}
-                              </Text>
-                            </View>
-                          </View>
-                        </Pressable>
-                      </Animated.View>
-                    );
-                  })}
-                </ScrollView>
-              </Animated.View>
-            ) : null}
 
             {/* Nya på Reslot — discovery section */}
             <NewOnReslotSection />
