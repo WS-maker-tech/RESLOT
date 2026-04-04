@@ -23,16 +23,20 @@ export const authMiddleware = createMiddleware<{
   if (token.startsWith("dev:")) {
     const phone = token.slice(4);
     if (phone) {
-      const existing = await db.userProfile.findUnique({ where: { phone } });
-      if (!existing) {
-        await db.userProfile.create({
-          data: { phone, firstName: "", lastName: "", email: "", phoneVerified: true, credits: 2 },
-        });
+      try {
+        let existing = await db.userProfile.findUnique({ where: { phone } });
+        if (!existing) {
+          existing = await db.userProfile.create({
+            data: { phone, firstName: "", lastName: "", email: "", phoneVerified: true, credits: 2 },
+          });
+        }
+        c.set("userPhone", phone);
+        c.set("supabaseUserId", phone);
+        await next();
+        return;
+      } catch (e) {
+        console.error("Dev bypass error:", e);
       }
-      c.set("userPhone", phone);
-      c.set("supabaseUserId", phone);
-      await next();
-      return;
     }
   }
 

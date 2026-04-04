@@ -9,13 +9,19 @@ interface ApiResponse<T> {
 const baseUrl = process.env.EXPO_PUBLIC_BACKEND_URL!;
 
 async function getAccessToken(): Promise<string | null> {
-  // Try to get a fresh Supabase session token
-  const { data } = await supabase.auth.getSession();
-  if (data.session?.access_token) {
-    return data.session.access_token;
-  }
-  // Fallback to stored token
-  return useAuthStore.getState().sessionToken;
+  // Prioritera lagrad token (t.ex. dev-token eller cached Supabase-token)
+  const stored = useAuthStore.getState().sessionToken;
+  if (stored) return stored;
+
+  // Fallback: hämta från Supabase-session
+  try {
+    const { data } = await supabase.auth.getSession();
+    if (data.session?.access_token) {
+      return data.session.access_token;
+    }
+  } catch (_) {}
+
+  return null;
 }
 
 const request = async <T>(
