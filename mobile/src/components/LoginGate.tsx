@@ -16,8 +16,16 @@ export function LoginGate({ title, subtitle }: LoginGateProps) {
   const router = useRouter();
   const logout = useAuthStore((s) => s.logout);
 
+  const setOnboardingComplete = useAuthStore((s) => s.setOnboardingComplete);
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+
   const handleLogin = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    // Om redan inloggad men fastnat i gäst-läge — rensa isGuest direkt
+    if (isLoggedIn) {
+      setOnboardingComplete();
+      return;
+    }
     logout();
     router.replace("/onboarding");
   };
