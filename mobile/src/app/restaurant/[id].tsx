@@ -825,17 +825,42 @@ export default function RestaurantDetailScreen() {
     router.push("/credits");
   }, [router]);
 
-  const handleShare = useCallback(() => {
+  const handleShare = useCallback(async () => {
     if (!reservation) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const r = reservation.restaurant;
     const date = formatReservationDate(reservation.reservationDate);
     const time = reservation.reservationTime.substring(0, 5);
-    const shareMessage = `Kolla in ${r.name} på Reslot — ledigt bord ${date} kl ${time}!`;
+    const shareText = `Kolla in ${r.name} på Reslot — ledigt bord ${date} kl ${time}!`;
+    const shareUrl = Platform.OS === "web"
+      ? window.location.href
+      : `https://reslot.se/restaurant/${reservation.id}`;
+
     if (Platform.OS === "web") {
-      navigator.clipboard.writeText(shareMessage).catch(() => {});
+      // Försök Web Share API (mobil Chrome/Safari stöder detta)
+      if (typeof navigator !== "undefined" && navigator.share) {
+        try {
+          await navigator.share({
+            title: `${r.name} — Reslot`,
+            text: shareText,
+            url: shareUrl,
+          });
+          return;
+        } catch (_) {}
+      }
+      // Fallback: kopiera länk + visa toast
+      try {
+        await navigator.clipboard.writeText(`${shareText}
+${shareUrl}`);
+        // Kort visuell feedback via alert (ingen toast-lib installerad)
+        alert("Länk kopierad! 🔗");
+      } catch (_) {}
     } else {
-      Share.share({ message: shareMessage }).catch(() => {});
+      Share.share({
+        message: `${shareText}
+${shareUrl}`,
+        url: shareUrl,
+      }).catch(() => {});
     }
   }, [reservation]);
 
