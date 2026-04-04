@@ -1287,6 +1287,49 @@ export default function RestaurantDetailScreen() {
           seatTypeLabel={reservation.seatType ? seatTypeLabel : null}
         />
 
+        {/* Seller info */}
+        {reservation.submitterFirstName ? (
+          <Animated.View entering={FadeInDown.delay(180).springify()} style={{ paddingHorizontal: SPACING.lg, paddingTop: 24 }}>
+            <View style={{
+              backgroundColor: C.bgCard,
+              borderRadius: RADIUS.lg,
+              padding: 14,
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 12,
+              borderWidth: 0.5,
+              borderColor: C.borderLight,
+              ...SHADOW.card,
+            }}>
+              <View style={{
+                width: 40, height: 40, borderRadius: 20,
+                backgroundColor: "rgba(126,200,122,0.15)",
+                alignItems: "center", justifyContent: "center",
+              }}>
+                <Text style={{ fontFamily: FONTS.bold, fontSize: 17, color: C.pistachio }}>
+                  {reservation.submitterFirstName.charAt(0).toUpperCase()}
+                </Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.textPrimary, letterSpacing: -0.2 }}>
+                  {reservation.submitterFirstName} {reservation.submitterLastName ? reservation.submitterLastName.charAt(0) + "." : ""} delar detta bord
+                </Text>
+                <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textSecondary, marginTop: 2 }}>
+                  Verifierad användare
+                </Text>
+              </View>
+              <View style={{
+                width: 24, height: 24, borderRadius: 12,
+                backgroundColor: C.successBg,
+                alignItems: "center", justifyContent: "center",
+                borderWidth: 1, borderColor: C.successLight,
+              }}>
+                <Check size={12} color={C.success} strokeWidth={3} />
+              </View>
+            </View>
+          </Animated.View>
+        ) : null}
+
         {/* Cost breakdown — IMPOSSIBLE TO MISS */}
         <Animated.View
           entering={FadeInDown.delay(200).springify()}
@@ -1478,7 +1521,7 @@ export default function RestaurantDetailScreen() {
                   lineHeight: 19,
                 }}
               >
-                Ångra gratis inom 5 min efter övertagande. Credits och serviceavgift återbetalas direkt.
+                Du har 5 minuter att ångra dig — helt kostnadsfritt. Inga frågor.
               </Text>
             </View>
           </View>
@@ -1513,7 +1556,7 @@ export default function RestaurantDetailScreen() {
               <Check size={14} color={C.coral} strokeWidth={3} />
             </View>
             <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: C.dark, flex: 1 }}>
-              Om bordet inte finns — 2 credits tillbaka
+              Reslot-garanti: fungerar inte överlåtelsen? Credits tillbaka.
             </Text>
           </View>
         </Animated.View>
@@ -1957,7 +2000,7 @@ export default function RestaurantDetailScreen() {
               {accepted ? <Check size={13} color="#FFFFFF" strokeWidth={3} /> : null}
             </View>
             <Text style={{ flex: 1, fontFamily: FONTS.regular, fontSize: 12, color: C.textSecondary, lineHeight: 17 }}>
-              Jag förstår att 2 credits dras direkt, serviceavgiften (29 kr) debiteras efter 5 min ångerfrist, och att jag tar ansvar för bokningen. No-show kan medföra en avgift på 10-20%.
+              Jag tar över ansvaret för denna bokning efter ångerfristen på 5 min. Credits dras direkt. Serviceavgift (29 kr) efter ångerfristen. No-show kan medföra avgift.
             </Text>
           </Pressable>
         ) : null}

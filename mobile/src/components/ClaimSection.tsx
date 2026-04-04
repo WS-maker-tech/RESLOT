@@ -18,6 +18,9 @@ interface ClaimSectionProps {
   errorShakeStyle: any;
   onPressIn: () => void;
   onPressOut: () => void;
+  submitterFirstName?: string;
+  submitterLastName?: string;
+  submitterBookingCount?: number;
 }
 
 export const ClaimSection = React.memo(function ClaimSection({
@@ -34,9 +37,38 @@ export const ClaimSection = React.memo(function ClaimSection({
   errorShakeStyle,
   onPressIn,
   onPressOut,
+  submitterFirstName,
+  submitterLastName,
+  submitterBookingCount,
 }: ClaimSectionProps) {
+  const sellerName = submitterFirstName
+    ? `${submitterFirstName} ${submitterLastName ? submitterLastName.charAt(0) + '.' : ''}`.trim()
+    : null;
+
   return (
     <>
+      {/* Seller info */}
+      {sellerName ? (
+        <Animated.View entering={FadeInDown.delay(160).springify()} style={styles.sellerContainer}>
+          <View style={styles.sellerCard}>
+            <View style={styles.sellerAvatar}>
+              <Text style={styles.sellerInitial}>{submitterFirstName?.charAt(0).toUpperCase()}</Text>
+            </View>
+            <View style={styles.sellerInfo}>
+              <Text style={styles.sellerName}>{sellerName} delar detta bord</Text>
+              {submitterBookingCount && submitterBookingCount > 1 ? (
+                <Text style={styles.sellerMeta}>{submitterBookingCount} bokningar delade</Text>
+              ) : (
+                <Text style={styles.sellerMeta}>Verifierad användare</Text>
+              )}
+            </View>
+            <View style={styles.sellerBadge}>
+              <Check size={11} color={C.success} strokeWidth={3} />
+            </View>
+          </View>
+        </Animated.View>
+      ) : null}
+
       {/* Cost breakdown */}
       <Animated.View
         entering={FadeInDown.delay(200).springify()}
@@ -343,6 +375,59 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: C.success,
     flex: 1,
+  },
+  sellerContainer: {
+    paddingHorizontal: SPACING.lg,
+    paddingTop: 24,
+  },
+  sellerCard: {
+    backgroundColor: C.bgCard,
+    borderRadius: RADIUS.lg,
+    padding: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    borderWidth: 0.5,
+    borderColor: C.borderLight,
+    ...SHADOW.card,
+  },
+  sellerAvatar: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: "rgba(126,200,122,0.15)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sellerInitial: {
+    fontFamily: FONTS.bold,
+    fontSize: 16,
+    color: C.pistachio,
+  },
+  sellerInfo: {
+    flex: 1,
+  },
+  sellerName: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 14,
+    color: C.textPrimary,
+    letterSpacing: -0.2,
+  },
+  sellerMeta: {
+    fontFamily: FONTS.regular,
+    fontSize: 12,
+    color: C.textSecondary,
+    marginTop: 2,
+  },
+  sellerBadge: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: C.successBg,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: C.successLight,
   },
   errorContainer: {
     paddingHorizontal: SPACING.lg,
