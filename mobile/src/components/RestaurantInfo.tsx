@@ -121,7 +121,7 @@ export const RestaurantInfo = React.memo(function RestaurantInfo({
             style={({ pressed }) => [styles.pillLink, { opacity: pressed ? 0.7 : 1 }]}
           >
             <Instagram size={13} color={C.textSecondary} strokeWidth={2} />
-            <Text style={styles.pillLinkText}>@{instagram}</Text>
+            <Text style={styles.pillLinkText}>{instagram?.startsWith("@") ? instagram : `@${instagram}`}</Text>
           </Pressable>
         ) : null}
       </View>

@@ -1003,9 +1003,16 @@ ${shareUrl}`,
       {Platform.OS === "web" ? (
         <Head>
           <title>{r.name} — Reslot</title>
-          <meta property="og:title" content={`${r.name} — Reslot`} />
-          {r.description ? <meta property="og:description" content={r.description} /> : null}
-          {r.image ? <meta property="og:image" content={r.image} /> : null}
+          <meta property="og:type" content="website" />
+          <meta property="og:title" content={`${r.name} — Ta över bordet på Reslot`} />
+          <meta property="og:description" content={r.description ?? `Ledigt bord på ${r.name}. Ta över via Reslot.`} />
+          <meta property="og:image" content={r.image ?? "https://reslot.se/og-image.jpg"} />
+          <meta property="og:image:width" content="1200" />
+          <meta property="og:image:height" content="630" />
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content={`${r.name} — Reslot`} />
+          <meta name="twitter:description" content={r.description ?? `Ledigt bord på ${r.name}.`} />
+          <meta name="twitter:image" content={r.image ?? "https://reslot.se/og-image.jpg"} />
         </Head>
       ) : null}
 
@@ -1336,7 +1343,7 @@ ${shareUrl}`,
                 })}
               >
                 <Instagram size={13} color={C.textSecondary} strokeWidth={2} />
-                <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.textSecondary }}>@{r.instagram}</Text>
+                <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.textSecondary }}>{r.instagram?.startsWith("@") ? r.instagram : `@${r.instagram}`}</Text>
               </Pressable>
             ) : null}
           </View>
@@ -2125,7 +2132,7 @@ ${shareUrl}`,
         <Animated.View style={btnStyle}>
           <Pressable
             testID="claim-button"
-            accessibilityLabel="Ta över bokning"
+            accessibilityLabel="Ta bordet"
             onPress={handleClaim}
             onPressIn={() => {
               scaleBtn.value = withSpring(0.97, { damping: 14, stiffness: 280 });
