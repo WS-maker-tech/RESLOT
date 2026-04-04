@@ -1240,14 +1240,28 @@ export default function HomeScreen() {
 
   // Memoized filtering for performance
   const filteredReservations = useMemo(() => {
+    // Formatera selectedDate som YYYY-MM-DD i lokal tid
+    const selYear = selectedDate.getFullYear();
+    const selMonth = String(selectedDate.getMonth() + 1).padStart(2, "0");
+    const selDay = String(selectedDate.getDate()).padStart(2, "0");
+    const selDateStr = `${selYear}-${selMonth}-${selDay}`;
+
     return reservations.filter((res: Reservation) => {
+      // Jämför datum i lokal tid (undvik UTC-offset problem)
+      const resDate = new Date(res.reservationDate);
+      const resYear = resDate.getFullYear();
+      const resMonth = String(resDate.getMonth() + 1).padStart(2, "0");
+      const resDay = String(resDate.getDate()).padStart(2, "0");
+      const resDateStr = `${resYear}-${resMonth}-${resDay}`;
+      if (resDateStr !== selDateStr) return false;
+
       if (activeFilter && activeFilter !== "Alla" && res.restaurant?.neighborhood !== activeFilter) return false;
       if (searchQuery) {
         return res.restaurant?.name?.toLowerCase().includes(searchQuery.toLowerCase());
       }
       return true;
     });
-  }, [reservations, activeFilter, searchQuery]);
+  }, [reservations, activeFilter, searchQuery, selectedDate]);
 
   const isLoading = reservationsLoading || profileLoading;
 
