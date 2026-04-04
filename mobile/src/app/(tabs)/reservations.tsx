@@ -23,7 +23,8 @@ import {
   Check,
   X,
   Send,
-, UtensilsCrossed } from "lucide-react-native";
+  UtensilsCrossed,
+} from "lucide-react-native";
 import { useAuthStore } from "@/lib/auth-store";
 import { LoginGate } from "@/components/LoginGate";
 import { useMyReservations, useCancelReservation, useSubmitFeedback } from "@/lib/api/hooks";

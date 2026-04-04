@@ -30,7 +30,8 @@ import {
   Sparkles,
   Star,
   MapPin,
-, UtensilsCrossed } from "lucide-react-native";
+  UtensilsCrossed,
+} from "lucide-react-native";
 import Animated, {
   FadeInDown,
   ZoomIn,

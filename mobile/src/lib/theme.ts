@@ -4,13 +4,15 @@ type ColorPalette = Record<
   | "textPrimary" | "textSecondary" | "textTertiary"
   | "divider" | "borderLight"
   | "success" | "successBright" | "error" | "danger" | "warning" | "info"
-  | "coralLight" | "coralPressed" | "successLight" | "successBg",
+  | "coralLight" | "coralPressed" | "successLight" | "successBg" | "pistachio" | "grayLight",
   string
 >;
 
 export const C = {
   // Primary — Reslot brand palette
   coral: "#7EC87A",  // pistachio
+  pistachio: "#7EC87A",
+  grayLight: "#9CA3AF",
   gold: "#C9A96E",
   dark: "#111827",
   bg: "#FAFAF8",
@@ -50,6 +52,8 @@ export const C = {
  */
 export const DARK_COLORS: ColorPalette = {
   coral: "#7EC87A",
+  pistachio: "#7EC87A",
+  grayLight: "#9CA3AF",
   gold: "#D4B87E",
   dark: "#FAFAFA",
   bg: "#1A1A1A",
