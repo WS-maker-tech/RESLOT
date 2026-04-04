@@ -257,6 +257,71 @@ setInterval(async () => {
   }
 }, GRACE_PERIOD_CRON_INTERVAL);
 
+// --- 2-Hour Reminder Cron (every 30 min) ---
+const REMINDER_CRON_INTERVAL = 30 * 60 * 1000; // 30 minutes
+let reminderCronRunning = false;
+
+setInterval(async () => {
+  if (reminderCronRunning) {
+    console.log("[REMINDER CRON] Skipped — previous run still in progress");
+    return;
+  }
+  reminderCronRunning = true;
+  try {
+    const now = new Date();
+    // Window: reservations happening between 1h45m and 2h15m from now
+    const windowStart = new Date(now.getTime() + 105 * 60 * 1000); // +1h45m
+    const windowEnd = new Date(now.getTime() + 135 * 60 * 1000);   // +2h15m
+
+    const reservations = await db.reservation.findMany({
+      where: {
+        status: "claimed",
+        reminderSent: false,
+        reservationDate: {
+          gte: new Date(now.toISOString().slice(0, 10)), // today or later
+        },
+      },
+      include: { restaurant: true },
+    });
+
+    for (const reservation of reservations) {
+      // Combine reservationDate + reservationTime into a full datetime
+      const dateStr = reservation.reservationDate.toISOString().slice(0, 10);
+      const reservationDateTime = new Date(`${dateStr}T${reservation.reservationTime}:00`);
+
+      if (reservationDateTime >= windowStart && reservationDateTime <= windowEnd) {
+        if (reservation.claimerPhone) {
+          await sendPushToUser(
+            reservation.claimerPhone,
+            "Påminnelse",
+            `Om 2 timmar sitter du på ${reservation.restaurant.name}. Glöm inte.`,
+            { type: "reminder_2h", reservationId: reservation.id, restaurantId: reservation.restaurantId }
+          ).catch(() => {});
+        }
+
+        await db.reservation.update({
+          where: { id: reservation.id },
+          data: { reminderSent: true },
+        });
+      }
+    }
+
+    const sent = reservations.filter((r) => {
+      const dateStr = r.reservationDate.toISOString().slice(0, 10);
+      const dt = new Date(`${dateStr}T${r.reservationTime}:00`);
+      return dt >= windowStart && dt <= windowEnd;
+    }).length;
+
+    if (sent > 0) {
+      console.log(`[REMINDER CRON] Sent ${sent} 2h reminder(s)`);
+    }
+  } catch (err) {
+    console.error("[REMINDER CRON] Error:", err);
+  } finally {
+    reminderCronRunning = false;
+  }
+}, REMINDER_CRON_INTERVAL);
+
 const port = Number(process.env.PORT) || 3000;
 
 export default {
