@@ -79,7 +79,7 @@ export const DayPicker = React.memo(function DayPicker({
               <Text
                 style={[
                   styles.dayDate,
-                  { color: isSelected ? "#111827" : C.textPrimary },
+                  { color: isSelected ? C.dark : C.textPrimary },
                 ]}
               >
                 {day.date}

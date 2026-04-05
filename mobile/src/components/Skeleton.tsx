@@ -1,5 +1,5 @@
 import React from "react";
-import { ViewStyle, StyleSheet } from "react-native";
+import { ViewStyle, StyleSheet, type DimensionValue } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -61,7 +61,7 @@ export const Skeleton = React.memo(function Skeleton({
         baseStyle,
         styles.base,
         {
-          width: width as any,
+          width: width as DimensionValue,
           height,
           borderRadius,
           overflow: "hidden",

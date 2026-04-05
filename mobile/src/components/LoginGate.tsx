@@ -99,7 +99,7 @@ export function LoginGate({ title, subtitle }: LoginGateProps) {
             style={{
               fontFamily: FONTS.bold,
               fontSize: 16,
-              color: "#111827",
+              color: C.dark,
               letterSpacing: -0.2,
             }}
           >

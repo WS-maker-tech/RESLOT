@@ -4,7 +4,11 @@ type ColorPalette = Record<
   | "textPrimary" | "textSecondary" | "textTertiary"
   | "divider" | "borderLight"
   | "success" | "successBright" | "error" | "danger" | "warning" | "info"
-  | "coralLight" | "coralPressed" | "successLight" | "successBg" | "pistachio" | "grayLight",
+  | "coralLight" | "coralPressed" | "successLight" | "successBg" | "pistachio" | "grayLight"
+  | "white" | "goldLight" | "goldBorder" | "goldPressed"
+  | "errorBg" | "errorBorder" | "errorLight"
+  | "infoBg" | "infoBorder" | "infoLight"
+  | "overlayDark" | "overlayLight" | "overlayMedium",
   string
 >;
 
@@ -43,6 +47,29 @@ export const C = {
   coralPressed: "rgba(126,200,122,0.25)",
   successLight: "rgba(139,158,126,0.10)",
   successBg: "rgba(139,158,126,0.08)",
+
+  // White (for text on dark backgrounds)
+  white: "#FFFFFF",
+
+  // Gold variants
+  goldLight: "rgba(201,169,110,0.10)",
+  goldBorder: "rgba(201,169,110,0.12)",
+  goldPressed: "rgba(201,169,110,0.40)",
+
+  // Error variants
+  errorBg: "rgba(239,68,68,0.06)",
+  errorBorder: "rgba(239,68,68,0.12)",
+  errorLight: "rgba(239,68,68,0.08)",
+
+  // Info variants
+  infoBg: "rgba(59,130,246,0.04)",
+  infoBorder: "rgba(59,130,246,0.10)",
+  infoLight: "rgba(59,130,246,0.10)",
+
+  // Overlays
+  overlayDark: "rgba(0,0,0,0.55)",
+  overlayLight: "rgba(0,0,0,0.04)",
+  overlayMedium: "rgba(0,0,0,0.06)",
 } as const;
 
 /**
@@ -79,6 +106,20 @@ export const DARK_COLORS: ColorPalette = {
   coralPressed: "rgba(126,200,122,0.20)",
   successLight: "rgba(157,175,144,0.15)",
   successBg: "rgba(157,175,144,0.10)",
+
+  white: "#FFFFFF",
+  goldLight: "rgba(212,184,126,0.15)",
+  goldBorder: "rgba(212,184,126,0.20)",
+  goldPressed: "rgba(212,184,126,0.40)",
+  errorBg: "rgba(248,113,113,0.10)",
+  errorBorder: "rgba(248,113,113,0.15)",
+  errorLight: "rgba(248,113,113,0.12)",
+  infoBg: "rgba(96,165,250,0.08)",
+  infoBorder: "rgba(96,165,250,0.12)",
+  infoLight: "rgba(96,165,250,0.12)",
+  overlayDark: "rgba(0,0,0,0.70)",
+  overlayLight: "rgba(255,255,255,0.06)",
+  overlayMedium: "rgba(255,255,255,0.10)",
 };
 
 /**
@@ -189,7 +230,7 @@ export const TYPO = {
   cta: {
     fontFamily: FONTS.bold,
     fontSize: 16,
-    color: "#111827",
+    color: C.dark,
   },
 } as const;
 

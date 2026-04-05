@@ -32,7 +32,7 @@ alertsRouter.post(
 
     if (alertIds && alertIds.length > 0) {
       await db.activityAlert.updateMany({
-        where: { id: { in: alertIds } },
+        where: { id: { in: alertIds }, userPhone: phone },
         data: { read: true },
       });
     } else {
@@ -102,10 +102,15 @@ alertsRouter.post(
 // DELETE /api/alerts/restaurant-alerts/:id - Remove restaurant alert
 alertsRouter.delete("/restaurant-alerts/:id", async (c) => {
   const id = c.req.param("id");
+  const userPhone = c.get("userPhone");
 
   const alert = await db.restaurantAlert.findUnique({ where: { id } });
   if (!alert) {
     return c.json({ error: { message: "Alert not found", code: "NOT_FOUND" } }, 404);
+  }
+
+  if (alert.userPhone !== userPhone) {
+    return c.json({ error: { message: "Forbidden", code: "FORBIDDEN" } }, 403);
   }
 
   await db.restaurantAlert.delete({ where: { id } });

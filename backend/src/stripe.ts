@@ -228,7 +228,7 @@ export async function createClaimPreAuth(params: {
       err instanceof Stripe.errors.StripeCardError &&
       err.code === "authentication_required"
     ) {
-      const piId = (err as any).payment_intent?.id;
+      const piId = (err as Stripe.errors.StripeCardError & { payment_intent?: { id: string } }).payment_intent?.id;
       if (piId) {
         const pi = await stripe.paymentIntents.retrieve(piId);
         return {

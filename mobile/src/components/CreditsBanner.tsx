@@ -61,10 +61,10 @@ const styles = StyleSheet.create({
   container: {
     marginHorizontal: SPACING.lg,
     marginVertical: 12,
-    backgroundColor: "rgba(201, 169, 110, 0.06)",
+    backgroundColor: C.goldLight,
     borderRadius: RADIUS.md,
     borderWidth: 1,
-    borderColor: "rgba(201, 169, 110, 0.12)",
+    borderColor: C.goldBorder,
     padding: SPACING.md,
   },
   leftContent: {
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: "rgba(201, 169, 110, 0.12)",
+    backgroundColor: C.goldBorder,
     alignItems: "center",
     justifyContent: "center",
   },

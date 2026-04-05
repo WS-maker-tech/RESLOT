@@ -283,7 +283,7 @@ const Header = React.memo(function Header({
             testID="credits-pill"
             accessibilityLabel="Visa credits"
             className="flex-row items-center rounded-full px-3 py-1.5"
-            style={{ backgroundColor: "rgba(201, 169, 110, 0.1)" }}
+            style={{ backgroundColor: C.goldLight }}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               onCreditsPress();

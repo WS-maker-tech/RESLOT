@@ -19,7 +19,7 @@ export default function InviteScreen() {
   const handleCopy = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (Platform.OS === "web") {
-      navigator.clipboard?.writeText(referralCode).catch(() => {});
+      navigator.clipboard?.writeText(referralCode).catch((err) => console.error("[Invite] Clipboard write failed:", err));
     }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -30,14 +30,14 @@ export default function InviteScreen() {
     Share.share({
       message: `Prova Reslot — ta över restaurangbokningar i sista minuten! Använd min kod ${referralCode} när du registrerar dig så får vi båda 1 credit.`,
       title: "Snappa ett bord",
-    }).catch(() => {});
+    }).catch((err) => console.error("[Invite] Share failed:", err));
   };
 
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>
       <SafeAreaView edges={["top"]} style={{ backgroundColor: C.bg }}>
         <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 }}>
-          <Pressable testID="back-button" accessibilityLabel="Gå tillbaka" onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.back(); }} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: "rgba(0,0,0,0.04)", alignItems: "center", justifyContent: "center", marginRight: 12 }}>
+          <Pressable testID="back-button" accessibilityLabel="Gå tillbaka" onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.back(); }} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: C.overlayLight, alignItems: "center", justifyContent: "center", marginRight: 12 }}>
             <ChevronLeft size={20} color={C.textSecondary} strokeWidth={2} />
           </Pressable>
           <Text style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: C.textPrimary, letterSpacing: -0.4 }}>Bjud in en vän</Text>
@@ -71,8 +71,8 @@ export default function InviteScreen() {
                 </Text>
               </Pressable>
               <Pressable testID="share-button" accessibilityLabel="Dela inbjudningskod" onPress={handleShare} style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, backgroundColor: C.coral, borderRadius: RADIUS.md, paddingVertical: 12 }}>
-                <Share2 size={16} color="#111827" strokeWidth={ICON.strokeWidth} />
-                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: "#111827" }}>Dela</Text>
+                <Share2 size={16} color={C.dark} strokeWidth={ICON.strokeWidth} />
+                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.dark }}>Dela</Text>
               </Pressable>
             </View>
           </View>

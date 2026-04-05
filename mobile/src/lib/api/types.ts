@@ -11,14 +11,14 @@ export interface Restaurant {
   priceLevel: number;
   image: string;
   description: string;
-  tags: string;
+  tags: string[] | string;
   timesBookedOnReslot: number;
   seatType: string;
   instagram: string | null;
   website: string | null;
-  vibeTags: string;
-  goodForTags: string;
-  foodTags: string;
+  vibeTags: TagWithCount[] | string;
+  goodForTags: string[] | string;
+  foodTags: string[] | string;
   latitude: number | null;
   longitude: number | null;
   isExclusive: boolean;
@@ -52,6 +52,12 @@ export interface Reservation {
   createdAt: string;
   updatedAt: string;
   restaurant: Restaurant;
+  feedback?: {
+    id: string;
+    worked: boolean;
+    comment: string | null;
+    createdAt: string;
+  } | null;
 }
 
 export interface UserProfile {
@@ -67,6 +73,8 @@ export interface UserProfile {
   emailVerified: boolean;
   phoneVerified: boolean;
   referralCode: string | null;
+  trustScore: number;
+  totalFeedbacks: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -104,7 +112,7 @@ export interface Watch {
   date: string | null;
   partySize: number | null;
   notes: string | null;
-  filterOptions: string | null;
+  filterOptions: WatchFilterOptions | string | null;
   createdAt: string;
   restaurant: Restaurant | null;
 }
@@ -152,10 +160,18 @@ export interface TagWithCount {
   count: number;
 }
 
-export function parseTags(jsonStr: string): string[] {
-  try { return JSON.parse(jsonStr); } catch { return []; }
+export function parseTags(input: string[] | string): string[] {
+  if (Array.isArray(input)) return input;
+  try { return JSON.parse(input); } catch { return []; }
 }
 
-export function parseTagsWithCount(jsonStr: string): TagWithCount[] {
-  try { return JSON.parse(jsonStr); } catch { return []; }
+export function parseTagsWithCount(input: TagWithCount[] | string): TagWithCount[] {
+  if (Array.isArray(input)) return input;
+  try { return JSON.parse(input); } catch { return []; }
+}
+
+export function parseWatchFiltersSafe(input: WatchFilterOptions | string | null): WatchFilterOptions | null {
+  if (!input) return null;
+  if (typeof input === "object") return input;
+  try { return JSON.parse(input); } catch { return null; }
 }

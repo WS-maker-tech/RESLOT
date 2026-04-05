@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
+import type { StyleProp, ViewStyle } from "react-native";
 import { Image } from "expo-image";
 import { Users, Clock } from "lucide-react-native";
 import Animated from "react-native-reanimated";
@@ -12,7 +13,7 @@ interface HeroSectionProps {
   imageUri: string;
   partySize: number;
   displayTime: string;
-  heroStyle: any;
+  heroStyle: StyleProp<ViewStyle>;
 }
 
 export const HeroSection = React.memo(function HeroSection({

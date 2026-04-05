@@ -25,7 +25,14 @@
     },
     "web": {
       "favicon": "./favicon.png",
-      "bundler": "metro"
+      "bundler": "metro",
+      "name": "Reslot",
+      "shortName": "Reslot",
+      "description": "Din genväg till fullbokade restauranger."
+    },
+    "icon": "./assets/logo/icon-1024.png",
+    "splash": {
+      "backgroundColor": "#FAFAF8"
     }
   }
 }

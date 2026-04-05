@@ -29,6 +29,7 @@ import { useActivityAlerts } from "@/lib/api/hooks";
 import { useAuthStore } from "@/lib/auth-store";
 import { C, FONTS } from "@/lib/theme";
 import type { ActivityAlert } from "@/lib/api/types";
+import { usePendingFeedback } from "@/lib/use-pending-feedback";
 
 function TabIcon({
   icon: Icon,
@@ -111,6 +112,8 @@ export default function TabLayout() {
   const unreadCount = (activityAlerts as ActivityAlert[]).filter((a) => !a.read).length;
   const badgeCount = unreadCount > 0 ? (unreadCount > 99 ? "99+" : unreadCount) : undefined;
 
+  usePendingFeedback();
+
   const splashStyle = useAnimatedStyle(() => ({
     opacity: splashOpacity.value,
   }));
@@ -151,11 +154,10 @@ export default function TabLayout() {
             style={{
               fontFamily: FONTS.displayBold,
               fontSize: 32,
-              color: C.textPrimary,
               letterSpacing: -0.8,
             }}
           >
-            Reslot
+            <Text style={{ color: C.textPrimary }}>Re</Text><Text style={{ color: C.pistachio }}>slot</Text>
           </Text>
           <Text
             style={{
@@ -178,7 +180,7 @@ export default function TabLayout() {
           tabBarShowLabel: true,
           tabBarLabelStyle: {
             fontFamily: FONTS.semiBold,
-            fontSize: 10,
+            fontSize: 9,
             marginTop: 4,
           },
           tabBarStyle: {

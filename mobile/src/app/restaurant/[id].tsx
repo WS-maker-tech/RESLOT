@@ -185,7 +185,7 @@ const SuccessOverlay = React.memo(function SuccessOverlay({
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: "rgba(0,0,0,0.6)",
+        backgroundColor: C.overlayDark,
         alignItems: "center",
         justifyContent: "center",
         zIndex: 200,
@@ -215,7 +215,7 @@ const SuccessOverlay = React.memo(function SuccessOverlay({
           elevation: 12,
         }}
       >
-        <Check size={58} color="#FFFFFF" strokeWidth={3} />
+        <Check size={58} color={C.white} strokeWidth={3} />
       </Animated.View>
 
       <Animated.Text
@@ -223,7 +223,7 @@ const SuccessOverlay = React.memo(function SuccessOverlay({
         style={{
           fontFamily: FONTS.displayBold,
           fontSize: 30,
-          color: "#FFFFFF",
+          color: C.white,
           marginTop: 26,
           letterSpacing: -0.8,
         }}
@@ -236,7 +236,7 @@ const SuccessOverlay = React.memo(function SuccessOverlay({
         style={{
           fontFamily: FONTS.bold,
           fontSize: 22,
-          color: "#FFFFFF",
+          color: C.white,
           marginTop: 12,
           letterSpacing: -0.4,
           textAlign: "center",
@@ -262,7 +262,7 @@ const SuccessOverlay = React.memo(function SuccessOverlay({
       <Animated.View
         entering={FadeInDown.delay(360).springify()}
         style={{
-          backgroundColor: "rgba(126,200,122,0.20)",
+          backgroundColor: C.coralPressed,
           borderRadius: RADIUS.full,
           paddingHorizontal: 16,
           paddingVertical: 8,
@@ -298,7 +298,7 @@ const SuccessOverlay = React.memo(function SuccessOverlay({
             alignItems: "center",
             justifyContent: "center",
             gap: 10,
-            backgroundColor: "#FFFFFF",
+            backgroundColor: C.white,
             borderRadius: RADIUS.lg,
             paddingVertical: 15,
             paddingHorizontal: 28,
@@ -435,7 +435,7 @@ const GracePeriodOverlay = React.memo(function GracePeriodOverlay({
             elevation: 6,
           }}
         >
-          <Check size={28} color="#FFFFFF" strokeWidth={3} />
+          <Check size={28} color={C.white} strokeWidth={3} />
         </Animated.View>
 
         <Text
@@ -1146,7 +1146,7 @@ ${shareUrl}`,
               style={{
                 fontFamily: FONTS.displayBold,
                 fontSize: 28,
-                color: "#FFFFFF",
+                color: C.white,
                 letterSpacing: -0.8,
                 lineHeight: 34,
                 textShadowColor: "rgba(0,0,0,0.3)",
@@ -1499,7 +1499,7 @@ ${shareUrl}`,
               marginBottom: 14,
             }}>
               <Text style={{ fontFamily: FONTS.bold, fontSize: 16, color: "rgba(255,255,255,0.7)" }}>Totalt</Text>
-              <Text style={{ fontFamily: FONTS.bold, fontSize: 20, color: "#FFFFFF", letterSpacing: -0.3 }}>2 credits + 29 kr</Text>
+              <Text style={{ fontFamily: FONTS.bold, fontSize: 20, color: C.white, letterSpacing: -0.3 }}>2 credits + 29 kr</Text>
             </View>
 
             {/* Balance */}
@@ -1551,7 +1551,7 @@ ${shareUrl}`,
                   elevation: 6,
                 })}
               >
-                <Text style={{ fontFamily: FONTS.bold, fontSize: 15, color: "#FFFFFF" }}>
+                <Text style={{ fontFamily: FONTS.bold, fontSize: 15, color: C.white }}>
                   Köp credits — 39 kr/st
                 </Text>
               </Pressable>
@@ -1994,7 +1994,7 @@ ${shareUrl}`,
                       alignItems: "center",
                       justifyContent: "center",
                     }}>
-                      <Check size={13} color="#FFFFFF" strokeWidth={3} />
+                      <Check size={13} color={C.white} strokeWidth={3} />
                     </View>
                   ) : null}
                 </Pressable>
@@ -2128,7 +2128,7 @@ ${shareUrl}`,
                 marginTop: 1,
               }}
             >
-              {accepted ? <Check size={13} color="#FFFFFF" strokeWidth={3} /> : null}
+              {accepted ? <Check size={13} color={C.white} strokeWidth={3} /> : null}
             </View>
             <Text style={{ flex: 1, fontFamily: FONTS.regular, fontSize: 12, color: C.textSecondary, lineHeight: 17 }}>
               Jag tar över ansvaret för denna bokning efter ångerfristen på 5 min. Credits dras direkt. Serviceavgift (29 kr) efter ångerfristen. No-show kan medföra avgift.
@@ -2193,7 +2193,7 @@ ${shareUrl}`,
                 </Text>
               </>
             ) : !hasEnoughCredits ? (
-              <Text style={{ fontFamily: FONTS.bold, fontSize: 16, color: "#FFFFFF" }}>
+              <Text style={{ fontFamily: FONTS.bold, fontSize: 16, color: C.white }}>
                 Köp credits för att ta över
               </Text>
             ) : (

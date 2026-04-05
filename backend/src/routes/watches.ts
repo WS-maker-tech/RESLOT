@@ -40,7 +40,7 @@ watchesRouter.post(
         date: body.date,
         partySize: body.partySize,
         notes: body.notes,
-        filterOptions: body.filterOptions ? JSON.stringify(body.filterOptions) : null,
+        filterOptions: body.filterOptions ?? undefined,
       },
     });
     return c.json({ data: watch }, 201);
@@ -69,21 +69,16 @@ watchesRouter.delete("/:id", async (c) => {
  * Used by the notification system to only send relevant alerts.
  */
 export function matchesWatchFilters(
-  watch: { filterOptions: string | null; partySize: number | null },
+  watch: { filterOptions: unknown; partySize: number | null },
   reservation: { reservationTime: string; reservationDate: Date; partySize: number }
 ): boolean {
   if (!watch.filterOptions) return true;
 
-  let filters: {
+  const filters = watch.filterOptions as {
     timeRange?: [string, string];
     weekdays?: number[];
     partySize?: number;
   };
-  try {
-    filters = JSON.parse(watch.filterOptions);
-  } catch {
-    return true;
-  }
 
   // Time range filter (e.g. ["18:00", "22:00"])
   if (filters.timeRange) {

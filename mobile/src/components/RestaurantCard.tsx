@@ -87,7 +87,7 @@ function PulsingUrgencyDot({ size = 7 }: { size?: number }) {
           width: size,
           height: size,
           borderRadius: size / 2,
-          backgroundColor: "#EF4444",
+          backgroundColor: C.error,
         },
       ]}
     />
@@ -137,7 +137,7 @@ function UrgencyBadge({ reservation }: { reservation: Reservation }) {
   return (
     <View testID="urgency-badge" style={styles.urgencyBadge}>
       <PulsingUrgencyDot size={7} />
-      <Flame size={11} color="#EF4444" fill="#EF4444" strokeWidth={0} />
+      <Flame size={11} color={C.error} fill={C.error} strokeWidth={0} />
       <Text style={styles.urgencyBadgeText}>
         {hours}h {minutes}m kvar
       </Text>
@@ -265,8 +265,8 @@ export const RestaurantCard = React.memo(function RestaurantCard({
                   <Animated.View style={heartAnimStyle}>
                     <Heart
                       size={14}
-                      color={isSaved ? "#FFFFFF" : "rgba(255,255,255,0.9)"}
-                      fill={isSaved ? "#FFFFFF" : "transparent"}
+                      color={isSaved ? C.white : C.white}
+                      fill={isSaved ? C.white : "transparent"}
                       strokeWidth={2}
                     />
                   </Animated.View>
@@ -275,7 +275,7 @@ export const RestaurantCard = React.memo(function RestaurantCard({
               {/* Watcher count on image */}
               {watcherCount > 0 ? (
                 <View style={styles.watcherOverlay}>
-                  <Eye size={10} color="#FFFFFF" strokeWidth={2.5} />
+                  <Eye size={10} color={C.white} strokeWidth={2.5} />
                   <Text style={styles.watcherOverlayText}>{watcherCount}</Text>
                 </View>
               ) : null}
@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 6,
     left: 6,
-    backgroundColor: "rgba(0,0,0,0.55)",
+    backgroundColor: C.overlayDark,
     borderRadius: 6,
     paddingHorizontal: 6,
     paddingVertical: 3,
@@ -437,7 +437,7 @@ const styles = StyleSheet.create({
   watcherOverlayText: {
     fontFamily: FONTS.bold,
     fontSize: 10.5,
-    color: "#FFFFFF",
+    color: C.white,
   },
   saveButton: {
     position: "absolute",
@@ -465,7 +465,7 @@ const styles = StyleSheet.create({
   urgencyBadgeToday: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(34,197,94,0.10)",
+    backgroundColor: C.successLight,
     borderRadius: 8,
     paddingHorizontal: 9,
     paddingVertical: 5,
@@ -476,13 +476,13 @@ const styles = StyleSheet.create({
   urgencyBadgeTodayText: {
     fontFamily: FONTS.bold,
     fontSize: 12,
-    color: "#16A34A",
+    color: C.success,
     letterSpacing: -0.2,
   },
   urgencyBadge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(239,68,68,0.08)",
+    backgroundColor: C.errorLight,
     borderRadius: 8,
     paddingHorizontal: 9,
     paddingVertical: 5,
@@ -493,7 +493,7 @@ const styles = StyleSheet.create({
   urgencyBadgeText: {
     fontFamily: FONTS.bold,
     fontSize: 12,
-    color: "#EF4444",
+    color: C.error,
     letterSpacing: -0.2,
   },
 });

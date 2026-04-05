@@ -42,7 +42,7 @@ import {
   useDeleteWatch,
 } from "@/lib/api/hooks";
 import type { ActivityAlert, RestaurantAlertWithRestaurant, Watch, WatchFilterOptions } from "@/lib/api/types";
-import { parseWatchFilters } from "@/lib/api/types";
+import { parseWatchFiltersSafe } from "@/lib/api/types";
 import Animated, { FadeInDown, ZoomIn } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
@@ -755,7 +755,7 @@ export default function AlertsScreen() {
             ) : (
               <View style={{ paddingHorizontal: SPACING.lg, gap: 10, marginTop: 4 }}>
                 {watches.map((watch: Watch, index: number) => {
-                  const filters = parseWatchFilters(watch.filterOptions);
+                  const filters = parseWatchFiltersSafe(watch.filterOptions);
                   const WEEKDAY_LABELS_SHORT = ["Sön", "Mån", "Tis", "Ons", "Tor", "Fre", "Lör"];
                   return (
                     <Animated.View key={watch.id} entering={FadeInDown.delay(index * 60).springify()}>

@@ -43,6 +43,7 @@ import { useAuthStore } from "@/lib/auth-store";
 import { LoginGate } from "@/components/LoginGate";
 import { C, FONTS, SPACING, SHADOW, RADIUS, ICON } from "../../lib/theme";
 import { Skeleton } from "@/components/Skeleton";
+import { TrustBadge } from "@/components/TrustBadge";
 
 const AnimatedCreditsCount = React.memo(function AnimatedCreditsCount({ value }: { value: number }) {
   const [displayValue, setDisplayValue] = useState(0);
@@ -68,7 +69,7 @@ const AnimatedCreditsCount = React.memo(function AnimatedCreditsCount({ value }:
   }, [value]);
 
   return (
-    <Text testID="credits-amount" style={{ fontFamily: FONTS.bold, fontSize: 38, color: "#fff" }}>
+    <Text testID="credits-amount" style={{ fontFamily: FONTS.bold, fontSize: 38, color: C.white }}>
       {displayValue}
     </Text>
   );
@@ -92,7 +93,7 @@ const ProfileSkeleton = React.memo(function ProfileSkeleton() {
 });
 
 interface MenuItemProps {
-  icon: any;
+  icon: React.ComponentType<{ size: number; color: string; strokeWidth: number }>;
   label: string;
   color: string;
   bgColor: string;
@@ -282,7 +283,7 @@ export default function ProfileScreen() {
             accessibilityLabel="Inställningar"
             onPress={handleSettingsPress}
             className="rounded-full p-2"
-            style={{ backgroundColor: "rgba(0,0,0,0.04)" }}
+            style={{ backgroundColor: C.overlayLight }}
           >
             <Settings size={20} color={C.textSecondary} strokeWidth={2} />
           </Pressable>
@@ -415,54 +416,9 @@ export default function ProfileScreen() {
                   <CheckCircle size={14} color={C.success} strokeWidth={ICON.strokeWidth} />
                 </View>
               ) : null}
-              {completedCount >= 3 ? (
-                <Animated.View
-                  entering={ZoomIn.springify().delay(200)}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 6,
-                    marginTop: 10,
-                    paddingHorizontal: 14,
-                    paddingVertical: 6,
-                    borderRadius: 20,
-                    backgroundColor: C.successLight,
-                  }}
-                >
-                  <ShieldCheck size={14} color={C.success} strokeWidth={ICON.strokeWidth} />
-                  <Text
-                    style={{
-                      fontFamily: FONTS.semiBold,
-                      fontSize: 13,
-                      color: C.success,
-                    }}
-                  >
-                    Pålitlig användare
-                  </Text>
-                </Animated.View>
-              ) : completedCount >= 1 ? (
-                <Animated.View
-                  entering={ZoomIn.springify().delay(200)}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 6,
-                    marginTop: 10,
-                    paddingHorizontal: 14,
-                    paddingVertical: 6,
-                    borderRadius: 20,
-                    backgroundColor: "rgba(201,169,110,0.08)",
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontFamily: FONTS.semiBold,
-                      fontSize: 13,
-                      color: C.gold,
-                    }}
-                  >
-                    Ny användare
-                  </Text>
+              {profile?.trustScore != null ? (
+                <Animated.View entering={ZoomIn.springify().delay(200)} style={{ marginTop: 10 }}>
+                  <TrustBadge score={profile.trustScore} />
                 </Animated.View>
               ) : null}
             </Animated.View>

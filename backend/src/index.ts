@@ -20,32 +20,29 @@ import { env } from "./env";
 
 const app = new Hono();
 
-// Trusted origins — explicit list, no wildcard echo
-const TRUSTED_ORIGINS = [
+const TRUSTED_ORIGINS = new Set([
   "http://localhost:8081",
   "http://localhost:3000",
   "http://127.0.0.1:8081",
   "http://127.0.0.1:3000",
+  "https://vibecode.dev",
+]);
+
+const TRUSTED_SUFFIX_PATTERNS = [
+  /^https:\/\/[a-z0-9-]+\.dev\.vibecode\.run$/,
+  /^https:\/\/[a-z0-9-]+\.vibecode\.run$/,
+  /^https:\/\/[a-z0-9-]+\.vibecodeapp\.com$/,
+  /^https:\/\/[a-z0-9-]+\.vibecode\.dev$/,
 ];
 
 app.use(
   "*",
   cors({
     origin: (origin) => {
-      if (!origin) return ""; // deny null origins
-      // Allow exact matches
-      if (TRUSTED_ORIGINS.includes(origin)) return origin;
-      // Allow vibecode development domains
-      if (
-        origin.endsWith(".dev.vibecode.run") ||
-        origin.endsWith(".vibecode.run") ||
-        origin.endsWith(".vibecodeapp.com") ||
-        origin.endsWith(".vibecode.dev") ||
-        origin === "https://vibecode.dev"
-      ) {
-        return origin;
-      }
-      return ""; // deny unknown origins
+      if (!origin) return "";
+      if (TRUSTED_ORIGINS.has(origin)) return origin;
+      if (TRUSTED_SUFFIX_PATTERNS.some((re) => re.test(origin))) return origin;
+      return "";
     },
     credentials: true,
   })
@@ -166,27 +163,30 @@ setInterval(async () => {
         const captured = await capturePayment(reservation.stripePaymentIntentId);
         if (!captured) {
           console.error(`[CRON] Failed to capture payment for reservation ${reservation.id} — marking as payment_failed`);
-          // Mark as payment_failed — do NOT award credits
-          await db.reservation.update({
-            where: { id: reservation.id },
-            data: { status: "payment_failed", creditStatus: "reverted" },
-          });
-          // Refund credits to claimer since payment failed
-          if (reservation.claimerPhone) {
-            await db.userProfile.update({
-              where: { phone: reservation.claimerPhone },
-              data: { credits: { increment: 2 } },
+          await db.$transaction(async (tx) => {
+            const result = await tx.reservation.updateMany({
+              where: { id: reservation.id, status: "grace_period", version: reservation.version },
+              data: { status: "payment_failed", creditStatus: "reverted", version: reservation.version + 1 },
             });
-          }
-          continue; // Skip finalization for this reservation
+            if (result.count === 0) return;
+            if (reservation.claimerPhone) {
+              await tx.userProfile.update({
+                where: { phone: reservation.claimerPhone },
+                data: { credits: { increment: 2 } },
+              });
+            }
+          });
+          continue;
         }
       }
 
       await db.$transaction(async (tx) => {
-        await tx.reservation.update({
-          where: { id: reservation.id },
-          data: { status: "completed", creditStatus: "awarded" },
+        const result = await tx.reservation.updateMany({
+          where: { id: reservation.id, status: "grace_period", version: reservation.version },
+          data: { status: "completed", creditStatus: "awarded", version: reservation.version + 1 },
         });
+
+        if (result.count === 0) return;
 
         await tx.userProfile.upsert({
           where: { phone: reservation.submitterPhone },

@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   },
   chipTextActive: {
     fontFamily: FONTS.semiBold,
-    color: "#111827",
+    color: C.dark,
   },
   chipTextInactive: {
     fontFamily: FONTS.medium,

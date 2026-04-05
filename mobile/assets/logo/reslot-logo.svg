@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Circular background -->
+  <circle cx="100" cy="100" r="100" fill="#111827"/>
+  
+  <!-- Fork & knife forming an "R" shape with a calendar dot -->
+  <!-- Stylized "R" mark: two vertical lines (fork tines) + curved top + leg -->
+  
+  <!-- Left vertical bar -->
+  <rect x="62" y="58" width="10" height="84" rx="5" fill="#7EC87A"/>
+  
+  <!-- Curved top arch (the bowl of R) -->
+  <path d="M72 58 Q115 58 115 82 Q115 106 72 106" stroke="#7EC87A" stroke-width="10" fill="none" stroke-linecap="round"/>
+  
+  <!-- Diagonal leg of R -->
+  <line x1="74" y1="106" x2="128" y2="142" stroke="#7EC87A" stroke-width="10" stroke-linecap="round"/>
+  
+  <!-- Small gold accent dot — the "reservation slot" -->
+  <circle cx="138" cy="62" r="9" fill="#C9A96E"/>
+</svg>

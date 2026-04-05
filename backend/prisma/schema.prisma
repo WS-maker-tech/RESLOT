@@ -8,6 +8,26 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum ReservationStatus {
+  active
+  claimed
+  grace_period
+  completed
+  cancelled
+  no_show
+  resold
+  payment_failed
+}
+
+enum SeatType {
+  indoor
+  outdoor
+  bar
+  private_room
+  terrace
+  any
+}
+
 model Restaurant {
   id                 String   @id @default(cuid())
   name               String
@@ -15,24 +35,23 @@ model Restaurant {
   cuisine            String
   neighborhood       String
   rating             Float
-  reviewCount        Int
+  reviewCount        Int      @default(0)
   priceLevel         Int
   image              String
   description        String
-  tags               String
+  tags               Json     @default("[]")
   timesBookedOnReslot Int     @default(0)
-  demandMultiplier    Float   @default(1.0)  // Dynamic pricing: multiplier based on restaurant demand
+  demandMultiplier    Float   @default(1.0)
   seatType           String
   instagram          String?
   website            String?
-  vibeTags           String
-  goodForTags        String
-  foodTags           String
+  vibeTags           Json     @default("[]")
+  goodForTags        Json     @default("[]")
+  foodTags           Json     @default("[]")
   latitude           Float?
   longitude          Float?
   isExclusive        Boolean  @default(false)
   city               String   @default("Stockholm")
-  // googlePlaceId   String?  @unique  // Link to Google Places API (enable after Mac Mini Supabase migration)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
@@ -40,12 +59,14 @@ model Restaurant {
   restaurantAlerts   RestaurantAlert[]
   watches            Watch[]
   savedByUsers       SavedRestaurant[]
+
+  @@index([city, cuisine, neighborhood])
 }
 
 model Reservation {
-  id                       String   @id @default(cuid())
+  id                       String            @id @default(cuid())
   restaurantId             String
-  restaurant               Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurant               Restaurant        @relation(fields: [restaurantId], references: [id], onDelete: Restrict)
   submitterPhone           String
   submitterFirstName       String
   submitterLastName        String
@@ -54,27 +75,27 @@ model Reservation {
   partySize                Int
   seatType                 String
   nameOnReservation        String
-  status                   String   @default("active") // active, claimed, grace_period, completed, cancelled, no_show, resold
+  status                   ReservationStatus @default(active)
   claimerPhone             String?
   claimedAt                DateTime?
   graceDeadline            DateTime?
-  creditStatus             String   @default("none") // none, pending, awarded, reverted
+  creditStatus             String            @default("none")
   serviceFee               Float?
   stripePaymentIntentId    String?
-  captureStatus            String   @default("none") // none, pending, captured, failed
+  captureStatus            String            @default("none")
   cancelFee                Float?
   prepaidAmount            Float?
   verificationLink         String?
   extraInfo                String?
   cancellationWindowHours  Int?
-  creditCost               Int      @default(2)     // Dynamic pricing: credit cost for claiming (default 2)
-  noShowFeeCharged         Boolean  @default(false)
+  creditCost               Int               @default(2)
+  noShowFeeCharged         Boolean           @default(false)
   noShowFeePaymentIntentId String?
-  resoldFromId             String?  // ID of the original reservation if this was created via resale
-  reminderSent             Boolean  @default(false)
-  version                  Int      @default(0) // Optimistic locking
-  createdAt                DateTime @default(now())
-  updatedAt                DateTime @updatedAt
+  resoldFromId             String?
+  reminderSent             Boolean           @default(false)
+  version                  Int               @default(0)
+  createdAt                DateTime          @default(now())
+  updatedAt                DateTime          @updatedAt
 
   noShowReports            NoShowReport[]
   reports                  ReservationReport[]
@@ -86,6 +107,7 @@ model Reservation {
   @@index([restaurantId])
   @@index([reservationDate])
   @@index([status, claimedAt])
+  @@index([restaurantId, reservationDate, status])
 }
 
 model UserProfile {
@@ -104,8 +126,8 @@ model UserProfile {
   referralUsed      String?
   stripeCustomerId  String?  @unique
   pushToken         String?
-  trustScore        Float    @default(5.0)   // Aggregated trust score (1-5)
-  totalFeedbacks    Int      @default(0)     // Total number of feedbacks received
+  trustScore        Float    @default(5.0)
+  totalFeedbacks    Int      @default(0)
   isDeleted         Boolean  @default(false)
   deletedAt         DateTime?
   createdAt         DateTime @default(now())
@@ -113,26 +135,30 @@ model UserProfile {
 }
 
 model Watch {
-  id            String     @id @default(cuid())
+  id            String      @id @default(cuid())
   userPhone     String
   restaurantId  String?
-  restaurant    Restaurant? @relation(fields: [restaurantId], references: [id])
+  restaurant    Restaurant? @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   date          String?
   partySize     Int?
   notes         String?
-  filterOptions String?    // JSON: { timeRange?: [string,string], weekdays?: number[], partySize?: number }
-  createdAt     DateTime   @default(now())
+  filterOptions Json?
+  createdAt     DateTime    @default(now())
 
   @@index([userPhone])
+  @@index([restaurantId])
 }
 
 model RestaurantAlert {
   id           String     @id @default(cuid())
   userPhone    String
   restaurantId String
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   enabled      Boolean    @default(true)
   createdAt    DateTime   @default(now())
+
+  @@index([restaurantId])
+  @@index([userPhone])
 }
 
 model ActivityAlert {
@@ -166,23 +192,25 @@ model Session {
   token     String   @unique
   expiresAt DateTime
   createdAt DateTime @default(now())
+
+  @@index([phone])
 }
 
 model NoShowReport {
-  id            String   @id @default(cuid())
+  id            String      @id @default(cuid())
   reservationId String
-  reservation   Reservation @relation(fields: [reservationId], references: [id])
+  reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
   reporterPhone String
   reason        String
   evidenceUrl   String?
-  status        String   @default("pending") // pending, confirmed, rejected
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  status        String      @default("pending")
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 }
 
 model ProcessedEvent {
-  id        String   @id // Stripe event ID
-  type      String   // event type (e.g. payment_intent.succeeded)
+  id        String   @id
+  type      String
   createdAt DateTime @default(now())
 }
 
@@ -190,7 +218,7 @@ model SavedRestaurant {
   id           String     @id @default(cuid())
   userPhone    String
   restaurantId String
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   createdAt    DateTime   @default(now())
 
   @@unique([userPhone, restaurantId])
@@ -210,9 +238,8 @@ model EmailVerification {
   @@index([email, used])
 }
 
-// --- Google Places cache ---
 model RestaurantCache {
-  placeId       String   @id            // Google Place ID
+  placeId       String   @id
   name          String
   address       String
   city          String
@@ -227,9 +254,9 @@ model RestaurantCache {
   website       String?
   instagram     String?
   phone         String?
-  openingHours  String?  // JSON string
-  tags          String?  // JSON string
-  rawGoogleData String?  // Full Google Places response (JSON)
+  openingHours  String?
+  tags          String?
+  rawGoogleData String?
   cachedAt      DateTime @default(now())
   expiresAt     DateTime
 
@@ -238,31 +265,29 @@ model RestaurantCache {
   @@index([expiresAt])
 }
 
-// --- Reservation reports ---
 model ReservationReport {
-  id            String   @id @default(cuid())
+  id            String      @id @default(cuid())
   reservationId String
-  reservation   Reservation @relation(fields: [reservationId], references: [id])
+  reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
   reporterPhone String
-  reason        String   // booking_not_found, wrong_details, restaurant_denied, fraud
+  reason        String
   details       String?
-  status        String   @default("pending") // pending, reviewed, resolved
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  status        String      @default("pending")
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 
   @@index([reservationId])
   @@index([reporterPhone])
 }
 
-// --- Reservation feedback (post-booking) ---
 model ReservationFeedback {
-  id            String   @id @default(cuid())
-  reservationId String   @unique          // One feedback per reservation
-  reservation   Reservation @relation(fields: [reservationId], references: [id])
-  userPhone     String                    // The claimer giving feedback
-  worked        Boolean                   // Did the booking work? (Ja/Nej)
-  comment       String?                   // Optional free text
-  createdAt     DateTime @default(now())
+  id            String      @id @default(cuid())
+  reservationId String      @unique
+  reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  userPhone     String
+  worked        Boolean
+  comment       String?
+  createdAt     DateTime    @default(now())
 
   @@index([userPhone])
   @@index([reservationId])

@@ -6,6 +6,7 @@ import { authMiddleware } from "../middleware/auth";
 import { createClaimPreAuth, cancelPreAuth, capturePayment, getOrCreateStripeCustomer, createNoShowFeeCharge } from "../stripe";
 import { sendPushToUser, sendPushToUsers } from "../push";
 import { matchesWatchFilters } from "./watches";
+import { calculateTrustScore } from "../lib/trust";
 
 const reservationsRouter = new Hono();
 
@@ -80,7 +81,9 @@ reservationsRouter.get(
       orderBy: { reservationDate: "asc" },
     });
 
-    return c.json({ data: reservations });
+    const publicReservations = reservations.map(({ submitterFirstName, submitterLastName, submitterPhone, claimerPhone, nameOnReservation, ...rest }) => rest);
+
+    return c.json({ data: publicReservations });
   }
 );
 
@@ -108,6 +111,7 @@ reservationsRouter.get("/mine", authMiddleware, async (c) => {
     },
     include: {
       restaurant: true,
+      feedback: true,
     },
     orderBy: { reservationDate: "desc" },
   });
@@ -135,7 +139,7 @@ reservationsRouter.get("/missed", async (c) => {
     take: 10,
   });
 
-  const data = reservations.map((r) => ({
+  const data = reservations.map(({ submitterFirstName, submitterLastName, submitterPhone, claimerPhone, nameOnReservation, ...r }) => ({
     ...r,
     timeToClaim: r.claimedAt && r.createdAt
       ? Math.round((new Date(r.claimedAt).getTime() - new Date(r.createdAt).getTime()) / 60000)
@@ -158,7 +162,8 @@ reservationsRouter.get("/:id", async (c) => {
     return c.json({ error: { message: "Reservation not found", code: "NOT_FOUND" } }, 404);
   }
 
-  return c.json({ data: reservation });
+  const { submitterFirstName, submitterLastName, submitterPhone, claimerPhone, nameOnReservation, ...publicReservation } = reservation;
+  return c.json({ data: publicReservation });
 });
 
 // POST /api/reservations - Submit a new reservation (PROTECTED)
@@ -299,7 +304,7 @@ async function sendSms(to: string, body: string) {
       console.error("[SMS] Twilio error:", err);
     }
   } else {
-    console.log(`[SMS DEV] Would send to ${to}: ${body}`);
+    console.log(`[SMS DEV] Would send to ${to}`);
   }
 }
 
@@ -562,39 +567,52 @@ reservationsRouter.post("/:id/cancel-claim", authMiddleware, async (c) => {
     await cancelPreAuth(reservation.stripePaymentIntentId);
   }
 
-  // Refund 2 credits to claimer
-  if (reservation.claimerPhone) {
-    await db.userProfile.update({
-      where: { phone: reservation.claimerPhone },
-      data: { credits: { increment: 2 } },
+  const currentVersion = reservation.version;
+  const updated = await db.$transaction(async (tx) => {
+    const result = await tx.reservation.updateMany({
+      where: { id, version: currentVersion },
+      data: {
+        status: "active",
+        claimerPhone: null,
+        claimedAt: null,
+        graceDeadline: null,
+        creditStatus: "reverted",
+        serviceFee: null,
+        stripePaymentIntentId: null,
+        version: currentVersion + 1,
+      },
     });
+
+    if (result.count === 0) {
+      throw new Error("OPTIMISTIC_LOCK_FAILED");
+    }
+
+    if (reservation.claimerPhone) {
+      await tx.userProfile.update({
+        where: { phone: reservation.claimerPhone },
+        data: { credits: { increment: 2 } },
+      });
+    }
+
+    await tx.activityAlert.create({
+      data: {
+        userPhone: reservation.submitterPhone,
+        type: "claim",
+        title: "\u00d6vertagandet \u00e5ngrades",
+        message: `\u00d6vertagandet av din bokning p\u00e5 ${reservation.restaurant.name} \u00e5ngrades. Bokningen \u00e4r aktiv igen.`,
+        restaurantId: reservation.restaurantId,
+      },
+    });
+
+    return tx.reservation.findUnique({
+      where: { id },
+      include: { restaurant: true },
+    });
+  });
+
+  if (!updated) {
+    return c.json({ error: { message: "Reservation not found after update", code: "NOT_FOUND" } }, 404);
   }
-
-  // Revert reservation to active
-  const updated = await db.reservation.update({
-    where: { id },
-    data: {
-      status: "active",
-      claimerPhone: null,
-      claimedAt: null,
-      graceDeadline: null,
-      creditStatus: "reverted",
-      serviceFee: null,
-      stripePaymentIntentId: null,
-    },
-    include: { restaurant: true },
-  });
-
-  // Notify submitter
-  await db.activityAlert.create({
-    data: {
-      userPhone: reservation.submitterPhone,
-      type: "claim",
-      title: "\u00d6vertagandet \u00e5ngrades",
-      message: `\u00d6vertagandet av din bokning p\u00e5 ${reservation.restaurant.name} \u00e5ngrades. Bokningen \u00e4r aktiv igen.`,
-      restaurantId: reservation.restaurantId,
-    },
-  });
 
   return c.json({ data: updated });
 });
@@ -634,27 +652,42 @@ reservationsRouter.post("/:id/finalize", authMiddleware, async (c) => {
     }
   }
 
-  // Award 2 credits to submitter NOW
-  await db.userProfile.upsert({
-    where: { phone: reservation.submitterPhone },
-    update: { credits: { increment: 2 } },
-    create: {
-      phone: reservation.submitterPhone,
-      firstName: reservation.submitterFirstName,
-      lastName: reservation.submitterLastName,
-      email: "",
-      credits: 2,
-    },
+  const currentVersion = reservation.version;
+  const updated = await db.$transaction(async (tx) => {
+    const result = await tx.reservation.updateMany({
+      where: { id, status: "grace_period", version: currentVersion },
+      data: {
+        status: "completed",
+        creditStatus: "awarded",
+        version: currentVersion + 1,
+      },
+    });
+
+    if (result.count === 0) {
+      throw new Error("OPTIMISTIC_LOCK_FAILED");
+    }
+
+    await tx.userProfile.upsert({
+      where: { phone: reservation.submitterPhone },
+      update: { credits: { increment: 2 } },
+      create: {
+        phone: reservation.submitterPhone,
+        firstName: reservation.submitterFirstName,
+        lastName: reservation.submitterLastName,
+        email: "",
+        credits: 2,
+      },
+    });
+
+    return tx.reservation.findUnique({
+      where: { id },
+      include: { restaurant: true },
+    });
   });
 
-  const updated = await db.reservation.update({
-    where: { id },
-    data: {
-      status: "completed",
-      creditStatus: "awarded",
-    },
-    include: { restaurant: true },
-  });
+  if (!updated) {
+    return c.json({ error: { message: "Reservation not found after update", code: "NOT_FOUND" } }, 404);
+  }
 
   // Notify submitter about credit award
   await db.activityAlert.create({
@@ -693,9 +726,18 @@ reservationsRouter.patch("/:id/cancel", authMiddleware, async (c) => {
     );
   }
 
-  const updated = await db.reservation.update({
+  const currentVersion = reservation.version;
+  const result = await db.reservation.updateMany({
+    where: { id, status: "active", version: currentVersion },
+    data: { status: "cancelled", version: currentVersion + 1 },
+  });
+
+  if (result.count === 0) {
+    return c.json({ error: { message: "Bokningen har redan ändrats", code: "CONFLICT" } }, 409);
+  }
+
+  const updated = await db.reservation.findUnique({
     where: { id },
-    data: { status: "cancelled" },
     include: { restaurant: true },
   });
 
@@ -1066,24 +1108,12 @@ reservationsRouter.post(
         },
       });
 
-      // Update the SUBMITTER's trust score
-      const submitter = await tx.userProfile.findUnique({
+      // Recalculate the SUBMITTER's behavioral trust score
+      const newScore = await calculateTrustScore(reservation.submitterPhone);
+      await tx.userProfile.update({
         where: { phone: reservation.submitterPhone },
+        data: { trustScore: newScore, totalFeedbacks: { increment: 1 } },
       });
-
-      if (submitter) {
-        const ratingValue = worked ? 5 : 1;
-        const newTrustScore = (submitter.trustScore * submitter.totalFeedbacks + ratingValue) / (submitter.totalFeedbacks + 1);
-        const clampedScore = Math.min(5.0, Math.max(1.0, newTrustScore));
-
-        await tx.userProfile.update({
-          where: { phone: reservation.submitterPhone },
-          data: {
-            trustScore: clampedScore,
-            totalFeedbacks: { increment: 1 },
-          },
-        });
-      }
 
       return created;
     });

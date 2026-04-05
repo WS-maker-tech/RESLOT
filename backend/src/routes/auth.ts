@@ -1,10 +1,37 @@
 import { Hono } from "hono";
+import type { Context } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { db } from "../db";
 import { supabaseAdmin } from "../lib/supabase";
 
 const authRouter = new Hono();
+
+// Rate limiter for auth endpoints (by IP or token)
+const authRateLimit = new Map<string, { count: number; resetAt: number }>();
+const AUTH_RATE_LIMIT = 30;
+const AUTH_RATE_WINDOW_MS = 60 * 1000;
+
+function checkAuthRateLimit(key: string): boolean {
+  const now = Date.now();
+  const entry = authRateLimit.get(key);
+  if (!entry || now > entry.resetAt) {
+    authRateLimit.set(key, { count: 1, resetAt: now + AUTH_RATE_WINDOW_MS });
+    return true;
+  }
+  if (entry.count >= AUTH_RATE_LIMIT) return false;
+  entry.count++;
+  return true;
+}
+
+// Apply rate limiting to all auth routes
+authRouter.use("*", async (c, next) => {
+  const ip = c.req.header("x-forwarded-for") ?? c.req.header("x-real-ip") ?? "unknown";
+  if (!checkAuthRateLimit(ip)) {
+    return c.json({ error: { message: "För många förfrågningar. Försök igen senare.", code: "RATE_LIMITED" } }, 429);
+  }
+  await next();
+});
 
 // Helper: normalize Swedish phone numbers
 function normalizePhone(phone: string): string {
@@ -22,6 +49,20 @@ authRouter.get("/me", async (c) => {
     return c.json({ error: { message: "Unauthorized", code: "UNAUTHORIZED" } }, 401);
   }
   const token = authHeader.slice(7);
+
+  // DEV BYPASS: acceptera dev-token på format "dev:+46XXXXXXXXX"
+  if (token.startsWith("dev:")) {
+    const phone = token.slice(4);
+    if (phone) {
+      let profile = await db.userProfile.findUnique({ where: { phone } });
+      if (!profile) {
+        profile = await db.userProfile.create({
+          data: { phone, firstName: "", lastName: "", email: "", phoneVerified: true, credits: 2 },
+        });
+      }
+      return c.json({ data: profile });
+    }
+  }
 
   const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
   if (error || !user || !user.phone) {
@@ -89,7 +130,7 @@ function generateOtp(): string {
   return (100000 + (bytes[0]! % 900000)).toString();
 }
 
-async function getPhoneFromToken(c: any): Promise<string | null> {
+async function getPhoneFromToken(c: Context): Promise<string | null> {
   const authHeader = c.req.header("Authorization");
   if (!authHeader?.startsWith("Bearer ")) return null;
   const token = authHeader.slice(7);
@@ -126,7 +167,7 @@ authRouter.post(
       data: { phone, email, code, expiresAt },
     });
 
-    console.log(`[EMAIL VERIFY] Code for ${email} (phone: ${phone}): ${code}`);
+    // TODO: send verification code via email in production
 
     return c.json({ data: { success: true, message: "Verification code generated (check server logs)" } });
   }

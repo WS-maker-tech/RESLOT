@@ -123,14 +123,14 @@ function RootLayoutNav() {
                   Authorization: `Bearer ${sessionToken}`,
                 },
                 body: JSON.stringify({ token }),
-              }).catch(() => {});
+              }).catch((err) => console.error("[Auth] Failed to save push token:", err));
             }
           });
         } else {
           logout();
         }
       })
-      .catch(() => {});
+      .catch((err) => console.error("[Auth] Failed to verify session:", err));
   }, [hydrated]);
 
   if (!hydrated) return null;
@@ -160,6 +160,7 @@ function RootLayoutNav() {
         <Stack.Screen name="payment" options={{ presentation: "modal", headerShown: false }} />
         <Stack.Screen name="invite" options={{ presentation: "modal", headerShown: false }} />
         <Stack.Screen name="support" options={{ presentation: "modal", headerShown: false }} />
+        <Stack.Screen name="feedback" options={{ presentation: "modal", headerShown: false, animation: "slide_from_bottom" }} />
         <Stack.Screen name="add-watch" options={{ presentation: "modal", headerShown: false }} />
         <Stack.Screen name="booking-confirmation" options={{ headerShown: false, animation: "slide_from_right" }} />
         <Stack.Screen name="map" options={{ headerShown: false, animation: "slide_from_right" }} />

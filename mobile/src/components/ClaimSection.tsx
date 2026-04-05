@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, Pressable, ActivityIndicator, StyleSheet, Platform } from "react-native";
+import type { StyleProp, ViewStyle } from "react-native";
 import { Check, Shield, Sparkles, CreditCard, AlertCircle } from "lucide-react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { C, FONTS, SPACING, SHADOW, RADIUS } from "../lib/theme";
@@ -14,8 +15,8 @@ interface ClaimSectionProps {
   onToggleAccepted: () => void;
   onClaim: () => void;
   onBuyCredits: () => void;
-  btnStyle: any;
-  errorShakeStyle: any;
+  btnStyle: StyleProp<ViewStyle>;
+  errorShakeStyle: StyleProp<ViewStyle>;
   onPressIn: () => void;
   onPressOut: () => void;
   submitterFirstName?: string;
@@ -108,7 +109,7 @@ export const ClaimSection = React.memo(function ClaimSection({
           <View
             style={[
               styles.balanceRow,
-              { backgroundColor: hasEnoughCredits ? C.successBg : "rgba(239,68,68,0.06)" },
+              { backgroundColor: hasEnoughCredits ? C.successBg : C.errorBg },
             ]}
           >
             <Text style={styles.balanceLabel}>Ditt saldo</Text>
@@ -203,7 +204,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: C.borderLight,
     borderLeftWidth: 3,
-    borderLeftColor: "rgba(201,169,110,0.4)",
+    borderLeftColor: C.goldPressed,
     ...SHADOW.card,
   },
   costHeader: {
@@ -216,7 +217,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 8,
-    backgroundColor: "rgba(201,169,110,0.10)",
+    backgroundColor: C.goldLight,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -315,27 +316,27 @@ const styles = StyleSheet.create({
   buyCreditsText: {
     fontFamily: FONTS.bold,
     fontSize: 14,
-    color: "#FFFFFF",
+    color: C.white,
   },
   graceContainer: {
     paddingHorizontal: SPACING.lg,
     paddingTop: 14,
   },
   graceCard: {
-    backgroundColor: "rgba(59,130,246,0.04)",
+    backgroundColor: C.infoBg,
     borderRadius: RADIUS.lg,
     padding: 16,
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 12,
     borderWidth: 1,
-    borderColor: "rgba(59,130,246,0.10)",
+    borderColor: C.infoBorder,
   },
   graceIconContainer: {
     width: 32,
     height: 32,
     borderRadius: 8,
-    backgroundColor: "rgba(59,130,246,0.10)",
+    backgroundColor: C.infoLight,
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
@@ -395,7 +396,7 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: "rgba(126,200,122,0.15)",
+    backgroundColor: C.coralLight,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -434,14 +435,14 @@ const styles = StyleSheet.create({
     paddingTop: 16,
   },
   errorCard: {
-    backgroundColor: "rgba(239,68,68,0.06)",
+    backgroundColor: C.errorBg,
     borderRadius: RADIUS.md,
     padding: 14,
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
     borderWidth: 1,
-    borderColor: "rgba(239,68,68,0.12)",
+    borderColor: C.errorBorder,
   },
   errorText: {
     fontFamily: FONTS.medium,

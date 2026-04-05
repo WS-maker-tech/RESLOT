@@ -1,8 +1,58 @@
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { persist, createJSONStorage, type StateStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
+import { Platform } from "react-native";
 import { supabase } from "./supabase";
 import type { Session } from "@supabase/supabase-js";
+
+const SECURE_KEY = "reslot-auth-tokens";
+
+const secureStorage: StateStorage = {
+  getItem: async (name: string) => {
+    if (Platform.OS === "web") {
+      return AsyncStorage.getItem(name);
+    }
+    try {
+      const secureData = await SecureStore.getItemAsync(SECURE_KEY);
+      const asyncData = await AsyncStorage.getItem(name);
+      if (!asyncData) return null;
+      const parsed = JSON.parse(asyncData);
+      if (secureData) {
+        const tokens = JSON.parse(secureData);
+        parsed.state.supabaseAccessToken = tokens.supabaseAccessToken ?? null;
+        parsed.state.sessionToken = tokens.sessionToken ?? null;
+      }
+      return JSON.stringify(parsed);
+    } catch {
+      return AsyncStorage.getItem(name);
+    }
+  },
+  setItem: async (name: string, value: string) => {
+    if (Platform.OS === "web") {
+      return AsyncStorage.setItem(name, value);
+    }
+    try {
+      const parsed = JSON.parse(value);
+      const tokens = {
+        supabaseAccessToken: parsed.state.supabaseAccessToken,
+        sessionToken: parsed.state.sessionToken,
+      };
+      await SecureStore.setItemAsync(SECURE_KEY, JSON.stringify(tokens));
+      parsed.state.supabaseAccessToken = null;
+      parsed.state.sessionToken = null;
+      await AsyncStorage.setItem(name, JSON.stringify(parsed));
+    } catch {
+      await AsyncStorage.setItem(name, value);
+    }
+  },
+  removeItem: async (name: string) => {
+    if (Platform.OS !== "web") {
+      await SecureStore.deleteItemAsync(SECURE_KEY).catch(() => {});
+    }
+    await AsyncStorage.removeItem(name);
+  },
+};
 
 interface AuthState {
   hasCompletedOnboarding: boolean;
@@ -14,7 +64,7 @@ interface AuthState {
   email: string;
   selectedCity: string;
   supabaseAccessToken: string | null;
-  sessionToken: string | null; // kept for backward compat with api.ts
+  sessionToken: string | null;
   setOnboardingComplete: () => void;
   setGuestMode: () => void;
   setLoggedIn: (value: boolean) => void;
@@ -82,12 +132,11 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: "reslot-auth",
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => secureStorage),
     }
   )
 );
 
-// Listen for Supabase auth state changes and sync to store
 supabase.auth.onAuthStateChange((_event, session) => {
   useAuthStore.getState().setSupabaseSession(session);
 });

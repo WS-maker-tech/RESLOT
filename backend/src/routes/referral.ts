@@ -19,18 +19,26 @@ referralRouter.get("/code", async (c) => {
   if (!profile) return c.json({ error: { message: "Anv\u00e4ndare ej hittad", code: "NOT_FOUND" } }, 404);
 
   if (!profile.referralCode) {
-    let code = generateCode();
     let tries = 0;
     while (tries < 10) {
-      const existing = await db.userProfile.findFirst({ where: { referralCode: code } });
-      if (!existing) break;
-      code = generateCode();
-      tries++;
+      const code = generateCode();
+      try {
+        profile = await db.userProfile.update({
+          where: { phone },
+          data: { referralCode: code },
+        });
+        break;
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message.includes("Unique constraint")) {
+          tries++;
+          if (tries >= 10) {
+            return c.json({ error: { message: "Kunde inte generera kod, försök igen", code: "RETRY" } }, 500);
+          }
+          continue;
+        }
+        throw e;
+      }
     }
-    profile = await db.userProfile.update({
-      where: { phone },
-      data: { referralCode: code },
-    });
   }
 
   return c.json({ data: { referralCode: profile.referralCode } });

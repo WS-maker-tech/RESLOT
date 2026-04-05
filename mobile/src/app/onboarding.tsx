@@ -7,6 +7,7 @@ import {
   Dimensions,
   KeyboardAvoidingView,
   Platform,
+  useWindowDimensions,
 } from "react-native";
 import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -42,7 +43,10 @@ import { useAuthStore } from "@/lib/auth-store";
 import { supabase } from "@/lib/supabase";
 import { C as ThemeC, FONTS } from "../lib/theme";
 
-const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get("window");
+// Use static fallback for constants needed at module level (card sizes etc)
+const { width: _INIT_W, height: _INIT_H } = Dimensions.get("window");
+const SCREEN_W = Platform.OS === "web" ? Math.min(_INIT_W, 430) : _INIT_W;
+const SCREEN_H = Platform.OS === "web" ? Math.min(_INIT_H, 932) : _INIT_H;
 
 // --- Colors ---
 const C = {
@@ -68,7 +72,7 @@ const CARD_GAP = 9;
 const CARD_STEP = CARD_H + CARD_GAP;
 const STRIP_HALF = 6 * CARD_STEP;
 const STRIP_H = SCREEN_H * 0.58;
-const COL_W = (SCREEN_W - CARD_GAP * 2) / 3;
+const COL_W = (SCREEN_W - CARD_GAP * 2) / 3; // 2 gaps between 3 columns
 
 type StripCard = { name: string; meta: string; image: string };
 
@@ -99,16 +103,17 @@ const STRIP_COL_C: StripCard[] = [
   { name: "Djuret", meta: "Meat · 20:00", image: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=300&h=500&fit=crop&sat=-10" },
 ];
 
-function RestaurantStripCard({ card }: { card: StripCard }) {
+function RestaurantStripCard({ card, colW }: { card: StripCard; colW?: number }) {
   return (
     <View
       style={{
-        width: COL_W,
+        width: colW ?? COL_W,
+        minWidth: 0,
         height: CARD_H,
         borderRadius: 13,
         overflow: "hidden",
         marginBottom: CARD_GAP,
-        backgroundColor: "#1c1c1c",
+        backgroundColor: C.dark,
       }}
     >
       <Image
@@ -123,7 +128,7 @@ function RestaurantStripCard({ card }: { card: StripCard }) {
       />
       <View style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: 8 }}>
         <Text
-          style={{ fontFamily: FONTS.semiBold, fontSize: 11, color: "#FFFFFF", lineHeight: 14 }}
+          style={{ fontFamily: FONTS.semiBold, fontSize: 11, color: C.white, lineHeight: 14 }}
           numberOfLines={1}
         >
           {card.name}
@@ -144,11 +149,13 @@ function AnimatedColumn({
   direction,
   durationSec,
   startOffsetSec,
+  colW,
 }: {
   cards: StripCard[];
   direction: "up" | "down";
   durationSec: number;
   startOffsetSec: number;
+  colW: number;
 }) {
   const isDown = direction === "down";
   const startVal = isDown ? -STRIP_HALF : 0;
@@ -184,9 +191,9 @@ function AnimatedColumn({
 
   const allCards = [...cards, ...cards];
   return (
-    <Animated.View style={animStyle}>
+    <Animated.View style={[animStyle, { flex: 1 }]}>
       {allCards.map((card, i) => (
-        <RestaurantStripCard key={i} card={card} />
+        <RestaurantStripCard key={i} card={card} colW={colW} />
       ))}
     </Animated.View>
   );
@@ -412,13 +419,19 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
 
 // ==================== STEP 1: SPLASH ====================
 function SplashStep({ onGetStarted, onExplore }: { onGetStarted: () => void; onExplore: () => void }) {
+  const { width: winW, height: winH } = useWindowDimensions();
+  const contentW = Platform.OS === "web" ? Math.min(winW, 430) : winW;
+  const h = Platform.OS === "web" ? Math.min(winH, 932) : winH;
+  const colW = (winW - CARD_GAP * 2) / 3;
+  const stripH = h * 0.58;
+
   return (
     <View style={{ flex: 1 }}>
-      {/* Animated Restaurant Strip */}
-      <View style={{ height: STRIP_H, flexDirection: "row", gap: CARD_GAP, overflow: "hidden" }}>
-        <AnimatedColumn cards={STRIP_COL_A} direction="down" durationSec={30} startOffsetSec={9} />
-        <AnimatedColumn cards={STRIP_COL_B} direction="up" durationSec={23} startOffsetSec={4} />
-        <AnimatedColumn cards={STRIP_COL_C} direction="down" durationSec={37} startOffsetSec={22} />
+      {/* Animated Restaurant Strip — full window width */}
+      <View style={{ height: stripH, flexDirection: "row", gap: CARD_GAP, overflow: "hidden", width: winW }}>
+        <AnimatedColumn cards={STRIP_COL_A} direction="down" durationSec={30} startOffsetSec={9} colW={colW} />
+        <AnimatedColumn cards={STRIP_COL_B} direction="up" durationSec={23} startOffsetSec={4} colW={colW} />
+        <AnimatedColumn cards={STRIP_COL_C} direction="down" durationSec={37} startOffsetSec={22} colW={colW} />
 
         <LinearGradient
           colors={[C.bg, "transparent"]}
@@ -441,11 +454,10 @@ function SplashStep({ onGetStarted, onExplore }: { onGetStarted: () => void; onE
             style={{
               fontFamily: FONTS.displayBold,
               fontSize: 38,
-              color: C.text,
               letterSpacing: -1.4,
             }}
           >
-            Reslot
+            <Text style={{ color: C.textPrimary }}>Re</Text><Text style={{ color: C.pistachio }}>slot</Text>
           </Text>
         </Animated.View>
 
@@ -1933,7 +1945,7 @@ export default function OnboardingScreen() {
                     "Authorization": `Bearer ${accessToken}`,
                   },
                   body: JSON.stringify({ firstName: first, lastName: last, email, phone: storedPhone }),
-                }).catch(() => {});
+                }).catch((err) => console.error("[Onboarding] Failed to save profile:", err));
               }
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               setStep("city");

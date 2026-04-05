@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 64" fill="none">
+  <!-- Wordmark: "reslot" in clean geometric sans -->
+  <!-- Using path-based letterforms for precision -->
+  
+  <!-- Icon mark: small R glyph -->
+  <rect x="0" y="12" width="5" height="40" rx="2.5" fill="#111827"/>
+  <path d="M5 12 Q26 12 26 24 Q26 36 5 36" stroke="#111827" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <line x1="6" y1="36" x2="30" y2="52" stroke="#111827" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="32" cy="14" r="5" fill="#C9A96E"/>
+  
+  <!-- Wordmark text -->
+  <text x="48" y="46" 
+    font-family="'SF Pro Display', 'Helvetica Neue', -apple-system, sans-serif" 
+    font-size="36" 
+    font-weight="600" 
+    letter-spacing="-1.5"
+    fill="#111827">reslot</text>
+</svg>
