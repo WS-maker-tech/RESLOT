@@ -28,22 +28,6 @@ interface SupportWidgetProps {
   onSendMessage?: (text: string) => Promise<string>;
 }
 
-const SYSTEM_PROMPT = `Du är Reslots kundsupportagent. Reslot är en app där användare kan dela och ta över restaurangbokningar som de inte längre kan använda — en andrahandsmarknad för bordbokningar på exklusiva restauranger i Sverige.
-
-Du hjälper användare med:
-- Hur Reslot fungerar (credits-systemet, hur man lägger upp och tar bokningar)
-- Problem med betalning och credits
-- Frågor om specifika bokningar
-- Tekniska problem med appen
-
-Viktiga fakta:
-- Credits kostar inget — man tjänar dem genom att dela bokningar
-- Varje delad bokning ger 2 credits, att ta en bokning kostar 2 credits
-- Reslot garanterar inte att restaurangen accepterar överlåtelsen
-- Vid problem: support@reslot.se
-
-Ton: Varm, hjälpsam och professionell. Tala svenska. Håll svaren korta och konkreta.`;
-
 interface ChatMessage {
   role: "system" | "user" | "assistant";
   content: string;
@@ -51,23 +35,15 @@ interface ChatMessage {
 
 async function sendToAgent(messages: ChatMessage[]): Promise<string> {
   try {
-    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const baseUrl = process.env.EXPO_PUBLIC_BACKEND_URL ?? "http://localhost:3000";
+    const res = await fetch(`${baseUrl}/api/support/chat`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.EXPO_PUBLIC_OPENROUTER_KEY ?? ""}`,
-        "HTTP-Referer": "https://reslot.se",
-        "X-Title": "Reslot Support",
-      },
-      body: JSON.stringify({
-        model: "openai/gpt-4.1-mini",
-        messages: [{ role: "system", content: SYSTEM_PROMPT }, ...messages],
-        max_tokens: 300,
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages }),
     });
     if (!res.ok) throw new Error("API error");
-    const data = await res.json();
-    return data.choices?.[0]?.message?.content ?? "Jag förstår inte riktigt, kan du förtydliga?";
+    const data = await res.json() as { reply: string };
+    return data.reply ?? "Jag förstår inte riktigt, kan du förtydliga?";
   } catch {
     return "Tyvärr kan jag inte svara just nu. Kontakta oss på support@reslot.se";
   }

@@ -12,6 +12,7 @@ import { creditsRouter } from "./routes/credits";
 import { referralRouter } from "./routes/referral";
 import { savedRestaurantsRouter } from "./routes/saved-restaurants";
 import { notificationsRouter } from "./routes/notifications";
+import { supportRouter } from "./routes/support";
 import { logger } from "hono/logger";
 import { authMiddleware } from "./middleware/auth";
 import { db } from "./db";
@@ -109,6 +110,7 @@ app.route("/api/credits", creditsRouter);
 app.route("/api/referral", referralRouter);
 app.route("/api/saved-restaurants", savedRestaurantsRouter);
 app.route("/api/notifications", notificationsRouter);
+app.route("/api/support", supportRouter);
 
 // --- Grace Period Auto-Finalize Cron (every 60s) ---
 import { capturePayment } from "./stripe";
