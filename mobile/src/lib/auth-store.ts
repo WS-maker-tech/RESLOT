@@ -54,10 +54,17 @@ const secureStorage: StateStorage = {
   },
 };
 
+export type PendingIntent =
+  | { type: "claim"; reservationId: string; restaurantId: string }
+  | { type: "drop"; prefill?: Record<string, unknown> }
+  | { type: "watch"; restaurantId?: string };
+
 interface AuthState {
   hasCompletedOnboarding: boolean;
   isLoggedIn: boolean;
   isGuest: boolean;
+  showAuthModal: boolean;
+  pendingIntent: PendingIntent | null;
   phoneNumber: string;
   firstName: string;
   lastName: string;
@@ -67,6 +74,9 @@ interface AuthState {
   sessionToken: string | null;
   setOnboardingComplete: () => void;
   setGuestMode: () => void;
+  openAuthModal: (intent?: PendingIntent) => void;
+  closeAuthModal: () => void;
+  clearPendingIntent: () => void;
   setLoggedIn: (value: boolean) => void;
   setPhoneNumber: (phone: string) => void;
   setUserInfo: (first: string, last: string, email: string) => void;
@@ -82,6 +92,8 @@ export const useAuthStore = create<AuthState>()(
       hasCompletedOnboarding: false,
       isLoggedIn: false,
       isGuest: false,
+      showAuthModal: false,
+      pendingIntent: null,
       phoneNumber: "",
       firstName: "",
       lastName: "",
@@ -90,9 +102,12 @@ export const useAuthStore = create<AuthState>()(
       supabaseAccessToken: null,
       sessionToken: null,
       setOnboardingComplete: () =>
-        set({ hasCompletedOnboarding: true, isLoggedIn: true, isGuest: false }),
+        set({ hasCompletedOnboarding: true, isLoggedIn: true, isGuest: false, showAuthModal: false }),
       setGuestMode: () =>
-        set({ hasCompletedOnboarding: true, isLoggedIn: false, isGuest: true }),
+        set({ hasCompletedOnboarding: true, isLoggedIn: false, isGuest: true, showAuthModal: false, pendingIntent: null }),
+      openAuthModal: (intent) => set({ showAuthModal: true, pendingIntent: intent ?? null }),
+      closeAuthModal: () => set({ showAuthModal: false }),
+      clearPendingIntent: () => set({ pendingIntent: null }),
       setLoggedIn: (value) => set({ isLoggedIn: value }),
       setPhoneNumber: (phone) => set({ phoneNumber: phone }),
       setUserInfo: (first, last, email) =>
@@ -116,23 +131,28 @@ export const useAuthStore = create<AuthState>()(
         }
       },
       logout: () => {
-        supabase.auth.signOut();
+        supabase.auth.signOut().catch(console.error);
         set({
-          hasCompletedOnboarding: false,
+          hasCompletedOnboarding: true, // behåll — användaren får inte onboarding igen
           isLoggedIn: false,
-          isGuest: false,
+          isGuest: true, // gästläge efter logout
           phoneNumber: "",
           firstName: "",
           lastName: "",
           email: "",
           sessionToken: null,
           supabaseAccessToken: null,
+          showAuthModal: false,
         });
       },
     }),
     {
       name: "reslot-auth",
       storage: createJSONStorage(() => secureStorage),
+      partialize: (state) => {
+        const { pendingIntent, showAuthModal, ...rest } = state;
+        return rest;
+      },
     }
   )
 );

@@ -278,6 +278,7 @@ export default function SubmitScreen() {
   const progressAnim = useSharedValue((0 + 1) / STEP_LABELS.length);
 
   const phone = useAuthStore((s) => s.phoneNumber);
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
   const { data: restaurants = [] } = useRestaurants();
   const { data: profile } = useProfile(phone);
   const submitReservationMutation = useSubmitReservation();
@@ -413,7 +414,11 @@ export default function SubmitScreen() {
       setStep(step + 1);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     } else {
-      // Show confirmation overlay instead of submitting directly
+      // Kräv inloggning innan bekräftelse
+      if (!isLoggedIn) {
+        useAuthStore.getState().openAuthModal({ type: "drop" });
+        return;
+      }
       setShowConfirmation(true);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }

@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Platform, View, Text, Pressable } from 'react-native';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Redirect, Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useAuthStore } from '@/lib/auth-store';
+import { Modal } from 'react-native';
 import { useFonts } from 'expo-font';
 import { registerForPushNotificationsAsync, setupNotificationHandlers } from '@/lib/notifications';
 import { router as expoRouter } from 'expo-router';
@@ -86,8 +87,17 @@ const ReslotTheme = {
 };
 
 function RootLayoutNav() {
-  const hasCompletedOnboarding = useAuthStore((s) => s.hasCompletedOnboarding);
+  const showAuthModal = useAuthStore((s) => s.showAuthModal);
+  const closeAuthModal = useAuthStore((s) => s.closeAuthModal);
+  const router = useRouter();
   const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    if (showAuthModal) {
+      router.push('/onboarding');
+      closeAuthModal();
+    }
+  }, [showAuthModal]);
 
   useEffect(() => {
     // Wait for zustand to rehydrate from AsyncStorage
@@ -165,8 +175,8 @@ function RootLayoutNav() {
         <Stack.Screen name="booking-confirmation" options={{ headerShown: false, animation: "slide_from_right" }} />
         <Stack.Screen name="map" options={{ headerShown: false, animation: "slide_from_right" }} />
       </Stack>
-      {!hasCompletedOnboarding ? <Redirect href="/onboarding" /> : null}
-    </ThemeProvider>
+
+      </ThemeProvider>
   );
 }
 

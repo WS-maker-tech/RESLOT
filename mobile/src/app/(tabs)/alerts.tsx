@@ -48,6 +48,7 @@ import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { C, FONTS, SPACING, RADIUS, ICON } from "../../lib/theme";
 import { Skeleton } from "@/components/Skeleton";
+import { LoginGate } from "@/components/LoginGate";
 
 function AlertsSkeleton() {
   return (
@@ -288,8 +289,18 @@ function AlertItem({ alert, index }: { alert: ActivityAlert; index: number }) {
 }
 
 export default function AlertsScreen() {
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
   const phone = useAuthStore((s) => s.phoneNumber);
   const router = useRouter();
+
+  if (!isLoggedIn) {
+    return (
+      <LoginGate
+        title="Bevakningar"
+        subtitle="Logga in för att se dina bevakningar och händelser."
+      />
+    );
+  }
   const [activeTab, setActiveTab] = useState<"activity" | "watches">("activity");
   const [showAddAlert, setShowAddAlert] = useState(false);
   const [addedIds, setAddedIds] = useState<string[]>([]);

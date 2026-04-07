@@ -585,6 +585,7 @@ function FeedbackPrompt({
 
 export default function ReservationsScreen() {
   const isGuest = useAuthStore((s) => s.isGuest);
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
   const phone = useAuthStore((s) => s.phoneNumber);
 
   // Track which reservations have been given feedback
@@ -637,7 +638,7 @@ export default function ReservationsScreen() {
     [cancelMutation]
   );
 
-  if (isGuest) {
+  if (isGuest || !isLoggedIn) {
     return (
       <LoginGate
         title="Dina bord"

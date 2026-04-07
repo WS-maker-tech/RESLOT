@@ -1,6 +1,5 @@
 import React from "react";
 import { View, Text, Pressable } from "react-native";
-import { useRouter } from "expo-router";
 import { LogIn } from "lucide-react-native";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
@@ -13,21 +12,20 @@ interface LoginGateProps {
 }
 
 export function LoginGate({ title, subtitle }: LoginGateProps) {
-  const router = useRouter();
   const logout = useAuthStore((s) => s.logout);
 
   const setOnboardingComplete = useAuthStore((s) => s.setOnboardingComplete);
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
 
+  const openAuthModal = useAuthStore((s) => s.openAuthModal);
+
   const handleLogin = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    // Om redan inloggad men fastnat i gäst-läge — rensa isGuest direkt
     if (isLoggedIn) {
       setOnboardingComplete();
       return;
     }
-    logout();
-    router.replace("/onboarding");
+    openAuthModal();
   };
 
   return (

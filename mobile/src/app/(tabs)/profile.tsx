@@ -162,6 +162,7 @@ const MenuItem = React.memo(function MenuItem({
 
 export default function ProfileScreen() {
   const isGuest = useAuthStore((s) => s.isGuest);
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
   const firstName = useAuthStore((s) => s.firstName);
   const lastName = useAuthStore((s) => s.lastName);
   const phone = useAuthStore((s) => s.phoneNumber);
@@ -254,11 +255,11 @@ export default function ProfileScreen() {
   const buyScale = useSharedValue(1);
   const buyAnimStyle = useAnimatedStyle(() => ({ transform: [{ scale: buyScale.value }] }));
 
-  if (isGuest) {
+  if (isGuest || !isLoggedIn) {
     return (
       <LoginGate
         title="Din profil"
-        subtitle="Logga in för att se din profil."
+        subtitle="Logga in för att se din profil och dina bokningar."
       />
     );
   }

@@ -642,6 +642,7 @@ export default function RestaurantDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const phone = useAuthStore((s) => s.phoneNumber);
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
 
   const { data: reservation, isLoading, error } = useReservation(id ?? "");
   const { data: profile } = useProfile(phone ?? "");
@@ -725,6 +726,14 @@ export default function RestaurantDetailScreen() {
   }, [reservation?.seatType]);
 
   const handleClaim = useCallback(async () => {
+    if (!isLoggedIn) {
+      useAuthStore.getState().openAuthModal({
+        type: "claim",
+        reservationId: reservation?.id ?? "",
+        restaurantId: reservation?.restaurantId ?? "",
+      });
+      return;
+    }
     if (!accepted || !reservation) return;
     if (!phone) return;
     if (!hasEnoughCredits) return;

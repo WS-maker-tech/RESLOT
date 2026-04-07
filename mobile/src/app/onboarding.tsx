@@ -489,7 +489,7 @@ function SplashStep({ onGetStarted, onExplore }: { onGetStarted: () => void; onE
           onPress={onGetStarted}
           icon={<ArrowRight size={18} color="#111827" strokeWidth={2.5} />}
         />
-        <GhostButton testID="explore-btn" label="Utforska utan konto" onPress={onExplore} />
+
       </Animated.View>
     </View>
   );
@@ -1856,16 +1856,30 @@ export default function OnboardingScreen() {
     (city: string) => {
       setSelectedCity(city);
       setOnboardingComplete();
-      router.replace("/(tabs)");
+
+      // Execute pending intent directly after login instead of relying on layout useEffect
+      const intent = useAuthStore.getState().pendingIntent;
+      if (intent) {
+        useAuthStore.getState().clearPendingIntent();
+        try { router.dismissAll(); } catch (e) {}
+        setTimeout(() => {
+          if (intent.type === 'claim') {
+            router.replace(`/restaurant/${intent.restaurantId}`);
+          } else if (intent.type === 'drop') {
+            // TODO: persist form state so prefill survives navigation
+            router.replace('/(tabs)/submit');
+          } else if (intent.type === 'watch') {
+            router.replace('/add-watch');
+          }
+        }, 200);
+        return;
+      }
+
+      try { router.dismissAll(); } catch (e) {}
+      router.replace('/(tabs)');
     },
     [router, setSelectedCity, setOnboardingComplete]
   );
-
-  const skipToApp = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setGuestMode();
-    router.replace("/(tabs)");
-  }, [router, setGuestMode]);
 
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>
@@ -1876,7 +1890,7 @@ export default function OnboardingScreen() {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
               setStep("phone");
             }}
-            onExplore={skipToApp}
+            onExplore={() => router.replace('/(tabs)')}
           />
         ) : null}
 
