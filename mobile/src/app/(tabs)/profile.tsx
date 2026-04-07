@@ -27,6 +27,8 @@ import {
   Shield,
   ArrowUpRight,
   ArrowDownLeft,
+  FileText,
+  Lock,
 } from "lucide-react-native";
 import Animated, {
   FadeInDown,
@@ -44,6 +46,8 @@ import { LoginGate } from "@/components/LoginGate";
 import { C, FONTS, SPACING, SHADOW, RADIUS, ICON } from "../../lib/theme";
 import { Skeleton } from "@/components/Skeleton";
 import { TrustBadge } from "@/components/TrustBadge";
+import { LegalModal } from "@/components/LegalModal";
+import { TERMS_CONDITIONS, PRIVACY_POLICY } from "@/lib/legal-content";
 
 const AnimatedCreditsCount = React.memo(function AnimatedCreditsCount({ value }: { value: number }) {
   const [displayValue, setDisplayValue] = useState(0);
@@ -171,6 +175,8 @@ export default function ProfileScreen() {
   const [showComingSoon, setShowComingSoon] = useState(false);
   const [comingSoonTitle, setComingSoonTitle] = useState("");
   const [showLiabilityPolicy, setShowLiabilityPolicy] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
 
   const { data: profile, isLoading, error, refetch } = useProfile(
     phone || ""
@@ -775,9 +781,79 @@ export default function ProfileScreen() {
                 />
               </View>
             </Animated.View>
+
+            {/* Juridiskt (Legal) Section */}
+            <Animated.View
+              entering={FadeInDown.delay(260).springify()}
+              className="mx-5 mb-5"
+              testID="legal-section"
+            >
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginBottom: SPACING.sm, paddingHorizontal: 4 }}>
+                <ShieldCheck size={14} color={C.textTertiary} strokeWidth={2} />
+                <Text
+                  testID="section-legal"
+                  style={{
+                    fontFamily: FONTS.semiBold,
+                    fontSize: 12,
+                    color: C.textTertiary,
+                    letterSpacing: 0.8,
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Juridiskt
+                </Text>
+              </View>
+              <View
+                className="rounded-2xl px-5"
+                style={{
+                  backgroundColor: C.bgCard,
+                  borderWidth: 0.5,
+                  borderColor: C.borderLight,
+                  ...SHADOW.card,
+                }}
+              >
+                <MenuItem
+                  icon={FileText}
+                  label="Användarvillkor"
+                  color={C.textSecondary}
+                  bgColor="rgba(107, 114, 128, 0.1)"
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setShowTerms(true);
+                  }}
+                  index={0}
+                />
+                <MenuItem
+                  icon={Lock}
+                  label="Integritetspolicy"
+                  color={C.textSecondary}
+                  bgColor="rgba(107, 114, 128, 0.1)"
+                  isLast
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setShowPrivacy(true);
+                  }}
+                  index={1}
+                />
+              </View>
+            </Animated.View>
           </>
         )}
       </ScrollView>
+
+      {/* Legal Modals */}
+      <LegalModal
+        visible={showTerms}
+        onClose={() => setShowTerms(false)}
+        title="Användarvillkor"
+        content={TERMS_CONDITIONS}
+      />
+      <LegalModal
+        visible={showPrivacy}
+        onClose={() => setShowPrivacy(false)}
+        title="Integritetspolicy"
+        content={PRIVACY_POLICY}
+      />
 
       {/* Liability Policy Modal */}
       <Modal

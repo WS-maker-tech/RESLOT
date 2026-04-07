@@ -61,6 +61,11 @@ export default function Root({ children }: { children: React.ReactNode }) {
         <meta name="twitter:title" content="Reslot" />
         <meta name="twitter:description" content="Din genväg till fullbokade restauranger." />
         <meta name="twitter:image" content="/assets/logo/icon-512.png" />
+        {/* Leaflet map CSS */}
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+
+
         {/* Add any additional <head> elements that you want globally available on web... */}
       </head>
       <body>{children}</body>

@@ -23,6 +23,8 @@ import {
   Sparkles,
   ChevronRight,
   Users,
+  Eye,
+  EyeOff,
 } from "lucide-react-native";
 import Animated, {
   FadeIn,
@@ -242,7 +244,7 @@ function PulsingDot() {
 }
 
 // --- Step Enum ---
-type Step = "splash" | "phone" | "otp" | "register" | "city" | "credits_intro" | "welcome";
+type Step = "splash" | "phone" | "otp" | "register" | "city" | "credits_intro" | "welcome" | "login";
 
 // --- Shared Button ---
 function PrimaryButton({
@@ -418,7 +420,7 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
 }
 
 // ==================== STEP 1: SPLASH ====================
-function SplashStep({ onGetStarted, onExplore }: { onGetStarted: () => void; onExplore: () => void }) {
+function SplashStep({ onGetStarted, onExplore, onRegister }: { onGetStarted: () => void; onExplore: () => void; onRegister: () => void }) {
   const { width: winW, height: winH } = useWindowDimensions();
   const contentW = Platform.OS === "web" ? Math.min(winW, 430) : winW;
   const h = Platform.OS === "web" ? Math.min(winH, 932) : winH;
@@ -485,13 +487,74 @@ function SplashStep({ onGetStarted, onExplore }: { onGetStarted: () => void; onE
       >
         <PrimaryButton
           testID="get-started-btn"
-          label="Visa mig borden"
+          label="Logga in"
           onPress={onGetStarted}
           icon={<ArrowRight size={18} color="#111827" strokeWidth={2.5} />}
         />
+        <GhostButton testID="register-btn" label="Registrera dig" onPress={onRegister} />
 
       </Animated.View>
     </View>
+  );
+}
+
+// ==================== STEP LOGIN ====================
+function LoginStep({ onNext, onBack, onForgot }: { onNext: (email: string, password: string) => void; onBack: () => void; onForgot?: () => void }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && password.length >= 6;
+
+  return (
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+      <View style={{ flex: 1, paddingHorizontal: 24 }}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 8 }}>
+          <BackArrow onPress={onBack} />
+        </View>
+        <Animated.View entering={enterHeading(60)} style={{ marginTop: 20 }}>
+          <Text style={{ fontFamily: FONTS.displayBold, fontSize: 28, color: C.text, letterSpacing: -0.8, lineHeight: 36 }}>
+            Logga in
+          </Text>
+          <Text style={{ fontFamily: FONTS.regular, fontSize: 15, color: C.gray, marginTop: 8 }}>
+            Ange din e-post och ditt lösenord
+          </Text>
+        </Animated.View>
+
+        <Animated.View entering={enterContent(120)} style={{ marginTop: 32, gap: 12 }}>
+          <View style={{ backgroundColor: C.bgInput, borderRadius: 14, paddingHorizontal: 16, height: 52, justifyContent: "center" }}>
+            <TextInput
+              value={email}
+              onChangeText={setEmail}
+              placeholder="din@email.se"
+              placeholderTextColor={C.grayLight}
+              style={{ fontFamily: FONTS.regular, fontSize: 16, color: C.text }}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoFocus
+            />
+          </View>
+          <View style={{ backgroundColor: C.bgInput, borderRadius: 14, paddingHorizontal: 16, height: 52, flexDirection: "row", alignItems: "center" }}>
+            <TextInput
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Lösenord"
+              placeholderTextColor={C.grayLight}
+              secureTextEntry={!showPassword}
+              style={{ flex: 1, fontFamily: FONTS.regular, fontSize: 16, color: C.text }}
+              autoCapitalize="none"
+            />
+            <Pressable onPress={() => setShowPassword(!showPassword)} hitSlop={8}>
+              {showPassword ? <EyeOff size={18} color={C.grayLight} strokeWidth={2} /> : <Eye size={18} color={C.grayLight} strokeWidth={2} />}
+            </Pressable>
+          </View>
+        </Animated.View>
+
+        <View style={{ flex: 1 }} />
+        <Animated.View entering={enterFromBottom(200)} style={{ paddingBottom: 16 }}>
+          <PrimaryButton label="Logga in" onPress={() => onNext(email.trim(), password)} disabled={!isValid} />
+        </Animated.View>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -909,15 +972,17 @@ function RegisterStep({
   onNext,
   onBack,
 }: {
-  onNext: (first: string, last: string, email: string) => void;
+  onNext: (first: string, last: string, email: string, password: string) => void;
   onBack: () => void;
 }) {
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const canContinue = first.trim().length >= 2 && last.trim().length >= 2 && isValidEmail;
+  const canContinue = first.trim().length >= 2 && last.trim().length >= 2 && isValidEmail && password.length >= 6;
 
   return (
     <KeyboardAvoidingView
@@ -1052,16 +1117,36 @@ function RegisterStep({
               />
             </View>
             {email.length > 0 && !isValidEmail ? (
-              <Text
-                style={{
-                  fontFamily: FONTS.regular,
-                  fontSize: 12,
-                  color: C.error,
-                  marginTop: 4,
-                  marginLeft: 4,
-                }}
-              >
+              <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.error, marginTop: 4, marginLeft: 4 }}>
                 Ange en giltig e-postadress
+              </Text>
+            ) : null}
+          </View>
+
+          {/* Lösenord */}
+          <View style={{ marginTop: 12 }}>
+            <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.gray, marginBottom: 6, marginLeft: 4 }}>Lösenord</Text>
+            <View style={{ backgroundColor: C.bgInput, borderRadius: 14, paddingHorizontal: 16, height: 52, justifyContent: "center", flexDirection: "row", alignItems: "center" }}>
+              <TextInput
+                testID="password-input"
+                value={password}
+                onChangeText={setPassword}
+                placeholder="Minst 6 tecken"
+                placeholderTextColor={C.grayLight}
+                secureTextEntry={!showPassword}
+                style={{ flex: 1, fontFamily: FONTS.regular, fontSize: 16, color: C.text }}
+                autoCapitalize="none"
+              />
+              <Pressable onPress={() => setShowPassword(!showPassword)} hitSlop={8}>
+                {showPassword
+                  ? <EyeOff size={18} color={C.grayLight} strokeWidth={2} />
+                  : <Eye size={18} color={C.grayLight} strokeWidth={2} />
+                }
+              </Pressable>
+            </View>
+            {password.length > 0 && password.length < 6 ? (
+              <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.error, marginTop: 4, marginLeft: 4 }}>
+                Lösenordet måste vara minst 6 tecken
               </Text>
             ) : null}
           </View>
@@ -1073,7 +1158,7 @@ function RegisterStep({
           <PrimaryButton
             testID="register-next-btn"
             label="Fortsätt"
-            onPress={() => onNext(first.trim(), last.trim(), email.trim())}
+            onPress={() => onNext(first.trim(), last.trim(), email.trim(), password)}
             disabled={!canContinue}
           />
         </Animated.View>
@@ -1888,9 +1973,25 @@ export default function OnboardingScreen() {
           <SplashStep
             onGetStarted={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              setStep("login");
+            }}
+            onRegister={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               setStep("phone");
             }}
             onExplore={() => router.replace('/(tabs)')}
+          />
+        ) : null}
+
+        {step === "login" ? (
+          <LoginStep
+            onBack={() => setStep("splash")}
+            onNext={async (email, password) => {
+              // TODO: implementera email+lösenord auth via Supabase
+              // För nu: gå vidare som inloggad (dev-mode)
+              useAuthStore.getState().setSessionToken(`dev:+46701234567`);
+              finishOnboarding(useAuthStore.getState().selectedCity);
+            }}
           />
         ) : null}
 
@@ -1923,7 +2024,7 @@ export default function OnboardingScreen() {
 
         {step === "register" ? (
           <RegisterStep
-            onNext={async (first: string, last: string, email: string) => {
+            onNext={async (first: string, last: string, email: string, password: string) => {
               setFirstName(first);
               setUserInfo(first, last, email);
               const baseUrl = process.env.EXPO_PUBLIC_BACKEND_URL!;

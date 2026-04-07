@@ -8,6 +8,7 @@ import {
   CalendarCheck,
   Bell,
   User,
+  Map,
 } from "lucide-react-native";
 import Animated, {
   useSharedValue,
@@ -235,6 +236,19 @@ export default function TabLayout() {
             }) => (
               <TabIcon icon={CalendarCheck} color={color} focused={focused} />
             ),
+          }}
+        />
+        <Tabs.Screen
+          name="map"
+          options={{
+            title: "Karta",
+            tabBarIcon: ({
+              color,
+              focused,
+            }: {
+              color: string;
+              focused: boolean;
+            }) => <TabIcon icon={Map} color={color} focused={focused} />,
           }}
         />
         <Tabs.Screen

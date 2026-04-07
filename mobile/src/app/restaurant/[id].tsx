@@ -69,6 +69,7 @@ import { HeroSection } from "@/components/HeroSection";
 import { BookingDetails } from "@/components/BookingDetails";
 import { RestaurantInfo } from "@/components/RestaurantInfo";
 import { ClaimSection } from "@/components/ClaimSection";
+import { WebMap } from "@/components/WebMap";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 const HERO_HEIGHT = 380;
@@ -657,6 +658,7 @@ export default function RestaurantDetailScreen() {
 
   // Report modal state
   const [showReportModal, setShowReportModal] = useState(false);
+  const [showMapModal, setShowMapModal] = useState(false);
   const [reportReason, setReportReason] = useState<string | null>(null);
   const [reportDetails, setReportDetails] = useState("");
   const [reportSuccess, setReportSuccess] = useState(false);
@@ -1838,6 +1840,133 @@ ${shareUrl}`,
                 Rapportera problem
               </Text>
             </Pressable>
+          </Animated.View>
+        ) : null}
+
+        {/* Mini map */}
+        {restaurant?.latitude && restaurant?.longitude ? (
+          <Animated.View
+            entering={FadeInDown.delay(440).springify()}
+            style={{ paddingHorizontal: SPACING.lg, paddingTop: 20, paddingBottom: 8 }}
+          >
+            {Platform.OS === "web" ? (
+              <>
+                <Pressable
+                  onPress={() => setShowMapModal(true)}
+                  style={{
+                    height: 160,
+                    borderRadius: RADIUS.lg,
+                    overflow: "hidden",
+                    borderWidth: 0.5,
+                    borderColor: C.divider,
+                  }}
+                >
+                  <WebMap
+                    center={[restaurant.latitude!, restaurant.longitude!]}
+                    zoom={9}
+                    markers={[
+                      {
+                        id: restaurant.id,
+                        lat: restaurant.latitude!,
+                        lng: restaurant.longitude!,
+                        image: restaurant.image,
+                        name: restaurant.name,
+                      },
+                    ]}
+                    style={{ width: "100%", height: 160 }}
+                    interactive={false}
+                  />
+                </Pressable>
+
+                {/* Fullscreen map modal */}
+                <Modal
+                  visible={showMapModal}
+                  animationType="slide"
+                  presentationStyle="pageSheet"
+                  onRequestClose={() => setShowMapModal(false)}
+                >
+                  <View style={{ flex: 1, backgroundColor: C.bg }}>
+                    <SafeAreaView edges={["top"]} style={{ backgroundColor: "transparent" }}>
+                      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, paddingVertical: 12 }}>
+                        <Text style={{ fontFamily: FONTS.displayBold, fontSize: 18, color: C.textPrimary, letterSpacing: -0.4 }}>
+                          {restaurant.name}
+                        </Text>
+                        <Pressable
+                          onPress={() => setShowMapModal(false)}
+                          style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: "rgba(0,0,0,0.06)", alignItems: "center", justifyContent: "center" }}
+                        >
+                          <Text style={{ fontSize: 18, color: C.textSecondary }}>✕</Text>
+                        </Pressable>
+                      </View>
+                    </SafeAreaView>
+                    <WebMap
+                      center={[restaurant.latitude!, restaurant.longitude!]}
+                      zoom={13}
+                      markers={[
+                        {
+                          id: restaurant.id,
+                          lat: restaurant.latitude!,
+                          lng: restaurant.longitude!,
+                          image: restaurant.image,
+                          name: restaurant.name,
+                        },
+                      ]}
+                      style={{ flex: 1 }}
+                      interactive={true}
+                    />
+                  </View>
+                </Modal>
+              </>
+            ) : (
+              <View
+                style={{
+                  height: 80,
+                  borderRadius: RADIUS.lg,
+                  backgroundColor: "rgba(126,200,122,0.06)",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  paddingHorizontal: SPACING.md,
+                  gap: 12,
+                  borderWidth: 0.5,
+                  borderColor: C.divider,
+                }}
+              >
+                <View
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 20,
+                    backgroundColor: "rgba(126,200,122,0.12)",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <MapPin size={18} color={C.pistachio} strokeWidth={2} />
+                </View>
+                <Text
+                  style={{
+                    fontFamily: FONTS.medium,
+                    fontSize: 14,
+                    color: C.textSecondary,
+                    flex: 1,
+                  }}
+                  numberOfLines={2}
+                >
+                  {restaurant.address}
+                </Text>
+              </View>
+            )}
+            <Text
+              style={{
+                fontFamily: FONTS.regular,
+                fontSize: 13,
+                color: C.textTertiary,
+                marginTop: 8,
+                paddingLeft: 2,
+              }}
+            >
+              {restaurant.address}
+            </Text>
           </Animated.View>
         ) : null}
 
