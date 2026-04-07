@@ -28,23 +28,48 @@ interface SupportWidgetProps {
   onSendMessage?: (text: string) => Promise<string>;
 }
 
-const AGENT_ID = "agent_8401knmr5642fcevgdh642e4zhv7";
+const SYSTEM_PROMPT = `Du är Reslots kundsupportagent. Reslot är en app där användare kan dela och ta över restaurangbokningar som de inte längre kan använda — en andrahandsmarknad för bordbokningar på exklusiva restauranger i Sverige.
 
-async function sendToAgent(text: string): Promise<string> {
+Du hjälper användare med:
+- Hur Reslot fungerar (credits-systemet, hur man lägger upp och tar bokningar)
+- Problem med betalning och credits
+- Frågor om specifika bokningar
+- Tekniska problem med appen
+
+Viktiga fakta:
+- Credits kostar inget — man tjänar dem genom att dela bokningar
+- Varje delad bokning ger 2 credits, att ta en bokning kostar 2 credits
+- Reslot garanterar inte att restaurangen accepterar överlåtelsen
+- Vid problem: support@reslot.se
+
+Ton: Varm, hjälpsam och professionell. Tala svenska. Håll svaren korta och konkreta.`;
+
+interface ChatMessage {
+  role: "system" | "user" | "assistant";
+  content: string;
+}
+
+async function sendToAgent(messages: ChatMessage[]): Promise<string> {
   try {
-    const res = await fetch(
-      `https://api.elevenlabs.io/v1/convai/conversation/chat?agent_id=${AGENT_ID}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text }),
-      }
-    );
+    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.EXPO_PUBLIC_OPENROUTER_KEY ?? ""}`,
+        "HTTP-Referer": "https://reslot.se",
+        "X-Title": "Reslot Support",
+      },
+      body: JSON.stringify({
+        model: "openai/gpt-4.1-mini",
+        messages: [{ role: "system", content: SYSTEM_PROMPT }, ...messages],
+        max_tokens: 300,
+      }),
+    });
     if (!res.ok) throw new Error("API error");
     const data = await res.json();
-    return data.response ?? data.message ?? "Jag förstår inte riktigt, kan du förtydliga?";
+    return data.choices?.[0]?.message?.content ?? "Jag förstår inte riktigt, kan du förtydliga?";
   } catch {
-    return "Tyvärr kan jag inte svara just nu. Kontakta oss på support@reslot.se.";
+    return "Tyvärr kan jag inte svara just nu. Kontakta oss på support@reslot.se";
   }
 }
 
@@ -60,6 +85,7 @@ export default function SupportWidget({ onClose, onSendMessage }: SupportWidgetP
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
+  const historyRef = useRef<ChatMessage[]>([]);
 
   useEffect(() => {
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
@@ -76,6 +102,7 @@ export default function SupportWidget({ onClose, onSendMessage }: SupportWidgetP
       timestamp: new Date(),
     };
 
+    historyRef.current = [...historyRef.current, { role: "user", content: text }];
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setIsTyping(true);
@@ -83,7 +110,9 @@ export default function SupportWidget({ onClose, onSendMessage }: SupportWidgetP
     try {
       const reply = onSendMessage
         ? await onSendMessage(text)
-        : await sendToAgent(text);
+        : await sendToAgent(historyRef.current);
+
+      historyRef.current = [...historyRef.current, { role: "assistant", content: reply }];
 
       const agentMsg: Message = {
         id: (Date.now() + 1).toString(),
