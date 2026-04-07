@@ -8,98 +8,53 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import Animated, {
-  FadeIn,
-  FadeOut,
-  FadeInDown,
-} from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut, FadeInDown } from "react-native-reanimated";
 import { X, Send, Bot } from "lucide-react-native";
-import { C, FONTS, RADIUS, SHADOW } from "@/lib/theme";
+import { C, FONTS, SHADOW } from "@/lib/theme";
 
 interface Message {
   id: string;
   role: "user" | "agent";
   text: string;
-  timestamp: Date;
 }
 
 interface SupportWidgetProps {
   onClose: () => void;
-  onSendMessage?: (text: string) => Promise<string>;
+  // Injected from .web.tsx version
+  onSendMessage?: (text: string) => void;
+  agentMessages?: Message[];
+  isConnected?: boolean;
+  isTyping?: boolean;
 }
 
-interface ChatMessage {
-  role: "system" | "user" | "assistant";
-  content: string;
-}
+export default function SupportWidget({
+  onClose,
+  onSendMessage,
+  agentMessages = [],
+  isConnected = false,
+  isTyping = false,
+}: SupportWidgetProps) {
+  const [input, setInput] = useState("");
+  const scrollRef = useRef<ScrollView>(null);
 
-async function sendToAgent(messages: ChatMessage[]): Promise<string> {
-  try {
-    const baseUrl = process.env.EXPO_PUBLIC_BACKEND_URL ?? "http://localhost:3000";
-    const res = await fetch(`${baseUrl}/api/support/chat`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages }),
-    });
-    if (!res.ok) throw new Error("API error");
-    const data = await res.json() as { reply: string };
-    return data.reply ?? "Jag förstår inte riktigt, kan du förtydliga?";
-  } catch {
-    return "Tyvärr kan jag inte svara just nu. Kontakta oss på support@reslot.se";
-  }
-}
-
-export default function SupportWidget({ onClose, onSendMessage }: SupportWidgetProps) {
-  const [messages, setMessages] = useState<Message[]>([
+  const allMessages: Message[] = [
     {
-      id: "0",
+      id: "welcome",
       role: "agent",
       text: "Hej! Välkommen till Reslot Support 👋 Hur kan jag hjälpa dig idag?",
-      timestamp: new Date(),
     },
-  ]);
-  const [input, setInput] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-  const scrollRef = useRef<ScrollView>(null);
-  const historyRef = useRef<ChatMessage[]>([]);
+    ...agentMessages,
+  ];
 
   useEffect(() => {
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
-  }, [messages, isTyping]);
+  }, [agentMessages, isTyping]);
 
-  const handleSend = async () => {
+  const handleSend = () => {
     const text = input.trim();
-    if (!text) return;
-
-    const userMsg: Message = {
-      id: Date.now().toString(),
-      role: "user",
-      text,
-      timestamp: new Date(),
-    };
-
-    historyRef.current = [...historyRef.current, { role: "user", content: text }];
-    setMessages((prev) => [...prev, userMsg]);
+    if (!text || !onSendMessage) return;
+    onSendMessage(text);
     setInput("");
-    setIsTyping(true);
-
-    try {
-      const reply = onSendMessage
-        ? await onSendMessage(text)
-        : await sendToAgent(historyRef.current);
-
-      historyRef.current = [...historyRef.current, { role: "assistant", content: reply }];
-
-      const agentMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "agent",
-        text: reply,
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, agentMsg]);
-    } finally {
-      setIsTyping(false);
-    }
   };
 
   return (
@@ -135,16 +90,7 @@ export default function SupportWidget({ onClose, onSendMessage }: SupportWidgetP
         }}
       >
         <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-          <View
-            style={{
-              width: 34,
-              height: 34,
-              borderRadius: 17,
-              backgroundColor: "rgba(126,200,122,0.12)",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+          <View style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: "rgba(126,200,122,0.12)", alignItems: "center", justifyContent: "center" }}>
             <Bot size={18} color={C.pistachio} strokeWidth={2} />
           </View>
           <View>
@@ -154,18 +100,14 @@ export default function SupportWidget({ onClose, onSendMessage }: SupportWidgetP
               <Text style={{ color: C.textPrimary }}> Support</Text>
             </Text>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 5, marginTop: 1 }}>
-              <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: "#4CAF50" }} />
+              <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: isConnected ? "#4CAF50" : "#aaa" }} />
               <Text style={{ fontFamily: FONTS.regular, fontSize: 11, color: C.textTertiary }}>
-                Online
+                {isConnected ? "Online" : "Ansluter..."}
               </Text>
             </View>
           </View>
         </View>
-        <Pressable
-          onPress={onClose}
-          hitSlop={10}
-          style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: "rgba(0,0,0,0.05)", alignItems: "center", justifyContent: "center" }}
-        >
+        <Pressable onPress={onClose} hitSlop={10} style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: "rgba(0,0,0,0.05)", alignItems: "center", justifyContent: "center" }}>
           <X size={16} color={C.textSecondary} strokeWidth={2} />
         </Pressable>
       </View>
@@ -178,33 +120,21 @@ export default function SupportWidget({ onClose, onSendMessage }: SupportWidgetP
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {messages.map((msg) => (
+        {allMessages.map((msg) => (
           <Animated.View
             key={msg.id}
             entering={FadeInDown.duration(200).springify()}
-            style={{
-              alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
-              maxWidth: "82%",
-            }}
+            style={{ alignSelf: msg.role === "user" ? "flex-end" : "flex-start", maxWidth: "82%" }}
           >
-            <View
-              style={{
-                backgroundColor: msg.role === "user" ? C.pistachio : "rgba(0,0,0,0.05)",
-                borderRadius: 16,
-                borderBottomRightRadius: msg.role === "user" ? 4 : 16,
-                borderBottomLeftRadius: msg.role === "agent" ? 4 : 16,
-                paddingHorizontal: 14,
-                paddingVertical: 10,
-              }}
-            >
-              <Text
-                style={{
-                  fontFamily: FONTS.regular,
-                  fontSize: 14,
-                  color: msg.role === "user" ? "#FFFFFF" : C.textPrimary,
-                  lineHeight: 20,
-                }}
-              >
+            <View style={{
+              backgroundColor: msg.role === "user" ? C.pistachio : "rgba(0,0,0,0.05)",
+              borderRadius: 16,
+              borderBottomRightRadius: msg.role === "user" ? 4 : 16,
+              borderBottomLeftRadius: msg.role === "agent" ? 4 : 16,
+              paddingHorizontal: 14,
+              paddingVertical: 10,
+            }}>
+              <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: msg.role === "user" ? "#FFFFFF" : C.textPrimary, lineHeight: 20 }}>
                 {msg.text}
               </Text>
             </View>
@@ -213,23 +143,9 @@ export default function SupportWidget({ onClose, onSendMessage }: SupportWidgetP
 
         {isTyping ? (
           <Animated.View entering={FadeInDown.duration(200)} style={{ alignSelf: "flex-start" }}>
-            <View
-              style={{
-                backgroundColor: "rgba(0,0,0,0.05)",
-                borderRadius: 16,
-                borderBottomLeftRadius: 4,
-                paddingHorizontal: 16,
-                paddingVertical: 12,
-                flexDirection: "row",
-                gap: 4,
-                alignItems: "center",
-              }}
-            >
+            <View style={{ backgroundColor: "rgba(0,0,0,0.05)", borderRadius: 16, borderBottomLeftRadius: 4, paddingHorizontal: 16, paddingVertical: 12, flexDirection: "row", gap: 4, alignItems: "center" }}>
               {[0, 1, 2].map((i) => (
-                <View
-                  key={i}
-                  style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: C.textTertiary, opacity: 0.5 + i * 0.2 }}
-                />
+                <View key={i} style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: C.textTertiary, opacity: 0.4 + i * 0.2 }} />
               ))}
             </View>
           </Animated.View>
@@ -238,33 +154,13 @@ export default function SupportWidget({ onClose, onSendMessage }: SupportWidgetP
 
       {/* Input */}
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            paddingHorizontal: 12,
-            paddingVertical: 10,
-            borderTopWidth: 1,
-            borderTopColor: C.divider,
-            gap: 8,
-          }}
-        >
+        <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 12, paddingVertical: 10, borderTopWidth: 1, borderTopColor: C.divider, gap: 8 }}>
           <TextInput
             value={input}
             onChangeText={setInput}
             placeholder="Skriv ett meddelande..."
             placeholderTextColor={C.textTertiary}
-            style={{
-              flex: 1,
-              fontFamily: FONTS.regular,
-              fontSize: 14,
-              color: C.textPrimary,
-              backgroundColor: "rgba(0,0,0,0.04)",
-              borderRadius: 20,
-              paddingHorizontal: 14,
-              paddingVertical: 9,
-              maxHeight: 80,
-            }}
+            style={{ flex: 1, fontFamily: FONTS.regular, fontSize: 14, color: C.textPrimary, backgroundColor: "rgba(0,0,0,0.04)", borderRadius: 20, paddingHorizontal: 14, paddingVertical: 9, maxHeight: 80 }}
             multiline
             returnKeyType="send"
             onSubmitEditing={handleSend}
@@ -272,21 +168,18 @@ export default function SupportWidget({ onClose, onSendMessage }: SupportWidgetP
           />
           <Pressable
             onPress={handleSend}
-            disabled={!input.trim()}
+            disabled={!input.trim() || !isConnected}
             style={({ pressed }) => ({
-              width: 38,
-              height: 38,
-              borderRadius: 19,
-              backgroundColor: input.trim() ? C.pistachio : "rgba(0,0,0,0.08)",
-              alignItems: "center",
-              justifyContent: "center",
+              width: 38, height: 38, borderRadius: 19,
+              backgroundColor: input.trim() && isConnected ? C.pistachio : "rgba(0,0,0,0.08)",
+              alignItems: "center", justifyContent: "center",
               opacity: pressed ? 0.85 : 1,
             })}
           >
-            <Send size={16} color={input.trim() ? "#FFFFFF" : C.textTertiary} strokeWidth={2} />
+            <Send size={16} color={input.trim() && isConnected ? "#FFFFFF" : C.textTertiary} strokeWidth={2} />
           </Pressable>
         </View>
-        <Text style={{ fontFamily: FONTS.regular, fontSize: 10, color: C.textTertiary, textAlign: "center", paddingBottom: 8, opacity: 0.6 }}>
+        <Text style={{ fontFamily: FONTS.regular, fontSize: 10, color: C.textTertiary, textAlign: "center", paddingBottom: 8, opacity: 0.5 }}>
           Powered by ElevenLabs
         </Text>
       </KeyboardAvoidingView>
