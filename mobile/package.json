@@ -14,6 +14,7 @@
     "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
     "@bottom-tabs/react-navigation": "^0.12.2",
     "@codeherence/react-native-header": "^1.0.0",
+    "@elevenlabs/react": "^1.0.3",
     "@expo-google-fonts/fraunces": "^0.4.1",
     "@expo-google-fonts/playfair-display": "^0.4.2",
     "@expo-google-fonts/plus-jakarta-sans": "^0.4.2",
