@@ -1,72 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
-enum ReservationStatus {
-  active
-  claimed
-  grace_period
-  completed
-  cancelled
-  no_show
-  resold
-  payment_failed
-}
-
-enum SeatType {
-  indoor
-  outdoor
-  bar
-  private_room
-  terrace
-  any
-}
-
 model Restaurant {
-  id                 String   @id @default(cuid())
-  name               String
-  address            String
-  cuisine            String
-  neighborhood       String
-  rating             Float
-  reviewCount        Int      @default(0)
-  priceLevel         Int
-  image              String
-  description        String
-  tags               Json     @default("[]")
-  timesBookedOnReslot Int     @default(0)
-  demandMultiplier    Float   @default(1.0)
-  seatType           String
-  instagram          String?
-  website            String?
-  vibeTags           Json     @default("[]")
-  goodForTags        Json     @default("[]")
-  foodTags           Json     @default("[]")
-  latitude           Float?
-  longitude          Float?
-  isExclusive        Boolean  @default(false)
-  city               String   @default("Stockholm")
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-
-  reservations       Reservation[]
-  restaurantAlerts   RestaurantAlert[]
-  watches            Watch[]
-  savedByUsers       SavedRestaurant[]
+  id                  String            @id @default(cuid())
+  name                String
+  address             String
+  cuisine             String
+  neighborhood        String
+  rating              Float
+  reviewCount         Int               @default(0)
+  priceLevel          Int
+  image               String
+  description         String
+  tags                Json              @default("[]")
+  timesBookedOnReslot Int               @default(0)
+  demandMultiplier    Float             @default(1.0)
+  seatType            String
+  instagram           String?
+  website             String?
+  vibeTags            Json              @default("[]")
+  goodForTags         Json              @default("[]")
+  foodTags            Json              @default("[]")
+  latitude            Float?
+  longitude           Float?
+  isExclusive         Boolean           @default(false)
+  city                String            @default("Stockholm")
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  reservations        Reservation[]
+  restaurantAlerts    RestaurantAlert[]
+  savedByUsers        SavedRestaurant[]
+  watches             Watch[]
 
   @@index([city, cuisine, neighborhood])
 }
 
 model Reservation {
-  id                       String            @id @default(cuid())
+  id                       String               @id @default(cuid())
   restaurantId             String
-  restaurant               Restaurant        @relation(fields: [restaurantId], references: [id], onDelete: Restrict)
   submitterPhone           String
   submitterFirstName       String
   submitterLastName        String
@@ -75,31 +53,31 @@ model Reservation {
   partySize                Int
   seatType                 String
   nameOnReservation        String
-  status                   ReservationStatus @default(active)
+  status                   ReservationStatus    @default(active)
   claimerPhone             String?
   claimedAt                DateTime?
   graceDeadline            DateTime?
-  creditStatus             String            @default("none")
+  creditStatus             String               @default("none")
   serviceFee               Float?
   stripePaymentIntentId    String?
-  captureStatus            String            @default("none")
+  captureStatus            String               @default("none")
   cancelFee                Float?
   prepaidAmount            Float?
   verificationLink         String?
   extraInfo                String?
   cancellationWindowHours  Int?
-  creditCost               Int               @default(2)
-  noShowFeeCharged         Boolean           @default(false)
+  creditCost               Int                  @default(2)
+  noShowFeeCharged         Boolean              @default(false)
   noShowFeePaymentIntentId String?
   resoldFromId             String?
-  reminderSent             Boolean           @default(false)
-  version                  Int               @default(0)
-  createdAt                DateTime          @default(now())
-  updatedAt                DateTime          @updatedAt
-
+  reminderSent             Boolean              @default(false)
+  version                  Int                  @default(0)
+  createdAt                DateTime             @default(now())
+  updatedAt                DateTime             @updatedAt
   noShowReports            NoShowReport[]
-  reports                  ReservationReport[]
+  restaurant               Restaurant           @relation(fields: [restaurantId], references: [id])
   feedback                 ReservationFeedback?
+  reports                  ReservationReport[]
 
   @@index([status])
   @@index([submitterPhone])
@@ -111,39 +89,39 @@ model Reservation {
 }
 
 model UserProfile {
-  id                String   @id @default(cuid())
-  phone             String   @unique
-  firstName         String
-  lastName          String
-  email             String
-  avatar            String?
-  credits           Int      @default(0)
-  selectedCity      String   @default("Stockholm")
-  dateOfBirth       String?
-  emailVerified     Boolean  @default(false)
-  phoneVerified     Boolean  @default(true)
-  referralCode      String?  @unique
-  referralUsed      String?
-  stripeCustomerId  String?  @unique
-  pushToken         String?
-  trustScore        Float    @default(5.0)
-  totalFeedbacks    Int      @default(0)
-  isDeleted         Boolean  @default(false)
-  deletedAt         DateTime?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id               String    @id @default(cuid())
+  phone            String    @unique
+  firstName        String
+  lastName         String
+  email            String
+  avatar           String?
+  credits          Int       @default(0)
+  selectedCity     String    @default("Stockholm")
+  dateOfBirth      String?
+  emailVerified    Boolean   @default(false)
+  phoneVerified    Boolean   @default(true)
+  referralCode     String?   @unique
+  referralUsed     String?
+  stripeCustomerId String?   @unique
+  pushToken        String?
+  trustScore       Float     @default(5.0)
+  totalFeedbacks   Int       @default(0)
+  isDeleted        Boolean   @default(false)
+  deletedAt        DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 }
 
 model Watch {
   id            String      @id @default(cuid())
   userPhone     String
   restaurantId  String?
-  restaurant    Restaurant? @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   date          String?
   partySize     Int?
   notes         String?
   filterOptions Json?
   createdAt     DateTime    @default(now())
+  restaurant    Restaurant? @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
 
   @@index([userPhone])
   @@index([restaurantId])
@@ -153,9 +131,9 @@ model RestaurantAlert {
   id           String     @id @default(cuid())
   userPhone    String
   restaurantId String
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   enabled      Boolean    @default(true)
   createdAt    DateTime   @default(now())
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
 
   @@index([restaurantId])
   @@index([userPhone])
@@ -199,13 +177,13 @@ model Session {
 model NoShowReport {
   id            String      @id @default(cuid())
   reservationId String
-  reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
   reporterPhone String
   reason        String
   evidenceUrl   String?
   status        String      @default("pending")
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
+  reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
 }
 
 model ProcessedEvent {
@@ -218,8 +196,8 @@ model SavedRestaurant {
   id           String     @id @default(cuid())
   userPhone    String
   restaurantId String
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   createdAt    DateTime   @default(now())
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
 
   @@unique([userPhone, restaurantId])
   @@index([userPhone])
@@ -268,13 +246,13 @@ model RestaurantCache {
 model ReservationReport {
   id            String      @id @default(cuid())
   reservationId String
-  reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
   reporterPhone String
   reason        String
   details       String?
   status        String      @default("pending")
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
+  reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
 
   @@index([reservationId])
   @@index([reporterPhone])
@@ -283,12 +261,32 @@ model ReservationReport {
 model ReservationFeedback {
   id            String      @id @default(cuid())
   reservationId String      @unique
-  reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
   userPhone     String
   worked        Boolean
   comment       String?
   createdAt     DateTime    @default(now())
+  reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
 
   @@index([userPhone])
   @@index([reservationId])
+}
+
+enum ReservationStatus {
+  active
+  claimed
+  grace_period
+  completed
+  cancelled
+  no_show
+  resold
+  payment_failed
+}
+
+enum SeatType {
+  indoor
+  outdoor
+  bar
+  private_room
+  terrace
+  any
 }

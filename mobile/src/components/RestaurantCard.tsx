@@ -300,10 +300,7 @@ export const RestaurantCard = React.memo(function RestaurantCard({
                 <Text style={styles.reviewCountText}>
                   ({restaurant.reviewCount})
                 </Text>
-                <View style={styles.dot} />
-                <Text style={styles.cuisineText}>
-                  {restaurant.cuisine}
-                </Text>
+
               </View>
 
               {/* Address */}

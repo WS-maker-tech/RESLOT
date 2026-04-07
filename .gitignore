@@ -1,3 +1,9 @@
+# Claude / AI agent files
+.claude/
+AUDIT.md
+CLAUDE.clean-claude.md
+logo-preview.html
+
 node_modules/
 .env
 .env.local

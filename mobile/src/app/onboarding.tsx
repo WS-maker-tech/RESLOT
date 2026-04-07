@@ -474,17 +474,7 @@ function SplashStep({ onGetStarted, onExplore }: { onGetStarted: () => void; onE
           >
             Bord som andra{"\n"}inte kan ta
           </Text>
-          <Text
-            style={{
-              fontFamily: FONTS.regular,
-              fontSize: 15,
-              color: C.gray,
-              marginTop: 12,
-              lineHeight: 23,
-            }}
-          >
-            Någon kan inte gå på Frantzén.{"\n"}Nu kan du.
-          </Text>
+
         </Animated.View>
       </View>
 
@@ -552,7 +542,7 @@ function PhoneStep({
               lineHeight: 36,
             }}
           >
-            Ditt nummer —{"\n"}det räcker
+            Ditt nummer
           </Text>
           <Text
             style={{
@@ -1326,19 +1316,7 @@ function CreditsIntroStep({ onContinue, onBack }: { onContinue: () => void; onBa
               letterSpacing: -0.8,
             }}
           >
-            Så fungerar credits
-          </Text>
-          <Text
-            style={{
-              fontFamily: FONTS.regular,
-              fontSize: 15,
-              color: C.gray,
-              textAlign: "center",
-              marginTop: 10,
-              lineHeight: 23,
-            }}
-          >
-            Så fungerar det — med riktiga restauranger
+            Så fungerar det
           </Text>
         </Animated.View>
 
@@ -1716,7 +1694,7 @@ function WelcomeStep({ onContinue, firstName, cityName }: { onContinue: () => vo
             letterSpacing: -1,
           }}
         >
-          Välkommen{firstName ? `,\n${firstName}` : null}!
+          Välkommen!
         </Text>
       </Animated.View>
 
