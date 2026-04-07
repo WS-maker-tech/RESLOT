@@ -15,12 +15,7 @@ export default function SupportBubble() {
     >
       {isOpen ? (
         <SupportWidget
-          status="disconnected"
-          isSpeaking={false}
-          onStart={() => {}}
-          onEnd={() => {}}
           onClose={() => setIsOpen(false)}
-          webOnly
         />
       ) : null}
 
