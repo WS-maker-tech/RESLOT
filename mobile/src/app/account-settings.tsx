@@ -5,7 +5,7 @@ import { useRouter } from "expo-router";
 import { ChevronLeft, Check, AlertTriangle, CheckCircle } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
-import { api } from "@/lib/api/api";
+import { useProfile } from "@/lib/api/hooks";
 import { useAuthStore } from "@/lib/auth-store";
 import { C, FONTS, SPACING, RADIUS, SHADOW, ICON } from "@/lib/theme";
 
@@ -45,9 +45,9 @@ export default function AccountSettingsScreen() {
   const router = useRouter();
   const phone = useAuthStore((s) => s.phoneNumber);
   const logout = useAuthStore((s) => s.logout);
+  const { data: profile, isLoading } = useProfile(phone || "");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showSaveSuccess, setShowSaveSuccess] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -57,38 +57,26 @@ export default function AccountSettingsScreen() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    // Load profile from Supabase
-    api.profile.get()
-      .then((profile) => {
-        setFirstName(profile.firstName);
-        setLastName(profile.lastName);
-        setEmail(profile.email);
-        setDateOfBirth(profile.dateOfBirth ?? "");
-        setCity(profile.selectedCity ?? "Stockholm");
-      })
-      .catch((err) => {
-        console.error("[AccountSettings] Failed to load profile:", err);
-        Alert.alert("Fel", "Kunde inte ladda profildata");
-      })
-      .finally(() => setIsLoading(false));
-  }, []);
+    if (profile) {
+      setFirstName(profile.firstName);
+      setLastName(profile.lastName);
+      setEmail(profile.email);
+      setDateOfBirth(profile.dateOfBirth ?? "");
+      setCity(profile.selectedCity);
+    }
+  }, [profile]);
 
   const handleSave = async () => {
-    if (!firstName || !lastName || !email) {
-      Alert.alert("Fel", "Fyll i alla obligatoriska fält");
-      return;
-    }
-
+    if (!phone) return;
     setSaving(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     try {
-      await api.profile.update({
-        firstName,
-        lastName,
-        email,
-        dateOfBirth: dateOfBirth || null,
-        selectedCity: city,
-      } as any);
+      const baseUrl = process.env.EXPO_PUBLIC_BACKEND_URL!;
+      await fetch(`${baseUrl}/api/profile`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, firstName, lastName, email, dateOfBirth, selectedCity: city }),
+      });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setShowSaveSuccess(true);
       setTimeout(() => {
@@ -97,15 +85,20 @@ export default function AccountSettingsScreen() {
     } catch (err) {
       console.error("[AccountSettings] Save failed:", err);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert("Fel", "Kunde inte spara ändringar");
     } finally {
       setSaving(false);
     }
   };
 
   const handleDeleteAccount = async () => {
+    if (!phone) return;
     try {
-      await api.profile.delete();
+      const baseUrl = process.env.EXPO_PUBLIC_BACKEND_URL!;
+      await fetch(`${baseUrl}/api/profile`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone }),
+      });
       setShowDeleteConfirm(false);
       logout();
       router.replace("/onboarding");
@@ -166,8 +159,8 @@ export default function AccountSettingsScreen() {
 
             <Animated.View entering={FadeInDown.delay(100).springify()}>
               <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textTertiary, letterSpacing: 1, textTransform: "uppercase", marginBottom: 14, marginTop: 24 }}>Kontaktuppgifter</Text>
-              <InputField label="E-post" value={email} onChangeText={setEmail} placeholder="anna@example.com" keyboardType="email-address" />
-              <InputField label="Telefon" value={phone ?? ""} onChangeText={() => {}} placeholder={phone ?? ""} keyboardType="phone-pad" editable={false} />
+              <InputField label="E-post" value={email} onChangeText={setEmail} placeholder="anna@example.com" keyboardType="email-address" verified={profile?.emailVerified} />
+              <InputField label="Telefon" value={phone ?? ""} onChangeText={() => {}} placeholder={phone ?? ""} keyboardType="phone-pad" verified={profile?.phoneVerified} editable={false} />
             </Animated.View>
 
             <Animated.View entering={FadeInDown.delay(200).springify()}>

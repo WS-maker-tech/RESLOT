@@ -11,7 +11,6 @@ import { Modal } from 'react-native';
 import { useFonts } from 'expo-font';
 import { registerForPushNotificationsAsync, setupNotificationHandlers } from '@/lib/notifications';
 import { router as expoRouter } from 'expo-router';
-import { supabase } from '@/lib/supabase'; // cache-bust 1
 
 // react-native-keyboard-controller is native-only; skip on web
 const KeyboardProvider =
@@ -116,22 +115,32 @@ function RootLayoutNav() {
     if (!hydrated) return;
     const { sessionToken, setLoggedIn, logout } = useAuthStore.getState();
     if (!sessionToken) return;
-    supabase.auth.getUser().then(({ data: { user }, error }) => {
-      if (error || !user) {
-        logout();
-        return;
-      }
-      setLoggedIn(true);
-      // Register push token on successful auth verification
-      registerForPushNotificationsAsync().then((token) => {
-        if (token) {
-          supabase.from('UserProfile').update({ pushToken: token }).eq('id', user.id)
-            .then(({ error: err }) => {
-              if (err) console.error('[Auth] Failed to save push token:', err);
-            });
+    const baseUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+    if (!baseUrl) return;
+    fetch(`${baseUrl}/api/auth/me`, {
+      headers: { Authorization: `Bearer ${sessionToken}` },
+    })
+      .then((res) => {
+        if (res.ok) {
+          setLoggedIn(true);
+          // Register push token on successful auth verification
+          registerForPushNotificationsAsync().then((token) => {
+            if (token && baseUrl) {
+              fetch(`${baseUrl}/api/profile/push-token`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${sessionToken}`,
+                },
+                body: JSON.stringify({ token }),
+              }).catch((err) => console.error("[Auth] Failed to save push token:", err));
+            }
+          });
+        } else {
+          logout();
         }
-      });
-    }).catch((err) => console.error('[Auth] Failed to verify session:', err));
+      })
+      .catch((err) => console.error("[Auth] Failed to verify session:", err));
   }, [hydrated]);
 
   if (!hydrated) return null;
@@ -180,15 +189,21 @@ export default function RootLayout() {
     registerForPushNotificationsAsync().then((token) => {
       if (token) {
         console.log("[Notifications] Push token:", token);
-        // Save token to Supabase if user is authenticated
-        supabase.auth.getUser().then(({ data: { user } }) => {
-          if (user) {
-            supabase.from('UserProfile').update({ pushToken: token }).eq('id', user.id)
-              .then(({ error }) => {
-                if (error) console.error('[Notifications] Failed to save push token:', error);
-              });
+        // Save token to backend if user is authenticated
+        const { sessionToken } = useAuthStore.getState();
+        if (sessionToken) {
+          const baseUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+          if (baseUrl) {
+            fetch(`${baseUrl}/api/profile/push-token`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${sessionToken}`,
+              },
+              body: JSON.stringify({ token }),
+            }).catch((err) => console.error("[Notifications] Failed to save push token:", err));
           }
-        });
+        }
       }
     });
 

@@ -1,19 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "./api";
-import { supabase } from "@/lib/supabase";
 import type {
   Restaurant,
   Reservation,
+  MissedReservation,
   UserProfile,
+  ActivityAlert,
+  RestaurantAlertWithRestaurant,
   Watch,
   WatchFilterOptions,
   SavedRestaurant,
   CardStatus,
   CheckoutSessionResult,
   CreditsPurchaseResult,
-  MissedReservation,
-  ActivityAlert,
-  RestaurantAlertWithRestaurant,
 } from "./types";
 
 // ─── Restaurants ───────────────────────────────────────
@@ -24,7 +23,15 @@ export function useRestaurants(params?: {
 }) {
   return useQuery({
     queryKey: ["restaurants", params?.city, params?.neighborhood, params?.search],
-    queryFn: () => api.restaurants.getAll(params),
+    queryFn: async () => {
+      const queryParams = new URLSearchParams();
+      if (params?.city) queryParams.set("city", params.city);
+      if (params?.neighborhood && params.neighborhood !== "Alla")
+        queryParams.set("neighborhood", params.neighborhood);
+      if (params?.search) queryParams.set("search", params.search);
+      const qs = queryParams.toString();
+      return api.get<Restaurant[]>(`/api/restaurants${qs ? `?${qs}` : ""}`);
+    },
     staleTime: 5 * 60 * 1000,
   });
 }
@@ -32,7 +39,10 @@ export function useRestaurants(params?: {
 export function useRestaurant(id: string) {
   return useQuery({
     queryKey: ["restaurant", id],
-    queryFn: () => api.restaurants.getOne(id),
+    queryFn: () =>
+      api.get<Restaurant & { reservations: Reservation[] }>(
+        `/api/restaurants/${id}`
+      ),
     enabled: !!id,
     staleTime: 5 * 60 * 1000,
   });
@@ -41,7 +51,7 @@ export function useRestaurant(id: string) {
 export function useReservation(id: string) {
   return useQuery({
     queryKey: ["reservation", id],
-    queryFn: () => api.reservations.getOne(id),
+    queryFn: () => api.get<Reservation>(`/api/reservations/${id}`),
     enabled: !!id,
     staleTime: 5 * 60 * 1000,
   });
@@ -55,16 +65,27 @@ export function useReservations(params?: {
 }) {
   return useQuery({
     queryKey: ["reservations", params?.city, params?.neighborhood, params?.date],
-    queryFn: () => api.reservations.getAll(params),
+    queryFn: async () => {
+      const queryParams = new URLSearchParams();
+      if (params?.city) queryParams.set("city", params.city);
+      if (params?.neighborhood && params.neighborhood !== "Alla")
+        queryParams.set("neighborhood", params.neighborhood);
+      if (params?.date) queryParams.set("date", params.date);
+      const qs = queryParams.toString();
+      return api.get<Reservation[]>(`/api/reservations${qs ? `?${qs}` : ""}`);
+    },
     staleTime: 5 * 60 * 1000,
   });
 }
 
-// ─── Missed Reservations — TODO: implement when Supabase schema supports it
-export function useMissedReservations(_city?: string) {
+// ─── Missed Reservations (loss aversion) ─────────────
+export function useMissedReservations(city?: string) {
   return useQuery({
-    queryKey: ["missedReservations", _city],
-    queryFn: async (): Promise<MissedReservation[]> => [],
+    queryKey: ["missedReservations", city],
+    queryFn: async () => {
+      const qs = city ? `?city=${encodeURIComponent(city)}` : "";
+      return api.get<MissedReservation[]>(`/api/reservations/missed${qs}`);
+    },
     staleTime: 2 * 60 * 1000,
   });
 }
@@ -73,7 +94,8 @@ export function useMissedReservations(_city?: string) {
 export function useMyReservations(phone: string) {
   return useQuery({
     queryKey: ["myReservations", phone],
-    queryFn: () => api.reservations.getMine(),
+    queryFn: () =>
+      api.get<Reservation[]>(`/api/reservations/mine`),
     enabled: !!phone,
     staleTime: 5 * 60 * 1000,
   });
@@ -98,7 +120,7 @@ export function useSubmitReservation() {
       verificationLink?: string;
       cancellationWindowHours?: number;
       extraInfo?: string;
-    }) => api.reservations.create(body),
+    }) => api.post<Reservation>("/api/reservations", body),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["reservations"] });
       qc.invalidateQueries({ queryKey: ["myReservations"] });
@@ -110,17 +132,16 @@ export function useSubmitReservation() {
 export function useClaimReservation() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({
+    mutationFn: ({
       reservationId,
+      claimerPhone,
     }: {
       reservationId: string;
-      claimerPhone?: string; // kept for API compat; userId resolved from Supabase Auth
-    }) => {
-      const { data } = await supabase.auth.getUser();
-      const claimerId = data.user?.id;
-      if (!claimerId) throw new Error("Not authenticated");
-      return api.reservations.claim(reservationId, claimerId);
-    },
+      claimerPhone: string;
+    }) =>
+      api.post<Reservation>(`/api/reservations/${reservationId}/claim`, {
+        claimerPhone,
+      }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["reservations"] });
       qc.invalidateQueries({ queryKey: ["myReservations"] });
@@ -135,7 +156,7 @@ export function useCancelReservation() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (reservationId: string) =>
-      api.reservations.cancel(reservationId),
+      api.patch<Reservation>(`/api/reservations/${reservationId}/cancel`, {}),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["reservations"] });
       qc.invalidateQueries({ queryKey: ["myReservations"] });
@@ -148,7 +169,7 @@ export function useCancelClaim() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (reservationId: string) =>
-      api.reservations.cancelClaim(reservationId),
+      api.post<Reservation>(`/api/reservations/${reservationId}/cancel-claim`, {}),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["reservations"] });
       qc.invalidateQueries({ queryKey: ["myReservations"] });
@@ -159,89 +180,88 @@ export function useCancelClaim() {
 }
 
 // ─── Profile ──────────────────────────────────────────
-export function useProfile(phone?: string | null) {
+export function useProfile(phone: string) {
   return useQuery({
     queryKey: ["profile", phone],
-    queryFn: () => api.profile.get(),
+    queryFn: () =>
+      api.get<UserProfile>(`/api/profile`),
     enabled: !!phone,
     staleTime: 60 * 1000,
   });
 }
 
-// ─── Activity Alerts — TODO: implement when Supabase schema supports it
+// ─── Activity Alerts ──────────────────────────────────
 export function useActivityAlerts(phone: string) {
   return useQuery({
     queryKey: ["activityAlerts", phone],
-    queryFn: async (): Promise<ActivityAlert[]> => [],
+    queryFn: () =>
+      api.get<ActivityAlert[]>(`/api/alerts`),
     enabled: !!phone,
     staleTime: 5 * 60 * 1000,
   });
 }
 
-// TODO: implement useMarkAlertsRead when activity_alerts table is available in Supabase
 export function useMarkAlertsRead() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (_body: { phone?: string; alertIds?: string[] }): Promise<{ success: boolean }> => ({
-      success: true,
-    }),
+    mutationFn: (body: { phone?: string; alertIds?: string[] }) =>
+      api.post<{ success: boolean }>("/api/alerts/read", body),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["activityAlerts"] });
     },
   });
 }
 
-// ─── Restaurant Alerts — TODO: implement when Supabase schema supports it
+// ─── Restaurant Alerts ────────────────────────────────
 export function useRestaurantAlerts(phone: string) {
   return useQuery({
     queryKey: ["restaurantAlerts", phone],
-    queryFn: async (): Promise<RestaurantAlertWithRestaurant[]> => [],
+    queryFn: () =>
+      api.get<RestaurantAlertWithRestaurant[]>(`/api/alerts/restaurant-alerts`),
     enabled: !!phone,
     staleTime: 60 * 1000,
   });
 }
 
-// TODO: implement when restaurant_alerts table is available in Supabase
 export function useAddRestaurantAlert() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (_body: {
-      userPhone: string;
-      restaurantId: string;
-    }): Promise<RestaurantAlertWithRestaurant> => {
-      throw new Error("Not implemented yet");
-    },
+    mutationFn: (body: { userPhone: string; restaurantId: string }) =>
+      api.post<RestaurantAlertWithRestaurant>(
+        "/api/alerts/restaurant-alerts",
+        body
+      ),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["restaurantAlerts"] });
     },
   });
 }
 
-// TODO: implement when restaurant_alerts table is available in Supabase
 export function useRemoveRestaurantAlert() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (_alertId: string): Promise<{ success: boolean }> => {
-      throw new Error("Not implemented yet");
-    },
+    mutationFn: (alertId: string) =>
+      api.delete<{ success: boolean }>(
+        `/api/alerts/restaurant-alerts/${alertId}`
+      ),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["restaurantAlerts"] });
     },
   });
 }
 
-// ─── Watches (bevakningar) ────────────────────────────
+// ---- Watches (bevakningar) ----
 export function useWatches(phone: string | null | undefined) {
   return useQuery({
     queryKey: ["watches", phone],
-    queryFn: () => api.watches.getAll(),
+    queryFn: () => api.get<Watch[]>(`/api/watches`),
     enabled: !!phone,
     staleTime: 60 * 1000,
   });
 }
 
 interface AddWatchData {
-  userPhone?: string;
+  userPhone: string;
   restaurantId?: string;
   date?: string;
   partySize?: number;
@@ -252,10 +272,9 @@ interface AddWatchData {
 export function useAddWatch() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: AddWatchData) => api.watches.create(data),
+    mutationFn: (data: AddWatchData) => api.post<Watch>("/api/watches", data),
     onSuccess: (_: Watch, variables: AddWatchData) => {
       queryClient.invalidateQueries({ queryKey: ["watches", variables.userPhone] });
-      queryClient.invalidateQueries({ queryKey: ["watches"] });
     },
   });
 }
@@ -263,35 +282,29 @@ export function useAddWatch() {
 export function useDeleteWatch() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id }: { id: string; userPhone?: string }) =>
-      api.watches.delete(id),
-    onSuccess: (_: { success: boolean }, variables: { id: string; userPhone?: string }) => {
+    mutationFn: ({ id }: { id: string; userPhone: string }) =>
+      api.delete<{ success: boolean }>(`/api/watches/${id}`),
+    onSuccess: (_: { success: boolean }, variables: { id: string; userPhone: string }) => {
       queryClient.invalidateQueries({ queryKey: ["watches", variables.userPhone] });
-      queryClient.invalidateQueries({ queryKey: ["watches"] });
     },
   });
 }
 
 // ─── New on Reslot (discovery) ────────────────────────
-// TODO: add a "new" filter/query to api.restaurants.getAll when schema supports it
 export function useNewOnReslot() {
   return useQuery({
     queryKey: ["newOnReslot"],
-    queryFn: () => api.restaurants.getAll(),
+    queryFn: () => api.get<Restaurant[]>("/api/restaurants/new-on-reslot"),
     staleTime: 5 * 60 * 1000,
   });
 }
 
-// ─── Credits purchase — TODO: implement with Stripe later
+// ---- Credits purchase ----
 export function usePurchaseCredits() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (_data: {
-      phone: string;
-      quantity: number;
-    }): Promise<CreditsPurchaseResult> => {
-      throw new Error("Credits purchase not implemented yet (Stripe)");
-    },
+    mutationFn: (data: { phone: string; quantity: number }) =>
+      api.post<CreditsPurchaseResult>("/api/credits/purchase", data),
     onSuccess: (_: CreditsPurchaseResult, variables: { phone: string; quantity: number }) => {
       queryClient.invalidateQueries({ queryKey: ["profile", variables.phone] });
       queryClient.invalidateQueries({ queryKey: ["activityAlerts", variables.phone] });
@@ -299,60 +312,49 @@ export function usePurchaseCredits() {
   });
 }
 
-// ─── Card setup — TODO: implement with Stripe later
+// ---- Card setup ----
 export function useCardStatus(phone: string | null | undefined) {
   return useQuery({
     queryKey: ["cardStatus", phone],
-    queryFn: async (): Promise<CardStatus> => ({
-      hasCard: false,
-      cardLast4: null,
-      cardBrand: null,
-    }),
+    queryFn: () => api.get<CardStatus>("/api/credits/card-status"),
     enabled: !!phone,
     staleTime: 5 * 60 * 1000,
   });
 }
 
-// TODO: implement with Stripe later
 export function useSetupCard() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (): Promise<CheckoutSessionResult> => {
-      throw new Error("Card setup not implemented yet (Stripe)");
-    },
+    mutationFn: () =>
+      api.post<CheckoutSessionResult>("/api/credits/setup-card", {}),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cardStatus"] });
     },
   });
 }
 
-// ─── Referral — TODO: implement when referral system is in Supabase
+// ---- Referral ----
 export function useReferralCode(phone: string | null | undefined) {
   return useQuery({
     queryKey: ["referralCode", phone],
-    queryFn: async (): Promise<{ referralCode: string }> => ({ referralCode: "" }),
+    queryFn: () => api.get<{ referralCode: string }>(`/api/referral/code`),
     enabled: !!phone,
     staleTime: 10 * 60 * 1000,
   });
 }
 
-// TODO: implement referral use when schema supports it
 export function useUseReferralCode() {
   return useMutation({
-    mutationFn: async (_data: {
-      phone: string;
-      referralCode: string;
-    }): Promise<{ success: boolean }> => {
-      throw new Error("Referral not implemented yet");
-    },
+    mutationFn: (data: { phone: string; referralCode: string }) =>
+      api.post<{ success: boolean }>("/api/referral/use", data),
   });
 }
 
 // ─── Push Notifications ──────────────────────────────
 export function useSavePushToken() {
   return useMutation({
-    mutationFn: ({ token }: { token: string }) =>
-      api.profile.savePushToken(token).then(() => ({ success: true })),
+    mutationFn: (data: { token: string }) =>
+      api.post<{ success: boolean }>("/api/profile/push-token", data),
   });
 }
 
@@ -360,45 +362,28 @@ export function useSavePushToken() {
 export function useSubmitFeedback() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      reservationId,
-      worked,
-      comment,
-    }: {
-      reservationId: string;
-      worked: boolean;
-      comment?: string;
-    }) => api.feedback.submit(reservationId, worked, comment),
+    mutationFn: ({ reservationId, worked, comment }: { reservationId: string; worked: boolean; comment?: string }) =>
+      api.post<{ id: string; worked: boolean }>(`/api/reservations/${reservationId}/feedback`, { worked, comment }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["myReservations"] });
     },
   });
 }
 
-// ─── Support — TODO: implement support channel in Supabase or external service
+// ─── Support ─────────────────────────────────────────
 export function useSubmitSupportMessage() {
   return useMutation({
-    mutationFn: async (_data: {
-      message: string;
-      phone?: string;
-      email?: string;
-    }): Promise<{ success: boolean }> => {
-      throw new Error("Support messages not implemented yet");
-    },
+    mutationFn: (data: { message: string; phone?: string; email?: string }) =>
+      api.post<{ success: boolean }>("/api/support", data),
   });
 }
 
-// ─── Report Reservation — TODO: implement when reports table is in Supabase
+// ─── Report Reservation ─────────────────────────────
 export function useReportReservation() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (_params: {
-      reservationId: string;
-      reason: string;
-      details?: string;
-    }): Promise<{ id: string; reason: string; status: string }> => {
-      throw new Error("Reservation reporting not implemented yet");
-    },
+    mutationFn: ({ reservationId, reason, details }: { reservationId: string; reason: string; details?: string }) =>
+      api.post<{ id: string; reason: string; status: string }>(`/api/reservations/${reservationId}/report`, { reason, details }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["reservation"] });
       qc.invalidateQueries({ queryKey: ["myReservations"] });
@@ -406,38 +391,35 @@ export function useReportReservation() {
   });
 }
 
-// ─── Saved Restaurants — TODO: implement when saved_restaurants table is in Supabase
+// ─── Saved Restaurants ───────────────────────────────
 export function useSavedRestaurants(phone: string | null | undefined) {
   return useQuery({
     queryKey: ["savedRestaurants", phone],
-    queryFn: async (): Promise<SavedRestaurant[]> => [],
+    queryFn: () => api.get<SavedRestaurant[]>("/api/saved-restaurants"),
     enabled: !!phone,
     staleTime: 60 * 1000,
   });
 }
 
-// TODO: implement when saved_restaurants table is in Supabase
 export function useSaveRestaurant() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (_data: { restaurantId: string }): Promise<SavedRestaurant> => {
-      throw new Error("Saved restaurants not implemented yet");
-    },
+    mutationFn: (data: { restaurantId: string }) =>
+      api.post<SavedRestaurant>("/api/saved-restaurants", data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["savedRestaurants"] });
     },
   });
 }
 
-// TODO: implement when saved_restaurants table is in Supabase
 export function useUnsaveRestaurant() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (_restaurantId: string): Promise<{ success: boolean }> => {
-      throw new Error("Saved restaurants not implemented yet");
-    },
+    mutationFn: (restaurantId: string) =>
+      api.delete<{ success: boolean }>(`/api/saved-restaurants/${restaurantId}`),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["savedRestaurants"] });
     },
   });
 }
+

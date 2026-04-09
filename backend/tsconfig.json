@@ -2,24 +2,21 @@
   "compilerOptions": {
     // Environment setup & latest features
     "lib": ["ESNext"],
-    "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "outDir": "dist",
-
-    // Allow JS interop
+    "target": "ESNext",
+    "module": "Preserve",
+    "moduleDetection": "force",
+    "jsx": "react-jsx",
     "allowJs": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
 
-    // Do NOT emit during typecheck — Vercel builder handles transpilation
-    "noEmit": false,
-    "declaration": false,
-    "skipLibCheck": true,
+    // Bundler mode
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "noEmit": true,
 
     // Best practices
     "strict": true,
+    "skipLibCheck": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
@@ -28,7 +25,5 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false
-  },
-  "include": ["src/**/*", "api/**/*"],
-  "exclude": ["node_modules", "dist", "prisma"]
+  }
 }
