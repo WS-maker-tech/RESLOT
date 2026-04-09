@@ -115,32 +115,22 @@ function RootLayoutNav() {
     if (!hydrated) return;
     const { sessionToken, setLoggedIn, logout } = useAuthStore.getState();
     if (!sessionToken) return;
-    const baseUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
-    if (!baseUrl) return;
-    fetch(`${baseUrl}/api/auth/me`, {
-      headers: { Authorization: `Bearer ${sessionToken}` },
-    })
-      .then((res) => {
-        if (res.ok) {
-          setLoggedIn(true);
-          // Register push token on successful auth verification
-          registerForPushNotificationsAsync().then((token) => {
-            if (token && baseUrl) {
-              fetch(`${baseUrl}/api/profile/push-token`, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${sessionToken}`,
-                },
-                body: JSON.stringify({ token }),
-              }).catch((err) => console.error("[Auth] Failed to save push token:", err));
-            }
-          });
-        } else {
-          logout();
+    supabase.auth.getUser().then(({ data: { user }, error }) => {
+      if (error || !user) {
+        logout();
+        return;
+      }
+      setLoggedIn(true);
+      // Register push token on successful auth verification
+      registerForPushNotificationsAsync().then((token) => {
+        if (token) {
+          supabase.from('users').update({ push_token: token }).eq('id', user.id)
+            .then(({ error: err }) => {
+              if (err) console.error('[Auth] Failed to save push token:', err);
+            });
         }
-      })
-      .catch((err) => console.error("[Auth] Failed to verify session:", err));
+      });
+    }).catch((err) => console.error('[Auth] Failed to verify session:', err));
   }, [hydrated]);
 
   if (!hydrated) return null;
@@ -189,21 +179,15 @@ export default function RootLayout() {
     registerForPushNotificationsAsync().then((token) => {
       if (token) {
         console.log("[Notifications] Push token:", token);
-        // Save token to backend if user is authenticated
-        const { sessionToken } = useAuthStore.getState();
-        if (sessionToken) {
-          const baseUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
-          if (baseUrl) {
-            fetch(`${baseUrl}/api/profile/push-token`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${sessionToken}`,
-              },
-              body: JSON.stringify({ token }),
-            }).catch((err) => console.error("[Notifications] Failed to save push token:", err));
+        // Save token to Supabase if user is authenticated
+        supabase.auth.getUser().then(({ data: { user } }) => {
+          if (user) {
+            supabase.from('users').update({ push_token: token }).eq('id', user.id)
+              .then(({ error }) => {
+                if (error) console.error('[Notifications] Failed to save push token:', error);
+              });
           }
-        }
+        });
       }
     });
 

@@ -15,7 +15,6 @@ import { ThumbsUp, ThumbsDown, X, CheckCircle } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import Animated, { FadeInDown, FadeIn } from "react-native-reanimated";
 import { C, FONTS, SPACING, RADIUS, SHADOW } from "@/lib/theme";
-import { useAuthStore } from "@/lib/auth-store";
 import { api } from "@/lib/api/api";
 
 export default function FeedbackScreen() {
@@ -25,27 +24,14 @@ export default function FeedbackScreen() {
     restaurantName: string;
   }>();
 
-
-
   const [worked, setWorked] = useState<boolean | null>(null);
   const [comment, setComment] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   const mutation = useMutation({
     mutationFn: async (data: { worked: boolean; comment?: string }) => {
-      const res = await fetch(
-        `${baseUrl}/api/reservations/${reservationId}/feedback`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(data),
-        }
-      );
-      if (!res.ok) throw new Error("Failed");
-      return res.json();
+      if (!reservationId) throw new Error("No reservation ID");
+      return api.feedback.submit(reservationId, data.worked, data.comment);
     },
     onSuccess: () => {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);

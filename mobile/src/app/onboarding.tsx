@@ -2027,18 +2027,16 @@ export default function OnboardingScreen() {
             onNext={async (first: string, last: string, email: string, password: string) => {
               setFirstName(first);
               setUserInfo(first, last, email);
-              const baseUrl = process.env.EXPO_PUBLIC_BACKEND_URL!;
-              const { data: sessionData } = await supabase.auth.getSession();
-              const accessToken = sessionData.session?.access_token;
-              if (accessToken) {
-                await fetch(`${baseUrl}/api/profile`, {
-                  method: "PUT",
-                  headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${accessToken}`,
-                  },
-                  body: JSON.stringify({ firstName: first, lastName: last, email, phone: storedPhone }),
-                }).catch((err) => console.error("[Onboarding] Failed to save profile:", err));
+              const { data: { user } } = await supabase.auth.getUser();
+              if (user) {
+                await supabase.from('users').upsert({
+                  id: user.id,
+                  name: `${first} ${last}`.trim(),
+                  email,
+                  phone: storedPhone,
+                }, { onConflict: 'id' }).then(({ error }) => {
+                  if (error) console.error('[Onboarding] Failed to save profile:', error);
+                });
               }
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               setStep("city");
