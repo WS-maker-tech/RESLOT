@@ -11,7 +11,7 @@ import { Modal } from 'react-native';
 import { useFonts } from 'expo-font';
 import { registerForPushNotificationsAsync, setupNotificationHandlers } from '@/lib/notifications';
 import { router as expoRouter } from 'expo-router';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase'; // cache-bust 1
 
 // react-native-keyboard-controller is native-only; skip on web
 const KeyboardProvider =
