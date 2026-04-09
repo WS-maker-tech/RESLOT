@@ -112,7 +112,7 @@ export const api = {
       const { data, error } = await supabase
         .from("Reservation")
         .select("*, Restaurant:restaurantId(id, name, city, address, latitude, longitude, image, neighborhood)")
-        .or(\`submitterPhone.eq.\${userId},claimerPhone.eq.\${userId}\`);
+        .or("submitterPhone.eq." + userId + ",claimerPhone.eq." + userId);
       
       if (error) throw new Error(error.message);
       return (data || []) as Reservation[];
@@ -198,7 +198,7 @@ export const api = {
       if (params?.neighborhood && params.neighborhood !== "Alla") {
         query = query.eq("neighborhood", params.neighborhood);
       }
-      if (params?.search) query = query.ilike("name", \`%\${params.search}%\`);
+      if (params?.search) query = query.ilike("name", "%" + params.search + "%");
       
       const { data, error } = await query;
       if (error) throw new Error(error.message);
