@@ -183,8 +183,13 @@ export function useCancelClaim() {
 export function useProfile(phone: string) {
   return useQuery({
     queryKey: ["profile", phone],
-    queryFn: () =>
-      api.get<UserProfile>(`/api/profile`),
+    queryFn: async () => {
+      try {
+        return await api.get<UserProfile>(`/api/profile`);
+      } catch {
+        return null;
+      }
+    },
     enabled: !!phone,
     staleTime: 60 * 1000,
   });
