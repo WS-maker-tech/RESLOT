@@ -1,5 +1,7 @@
 // Supabase-only API client - no backend dependency
 // All calls go directly to Supabase (Auth + Database)
+// Note: Table names use PascalCase (Reservation, Restaurant, UserProfile, etc)
+// Column names use camelCase (reservationDate, restaurantId, submitterPhone, etc)
 
 import { supabase } from "@/lib/supabase";
 import type {
@@ -32,7 +34,7 @@ export const api = {
       if (!userId) throw new Error("Not authenticated");
       
       const { data, error } = await supabase
-        .from("users")
+        .from("UserProfile")
         .select("*")
         .eq("id", userId)
         .single();
@@ -45,7 +47,7 @@ export const api = {
       if (!userId) throw new Error("Not authenticated");
       
       const { data, error } = await supabase
-        .from("users")
+        .from("UserProfile")
         .update(profile)
         .eq("id", userId)
         .select()
@@ -59,8 +61,8 @@ export const api = {
       if (!userId) throw new Error("Not authenticated");
       
       const { error } = await supabase
-        .from("users")
-        .update({ push_token: token })
+        .from("UserProfile")
+        .update({ pushToken: token })
         .eq("id", userId);
       
       if (error) throw new Error(error.message);
@@ -70,7 +72,7 @@ export const api = {
       if (!userId) throw new Error("Not authenticated");
       
       const { error } = await supabase
-        .from("users")
+        .from("UserProfile")
         .delete()
         .eq("id", userId);
       
@@ -81,31 +83,44 @@ export const api = {
   // ─── Reservations ───────────────────────────────────────
   reservations: {
     async getAll(params?: { city?: string; neighborhood?: string; date?: string }): Promise<Reservation[]> {
-      let query = supabase.from("reservations").select("*, restaurant:restaurants(*)");
+      let query = supabase.from("Reservation").select("*, Restaurant:restaurantId(id, name, city, address, latitude, longitude, image, neighborhood)");
       
-      if (params?.city) query = query.eq("restaurant.city", params.city);
-      if (params?.date) query = query.eq("date", params.date);
+      // For city filter, we need to join and filter on Restaurant
+      if (params?.city || params?.date) {
+        // Get all reservations first, then filter client-side
+        const { data, error } = await query;
+        if (error) throw new Error(error.message);
+        
+        let filtered = (data || []) as Reservation[];
+        if (params?.city) {
+          filtered = filtered.filter((r: any) => r.Restaurant?.city === params.city);
+        }
+        if (params?.date) {
+          filtered = filtered.filter((r: any) => r.reservationDate === params.date);
+        }
+        return filtered;
+      }
       
       const { data, error } = await query;
       if (error) throw new Error(error.message);
-      return data as Reservation[];
+      return (data || []) as Reservation[];
     },
     async getMine(): Promise<Reservation[]> {
       const userId = await getCurrentUserId();
       if (!userId) throw new Error("Not authenticated");
       
       const { data, error } = await supabase
-        .from("reservations")
-        .select("*, restaurant:restaurants(*)")
-        .or(`original_holder_id.eq.${userId},claimer_id.eq.${userId}`);
+        .from("Reservation")
+        .select("*, Restaurant:restaurantId(id, name, city, address, latitude, longitude, image, neighborhood)")
+        .or(\`submitterPhone.eq.\${userId},claimerPhone.eq.\${userId}\`);
       
       if (error) throw new Error(error.message);
-      return data as Reservation[];
+      return (data || []) as Reservation[];
     },
     async getOne(id: string): Promise<Reservation> {
       const { data, error } = await supabase
-        .from("reservations")
-        .select("*, restaurant:restaurants(*)")
+        .from("Reservation")
+        .select("*, Restaurant:restaurantId(id, name, city, address, latitude, longitude, image, neighborhood)")
         .eq("id", id)
         .single();
       
@@ -114,9 +129,9 @@ export const api = {
     },
     async create(reservation: any): Promise<Reservation> {
       const { data, error } = await supabase
-        .from("reservations")
+        .from("Reservation")
         .insert([reservation])
-        .select("*, restaurant:restaurants(*)")
+        .select("*, Restaurant:restaurantId(id, name, city, address, latitude, longitude, image, neighborhood)")
         .single();
       
       if (error) throw new Error(error.message);
@@ -124,10 +139,10 @@ export const api = {
     },
     async claim(reservationId: string, claimerId: string): Promise<Reservation> {
       const { data, error } = await supabase
-        .from("reservations")
-        .update({ claimer_id: claimerId, status: "claimed", claimed_at: new Date().toISOString() })
+        .from("Reservation")
+        .update({ claimerPhone: claimerId, status: "claimed", claimedAt: new Date().toISOString() })
         .eq("id", reservationId)
-        .select("*, restaurant:restaurants(*)")
+        .select("*, Restaurant:restaurantId(id, name, city, address, latitude, longitude, image, neighborhood)")
         .single();
       
       if (error) throw new Error(error.message);
@@ -135,10 +150,10 @@ export const api = {
     },
     async cancel(reservationId: string): Promise<Reservation> {
       const { data, error } = await supabase
-        .from("reservations")
+        .from("Reservation")
         .update({ status: "cancelled" })
         .eq("id", reservationId)
-        .select("*, restaurant:restaurants(*)")
+        .select("*, Restaurant:restaurantId(id, name, city, address, latitude, longitude, image, neighborhood)")
         .single();
       
       if (error) throw new Error(error.message);
@@ -146,10 +161,10 @@ export const api = {
     },
     async cancelClaim(reservationId: string): Promise<Reservation> {
       const { data, error } = await supabase
-        .from("reservations")
-        .update({ claimer_id: null, status: "active", claimed_at: null })
+        .from("Reservation")
+        .update({ claimerPhone: null, status: "active", claimedAt: null })
         .eq("id", reservationId)
-        .select("*, restaurant:restaurants(*)")
+        .select("*, Restaurant:restaurantId(id, name, city, address, latitude, longitude, image, neighborhood)")
         .single();
       
       if (error) throw new Error(error.message);
@@ -164,8 +179,8 @@ export const api = {
       if (!userId) throw new Error("Not authenticated");
       
       const { data, error } = await supabase
-        .from("feedbacks")
-        .insert([{ reservation_id: reservationId, user_id: userId, worked, comment }])
+        .from("ReservationFeedback")
+        .insert([{ reservationId, userId, worked }])
         .select("id, worked")
         .single();
       
@@ -177,22 +192,21 @@ export const api = {
   // ─── Restaurants ────────────────────────────────────────
   restaurants: {
     async getAll(params?: { city?: string; neighborhood?: string; search?: string }): Promise<Restaurant[]> {
-      let query = supabase.from("restaurants").select("*");
+      let query = supabase.from("Restaurant").select("*");
       
       if (params?.city) query = query.eq("city", params.city);
       if (params?.neighborhood && params.neighborhood !== "Alla") {
-        // Assuming a neighborhood column exists in restaurants table
-        // If not, this may need adjustment
+        query = query.eq("neighborhood", params.neighborhood);
       }
-      if (params?.search) query = query.ilike("name", `%${params.search}%`);
+      if (params?.search) query = query.ilike("name", \`%\${params.search}%\`);
       
       const { data, error } = await query;
       if (error) throw new Error(error.message);
-      return data as Restaurant[];
+      return (data || []) as Restaurant[];
     },
     async getOne(id: string): Promise<Restaurant & { reservations: Reservation[] }> {
       const { data: restaurant, error: restaurantError } = await supabase
-        .from("restaurants")
+        .from("Restaurant")
         .select("*")
         .eq("id", id)
         .single();
@@ -200,9 +214,9 @@ export const api = {
       if (restaurantError) throw new Error(restaurantError.message);
       
       const { data: reservations, error: reservError } = await supabase
-        .from("reservations")
+        .from("Reservation")
         .select("*")
-        .eq("restaurant_id", id);
+        .eq("restaurantId", id);
       
       if (reservError) throw new Error(reservError.message);
       
@@ -217,21 +231,21 @@ export const api = {
       if (!userId) throw new Error("Not authenticated");
       
       const { data, error } = await supabase
-        .from("watches")
-        .select("*, restaurant:restaurants(*)")
-        .eq("user_id", userId);
+        .from("Watch")
+        .select("*, Restaurant:restaurantId(id, name, city, address, latitude, longitude, image, neighborhood)")
+        .eq("userPhone", userId);
       
       if (error) throw new Error(error.message);
-      return data as Watch[];
+      return (data || []) as Watch[];
     },
     async create(watch: any): Promise<Watch> {
       const userId = await getCurrentUserId();
       if (!userId) throw new Error("Not authenticated");
       
       const { data, error } = await supabase
-        .from("watches")
-        .insert([{ ...watch, user_id: userId }])
-        .select("*, restaurant:restaurants(*)")
+        .from("Watch")
+        .insert([{ ...watch, userPhone: userId }])
+        .select("*, Restaurant:restaurantId(id, name, city, address, latitude, longitude, image, neighborhood)")
         .single();
       
       if (error) throw new Error(error.message);
@@ -239,7 +253,7 @@ export const api = {
     },
     async delete(id: string): Promise<{ success: boolean }> {
       const { error } = await supabase
-        .from("watches")
+        .from("Watch")
         .delete()
         .eq("id", id);
       
