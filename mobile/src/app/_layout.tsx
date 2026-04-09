@@ -11,6 +11,7 @@ import { Modal } from 'react-native';
 import { useFonts } from 'expo-font';
 import { registerForPushNotificationsAsync, setupNotificationHandlers } from '@/lib/notifications';
 import { router as expoRouter } from 'expo-router';
+import { supabase } from '@/lib/supabase';
 
 // react-native-keyboard-controller is native-only; skip on web
 const KeyboardProvider =
@@ -124,7 +125,7 @@ function RootLayoutNav() {
       // Register push token on successful auth verification
       registerForPushNotificationsAsync().then((token) => {
         if (token) {
-          supabase.from('users').update({ push_token: token }).eq('id', user.id)
+          supabase.from('UserProfile').update({ pushToken: token }).eq('id', user.id)
             .then(({ error: err }) => {
               if (err) console.error('[Auth] Failed to save push token:', err);
             });
@@ -182,7 +183,7 @@ export default function RootLayout() {
         // Save token to Supabase if user is authenticated
         supabase.auth.getUser().then(({ data: { user } }) => {
           if (user) {
-            supabase.from('users').update({ push_token: token }).eq('id', user.id)
+            supabase.from('UserProfile').update({ pushToken: token }).eq('id', user.id)
               .then(({ error }) => {
                 if (error) console.error('[Notifications] Failed to save push token:', error);
               });
