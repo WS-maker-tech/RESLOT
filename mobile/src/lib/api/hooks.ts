@@ -24,13 +24,15 @@ export function useRestaurants(params?: {
   return useQuery({
     queryKey: ["restaurants", params?.city, params?.neighborhood, params?.search],
     queryFn: async () => {
-      const queryParams = new URLSearchParams();
-      if (params?.city) queryParams.set("city", params.city);
-      if (params?.neighborhood && params.neighborhood !== "Alla")
-        queryParams.set("neighborhood", params.neighborhood);
-      if (params?.search) queryParams.set("search", params.search);
-      const qs = queryParams.toString();
-      return api.get<Restaurant[]>(`/api/restaurants${qs ? `?${qs}` : ""}`);
+      try {
+        const queryParams = new URLSearchParams();
+        if (params?.city) queryParams.set("city", params.city);
+        if (params?.neighborhood && params.neighborhood !== "Alla")
+          queryParams.set("neighborhood", params.neighborhood);
+        if (params?.search) queryParams.set("search", params.search);
+        const qs = queryParams.toString();
+        return await api.get<Restaurant[]>(`/api/restaurants${qs ? `?${qs}` : ""}`) ?? [];
+      } catch { return [] as Restaurant[]; }
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -39,10 +41,10 @@ export function useRestaurants(params?: {
 export function useRestaurant(id: string) {
   return useQuery({
     queryKey: ["restaurant", id],
-    queryFn: () =>
-      api.get<Restaurant & { reservations: Reservation[] }>(
-        `/api/restaurants/${id}`
-      ),
+    queryFn: async () => {
+      try { return await api.get<Restaurant & { reservations: Reservation[] }>(`/api/restaurants/${id}`); }
+      catch { return null; }
+    },
     enabled: !!id,
     staleTime: 5 * 60 * 1000,
   });
@@ -51,7 +53,10 @@ export function useRestaurant(id: string) {
 export function useReservation(id: string) {
   return useQuery({
     queryKey: ["reservation", id],
-    queryFn: () => api.get<Reservation>(`/api/reservations/${id}`),
+    queryFn: async () => {
+      try { return await api.get<Reservation>(`/api/reservations/${id}`); }
+      catch { return null; }
+    },
     enabled: !!id,
     staleTime: 5 * 60 * 1000,
   });
@@ -66,13 +71,15 @@ export function useReservations(params?: {
   return useQuery({
     queryKey: ["reservations", params?.city, params?.neighborhood, params?.date],
     queryFn: async () => {
-      const queryParams = new URLSearchParams();
-      if (params?.city) queryParams.set("city", params.city);
-      if (params?.neighborhood && params.neighborhood !== "Alla")
-        queryParams.set("neighborhood", params.neighborhood);
-      if (params?.date) queryParams.set("date", params.date);
-      const qs = queryParams.toString();
-      return api.get<Reservation[]>(`/api/reservations${qs ? `?${qs}` : ""}`);
+      try {
+        const queryParams = new URLSearchParams();
+        if (params?.city) queryParams.set("city", params.city);
+        if (params?.neighborhood && params.neighborhood !== "Alla")
+          queryParams.set("neighborhood", params.neighborhood);
+        if (params?.date) queryParams.set("date", params.date);
+        const qs = queryParams.toString();
+        return await api.get<Reservation[]>(`/api/reservations${qs ? `?${qs}` : ""}`) ?? [];
+      } catch { return [] as Reservation[]; }
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -83,8 +90,10 @@ export function useMissedReservations(city?: string) {
   return useQuery({
     queryKey: ["missedReservations", city],
     queryFn: async () => {
-      const qs = city ? `?city=${encodeURIComponent(city)}` : "";
-      return api.get<MissedReservation[]>(`/api/reservations/missed${qs}`);
+      try {
+        const qs = city ? `?city=${encodeURIComponent(city)}` : "";
+        return await api.get<MissedReservation[]>(`/api/reservations/missed${qs}`) ?? [];
+      } catch { return [] as MissedReservation[]; }
     },
     staleTime: 2 * 60 * 1000,
   });
@@ -94,8 +103,10 @@ export function useMissedReservations(city?: string) {
 export function useMyReservations(phone: string) {
   return useQuery({
     queryKey: ["myReservations", phone],
-    queryFn: () =>
-      api.get<Reservation[]>(`/api/reservations/mine`),
+    queryFn: async () => {
+      try { return await api.get<Reservation[]>(`/api/reservations/mine`) ?? []; }
+      catch { return [] as Reservation[]; }
+    },
     enabled: !!phone,
     staleTime: 5 * 60 * 1000,
   });
@@ -199,8 +210,10 @@ export function useProfile(phone: string) {
 export function useActivityAlerts(phone: string) {
   return useQuery({
     queryKey: ["activityAlerts", phone],
-    queryFn: () =>
-      api.get<ActivityAlert[]>(`/api/alerts`),
+    queryFn: async () => {
+      try { return await api.get<ActivityAlert[]>(`/api/alerts`) ?? []; }
+      catch { return [] as ActivityAlert[]; }
+    },
     enabled: !!phone,
     staleTime: 5 * 60 * 1000,
   });
@@ -221,8 +234,10 @@ export function useMarkAlertsRead() {
 export function useRestaurantAlerts(phone: string) {
   return useQuery({
     queryKey: ["restaurantAlerts", phone],
-    queryFn: () =>
-      api.get<RestaurantAlertWithRestaurant[]>(`/api/alerts/restaurant-alerts`),
+    queryFn: async () => {
+      try { return await api.get<RestaurantAlertWithRestaurant[]>(`/api/alerts/restaurant-alerts`) ?? []; }
+      catch { return [] as RestaurantAlertWithRestaurant[]; }
+    },
     enabled: !!phone,
     staleTime: 60 * 1000,
   });
@@ -259,7 +274,10 @@ export function useRemoveRestaurantAlert() {
 export function useWatches(phone: string | null | undefined) {
   return useQuery({
     queryKey: ["watches", phone],
-    queryFn: () => api.get<Watch[]>(`/api/watches`),
+    queryFn: async () => {
+      try { return await api.get<Watch[]>(`/api/watches`) ?? []; }
+      catch { return [] as Watch[]; }
+    },
     enabled: !!phone,
     staleTime: 60 * 1000,
   });
@@ -327,7 +345,10 @@ export function usePurchaseCredits() {
 export function useCardStatus(phone: string | null | undefined) {
   return useQuery({
     queryKey: ["cardStatus", phone],
-    queryFn: () => api.get<CardStatus>("/api/credits/card-status"),
+    queryFn: async () => {
+      try { return await api.get<CardStatus>("/api/credits/card-status"); }
+      catch { return null; }
+    },
     enabled: !!phone,
     staleTime: 5 * 60 * 1000,
   });
@@ -348,7 +369,10 @@ export function useSetupCard() {
 export function useReferralCode(phone: string | null | undefined) {
   return useQuery({
     queryKey: ["referralCode", phone],
-    queryFn: () => api.get<{ referralCode: string }>(`/api/referral/code`),
+    queryFn: async () => {
+      try { return await api.get<{ referralCode: string }>(`/api/referral/code`); }
+      catch { return { referralCode: '' }; }
+    },
     enabled: !!phone,
     staleTime: 10 * 60 * 1000,
   });
@@ -406,7 +430,10 @@ export function useReportReservation() {
 export function useSavedRestaurants(phone: string | null | undefined) {
   return useQuery({
     queryKey: ["savedRestaurants", phone],
-    queryFn: () => api.get<SavedRestaurant[]>("/api/saved-restaurants"),
+    queryFn: async () => {
+      try { return await api.get<SavedRestaurant[]>("/api/saved-restaurants") ?? []; }
+      catch { return [] as SavedRestaurant[]; }
+    },
     enabled: !!phone,
     staleTime: 60 * 1000,
   });
