@@ -79,7 +79,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .update({ claimerPhone: user.phone, status: "claimed", claimedAt: new Date().toISOString() })
       .eq("id", id).select("*, Restaurant:restaurantId(*)").single();
     if (error) return res.status(500).json({ error: { message: error.message } });
-    return res.status(200).json({ data });
+    return res.status(200).json({ data: normalize(data) });
   }
 
   // PATCH /api/reservations/:id/cancel
@@ -114,14 +114,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json({ data });
   }
 
-  // GET /api/reservations/:id
+  // GET /api/reservations/:id (also handles restaurant-id fallback)
   const reservationIdMatch = path.match(/^reservations\/([^/]+)$/);
   if (reservationIdMatch && req.method === "GET") {
     const id = reservationIdMatch[1];
+    // Try as reservation ID first
     const { data, error } = await supabase.from("Reservation")
       .select("*, Restaurant:restaurantId(*)").eq("id", id).single();
-    if (error) return res.status(404).json({ error: { message: error.message } });
-    return res.status(200).json({ data });
+    if (!error && data) return res.status(200).json({ data: normalize(data) });
+    // Fallback: try as restaurant ID — find first active reservation for it
+    const { data: byRestaurant } = await supabase.from("Reservation")
+      .select("*, Restaurant:restaurantId(*)").eq("restaurantId", id).eq("status", "active").order("reservationDate", { ascending: true }).limit(1);
+    if (byRestaurant && byRestaurant.length > 0) return res.status(200).json({ data: normalize(byRestaurant[0]) });
+    // Fallback: return restaurant as pseudo-reservation
+    const { data: restaurant } = await supabase.from("Restaurant").select("*").eq("id", id).single();
+    if (restaurant) return res.status(200).json({ data: { id, restaurant, status: "info_only" } });
+    return res.status(404).json({ error: { message: "Not found" } });
   }
 
   // GET /api/restaurants/new-on-reslot
@@ -137,7 +145,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { data: restaurant, error } = await supabase.from("Restaurant").select("*").eq("id", id).single();
     if (error) return res.status(404).json({ error: { message: error.message } });
     const { data: reservations } = await supabase.from("Reservation").select("*").eq("restaurantId", id).eq("status", "active");
-    return res.status(200).json({ data: { ...restaurant, reservations: reservations || [] } });
+    // Normalize reservations and map to frontend-expected field names
+    const normalizedReservations = (reservations || []).map((r: any) => ({
+      ...r,
+      restaurant: restaurant,
+    }));
+    return res.status(200).json({ data: { ...restaurant, reservations: normalizedReservations } });
   }
 
   // GET /api/restaurants
