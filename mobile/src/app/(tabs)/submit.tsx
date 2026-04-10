@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useReducer } from "react";
+import * as ImagePicker from "expo-image-picker";
 import {
   View,
   Text,
@@ -230,6 +231,7 @@ export default function SubmitScreen() {
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
+  const [screenshotUri, setScreenshotUri] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<{
     restaurant: boolean;
     date: boolean;
@@ -491,24 +493,29 @@ export default function SubmitScreen() {
                   paddingHorizontal: 16,
                 }}
               >
-                {selectedRestaurant?.name} är uppe.{"\n"}Du får 2 credits när någon tar bordet.
+                {selectedRestaurant?.name} är uppe och syns nu för andra användare.
               </Text>
+
+              {/* Credits info box */}
+              <View style={{ backgroundColor: "rgba(126,200,122,0.1)", borderRadius: RADIUS.lg, padding: 16, marginTop: 20, marginBottom: 8, borderWidth: 1, borderColor: "rgba(126,200,122,0.3)" }}>
+                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: "#3d7a3a", textAlign: "center" }}>Du får 2 credits när någon tar bordet</Text>
+                <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textSecondary, textAlign: "center", marginTop: 4 }}>1 credit = 1 bokning du kan ta över</Text>
+              </View>
+
               <Pressable
                 testID="submit-another-button"
                 accessibilityLabel="Lägg upp en till bokning"
                 onPress={resetForm}
-                className="mt-8 items-center rounded-full py-4 px-8"
-                style={{ backgroundColor: C.dark, alignSelf: "center" }}
+                style={{ backgroundColor: C.dark, borderRadius: RADIUS.full, paddingVertical: 14, paddingHorizontal: 32, alignSelf: "center", marginTop: 16 }}
               >
-                <Text
-                  style={{
-                    fontFamily: FONTS.semiBold,
-                    fontSize: 15,
-                    color: "#FFFFFF",
-                  }}
-                >
-                  Lägg upp en till
-                </Text>
+                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: "#FFFFFF" }}>Lägg upp en till</Text>
+              </Pressable>
+              <Pressable
+                accessibilityLabel="Gå till mina bokningar"
+                onPress={() => { router.replace("/(tabs)/reservations"); }}
+                style={{ alignSelf: "center", marginTop: 12, paddingVertical: 8 }}
+              >
+                <Text style={{ fontFamily: FONTS.medium, fontSize: 14, color: C.textSecondary }}>Visa mina bokningar →</Text>
               </Pressable>
             </Animated.View>
           </View>
@@ -607,6 +614,13 @@ export default function SubmitScreen() {
           {/* Step 0: Restaurant */}
           {step === 0 ? (
             <Animated.View entering={FadeInRight.duration(400)}>
+              {/* Credits info */}
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: "rgba(126,200,122,0.08)", borderRadius: RADIUS.md, padding: 12, marginBottom: 16, borderWidth: 1, borderColor: "rgba(126,200,122,0.2)" }}>
+                <Text style={{ fontSize: 20 }}>🎟️</Text>
+                <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textSecondary, flex: 1, lineHeight: 18 }}>
+                  Du får <Text style={{ fontFamily: FONTS.semiBold, color: "#3d7a3a" }}>2 credits</Text> när någon tar över din bokning. Använd credits för att ta andra bokningar.
+                </Text>
+              </View>
               {/* Search input */}
               <Animated.View
                 entering={FadeInDown.delay(0 * 50).springify()}
@@ -1646,7 +1660,18 @@ export default function SubmitScreen() {
                   <Pressable
                     testID="upload-screenshot-button"
                     accessibilityLabel="Ladda upp bokningsbekräftelse"
-                    onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)}
+                    onPress={async () => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      const result = await ImagePicker.launchImageLibraryAsync({
+                        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                        allowsEditing: false,
+                        quality: 0.8,
+                      });
+                      if (!result.canceled && result.assets[0]) {
+                        setScreenshotUri(result.assets[0].uri);
+                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                      }
+                    }}
                     style={{
                       borderWidth: 2,
                       borderStyle: "dashed",
@@ -1659,27 +1684,18 @@ export default function SubmitScreen() {
                       marginBottom: 16,
                     }}
                   >
-                    <Upload size={28} color={C.coral} strokeWidth={ICON.strokeWidth} />
-                    <Text
-                      style={{
-                        fontFamily: FONTS.semiBold,
-                        fontSize: 15,
-                        color: C.coral,
-                        marginTop: 10,
-                      }}
-                    >
-                      Ladda upp bekräftelse
-                    </Text>
-                    <Text
-                      style={{
-                        fontFamily: FONTS.regular,
-                        fontSize: 12,
-                        color: C.textTertiary,
-                        marginTop: 4,
-                      }}
-                    >
-                      JPG, PNG eller PDF
-                    </Text>
+                    {screenshotUri ? (
+                      <>
+                        <Image source={{ uri: screenshotUri }} style={{ width: "100%", height: 160, borderRadius: RADIUS.md }} contentFit="cover" />
+                        <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: C.success, marginTop: 8 }}>✓ Bild uppladdad — tryck för att byta</Text>
+                      </>
+                    ) : (
+                      <>
+                        <Upload size={28} color={C.coral} strokeWidth={ICON.strokeWidth} />
+                        <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.coral, marginTop: 10 }}>Ladda upp bekräftelse</Text>
+                        <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary, marginTop: 4 }}>JPG eller PNG</Text>
+                      </>
+                    )}
                   </Pressable>
 
                   <View
