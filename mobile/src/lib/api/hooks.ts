@@ -299,7 +299,13 @@ export function useDeleteWatch() {
 export function useNewOnReslot() {
   return useQuery({
     queryKey: ["newOnReslot"],
-    queryFn: () => api.get<Restaurant[]>("/api/restaurants/new-on-reslot"),
+    queryFn: async () => {
+      try {
+        return await api.get<Restaurant[]>("/api/restaurants/new-on-reslot") ?? [];
+      } catch {
+        return [];
+      }
+    },
     staleTime: 5 * 60 * 1000,
   });
 }
