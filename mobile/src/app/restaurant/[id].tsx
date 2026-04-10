@@ -37,6 +37,7 @@ import {
   X,
   AlertTriangle,
   ChevronRight,
+  CheckCircle,
 } from "lucide-react-native";
 import Animated, {
   FadeInDown,
@@ -1616,6 +1617,81 @@ ${shareUrl}`,
                 Du har 5 minuter att ångra dig — helt kostnadsfritt. Inga frågor.
               </Text>
             </View>
+          </View>
+        </Animated.View>
+
+        {/* Booking details — full transparency */}
+        <Animated.View
+          entering={FadeInDown.delay(295).springify()}
+          style={{ paddingHorizontal: SPACING.lg, paddingTop: 16 }}
+        >
+          <Text style={{ fontFamily: FONTS.displayBold, fontSize: 17, color: C.textPrimary, marginBottom: 12, letterSpacing: -0.3 }}>
+            Bokningsinformation
+          </Text>
+          <View style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: C.borderLight, overflow: "hidden" }}>
+            {/* Name on reservation */}
+            {reservation.nameOnReservation ? (
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingVertical: 13, borderBottomWidth: 0.5, borderBottomColor: C.divider }}>
+                <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary }}>Name on reservation</Text>
+                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.textPrimary }}>{reservation.nameOnReservation}</Text>
+              </View>
+            ) : null}
+            {/* Seat type */}
+            {reservation.seatType ? (
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingVertical: 13, borderBottomWidth: 0.5, borderBottomColor: C.divider }}>
+                <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary }}>Placering</Text>
+                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.textPrimary }}>{seatTypeLabel}</Text>
+              </View>
+            ) : null}
+            {/* Cancel fee */}
+            {reservation.cancelFee && reservation.cancelFee > 0 ? (
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingVertical: 13, borderBottomWidth: 0.5, borderBottomColor: C.divider }}>
+                <View>
+                  <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary }}>Avbokningsavgift</Text>
+                  {reservation.cancellationWindowHours ? (
+                    <Text style={{ fontFamily: FONTS.regular, fontSize: 11, color: C.textTertiary, marginTop: 1 }}>Inom {reservation.cancellationWindowHours}h före besöket</Text>
+                  ) : null}
+                </View>
+                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.coral }}>{reservation.cancelFee} SEK/pers · Totalt {reservation.cancelFee * reservation.partySize} SEK</Text>
+              </View>
+            ) : (
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingVertical: 13, borderBottomWidth: 0.5, borderBottomColor: C.divider }}>
+                <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary }}>Avbokningsavgift</Text>
+                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.success }}>Ingen ✕</Text>
+              </View>
+            )}
+            {/* Prepaid amount */}
+            {reservation.prepaidAmount && reservation.prepaidAmount > 0 ? (
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingVertical: 13, borderBottomWidth: 0.5, borderBottomColor: C.divider }}>
+                <View>
+                  <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary }}>Förbetalt belopp</Text>
+                  <Text style={{ fontFamily: FONTS.regular, fontSize: 11, color: C.textTertiary, marginTop: 1 }}>Betalas vid avbokning</Text>
+                </View>
+                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.coral }}>{reservation.prepaidAmount} SEK</Text>
+              </View>
+            ) : null}
+            {/* Extra info */}
+            {reservation.extraInfo ? (
+              <View style={{ paddingHorizontal: 16, paddingVertical: 13, borderBottomWidth: 0.5, borderBottomColor: C.divider }}>
+                <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary, marginBottom: 4 }}>Mer info</Text>
+                <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textPrimary }}>{reservation.extraInfo}</Text>
+              </View>
+            ) : null}
+            {/* Verification link */}
+            {reservation.verificationLink ? (
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingVertical: 13 }}>
+                <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary }}>Verifiering</Text>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                  <CheckCircle size={14} color={C.success} strokeWidth={2} />
+                  <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.success }}>Verifierad</Text>
+                </View>
+              </View>
+            ) : (
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingVertical: 13 }}>
+                <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary }}>Verifiering</Text>
+                <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textTertiary }}>Skärmdump</Text>
+              </View>
+            )}
           </View>
         </Animated.View>
 
