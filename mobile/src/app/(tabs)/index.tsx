@@ -1448,9 +1448,6 @@ export default function HomeScreen() {
 
 
 
-            {/* Nya på Reslot — discovery section */}
-            <NewOnReslotSection />
-
             {/* Du missade — loss aversion section */}
             <MissedBookingsSection city={selectedCity} />
 
