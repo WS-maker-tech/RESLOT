@@ -312,12 +312,12 @@ const Header = React.memo(function Header({
               width: 36,
               height: 36,
               borderRadius: 18,
-              backgroundColor: C.borderLight,
+              backgroundColor: "#7EC87A",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <MapPin size={18} color={C.textTertiary} strokeWidth={2} />
+            <MapPin size={18} color="#FFFFFF" strokeWidth={2.5} />
           </Pressable>
           <Pressable
             testID="search-toggle"

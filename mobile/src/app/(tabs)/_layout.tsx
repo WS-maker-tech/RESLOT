@@ -241,16 +241,7 @@ export default function TabLayout() {
         />
         <Tabs.Screen
           name="map"
-          options={{
-            title: "",
-            tabBarIcon: ({
-              color,
-              focused,
-            }: {
-              color: string;
-              focused: boolean;
-            }) => <TabIcon icon={Map} color={focused ? "#7EC87A" : color} focused={focused} />,
-          }}
+          options={{ href: null }}
         />
         <Tabs.Screen
           name="submit"
