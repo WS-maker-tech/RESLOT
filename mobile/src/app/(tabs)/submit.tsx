@@ -175,7 +175,7 @@ interface FormState {
   selectedRestaurant: Restaurant | null;
   location: "indoor" | "outdoor" | null;
   locationDetail: string;
-  mealType: "lunch" | "middag" | "brunch" | null;
+  mealType: "frukost" | "brunch" | "lunch" | "middag" | null;
   bookingDate: Date;
   firstName: string;
   lastName: string;
@@ -386,6 +386,9 @@ export default function SubmitScreen() {
     if (step === 3) {
       if (!firstName.trim()) { errors.firstName = true; hasError = true; }
       if (!lastName.trim()) { errors.lastName = true; hasError = true; }
+    }
+    if (step === 4 && hasCancelFee && !cancellationWindowHours.trim()) {
+      hasError = true;
     }
     if (step === 5 && !verifyMethod) {
       errors.verifyMethod = true;
@@ -808,7 +811,7 @@ export default function SubmitScreen() {
                   Typ av sittning (valfritt)
                 </Text>
                 <View style={{ flexDirection: "row", gap: 8 }}>
-                  {(["lunch", "middag", "brunch"] as const).map((type) => (
+                  {(["frukost", "brunch", "lunch", "middag"] as const).map((type) => (
                     <Pressable
                       key={type}
                       testID={`meal-type-${type}`}
@@ -1234,7 +1237,7 @@ export default function SubmitScreen() {
                       testID="cancel-fee-input"
                       value={cancelFeeAmount}
                       onChangeText={(v) => setField("cancelFeeAmount", v)}
-                      placeholder="Belopp i kr (t.ex. 500)"
+                      placeholder="Belopp per person i SEK (t.ex. 500)"
                       placeholderTextColor="#D1D5DB"
                       keyboardType="numeric"
                       style={{
@@ -1253,7 +1256,7 @@ export default function SubmitScreen() {
                   ) : null}
                   {hasCancelFee && cancelFeeAmount && partySize ? (
                     <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary, marginTop: 6 }}>
-                      Totalt: {parseFloat(cancelFeeAmount) * partySize} kr ({cancelFeeAmount} kr/person × {partySize} pers)
+                      {cancelFeeAmount} SEK/person → Totalt {parseFloat(cancelFeeAmount) * partySize} SEK ({partySize} pers)
                     </Text>
                   ) : null}
                 </View>
@@ -1323,7 +1326,7 @@ export default function SubmitScreen() {
                       testID="prepaid-fee-input"
                       value={prepaidFeeAmount}
                       onChangeText={(v) => setField("prepaidFeeAmount", v)}
-                      placeholder="Belopp i kr (t.ex. 1200)"
+                      placeholder="Totalt belopp i SEK (t.ex. 1200)"
                       placeholderTextColor="#D1D5DB"
                       keyboardType="numeric"
                       style={{
@@ -1697,10 +1700,11 @@ export default function SubmitScreen() {
                       Skärmdumpen bör visa:
                     </Text>
                     {[
+                      "Name on reservation",
                       "Restaurangens namn",
                       "Datum och tid",
                       "Antal gäster",
-                      "Bokningsbekräftelsenummer",
+                      "Avbokningsavgifter och detaljer",
                     ].map((req) => (
                       <View
                         key={req}
