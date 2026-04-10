@@ -25,6 +25,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const path = (req.query.path as string) || "";
   const token = req.headers.authorization?.replace("Bearer ", "");
 
+  // Helper: normalize Reservation (PascalCase -> camelCase for frontend)
+  function normalize(r: any) {
+    if (!r) return r;
+    const { Restaurant, ...rest } = r;
+    return { ...rest, restaurant: Restaurant ?? null };
+  }
+
   // GET /api/reservations
   if (path === "reservations" && req.method === "GET") {
     const { city, neighborhood, date } = req.query;
@@ -33,9 +40,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .select("*, Restaurant:restaurantId(id, name, city, address, latitude, longitude, image, neighborhood, cuisine, rating, priceLevel, vibeTags)")
       .eq("status", "active");
     if (error) return res.status(500).json({ error: { message: error.message } });
-    let filtered = data || [];
-    if (city) filtered = filtered.filter((r: any) => r.Restaurant?.city === city);
-    if (neighborhood && neighborhood !== "Alla") filtered = filtered.filter((r: any) => r.Restaurant?.neighborhood === neighborhood);
+    let filtered = (data || []).map(normalize);
+    if (city) filtered = filtered.filter((r: any) => r.restaurant?.city === city);
+    if (neighborhood && neighborhood !== "Alla") filtered = filtered.filter((r: any) => r.restaurant?.neighborhood === neighborhood);
     if (date) filtered = filtered.filter((r: any) => r.reservationDate === date);
     return res.status(200).json({ data: filtered });
   }
@@ -46,8 +53,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { data } = await supabase.from("Reservation")
       .select("*, Restaurant:restaurantId(id, name, city, image, neighborhood)")
       .eq("status", "claimed").order("claimedAt", { ascending: false }).limit(5);
-    let filtered = data || [];
-    if (city) filtered = filtered.filter((r: any) => r.Restaurant?.city === city);
+    let filtered = (data || []).map(normalize);
+    if (city) filtered = filtered.filter((r: any) => r.restaurant?.city === city);
     return res.status(200).json({ data: filtered });
   }
 
@@ -59,7 +66,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { data } = await supabase.from("Reservation")
       .select("*, Restaurant:restaurantId(id, name, city, address, image, neighborhood, latitude, longitude)")
       .or(phone ? `submitterPhone.eq.${phone},claimerPhone.eq.${phone}` : `id.eq.none`);
-    return res.status(200).json({ data: data || [] });
+    return res.status(200).json({ data: (data || []).map(normalize) });
   }
 
   // POST /api/reservations/:id/claim

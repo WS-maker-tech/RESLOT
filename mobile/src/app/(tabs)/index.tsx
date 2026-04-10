@@ -607,7 +607,8 @@ const MissedBookingCard = React.memo(function MissedBookingCard({
 // --- Missed Bookings Section (Premium) ---
 function MissedBookingsSection({ city }: { city: string }) {
   const router = useRouter();
-  const { data: missed = [] } = useMissedReservations(city);
+  const { data: missedRaw = [] } = useMissedReservations(city);
+  const missed = (missedRaw || []).filter((item: any) => item && item.id);
 
   if (missed.length === 0) return null;
 
@@ -723,7 +724,8 @@ function MissedBookingsSection({ city }: { city: string }) {
 // --- New on Reslot Discovery Section ---
 function NewOnReslotSection() {
   const router = useRouter();
-  const { data: newRestaurants = [] } = useNewOnReslot();
+  const { data: newRestaurantsRaw = [] } = useNewOnReslot();
+  const newRestaurants = (newRestaurantsRaw || []).filter((r: any) => r && r.id);
 
   if (newRestaurants.length === 0) return null;
 
