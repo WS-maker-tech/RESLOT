@@ -20,7 +20,7 @@ import { useAuthStore } from "@/lib/auth-store";
 import type { WatchFilterOptions } from "@/lib/api/types";
 import { C, FONTS, SPACING, RADIUS, ICON } from "@/lib/theme";
 
-const WEEKDAY_LABELS = ["Sön", "Mån", "Tis", "Ons", "Tor", "Fre", "Lör"];
+const WEEKDAY_LABELS = ["Alla", "Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"];
 const PARTY_SIZES = [1, 2, 3, 4, 5, 6, 7, 8];
 
 export default function AddWatchScreen() {

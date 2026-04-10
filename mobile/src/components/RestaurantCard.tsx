@@ -122,27 +122,7 @@ function UrgencyBadge({ reservation }: { reservation: Reservation }) {
     }
   }
 
-  if (!cancellationWindowHours) return null;
-
-  const created = new Date(createdAt);
-  const deadline = new Date(created.getTime() + cancellationWindowHours * 60 * 60 * 1000);
-  const diffMs = deadline.getTime() - now.getTime();
-  const diffHours = diffMs / (1000 * 60 * 60);
-
-  if (diffHours <= 0 || diffHours > 2) return null;
-
-  const hours = Math.floor(diffMs / (1000 * 60 * 60));
-  const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-
-  return (
-    <View testID="urgency-badge" style={styles.urgencyBadge}>
-      <PulsingUrgencyDot size={7} />
-      <Flame size={11} color={C.error} fill={C.error} strokeWidth={0} />
-      <Text style={styles.urgencyBadgeText}>
-        {hours}h {minutes}m kvar
-      </Text>
-    </View>
-  );
+  return null;
 }
 
 interface RestaurantCardProps {

@@ -242,14 +242,14 @@ export default function TabLayout() {
         <Tabs.Screen
           name="map"
           options={{
-            title: "Karta",
+            title: "",
             tabBarIcon: ({
               color,
               focused,
             }: {
               color: string;
               focused: boolean;
-            }) => <TabIcon icon={Map} color={color} focused={focused} />,
+            }) => <TabIcon icon={Map} color={focused ? "#7EC87A" : color} focused={focused} />,
           }}
         />
         <Tabs.Screen

@@ -1539,16 +1539,7 @@ function CreditsIntroStep({ onContinue, onBack }: { onContinue: () => void; onBa
         entering={enterFromBottom(460)}
         style={{ paddingBottom: 16 }}
       >
-        <Pressable
-          testID="credits-intro-skip-btn"
-          accessibilityLabel="Hoppa över"
-          onPress={onContinue}
-          style={{ alignItems: "center", paddingVertical: 10, marginBottom: 4 }}
-        >
-          <Text style={{ fontFamily: FONTS.medium, fontSize: 14, color: C.grayLight }}>
-            Hoppa över
-          </Text>
-        </Pressable>
+
         <PrimaryButton
           testID="credits-intro-continue-btn"
           label="Fattat — kör!"
