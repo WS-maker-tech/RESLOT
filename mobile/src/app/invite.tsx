@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { View, Text, ScrollView, Pressable, Share, Platform } from "react-native";
+import { View, Text, ScrollView, Pressable, Share } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { ChevronLeft, Copy, Share2, UserPlus, CheckCircle } from "lucide-react-native";
+import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useReferralCode } from "@/lib/api/hooks";
@@ -16,11 +17,9 @@ export default function InviteScreen() {
   const referralCode = referralError ? "FEL" : referralData?.referralCode ?? "LADDAR...";
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = () => {
+  const handleCopy = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (Platform.OS === "web") {
-      navigator.clipboard?.writeText(referralCode).catch((err) => console.error("[Invite] Clipboard write failed:", err));
-    }
+    await Clipboard.setStringAsync(referralCode);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
