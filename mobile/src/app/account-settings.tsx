@@ -45,6 +45,7 @@ export default function AccountSettingsScreen() {
   const router = useRouter();
   const phone = useAuthStore((s) => s.phoneNumber);
   const logout = useAuthStore((s) => s.logout);
+  const sessionToken = useAuthStore((s) => s.sessionToken);
   const { data: profile, isLoading } = useProfile(phone || "");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showSaveSuccess, setShowSaveSuccess] = useState(false);
@@ -74,7 +75,7 @@ export default function AccountSettingsScreen() {
       const baseUrl = process.env.EXPO_PUBLIC_BACKEND_URL!;
       await fetch(`${baseUrl}/api/profile`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${sessionToken}` },
         body: JSON.stringify({ phone, firstName, lastName, email, dateOfBirth, selectedCity: city }),
       });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -96,7 +97,7 @@ export default function AccountSettingsScreen() {
       const baseUrl = process.env.EXPO_PUBLIC_BACKEND_URL!;
       await fetch(`${baseUrl}/api/profile`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${sessionToken}` },
         body: JSON.stringify({ phone }),
       });
       setShowDeleteConfirm(false);
