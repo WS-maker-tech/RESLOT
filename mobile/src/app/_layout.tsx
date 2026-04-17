@@ -175,6 +175,7 @@ function RootLayoutNav() {
         <Stack.Screen name="add-watch" options={{ presentation: "modal", headerShown: false }} />
         <Stack.Screen name="booking-confirmation" options={{ headerShown: false, animation: "slide_from_right" }} />
         <Stack.Screen name="map" options={{ headerShown: false, animation: "slide_from_right" }} />
+        <Stack.Screen name="saved" options={{ presentation: "modal", headerShown: false }} />
       </Stack>
 
       </ThemeProvider>

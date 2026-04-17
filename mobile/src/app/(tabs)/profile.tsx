@@ -233,6 +233,11 @@ export default function ProfileScreen() {
     router.push("/(tabs)/reservations");
   }, [router]);
 
+  const handleSavedPress = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push("/saved");
+  }, [router]);
+
   const handleInvitePress = useCallback(() => {
     router.push("/invite");
   }, [router]);
@@ -645,9 +650,7 @@ export default function ProfileScreen() {
                 <Pressable
                   testID="saved-restaurants-link"
                   accessibilityLabel="Visa sparade restauranger"
-                  onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  }}
+                  onPress={handleSavedPress}
                   style={{ flex: 1, backgroundColor: C.bgCard, borderRadius: RADIUS.lg, borderWidth: 0.5, borderColor: C.borderLight, padding: 16, ...SHADOW.card, alignItems: "center" }}
                 >
                   <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
