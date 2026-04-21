@@ -29,14 +29,11 @@ import {
   AlertCircle,
   Check,
   Shield,
-  Sparkles,
-  CreditCard,
   Undo2,
   Timer,
   Flag,
   X,
   AlertTriangle,
-  ChevronRight,
   CheckCircle,
 } from "lucide-react-native";
 import Animated, {
@@ -57,7 +54,6 @@ import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   useReservation,
-  useReservations,
   useClaimReservation,
   useCancelClaim,
   useProfile,
@@ -66,14 +62,10 @@ import {
 import { useAuthStore } from "@/lib/auth-store";
 import { parseTagsWithCount, parseTags } from "@/lib/api/types";
 import { C, FONTS, SPACING, SHADOW, RADIUS } from "../../lib/theme";
-import { HeroSection } from "@/components/HeroSection";
-import { BookingDetails } from "@/components/BookingDetails";
-import { RestaurantInfo } from "@/components/RestaurantInfo";
-import { ClaimSection } from "@/components/ClaimSection";
 import { WebMap } from "@/components/WebMap";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
-const HERO_HEIGHT = 380;
+const HERO_HEIGHT = Math.min(SCREEN_HEIGHT * 0.33, 240);
 
 // Swedish day/month formatting
 const MONTHS_SV = [
@@ -657,6 +649,9 @@ export default function RestaurantDetailScreen() {
   const [showGracePeriod, setShowGracePeriod] = useState(false);
   const [showSuccessAnim, setShowSuccessAnim] = useState(false);
 
+  // Terms modal state
+  const [showTermsModal, setShowTermsModal] = useState(false);
+
   // Report modal state
   const [showReportModal, setShowReportModal] = useState(false);
   const [showMapModal, setShowMapModal] = useState(false);
@@ -703,18 +698,6 @@ export default function RestaurantDetailScreen() {
 
   const userCredits = profile?.credits ?? 0;
   const hasEnoughCredits = userCredits >= 2;
-
-  // Fetch other reservations in same neighborhood for internal linking
-  const neighborhood = reservation?.restaurant?.neighborhood;
-  const { data: neighborhoodReservations } = useReservations({
-    neighborhood: neighborhood ?? undefined,
-  });
-  const otherReservations = useMemo(() => {
-    if (!neighborhoodReservations || !reservation) return [];
-    return neighborhoodReservations
-      .filter((res) => res.id !== reservation.id && res.status === "active")
-      .slice(0, 3);
-  }, [neighborhoodReservations, reservation]);
 
   // These useMemo hooks MUST be before any early returns to satisfy Rules of Hooks
   const restaurant = reservation?.restaurant;
@@ -835,11 +818,6 @@ export default function RestaurantDetailScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     Linking.openURL(`https://instagram.com/${reservation.restaurant.instagram}`);
   }, [reservation]);
-
-  const handleBuyCredits = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.push("/credits");
-  }, [router]);
 
   const handleShare = useCallback(async () => {
     if (!reservation) return;
@@ -1271,6 +1249,15 @@ ${shareUrl}`,
                 );
               })}
             </View>
+            {r.rating > 0 ? (
+              <>
+                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: C.textPrimary, marginLeft: 2 }}>
+                  {r.rating.toFixed(1)}
+                </Text>
+                <View style={{ width: 3, height: 3, borderRadius: 1.5, backgroundColor: C.textTertiary, marginHorizontal: 2 }} />
+                <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.textSecondary }}>Google</Text>
+              </>
+            ) : null}
             <View style={{ width: 3, height: 3, borderRadius: 1.5, backgroundColor: C.textTertiary, marginHorizontal: 4 }} />
             <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.textSecondary }}>
               {r.cuisine}
@@ -1366,187 +1353,28 @@ ${shareUrl}`,
         {/* Divider */}
         <View style={{ height: 0.5, backgroundColor: C.divider, marginHorizontal: SPACING.lg, marginTop: 20 }} />
 
-        {/* Booking details */}
-        <BookingDetails
-          displayDate={displayDate}
-          displayTime={displayTime}
-          partySize={reservation.partySize}
-          seatTypeLabel={reservation.seatType ? seatTypeLabel : null}
-        />
-
-        {/* Seller info */}
-        {reservation.submitterFirstName ? (
-          <Animated.View entering={FadeInDown.delay(180).springify()} style={{ paddingHorizontal: SPACING.lg, paddingTop: 24 }}>
-            <View style={{
-              backgroundColor: C.bgCard,
-              borderRadius: RADIUS.lg,
-              padding: 14,
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 12,
-              borderWidth: 0.5,
-              borderColor: C.borderLight,
-              ...SHADOW.card,
-            }}>
-              <View style={{
-                width: 40, height: 40, borderRadius: 20,
-                backgroundColor: "rgba(126,200,122,0.15)",
-                alignItems: "center", justifyContent: "center",
-              }}>
-                <Text style={{ fontFamily: FONTS.bold, fontSize: 17, color: C.pistachio }}>
-                  {reservation.submitterFirstName.charAt(0).toUpperCase()}
-                </Text>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.textPrimary, letterSpacing: -0.2 }}>
-                  {reservation.submitterFirstName} {reservation.submitterLastName ? reservation.submitterLastName.charAt(0) + "." : ""} delar detta bord
-                </Text>
-                <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textSecondary, marginTop: 2 }}>
-                  Verifierad användare
-                </Text>
-              </View>
-              <View style={{
-                width: 24, height: 24, borderRadius: 12,
-                backgroundColor: C.successBg,
-                alignItems: "center", justifyContent: "center",
-                borderWidth: 1, borderColor: C.successLight,
-              }}>
-                <Check size={12} color={C.success} strokeWidth={3} />
-              </View>
-            </View>
-          </Animated.View>
-        ) : null}
-
-        {/* Cost breakdown — IMPOSSIBLE TO MISS */}
-        <Animated.View
-          entering={FadeInDown.delay(200).springify()}
-          style={{ paddingHorizontal: SPACING.lg, paddingTop: 24 }}
-        >
-          <View
-            testID="cost-breakdown"
-            style={{
-              backgroundColor: C.bgCard,
-              borderRadius: RADIUS.xl,
-              padding: 24,
-              borderWidth: 1.5,
-              borderColor: "rgba(201,169,110,0.25)",
-              ...SHADOW.elevated,
-            }}
-          >
-            {/* Header */}
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 20 }}>
-              <View
-                style={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: 10,
-                  backgroundColor: "rgba(201,169,110,0.12)",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <CreditCard size={18} color={C.gold} strokeWidth={2} />
-              </View>
-              <View>
-                <Text style={{ fontFamily: FONTS.displayBold, fontSize: 18, color: C.textPrimary, letterSpacing: -0.3 }}>
-                  Kostnad
-                </Text>
-                <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary, marginTop: 1 }}>
-                  Dras vid övertagande
-                </Text>
-              </View>
-            </View>
-
-            {/* Credits row — highlighted */}
-            <View style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              backgroundColor: "rgba(201,169,110,0.06)",
-              borderRadius: RADIUS.md,
-              paddingVertical: 14,
-              paddingHorizontal: 16,
-              marginBottom: 8,
-            }}>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-                <Sparkles size={16} color={C.gold} strokeWidth={2} />
-                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 16, color: C.textPrimary }}>Bokning</Text>
-              </View>
-              <Text style={{ fontFamily: FONTS.bold, fontSize: 18, color: C.gold }}>2 credits</Text>
-            </View>
-
-
-            {/* Total — big and bold */}
-            <View style={{
-              backgroundColor: C.dark,
-              borderRadius: RADIUS.lg,
-              paddingVertical: 16,
-              paddingHorizontal: 18,
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 14,
-            }}>
-              <Text style={{ fontFamily: FONTS.bold, fontSize: 16, color: "rgba(255,255,255,0.7)" }}>Totalt</Text>
-              <Text style={{ fontFamily: FONTS.bold, fontSize: 20, color: C.white, letterSpacing: -0.3 }}>2 credits</Text>
-            </View>
-
-            {/* Balance */}
-            <View
-              style={{
-                backgroundColor: hasEnoughCredits ? "rgba(126,200,122,0.08)" : "rgba(239,68,68,0.06)",
-                borderRadius: RADIUS.md,
-                paddingVertical: 12,
-                paddingHorizontal: 16,
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                borderWidth: 1,
-                borderColor: hasEnoughCredits ? "rgba(126,200,122,0.15)" : "rgba(239,68,68,0.12)",
-              }}
-            >
-              <Text style={{ fontFamily: FONTS.medium, fontSize: 14, color: C.textSecondary }}>Ditt saldo</Text>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
-                <Sparkles size={13} color={hasEnoughCredits ? C.coral : C.error} strokeWidth={2} />
-                <Text
-                  testID="user-credits-balance"
-                  style={{
-                    fontFamily: FONTS.bold,
-                    fontSize: 16,
-                    color: hasEnoughCredits ? C.coral : C.error,
-                  }}
-                >
-                  {userCredits} credits
-                </Text>
-              </View>
-            </View>
-
-            {!hasEnoughCredits ? (
-              <Pressable
-                testID="buy-credits-button"
-                accessibilityLabel="Köp credits"
-                onPress={handleBuyCredits}
-                style={({ pressed }) => ({
-                  backgroundColor: C.gold,
-                  borderRadius: RADIUS.lg,
-                  paddingVertical: 15,
-                  alignItems: "center",
-                  marginTop: 14,
-                  transform: [{ scale: pressed ? 0.97 : 1 }],
-                  shadowColor: C.gold,
-                  shadowOffset: { width: 0, height: 6 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 14,
-                  elevation: 6,
-                })}
-              >
-                <Text style={{ fontFamily: FONTS.bold, fontSize: 15, color: C.white }}>
-                  Köp credits
-                </Text>
-              </Pressable>
-            ) : null}
+        {/* Booking details — compact chip row */}
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, paddingHorizontal: SPACING.lg, paddingTop: 16 }}>
+          <View style={{ backgroundColor: "rgba(0,0,0,0.04)", borderRadius: RADIUS.sm, paddingHorizontal: 12, paddingVertical: 7, flexDirection: "row", alignItems: "center", gap: 6 }}>
+            <Calendar size={14} color={C.dark} strokeWidth={2.2} />
+            <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: C.textPrimary }}>{displayDate}</Text>
           </View>
-        </Animated.View>
+          <View style={{ backgroundColor: "rgba(0,0,0,0.04)", borderRadius: RADIUS.sm, paddingHorizontal: 12, paddingVertical: 7, flexDirection: "row", alignItems: "center", gap: 6 }}>
+            <Clock size={14} color={C.dark} strokeWidth={2.2} />
+            <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: C.textPrimary }}>{displayTime}</Text>
+          </View>
+          <View style={{ backgroundColor: "rgba(0,0,0,0.04)", borderRadius: RADIUS.sm, paddingHorizontal: 12, paddingVertical: 7, flexDirection: "row", alignItems: "center", gap: 6 }}>
+            <Users size={14} color={C.dark} strokeWidth={2.2} />
+            <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: C.textPrimary }}>{reservation.partySize} pers</Text>
+          </View>
+          {reservation.seatType && seatTypeLabel ? (
+            <View style={{ backgroundColor: "rgba(0,0,0,0.04)", borderRadius: RADIUS.sm, paddingHorizontal: 12, paddingVertical: 7 }}>
+              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: C.textPrimary }}>{seatTypeLabel}</Text>
+            </View>
+          ) : null}
+        </View>
+
+
 
         {/* Grace period info — prominent */}
         <Animated.View
@@ -1706,20 +1534,6 @@ ${shareUrl}`,
           </View>
         </Animated.View>
 
-        {/* Description */}
-        {r.description ? (
-          <Animated.View
-            entering={FadeInDown.delay(350).springify()}
-            style={{ paddingHorizontal: SPACING.lg, paddingTop: 20 }}
-          >
-            <Text style={{ fontFamily: FONTS.displayBold, fontSize: 17, color: C.textPrimary, marginBottom: 8, letterSpacing: -0.3 }}>
-              Om restaurangen
-            </Text>
-            <Text style={{ fontFamily: FONTS.regular, fontSize: 15, color: C.textSecondary, lineHeight: 23 }}>
-              {r.description}
-            </Text>
-          </Animated.View>
-        ) : null}
 
         {/* Liability transfer — trust builder */}
         {!isClaimed ? (
@@ -2023,55 +1837,6 @@ ${shareUrl}`,
           </Animated.View>
         ) : null}
 
-        {/* Internal linking — other reservations in same neighborhood */}
-        {otherReservations.length > 0 && neighborhood ? (
-          <Animated.View
-            entering={FadeInDown.delay(420).springify()}
-            style={{ paddingHorizontal: SPACING.lg, paddingTop: 28, paddingBottom: 24 }}
-          >
-            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-              <Text style={{ fontFamily: FONTS.displayBold, fontSize: 17, color: C.textPrimary, letterSpacing: -0.3 }}>
-                Andra bord i {neighborhood}
-              </Text>
-              <ChevronRight size={18} color={C.textTertiary} strokeWidth={2} />
-            </View>
-            {otherReservations.map((res) => (
-              <Pressable
-                key={res.id}
-                testID={`neighborhood-reservation-${res.id}`}
-                accessibilityLabel={`Visa ${res.restaurant.name}`}
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  router.push(`/restaurant/${res.id}`);
-                }}
-                style={({ pressed }) => ({
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 12,
-                  paddingVertical: 10,
-                  opacity: pressed ? 0.7 : 1,
-                  borderBottomWidth: 0.5,
-                  borderBottomColor: C.divider,
-                })}
-              >
-                <Image
-                  source={{ uri: res.restaurant.image }}
-                  style={{ width: 48, height: 48, borderRadius: RADIUS.md }}
-                  contentFit="cover"
-                />
-                <View style={{ flex: 1 }}>
-                  <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.textPrimary, letterSpacing: -0.2 }} numberOfLines={1}>
-                    {res.restaurant.name}
-                  </Text>
-                  <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textSecondary, marginTop: 2 }}>
-                    {formatReservationDate(res.reservationDate)} kl {res.reservationTime.substring(0, 5)} · {res.partySize} pers
-                  </Text>
-                </View>
-                <ChevronRight size={16} color={C.textTertiary} strokeWidth={2} />
-              </Pressable>
-            ))}
-          </Animated.View>
-        ) : null}
       </Animated.ScrollView>
 
       {/* Report Modal */}
@@ -2300,31 +2065,45 @@ ${shareUrl}`,
       >
         {/* Checkbox */}
         {!isClaimed ? (
-          <Pressable
-            testID="cancellation-checkbox"
-            accessibilityLabel="Godkänn villkor för att ta över bokning"
-            onPress={handleToggleAccepted}
-            style={{ flexDirection: "row", alignItems: "flex-start", gap: 10, marginBottom: 12 }}
-          >
-            <View
-              style={{
-                width: 22,
-                height: 22,
-                borderRadius: 7,
-                borderWidth: 1.5,
-                borderColor: accepted ? C.coral : "rgba(0,0,0,0.18)",
-                backgroundColor: accepted ? C.coral : "transparent",
-                alignItems: "center",
-                justifyContent: "center",
-                marginTop: 1,
-              }}
+          <View style={{ marginBottom: 12 }}>
+            <Pressable
+              testID="cancellation-checkbox"
+              accessibilityLabel="Godkänn villkor för att ta över bokning"
+              onPress={handleToggleAccepted}
+              style={{ flexDirection: "row", alignItems: "flex-start", gap: 10 }}
             >
-              {accepted ? <Check size={13} color={C.white} strokeWidth={3} /> : null}
-            </View>
-            <Text style={{ flex: 1, fontFamily: FONTS.regular, fontSize: 12, color: C.textSecondary, lineHeight: 17 }}>
-              Jag tar över ansvaret för denna bokning efter ångerfristen på 5 min. Credits dras direkt. No-show kan medföra avgift.
-            </Text>
-          </Pressable>
+              <View
+                style={{
+                  width: 22,
+                  height: 22,
+                  borderRadius: 7,
+                  borderWidth: 1.5,
+                  borderColor: accepted ? C.coral : "rgba(0,0,0,0.18)",
+                  backgroundColor: accepted ? C.coral : "transparent",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginTop: 1,
+                }}
+              >
+                {accepted ? <Check size={13} color={C.white} strokeWidth={3} /> : null}
+              </View>
+              <Text style={{ flex: 1, fontFamily: FONTS.regular, fontSize: 12, color: C.textSecondary, lineHeight: 17 }}>
+                {reservation.cancelFee && reservation.cancelFee > 0
+                  ? `Jag godkänner en avbokningsavgift på ${reservation.cancelFee * reservation.partySize} kr samt övriga villkor`
+                  : "Jag godkänner villkoren för bokningen"}
+              </Text>
+            </Pressable>
+            <Pressable
+              testID="read-terms-button"
+              accessibilityLabel="Läs villkor"
+              onPress={() => setShowTermsModal(true)}
+              style={{ marginLeft: 32, marginTop: 4 }}
+            >
+              <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.coral, textDecorationLine: "underline" }}>
+                Läs villkor
+              </Text>
+            </Pressable>
+          </View>
         ) : null}
 
         {/* CTA Button — premium pistachio + black text */}
@@ -2385,7 +2164,7 @@ ${shareUrl}`,
               </>
             ) : !hasEnoughCredits ? (
               <Text style={{ fontFamily: FONTS.bold, fontSize: 16, color: C.white }}>
-                Köp credits för att ta över
+                Köp credits
               </Text>
             ) : (
               <Text
@@ -2396,12 +2175,73 @@ ${shareUrl}`,
                   letterSpacing: -0.2,
                 }}
               >
-                Ta bokning — 2 credits
+                Överta bokning · {reservation.creditCost ?? 2} credits
               </Text>
             )}
           </Pressable>
         </Animated.View>
       </Animated.View>
+
+      {/* Terms Modal */}
+      <Modal
+        visible={showTermsModal}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowTermsModal(false)}
+      >
+        <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: C.bg }}>
+          <View style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            paddingHorizontal: SPACING.lg,
+            paddingVertical: 14,
+            borderBottomWidth: 0.5,
+            borderBottomColor: C.divider,
+          }}>
+            <Text style={{ fontFamily: FONTS.displayBold, fontSize: 18, color: C.textPrimary, letterSpacing: -0.3 }}>
+              Villkor för bokning
+            </Text>
+            <Pressable
+              testID="terms-modal-close"
+              accessibilityLabel="Stäng"
+              onPress={() => setShowTermsModal(false)}
+              style={({ pressed }) => ({
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                backgroundColor: "rgba(0,0,0,0.04)",
+                alignItems: "center",
+                justifyContent: "center",
+                transform: [{ scale: pressed ? 0.93 : 1 }],
+              })}
+            >
+              <X size={20} color={C.textSecondary} strokeWidth={2} />
+            </Pressable>
+          </View>
+          <View style={{ flex: 1, paddingHorizontal: SPACING.lg, paddingTop: 20 }}>
+            <Text style={{ fontFamily: FONTS.regular, fontSize: 15, color: C.textPrimary, lineHeight: 23 }}>
+              {"När du tar över en bokning via Reslot godkänner du att du tar fullt ansvar för bokningen från det att ångerfristen på 5 minuter har löpt ut.\n\nOm du inte dyker upp på restaurangen (no-show) eller avbokar senare än vad restaurangens regler tillåter kan du debiteras den avbokningsavgift som anges på bokningssidan. Avgiften baseras på restaurangens egna regler och är inte satt av Reslot.\n\nBetalning sker endast om villkoren bryts — det vill säga vid no-show eller sen avbokning.\n\nReslot är en marknadsplats som förmedlar kontakt mellan den som vill lämna en bokning och den som vill ta över den. Reslot ansvarar inte för restaurangens tjänster, eventuella fel i bokningsinformation eller restaurangens egna policyer."}
+            </Text>
+          </View>
+          <View style={{ paddingHorizontal: SPACING.lg, paddingBottom: 20 }}>
+            <Pressable
+              testID="terms-close-button"
+              accessibilityLabel="Stäng villkor"
+              onPress={() => setShowTermsModal(false)}
+              style={({ pressed }) => ({
+                backgroundColor: C.coral,
+                borderRadius: RADIUS.lg,
+                paddingVertical: 16,
+                alignItems: "center",
+                transform: [{ scale: pressed ? 0.97 : 1 }],
+              })}
+            >
+              <Text style={{ fontFamily: FONTS.bold, fontSize: 15, color: C.dark }}>Stäng</Text>
+            </Pressable>
+          </View>
+        </SafeAreaView>
+      </Modal>
     </View>
   );
 }

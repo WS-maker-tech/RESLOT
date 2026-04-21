@@ -1230,7 +1230,7 @@ export default function SubmitScreen() {
                             marginTop: 2,
                           }}
                         >
-                          Avgift vid sen avbokning
+                          Avgift vid sen avbokning (per person)
                         </Text>
                       </View>
                     </View>
@@ -1251,7 +1251,7 @@ export default function SubmitScreen() {
                       testID="cancel-fee-input"
                       value={cancelFeeAmount}
                       onChangeText={(v) => setField("cancelFeeAmount", v)}
-                      placeholder="Belopp per person i SEK (t.ex. 500)"
+                      placeholder="Avgift per person i SEK (t.ex. 250)"
                       placeholderTextColor="#D1D5DB"
                       keyboardType="numeric"
                       style={{
@@ -1268,9 +1268,9 @@ export default function SubmitScreen() {
                       }}
                     />
                   ) : null}
-                  {hasCancelFee && cancelFeeAmount && partySize ? (
+                  {hasCancelFee && cancelFeeAmount && parseFloat(cancelFeeAmount) > 0 && partySize > 0 ? (
                     <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary, marginTop: 6 }}>
-                      {cancelFeeAmount} SEK/person → Totalt {parseFloat(cancelFeeAmount) * partySize} SEK ({partySize} pers)
+                      Totalt: {parseFloat(cancelFeeAmount) * partySize} SEK för {partySize} personer
                     </Text>
                   ) : null}
                 </View>
