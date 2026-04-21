@@ -271,16 +271,11 @@ export const RestaurantCard = React.memo(function RestaurantCard({
                 {restaurant.name}
               </Text>
 
-              {/* Rating + cuisine row */}
+              {/* Rating stars */}
               <View style={styles.metaRow}>
-                <Star size={12} color={C.gold} fill={C.gold} strokeWidth={0} />
-                <Text style={styles.ratingText}>
-                  {restaurant.rating.toFixed(1)}
-                </Text>
-                <Text style={styles.reviewCountText}>
-                  ({restaurant.reviewCount})
-                </Text>
-
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <Star key={i} size={12} color={C.gold} fill={C.gold} strokeWidth={0} />
+                ))}
               </View>
 
               {/* Address */}

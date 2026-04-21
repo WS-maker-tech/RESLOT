@@ -124,17 +124,6 @@ export default function PaymentScreen() {
           <Text style={{ fontFamily: FONTS.displayBold, fontSize: 17, color: C.textPrimary, letterSpacing: -0.3, marginBottom: 14 }}>Så fungerar betalningar</Text>
 
           <View style={{ gap: 10 }}>
-            {/* Claim payment */}
-            <View style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.md, padding: 14, borderWidth: 0.5, borderColor: C.divider, flexDirection: "row", alignItems: "center", gap: 12 }}>
-              <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: C.coralLight, alignItems: "center", justifyContent: "center" }}>
-                <CreditCard size={20} color={C.coral} strokeWidth={2} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.textPrimary }}>Serviceavgift vid övertagande</Text>
-                <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textSecondary, marginTop: 2 }}>29 kr debiteras efter 5 min ångerfrist</Text>
-              </View>
-            </View>
-
             {/* Credits purchase */}
             <View style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.md, padding: 14, borderWidth: 0.5, borderColor: C.divider, flexDirection: "row", alignItems: "center", gap: 12 }}>
               <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: "rgba(201,169,110,0.1)", alignItems: "center", justifyContent: "center" }}>

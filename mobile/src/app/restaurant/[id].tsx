@@ -725,7 +725,7 @@ export default function RestaurantDetailScreen() {
   const isClaimed = useMemo(() => claimSuccess || reservation?.status === "claimed" || reservation?.status === "grace_period", [claimSuccess, reservation?.status]);
   const seatTypeLabel = useMemo(() => {
     const st = reservation?.seatType;
-    return st === "inside" ? "Inomhus" : st === "outside" ? "Utomhus" : st === "bar" ? "Bar" : st ?? "";
+    return st === "inside" || st === "Inomhus" || st === "indoor" ? "Inomhus" : st === "outside" || st === "Utomhus" || st === "outdoor" ? "Utomhus" : st === "bar" || st === "Bar seating" || st === "Bardisk" ? "Bardisk" : st === "window" || st === "Window" || st === "Fönsterbord" ? "Fönsterbord" : st === "terrace" || st === "Terrass" ? "Terrass" : st === "private" || st === "Private room" || st === "Privat rum" ? "Privat rum" : st ?? "";
   }, [reservation?.seatType]);
 
   const handleClaim = useCallback(async () => {
@@ -1271,12 +1271,6 @@ ${shareUrl}`,
                 );
               })}
             </View>
-            <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: C.gold }}>
-              {r.rating}
-            </Text>
-            <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textTertiary }}>
-              ({r.reviewCount})
-            </Text>
             <View style={{ width: 3, height: 3, borderRadius: 1.5, backgroundColor: C.textTertiary, marginHorizontal: 4 }} />
             <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.textSecondary }}>
               {r.cuisine}
@@ -1481,23 +1475,6 @@ ${shareUrl}`,
               <Text style={{ fontFamily: FONTS.bold, fontSize: 18, color: C.gold }}>2 credits</Text>
             </View>
 
-            {/* Service fee row — highlighted */}
-            <View style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              backgroundColor: "rgba(0,0,0,0.025)",
-              borderRadius: RADIUS.md,
-              paddingVertical: 14,
-              paddingHorizontal: 16,
-              marginBottom: 16,
-            }}>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-                <CreditCard size={16} color={C.textSecondary} strokeWidth={2} />
-                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 16, color: C.textPrimary }}>Serviceavgift</Text>
-              </View>
-              <Text style={{ fontFamily: FONTS.bold, fontSize: 18, color: C.textPrimary }}>29 kr</Text>
-            </View>
 
             {/* Total — big and bold */}
             <View style={{
@@ -1511,7 +1488,7 @@ ${shareUrl}`,
               marginBottom: 14,
             }}>
               <Text style={{ fontFamily: FONTS.bold, fontSize: 16, color: "rgba(255,255,255,0.7)" }}>Totalt</Text>
-              <Text style={{ fontFamily: FONTS.bold, fontSize: 20, color: C.white, letterSpacing: -0.3 }}>2 credits + 29 kr</Text>
+              <Text style={{ fontFamily: FONTS.bold, fontSize: 20, color: C.white, letterSpacing: -0.3 }}>2 credits</Text>
             </View>
 
             {/* Balance */}
@@ -1632,7 +1609,7 @@ ${shareUrl}`,
             {/* Name on reservation */}
             {reservation.nameOnReservation ? (
               <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingVertical: 13, borderBottomWidth: 0.5, borderBottomColor: C.divider }}>
-                <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary }}>Name on reservation</Text>
+                <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary }}>Namn på bokning</Text>
                 <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.textPrimary }}>{reservation.nameOnReservation}</Text>
               </View>
             ) : null}

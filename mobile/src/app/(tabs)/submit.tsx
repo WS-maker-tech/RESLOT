@@ -1716,7 +1716,7 @@ export default function SubmitScreen() {
                       Skärmdumpen bör visa:
                     </Text>
                     {[
-                      "Name on reservation",
+                      "Namn på bokning",
                       "Restaurangens namn",
                       "Datum och tid",
                       "Antal gäster",

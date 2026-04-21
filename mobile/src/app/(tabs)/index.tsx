@@ -829,11 +829,10 @@ function NewOnReslotSection() {
                   {restaurant.name}
                 </Text>
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 4, marginTop: 2 }}>
-                  <Star size={11} color={C.gold} fill={C.gold} strokeWidth={0} />
-                  <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.textSecondary }}>
-                    {restaurant.rating.toFixed(1)}
-                  </Text>
-                  <View style={{ width: 3, height: 3, borderRadius: 1.5, backgroundColor: C.borderLight }} />
+                  {[0, 1, 2, 3, 4].map((i) => (
+                    <Star key={i} size={11} color={C.gold} fill={C.gold} strokeWidth={0} />
+                  ))}
+                  <View style={{ width: 3, height: 3, borderRadius: 1.5, backgroundColor: C.borderLight, marginLeft: 2 }} />
                   <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.textSecondary }} numberOfLines={1}>
                     {restaurant.cuisine}
                   </Text>
