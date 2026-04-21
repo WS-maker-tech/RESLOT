@@ -1541,7 +1541,7 @@ ${shareUrl}`,
                 })}
               >
                 <Text style={{ fontFamily: FONTS.bold, fontSize: 15, color: C.white }}>
-                  Köp credits — 39 kr/st
+                  Köp credits
                 </Text>
               </Pressable>
             ) : null}
@@ -2322,7 +2322,7 @@ ${shareUrl}`,
               {accepted ? <Check size={13} color={C.white} strokeWidth={3} /> : null}
             </View>
             <Text style={{ flex: 1, fontFamily: FONTS.regular, fontSize: 12, color: C.textSecondary, lineHeight: 17 }}>
-              Jag tar över ansvaret för denna bokning efter ångerfristen på 5 min. Credits dras direkt. Serviceavgift (29 kr) efter ångerfristen. No-show kan medföra avgift.
+              Jag tar över ansvaret för denna bokning efter ångerfristen på 5 min. Credits dras direkt. No-show kan medföra avgift.
             </Text>
           </Pressable>
         ) : null}
@@ -2396,7 +2396,7 @@ ${shareUrl}`,
                   letterSpacing: -0.2,
                 }}
               >
-                Ta över bokning — 2 credits + 29 kr
+                Ta bokning — 2 credits
               </Text>
             )}
           </Pressable>
