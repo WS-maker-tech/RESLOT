@@ -3,6 +3,7 @@ import { View, Text, ScrollView, Pressable, LayoutAnimation, Platform, UIManager
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ChevronRight, MessageCircle } from "lucide-react-native";
 import { useRouter } from "expo-router";
+import SupportBubble from "@/components/SupportBubble";
 import * as Haptics from "expo-haptics";
 import Animated, {
   FadeInDown,
@@ -276,6 +277,7 @@ export default function FaqScreen() {
           </AnimatedPressable>
         </Animated.View>
       </ScrollView>
+      <SupportBubble />
     </SafeAreaView>
   );
 }

@@ -31,7 +31,7 @@ import { useAuthStore } from "@/lib/auth-store";
 import { C, FONTS } from "@/lib/theme";
 import type { ActivityAlert } from "@/lib/api/types";
 import { usePendingFeedback } from "@/lib/use-pending-feedback";
-import SupportBubble from "@/components/SupportBubble";
+// SupportBubble visas endast på FAQ-sidan
 
 function TabIcon({
   icon: Icon,
@@ -303,7 +303,7 @@ export default function TabLayout() {
         />
 
       </Tabs>
-      <SupportBubble />
+      {/* SupportBubble moved to FAQ page only */}
     </View>
   );
 }
