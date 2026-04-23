@@ -252,22 +252,23 @@ const Header = React.memo(function Header({
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             onCityPress();
           }}
-          style={{ flexDirection: "row", alignItems: "center" }}
+          style={{ flexDirection: "row", alignItems: "center", flexShrink: 1 }}
         >
           <Text
             style={{
               fontFamily: FONTS.displayBold,
-              fontSize: 22,
+              fontSize: 20,
               color: C.dark,
               letterSpacing: -0.5,
             }}
+            numberOfLines={1}
           >
             Bokningar i{" "}
           </Text>
           <Text
             style={{
               fontFamily: FONTS.displayBold,
-              fontSize: 22,
+              fontSize: 20,
               color: C.coral,
               letterSpacing: -0.5,
               opacity: 0.9,
@@ -278,7 +279,7 @@ const Header = React.memo(function Header({
           <ChevronDown size={14} color={C.coral} strokeWidth={ICON.strokeWidth} style={{ marginLeft: 2 }} />
         </Pressable>
 
-        <View className="flex-row items-center" style={{ gap: 8 }}>
+        <View className="flex-row items-center" style={{ gap: 6 }}>
           <Pressable
             testID="credits-pill"
             accessibilityLabel="Visa credits"

@@ -1,8 +1,8 @@
-import React from "react";
-import { View, Text, ScrollView, Pressable, ActivityIndicator } from "react-native";
+import React, { useState } from "react";
+import { View, Text, ScrollView, Pressable, TextInput, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { ChevronLeft, Shield, CreditCard, ChevronRight, Sparkles, CheckCircle2, AlertCircle } from "lucide-react-native";
+import { ChevronLeft, ShieldCheck, CreditCard, CheckCircle2, AlertCircle } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import * as WebBrowser from "expo-web-browser";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -15,7 +15,12 @@ export default function PaymentScreen() {
   const phone = useAuthStore((s) => s.phoneNumber);
   const { data: cardStatus, isLoading: cardLoading, refetch: refetchCard } = useCardStatus(phone);
   const setupCardMutation = useSetupCard();
-  const [setupError, setSetupError] = React.useState<string | null>(null);
+  const [setupError, setSetupError] = useState<string | null>(null);
+
+  const [cardNumber, setCardNumber] = useState("");
+  const [expiry, setExpiry] = useState("");
+  const [cvv, setCvv] = useState("");
+  const [cardName, setCardName] = useState("");
 
   const handleSetupCard = async () => {
     setSetupError(null);
@@ -27,7 +32,6 @@ export default function PaymentScreen() {
           dismissButtonStyle: "close",
           presentationStyle: WebBrowser.WebBrowserPresentationStyle.FORM_SHEET,
         });
-        // Refetch card status after returning from Stripe
         refetchCard();
       }
     } catch (err: unknown) {
@@ -41,28 +45,38 @@ export default function PaymentScreen() {
     <View style={{ flex: 1, backgroundColor: C.bg }}>
       <SafeAreaView edges={["top"]} style={{ backgroundColor: C.bg }}>
         <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 }}>
-          <Pressable testID="back-button" accessibilityLabel="Gå tillbaka" onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.back(); }} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: "rgba(0,0,0,0.04)", alignItems: "center", justifyContent: "center", marginRight: 12 }}>
+          <Pressable
+            testID="back-button"
+            accessibilityLabel="Gå tillbaka"
+            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.back(); }}
+            style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: C.overlayLight, alignItems: "center", justifyContent: "center", marginRight: 12 }}
+          >
             <ChevronLeft size={20} color={C.textSecondary} strokeWidth={2} />
           </Pressable>
-          <Text style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: C.textPrimary, letterSpacing: -0.4 }}>Betalningar</Text>
+          <Text style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: C.textPrimary, letterSpacing: -0.4 }}>Betalning</Text>
         </View>
       </SafeAreaView>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 80 }}>
-        {/* Card status section */}
-        <Animated.View entering={FadeInDown.springify()} style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.lg, padding: SPACING.md, borderWidth: 0.5, borderColor: C.divider, marginBottom: 16, ...SHADOW.card }}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 12 }}>
-            <CreditCard size={18} color={C.coral} strokeWidth={2} />
-            <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.textPrimary }}>Ditt betalkort</Text>
+        {/* Security info box */}
+        <Animated.View entering={FadeInDown.springify()}>
+          <View style={{ backgroundColor: "rgba(126,200,122,0.08)", borderRadius: RADIUS.lg, padding: SPACING.md, flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 20, borderWidth: 1, borderColor: "rgba(126,200,122,0.15)" }}>
+            <ShieldCheck size={22} color="#7EC87A" strokeWidth={ICON.strokeWidth} />
+            <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textSecondary, flex: 1, lineHeight: 20 }}>
+              Ditt kort används bara som säkerhet. Du debiteras aldrig enbart för att lägga in kortuppgifter.
+            </Text>
           </View>
+        </Animated.View>
 
-          {cardLoading ? (
-            <ActivityIndicator size="small" color={C.coral} />
-          ) : cardStatus?.hasCard ? (
-            <View style={{ gap: 12 }}>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+        {/* Existing card status */}
+        {cardLoading ? (
+          <ActivityIndicator size="small" color={C.coral} style={{ marginBottom: 20 }} />
+        ) : cardStatus?.hasCard ? (
+          <Animated.View entering={FadeInDown.delay(40).springify()} style={{ marginBottom: 20 }}>
+            <View style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.lg, padding: SPACING.md, borderWidth: 0.5, borderColor: C.divider, ...SHADOW.card }}>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 10 }}>
                 <CheckCircle2 size={16} color={C.success} strokeWidth={2} />
-                <Text style={{ fontFamily: FONTS.medium, fontSize: 14, color: C.textPrimary }}>
+                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.textPrimary }}>
                   {(cardStatus.cardBrand ?? "Kort").charAt(0).toUpperCase() + (cardStatus.cardBrand ?? "kort").slice(1)} som slutar på {cardStatus.cardLast4}
                 </Text>
               </View>
@@ -71,97 +85,164 @@ export default function PaymentScreen() {
                 accessibilityLabel="Byt betalkort"
                 onPress={handleSetupCard}
                 disabled={setupCardMutation.isPending}
-                style={{ backgroundColor: "rgba(0,0,0,0.04)", borderRadius: RADIUS.md, paddingVertical: 10, alignItems: "center" }}
+                style={{ backgroundColor: C.overlayLight, borderRadius: RADIUS.md, paddingVertical: 10, alignItems: "center" }}
               >
                 <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: C.textSecondary }}>
                   {setupCardMutation.isPending ? "Öppnar..." : "Byt kort"}
                 </Text>
               </Pressable>
             </View>
-          ) : (
-            <View style={{ gap: 12 }}>
-              <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textSecondary, lineHeight: 20 }}>
-                Lägg till ett betalkort för att kunna ta över bokningar och köpa credits.
-              </Text>
-              <Pressable
-                testID="add-card-button"
-                accessibilityLabel="Lägg till betalkort"
-                onPress={handleSetupCard}
-                disabled={setupCardMutation.isPending}
-                style={{ backgroundColor: C.coral, borderRadius: RADIUS.md, paddingVertical: 14, alignItems: "center", ...SHADOW.elevated }}
-              >
-                <Text style={{ fontFamily: FONTS.bold, fontSize: 15, color: "#111827" }}>
-                  {setupCardMutation.isPending ? "Öppnar..." : "Lägg till kort"}
-                </Text>
-              </Pressable>
+          </Animated.View>
+        ) : null}
+
+        {/* Card input section */}
+        <Animated.View entering={FadeInDown.delay(80).springify()}>
+          <View style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.lg, padding: SPACING.lg, borderWidth: 0.5, borderColor: C.borderLight, ...SHADOW.card, marginBottom: 20 }}>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: SPACING.md }}>
+              <CreditCard size={18} color={C.textSecondary} strokeWidth={2} />
+              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.textPrimary }}>Kortuppgifter</Text>
             </View>
-          )}
+
+            {/* Card number */}
+            <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.textTertiary, marginBottom: 6 }}>Kortnummer</Text>
+            <TextInput
+              testID="card-number-input"
+              value={cardNumber}
+              onChangeText={setCardNumber}
+              placeholder="•••• •••• •••• ••••"
+              placeholderTextColor={C.grayLight}
+              keyboardType="numeric"
+              maxLength={19}
+              style={{
+                fontFamily: FONTS.medium,
+                fontSize: 16,
+                color: C.textPrimary,
+                backgroundColor: C.bgInput,
+                borderRadius: RADIUS.md,
+                paddingHorizontal: 14,
+                paddingVertical: 14,
+                marginBottom: 14,
+                letterSpacing: 2,
+              }}
+            />
+
+            {/* Expiry + CVV row */}
+            <View style={{ flexDirection: "row", gap: 12, marginBottom: 14 }}>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.textTertiary, marginBottom: 6 }}>Giltig till</Text>
+                <TextInput
+                  testID="expiry-input"
+                  value={expiry}
+                  onChangeText={setExpiry}
+                  placeholder="MM/ÅÅ"
+                  placeholderTextColor={C.grayLight}
+                  keyboardType="numeric"
+                  maxLength={5}
+                  style={{
+                    fontFamily: FONTS.medium,
+                    fontSize: 16,
+                    color: C.textPrimary,
+                    backgroundColor: C.bgInput,
+                    borderRadius: RADIUS.md,
+                    paddingHorizontal: 14,
+                    paddingVertical: 14,
+                  }}
+                />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.textTertiary, marginBottom: 6 }}>CVV</Text>
+                <TextInput
+                  testID="cvv-input"
+                  value={cvv}
+                  onChangeText={setCvv}
+                  placeholder="•••"
+                  placeholderTextColor={C.grayLight}
+                  keyboardType="numeric"
+                  secureTextEntry
+                  maxLength={4}
+                  style={{
+                    fontFamily: FONTS.medium,
+                    fontSize: 16,
+                    color: C.textPrimary,
+                    backgroundColor: C.bgInput,
+                    borderRadius: RADIUS.md,
+                    paddingHorizontal: 14,
+                    paddingVertical: 14,
+                  }}
+                />
+              </View>
+            </View>
+
+            {/* Card holder name */}
+            <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.textTertiary, marginBottom: 6 }}>Namn på kort</Text>
+            <TextInput
+              testID="card-name-input"
+              value={cardName}
+              onChangeText={setCardName}
+              placeholder="Förnamn Efternamn"
+              placeholderTextColor={C.grayLight}
+              autoCapitalize="words"
+              style={{
+                fontFamily: FONTS.medium,
+                fontSize: 16,
+                color: C.textPrimary,
+                backgroundColor: C.bgInput,
+                borderRadius: RADIUS.md,
+                paddingHorizontal: 14,
+                paddingVertical: 14,
+              }}
+            />
+          </View>
+        </Animated.View>
+
+        {/* Save card button */}
+        <Animated.View entering={FadeInDown.delay(140).springify()}>
+          <Pressable
+            testID="save-card-button"
+            accessibilityLabel="Spara kort"
+            onPress={handleSetupCard}
+            disabled={setupCardMutation.isPending}
+            style={{
+              backgroundColor: "#7EC87A",
+              borderRadius: RADIUS.full,
+              paddingVertical: 16,
+              alignItems: "center",
+              marginBottom: 14,
+              ...SHADOW.elevated,
+            }}
+          >
+            <Text style={{ fontFamily: FONTS.bold, fontSize: 16, color: "#111827" }}>
+              {setupCardMutation.isPending ? "Öppnar Stripe..." : "Spara kort"}
+            </Text>
+          </Pressable>
 
           {setupError ? (
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginTop: 10, backgroundColor: "rgba(239,68,68,0.08)", borderRadius: RADIUS.sm, padding: 10 }}>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 14, backgroundColor: C.errorBg, borderRadius: RADIUS.sm, padding: 10 }}>
               <AlertCircle size={14} color={C.error} strokeWidth={2} />
               <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.error, flex: 1 }}>{setupError}</Text>
             </View>
           ) : null}
-        </Animated.View>
 
-        {/* Secure payment info */}
-        <Animated.View entering={FadeInDown.delay(60).springify()} style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.lg, padding: SPACING.md, borderWidth: 0.5, borderColor: C.divider, marginBottom: 24, gap: 12 }}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-            <Shield size={18} color={C.success} strokeWidth={2} />
-            <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.textPrimary }}>Säker betalning med Stripe</Text>
-          </View>
-          <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textSecondary, lineHeight: 20 }}>
-            Reslot hanterar betalningar säkert via Stripe. Vi sparar aldrig dina kortuppgifter — de hanteras direkt av Stripe.
-          </Text>
-          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: C.success, lineHeight: 20, marginTop: 8 }}>
-            Inga pengar dras enbart av att du lägger in kortuppgifter.
+          <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary, textAlign: "center", lineHeight: 18, paddingHorizontal: 10 }}>
+            Betalningsansvar uppstår först om du inte dyker upp eller avbokar för sent. Vi lagrar aldrig dina kortuppgifter okrypterat.
           </Text>
         </Animated.View>
 
-        {/* How payments work */}
-        <Animated.View entering={FadeInDown.delay(120).springify()}>
-          <Text style={{ fontFamily: FONTS.displayBold, fontSize: 17, color: C.textPrimary, letterSpacing: -0.3, marginBottom: 14 }}>Så fungerar betalningar</Text>
-
-          <View style={{ gap: 10 }}>
-            {/* Credits purchase */}
-            <View style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.md, padding: 14, borderWidth: 0.5, borderColor: C.divider, flexDirection: "row", alignItems: "center", gap: 12 }}>
-              <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: "rgba(201,169,110,0.1)", alignItems: "center", justifyContent: "center" }}>
-                <Sparkles size={20} color={C.gold} strokeWidth={2} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.textPrimary }}>Köp credits</Text>
-                <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textSecondary, marginTop: 2 }}>39 kr per credit — betalas direkt via Stripe</Text>
-              </View>
-            </View>
-
-            {/* No-show */}
-            <View style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.md, padding: 14, borderWidth: 0.5, borderColor: C.divider, flexDirection: "row", alignItems: "center", gap: 12 }}>
-              <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: "rgba(239,68,68,0.1)", alignItems: "center", justifyContent: "center" }}>
-                <Shield size={20} color={C.error} strokeWidth={2} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.textPrimary }}>No-show-avgift</Text>
-                <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textSecondary, marginTop: 2 }}>10-20% av bokningens avbokningsavgift vid uteblivet besök</Text>
-              </View>
-            </View>
-          </View>
-        </Animated.View>
-
-        {/* CTA */}
+        {/* Security section */}
         <Animated.View entering={FadeInDown.delay(200).springify()} style={{ marginTop: 28 }}>
-          <Pressable
-            testID="buy-credits-cta"
-            accessibilityLabel="Köp credits"
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              router.push("/credits");
-            }}
-            style={{ backgroundColor: C.coral, borderRadius: RADIUS.lg, paddingVertical: 16, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, shadowColor: C.coral, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.25, shadowRadius: 14, elevation: 6 }}
-          >
-            <Text style={{ fontFamily: FONTS.bold, fontSize: 16, color: "#111827", letterSpacing: -0.2 }}>Köp credits</Text>
-            <ChevronRight size={18} color="#111827" strokeWidth={2.5} />
-          </Pressable>
+          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textTertiary, letterSpacing: 0.8, textTransform: "uppercase", marginBottom: 12 }}>Säkerhet</Text>
+          <View style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.lg, padding: SPACING.md, borderWidth: 0.5, borderColor: C.borderLight, ...SHADOW.card, gap: 16 }}>
+            {[
+              { emoji: "🔒", text: "256-bitars kryptering" },
+              { emoji: "✓", text: "PCI DSS-certifierat" },
+              { emoji: "🛡️", text: "Skyddad av Stripe" },
+            ].map((item, i) => (
+              <View key={i} style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
+                <Text style={{ fontSize: 18, width: 28, textAlign: "center" }}>{item.emoji}</Text>
+                <Text style={{ fontFamily: FONTS.medium, fontSize: 14, color: C.textPrimary }}>{item.text}</Text>
+              </View>
+            ))}
+          </View>
         </Animated.View>
       </ScrollView>
     </View>

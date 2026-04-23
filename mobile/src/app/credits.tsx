@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, ScrollView, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { Upload, ArrowDownLeft, UserPlus, ChevronRight, Clock, ShoppingCart, Gift, AlertCircle } from "lucide-react-native";
+import { Upload, ArrowDownLeft, UserPlus, ChevronRight, AlertCircle } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import * as WebBrowser from "expo-web-browser";
 import Animated, {
@@ -13,8 +13,7 @@ import Animated, {
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
-import { useProfile, useActivityAlerts, usePurchaseCredits } from "@/lib/api/hooks";
-import type { ActivityAlert } from "@/lib/api/types";
+import { useProfile, usePurchaseCredits } from "@/lib/api/hooks";
 import { useAuthStore } from "@/lib/auth-store";
 import { C, FONTS, SPACING, SHADOW, RADIUS, ICON } from "../lib/theme";
 
@@ -96,24 +95,10 @@ function CreditBadge({ label, color }: { label: string; color: "green" | "coral"
   );
 }
 
-function formatRelativeDate(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  if (diffDays === 0) return "Idag";
-  if (diffDays === 1) return "Igår";
-  return `${diffDays} dagar sedan`;
-}
-
 export default function CreditsScreen() {
   const router = useRouter();
   const phone = useAuthStore((s) => s.phoneNumber);
   const { data: profile, isLoading: profileLoading, error: profileError, refetch: profileRefetch } = useProfile(phone);
-  const { data: activityAlerts } = useActivityAlerts(phone ?? "");
-  const creditAlerts = (activityAlerts ?? []).filter(
-    (a: ActivityAlert) => a.type === "credit"
-  );
   const purchaseMutation = usePurchaseCredits();
   const [buyingQuantity, setBuyingQuantity] = React.useState<number | null>(null);
   const targetCredits = profile?.credits ?? 0;
@@ -202,16 +187,6 @@ export default function CreditsScreen() {
           >
             Reslot credits
           </Text>
-          <Text
-            style={{
-              fontFamily: FONTS.regular,
-              fontSize: 14,
-              color: C.textTertiary,
-              marginTop: 5,
-            }}
-          >
-            Tjäna och använd credits för att ta över bokningar.
-          </Text>
         </Animated.View>
 
         {/* Balance card */}
@@ -223,7 +198,7 @@ export default function CreditsScreen() {
             style={{
               backgroundColor: C.dark,
               borderRadius: 24,
-              padding: SPACING.xl,
+              padding: SPACING.lg,
               overflow: "hidden",
               shadowColor: C.dark,
               shadowOffset: { width: 0, height: 8 },
@@ -294,17 +269,6 @@ export default function CreditsScreen() {
               </Text>
             </View>
 
-            {/* Monetary value */}
-            <Text
-              style={{
-                fontFamily: FONTS.medium,
-                fontSize: 14,
-                color: "rgba(255,255,255,0.5)",
-                marginTop: 4,
-              }}
-            >
-              Värde: {displayCredits * 39} kr
-            </Text>
           </View>
         </Animated.View>
 
@@ -456,12 +420,12 @@ export default function CreditsScreen() {
                   accessibilityLabel={`Köp ${qty} credit${qty > 1 ? "s" : ""} för ${qty * 39} kronor`}
                   onPress={() => handleBuyCredits(qty)}
                   style={{
-                    backgroundColor: C.bgCard,
+                    backgroundColor: qty === 2 ? "#7EC87A" : C.bgCard,
                     borderRadius: RADIUS.md,
                     paddingVertical: 14,
                     alignItems: "center",
                     justifyContent: "center",
-                    borderWidth: qty === 2 ? 2 : 0.5,
+                    borderWidth: qty === 2 ? 0 : 0.5,
                     borderColor: qty === 2 ? "#7EC87A" : C.divider,
                     marginBottom: 8,
                     position: "relative" as const,
@@ -470,8 +434,8 @@ export default function CreditsScreen() {
                   }}
                 >
                   {qty === 2 ? (
-                    <View style={{ position: "absolute", top: -10, right: 12, backgroundColor: "#7EC87A", paddingHorizontal: 8, paddingVertical: 2, borderRadius: RADIUS.sm }}>
-                      <Text style={{ fontFamily: FONTS.bold, fontSize: 10, color: "#111827" }}>Rekommenderat</Text>
+                    <View style={{ position: "absolute", top: -10, right: 12, backgroundColor: C.dark, paddingHorizontal: 8, paddingVertical: 2, borderRadius: RADIUS.sm }}>
+                      <Text style={{ fontFamily: FONTS.bold, fontSize: 10, color: "#FFFFFF" }}>Rekommenderat</Text>
                     </View>
                   ) : null}
                   {buyingQuantity === qty ? (
@@ -481,11 +445,11 @@ export default function CreditsScreen() {
                       style={{
                         fontFamily: FONTS.bold,
                         fontSize: 15,
-                        color: C.textPrimary,
+                        color: qty === 2 ? "#FFFFFF" : C.textPrimary,
                         letterSpacing: -0.1,
                       }}
                     >
-                      {qty === 1 ? "1 credit · 39 kr" : qty === 2 ? "2 credits · 78 kr" : "3 credits · 117 kr"}
+                      {qty === 1 ? "Köp 1 credit · 39 kr" : qty === 2 ? "Köp 2 credits · 78 kr" : "Köp 3 credits · 117 kr"}
                     </Text>
                   )}
                 </AnimatedPressable>
@@ -562,7 +526,7 @@ export default function CreditsScreen() {
                     Bjud in en vän
                   </Text>
                 </View>
-                <CreditBadge label="+1 credit vardera" color="green" />
+                <CreditBadge label="+1 credit till er båda" color="green" />
                 <ChevronRight size={16} color={C.textTertiary} strokeWidth={2} />
               </AnimatedPressable>
             </Animated.View>
@@ -619,146 +583,6 @@ export default function CreditsScreen() {
           </View>
         </View>
 
-        {/* Historik */}
-        <View style={{ marginTop: 32, paddingHorizontal: SPACING.lg, marginBottom: SPACING.lg }}>
-          <Animated.View entering={FadeInDown.delay(580).springify()}>
-            <Text
-              style={{
-                fontFamily: FONTS.displayBold,
-                fontSize: 18,
-                color: C.textPrimary,
-                letterSpacing: -0.3,
-                marginBottom: SPACING.md,
-              }}
-            >
-              Historik
-            </Text>
-          </Animated.View>
-
-          {creditAlerts.length === 0 ? (
-            <Animated.View entering={FadeInDown.delay(620).springify()} style={{ alignItems: "center", paddingVertical: 24 }}>
-              <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: "rgba(201,169,110,0.10)", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
-                <Clock size={28} color={C.gold} strokeWidth={ICON.strokeWidth} />
-              </View>
-              <Text style={{ fontFamily: FONTS.displayBold, fontSize: 17, color: C.textPrimary, textAlign: "center", letterSpacing: -0.2 }}>
-                Ingen historik än
-              </Text>
-              <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textSecondary, marginTop: 6, textAlign: "center", lineHeight: 20, paddingHorizontal: 20 }}>
-                Här ser du alla transaktioner:{"\n"}+2 (bokning övertagen), −2 (tog över), +1 (referral)
-              </Text>
-            </Animated.View>
-          ) : (
-            <View
-              style={{
-                backgroundColor: C.bgCard,
-                borderRadius: RADIUS.lg,
-                borderWidth: 0.5,
-                borderColor: C.divider,
-                overflow: "hidden",
-                ...SHADOW.card,
-              }}
-            >
-              {creditAlerts.map((alert, index) => {
-                const msgLower = (alert.message ?? alert.title ?? "").toLowerCase();
-                const isSpent = msgLower.includes("köp") || msgLower.includes("tog över") || msgLower.includes("−") || msgLower.includes("debit");
-                const isReferral = msgLower.includes("referral") || msgLower.includes("bjud");
-                const isEarned = !isSpent;
-                const iconColor = isSpent ? C.coral : isReferral ? C.gold : C.success;
-                const IconComponent = isSpent ? ShoppingCart : isReferral ? UserPlus : isEarned ? Gift : Clock;
-                const iconBg = isSpent ? C.coralLight : isReferral ? "rgba(201,169,110,0.12)" : C.successLight;
-                const amountLabel = isSpent ? "−2" : isReferral ? "+1" : "+2";
-                const amountColor = isSpent ? C.coral : C.success;
-
-                return (
-                  <Animated.View
-                    key={alert.id}
-                    entering={FadeInDown.delay(620 + index * 60)
-                      .springify()}
-                  >
-                    {index > 0 && (
-                      <View
-                        style={{
-                          height: 0.5,
-                          backgroundColor: C.divider,
-                          marginLeft: 62,
-                        }}
-                      />
-                    )}
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        padding: 14,
-                        gap: 12,
-                      }}
-                    >
-                      <View
-                        style={{
-                          width: 36,
-                          height: 36,
-                          borderRadius: 10,
-                          backgroundColor: iconBg,
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <IconComponent size={18} color={iconColor} strokeWidth={2} />
-                      </View>
-                      <View style={{ flex: 1 }}>
-                        <View
-                          style={{
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            marginBottom: 2,
-                          }}
-                        >
-                          <Text
-                            style={{
-                              fontFamily: FONTS.semiBold,
-                              fontSize: 14,
-                              color: C.textPrimary,
-                              flex: 1,
-                            }}
-                            numberOfLines={1}
-                          >
-                            {alert.title}
-                          </Text>
-                          <Text
-                            style={{
-                              fontFamily: FONTS.regular,
-                              fontSize: 12,
-                              color: C.textTertiary,
-                              marginLeft: 8,
-                            }}
-                          >
-                            {formatRelativeDate(alert.createdAt)}
-                          </Text>
-                        </View>
-                        <Text
-                          style={{
-                            fontFamily: FONTS.regular,
-                            fontSize: 13,
-                            color: C.textSecondary,
-                          }}
-                          numberOfLines={2}
-                        >
-                          {alert.message}
-                        </Text>
-                      </View>
-                      <View style={{ alignItems: "flex-end", justifyContent: "center", marginLeft: 8 }}>
-                        <Text style={{ fontFamily: FONTS.bold, fontSize: 16, color: amountColor, letterSpacing: -0.3 }}>
-                          {amountLabel}
-                        </Text>
-                        <Text style={{ fontFamily: FONTS.regular, fontSize: 10, color: C.textTertiary }}>credits</Text>
-                      </View>
-                    </View>
-                  </Animated.View>
-                );
-              })}
-            </View>
-          )}
-        </View>
       </ScrollView>
       )}
     </SafeAreaView>

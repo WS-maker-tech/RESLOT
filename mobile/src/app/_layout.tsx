@@ -170,7 +170,7 @@ function RootLayoutNav() {
         <Stack.Screen name="credit-history" options={{ presentation: "modal", headerShown: false }} />
         <Stack.Screen name="account-settings" options={{ presentation: "modal", headerShown: false }} />
         <Stack.Screen name="payment" options={{ presentation: "modal", headerShown: false }} />
-        <Stack.Screen name="invite" options={{ presentation: "modal", headerShown: false }} />
+        <Stack.Screen name="invite" options={{ headerShown: false, animation: "slide_from_right" }} />
         <Stack.Screen name="support" options={{ presentation: "modal", headerShown: false }} />
         <Stack.Screen name="feedback" options={{ presentation: "modal", headerShown: false, animation: "slide_from_bottom" }} />
         <Stack.Screen name="add-watch" options={{ presentation: "modal", headerShown: false }} />

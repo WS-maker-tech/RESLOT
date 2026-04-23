@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, ScrollView, Pressable, LayoutAnimation, Platform, UIManager } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ChevronRight, MessageCircle } from "lucide-react-native";
+import { ChevronRight, MessageCircle, X } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import SupportBubble from "@/components/SupportBubble";
 import * as Haptics from "expo-haptics";
@@ -191,7 +191,14 @@ export default function FaqScreen() {
       >
         <Animated.View
           entering={FadeInDown.springify()}
-          style={{ paddingHorizontal: SPACING.lg, paddingTop: SPACING.xl, paddingBottom: 6 }}
+          style={{
+            paddingHorizontal: SPACING.lg,
+            paddingTop: SPACING.xl,
+            paddingBottom: 6,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
         >
           <Text
             style={{
@@ -201,18 +208,26 @@ export default function FaqScreen() {
               letterSpacing: -0.8,
             }}
           >
-            Frågor och svar
+            Frågor & svar
           </Text>
-          <Text
+          <Pressable
+            testID="faq-close-button"
+            accessibilityLabel="Stäng"
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              router.back();
+            }}
             style={{
-              fontFamily: FONTS.regular,
-              fontSize: 14,
-              color: C.textTertiary,
-              marginTop: 5,
+              width: 36,
+              height: 36,
+              borderRadius: 18,
+              backgroundColor: C.borderLight,
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            Allt du behöver veta om Reslot.
-          </Text>
+            <X size={18} color={C.textTertiary} strokeWidth={2} />
+          </Pressable>
         </Animated.View>
 
         <View style={{ marginTop: SPACING.lg, paddingHorizontal: SPACING.lg, gap: SPACING.sm }}>

@@ -721,7 +721,7 @@ export default function AlertsScreen() {
                     letterSpacing: -0.3,
                   }}
                 >
-                  Inga bevakningar
+                  Du har inga bevakningar ännu
                 </Animated.Text>
                 <Animated.Text
                   entering={FadeInDown.delay(300).springify()}
@@ -735,7 +735,7 @@ export default function AlertsScreen() {
                     lineHeight: 20,
                   }}
                 >
-                  Bevaka restauranger för att få notiser om lediga bord
+                  Lägg till en bevakning för att få notis när en bokning dyker upp
                 </Animated.Text>
                 <Animated.View entering={FadeInDown.delay(400).springify()}>
                   <Pressable
