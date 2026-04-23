@@ -167,6 +167,7 @@ function RootLayoutNav() {
             title: "Reslot credits",
           }}
         />
+        <Stack.Screen name="credit-history" options={{ presentation: "modal", headerShown: false }} />
         <Stack.Screen name="account-settings" options={{ presentation: "modal", headerShown: false }} />
         <Stack.Screen name="payment" options={{ presentation: "modal", headerShown: false }} />
         <Stack.Screen name="invite" options={{ presentation: "modal", headerShown: false }} />
@@ -176,6 +177,7 @@ function RootLayoutNav() {
         <Stack.Screen name="booking-confirmation" options={{ headerShown: false, animation: "slide_from_right" }} />
         <Stack.Screen name="map" options={{ headerShown: false, animation: "slide_from_right" }} />
         <Stack.Screen name="saved" options={{ presentation: "modal", headerShown: false }} />
+        <Stack.Screen name="settings" options={{ headerShown: false, animation: "slide_from_right" }} />
       </Stack>
 
       </ThemeProvider>

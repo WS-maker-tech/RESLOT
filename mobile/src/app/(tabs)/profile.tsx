@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as ImagePicker from "expo-image-picker";
 import {
   Settings,
   ChevronRight,
@@ -73,7 +74,7 @@ const AnimatedCreditsCount = React.memo(function AnimatedCreditsCount({ value }:
   }, [value]);
 
   return (
-    <Text testID="credits-amount" style={{ fontFamily: FONTS.bold, fontSize: 38, color: C.white }}>
+    <Text testID="credits-amount" style={{ fontFamily: FONTS.displayBold, fontSize: 40, color: "#F59E0B" }}>
       {displayValue}
     </Text>
   );
@@ -177,6 +178,7 @@ export default function ProfileScreen() {
   const [showLiabilityPolicy, setShowLiabilityPolicy] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
+  const [profileImageUri, setProfileImageUri] = useState<string | null>(null);
 
   const { data: profile, isLoading, error, refetch } = useProfile(
     phone || ""
@@ -202,21 +204,34 @@ export default function ProfileScreen() {
     [profile?.firstName, profile?.lastName, firstName, lastName]);
 
   const avatar = useMemo(() =>
-    profile?.avatar ??
-    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face",
-    [profile?.avatar]);
+    profileImageUri ?? profile?.avatar ?? null,
+    [profileImageUri, profile?.avatar]);
+
+  const initials = useMemo(() => {
+    const f = profile?.firstName ?? firstName ?? "";
+    const l = profile?.lastName ?? lastName ?? "";
+    return `${f.charAt(0)}${l.charAt(0)}`.toUpperCase();
+  }, [profile?.firstName, profile?.lastName, firstName, lastName]);
 
   const email = useMemo(() => profile?.email ?? "", [profile?.email]);
 
   const handleSettingsPress = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.push("/account-settings");
+    router.push("/settings");
   }, [router]);
 
-  const handleProfileImagePress = useCallback(() => {
+  const handlePickImage = useCallback(async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.push("/account-settings");
-  }, [router]);
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+    if (!result.canceled && result.assets[0]) {
+      setProfileImageUri(result.assets[0].uri);
+    }
+  }, []);
 
   const handleBuyCreditsPress = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -374,30 +389,49 @@ export default function ProfileScreen() {
               <Pressable
                 testID="profile-image-button"
                 accessibilityLabel="Ändra profilbild"
-                onPress={handleProfileImagePress}
+                onPress={handlePickImage}
                 style={{ position: "relative" }}
               >
-                <Image
-                  source={{ uri: avatar }}
-                  style={{
-                    width: 84,
-                    height: 84,
-                    borderRadius: 42,
-                    borderWidth: 3,
-                    borderColor: C.coralLight,
-                    backgroundColor: C.bgInput,
-                  }}
-                  cachePolicy="memory-disk"
-                />
-                <View style={{ position: "absolute", bottom: 0, right: 0, width: 26, height: 26, borderRadius: 13, backgroundColor: C.coral, alignItems: "center", justifyContent: "center", borderWidth: 2, borderColor: C.bg }}>
-                  <Camera size={12} color="#111827" strokeWidth={ICON.strokeWidth} />
+                {avatar ? (
+                  <Image
+                    source={{ uri: avatar }}
+                    style={{
+                      width: 84,
+                      height: 84,
+                      borderRadius: 42,
+                      borderWidth: 3,
+                      borderColor: "#7EC87A",
+                      backgroundColor: C.bgInput,
+                    }}
+                    cachePolicy="memory-disk"
+                  />
+                ) : (
+                  <View
+                    style={{
+                      width: 84,
+                      height: 84,
+                      borderRadius: 42,
+                      borderWidth: 3,
+                      borderColor: "#7EC87A",
+                      backgroundColor: "#7EC87A",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text style={{ fontFamily: FONTS.displayBold, fontSize: 28, color: C.white }}>
+                      {initials}
+                    </Text>
+                  </View>
+                )}
+                <View style={{ position: "absolute", bottom: 0, right: 0, width: 26, height: 26, borderRadius: 13, backgroundColor: "#7EC87A", alignItems: "center", justifyContent: "center", borderWidth: 2, borderColor: C.bg }}>
+                  <Camera size={14} color={C.white} strokeWidth={ICON.strokeWidth} />
                 </View>
               </Pressable>
               <Text
                 testID="profile-display-name"
                 style={{
                   fontFamily: FONTS.displayBold,
-                  fontSize: 26,
+                  fontSize: 22,
                   color: C.textPrimary,
                   marginTop: 14,
                   letterSpacing: -0.5,
@@ -441,12 +475,12 @@ export default function ProfileScreen() {
                 backgroundColor: C.dark, borderRadius: RADIUS.lg, padding: 22,
                 ...SHADOW.card,
               }}>
-                <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>
-                  Ditt saldo
+                <Text style={{ fontFamily: FONTS.medium, fontSize: 11, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 4 }}>
+                  DITT SALDO
                 </Text>
                 <View style={{ flexDirection: "row", alignItems: "baseline", gap: 6 }}>
                   <AnimatedCreditsCount value={profile?.credits ?? 0} />
-                  <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.gold }}>credits</Text>
+                  <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: "rgba(255,255,255,0.6)" }}>credits</Text>
                 </View>
                 <Pressable
                   testID="buy-credits-cta"
@@ -455,9 +489,19 @@ export default function ProfileScreen() {
                   onPressOut={() => { buyScale.value = withSpring(1, { damping: 12, stiffness: 200 }); }}
                   onPress={handleBuyCreditsPress}
                 >
-                  <Animated.View style={[buyAnimStyle, { marginTop: 12, backgroundColor: C.coral, borderRadius: 12, paddingVertical: 10, alignItems: "center" }]}>
+                  <Animated.View style={[buyAnimStyle, { marginTop: 12, backgroundColor: "#7EC87A", borderRadius: RADIUS.full, paddingVertical: 10, alignItems: "center" }]}>
                     <Text style={{ fontFamily: FONTS.bold, fontSize: 14, color: "#111827" }}>Köp credits</Text>
                   </Animated.View>
+                </Pressable>
+                <Pressable
+                  testID="credit-history-link"
+                  accessibilityLabel="Visa historik"
+                  onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/credit-history"); }}
+                  style={{ alignSelf: "center", marginTop: 10 }}
+                >
+                  <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.textSecondary }}>
+                    {"Visa historik →"}
+                  </Text>
                 </Pressable>
               </View>
             </Animated.View>
@@ -628,85 +672,73 @@ export default function ProfileScreen() {
 
             {/* Quick booking stats */}
             <Animated.View entering={FadeInDown.delay(160).springify()} className="mx-5 mb-5">
-              <View style={{ flexDirection: "row", gap: 10 }}>
+              <View style={{ flexDirection: "row", gap: 8 }}>
                 <Pressable
                   testID="uploaded-bookings-link"
                   accessibilityLabel="Visa upplagda bokningar"
                   onPress={handleUploadedPress}
-                  style={{ flex: 1, backgroundColor: C.bgCard, borderRadius: RADIUS.lg, borderWidth: 0.5, borderColor: C.borderLight, padding: 16, ...SHADOW.card, alignItems: "center" }}
+                  style={{ flex: 1, backgroundColor: C.bgCard, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: C.borderLight, padding: 12, alignItems: "center" }}
                 >
-                  <Text style={{ fontFamily: FONTS.bold, fontSize: 22, color: C.coral }}>{submittedCount}</Text>
-                  <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.textSecondary, marginTop: 2 }}>Upplagda</Text>
+                  <Text style={{ fontFamily: FONTS.displayBold, fontSize: 22, color: "#7EC87A" }}>{submittedCount}</Text>
+                  <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textSecondary, marginTop: 2 }}>Upplagda</Text>
                 </Pressable>
                 <Pressable
                   testID="claimed-bookings-link"
                   accessibilityLabel="Visa övertagna bokningar"
                   onPress={handleClaimedPress}
-                  style={{ flex: 1, backgroundColor: C.bgCard, borderRadius: RADIUS.lg, borderWidth: 0.5, borderColor: C.borderLight, padding: 16, ...SHADOW.card, alignItems: "center" }}
+                  style={{ flex: 1, backgroundColor: C.bgCard, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: C.borderLight, padding: 12, alignItems: "center" }}
                 >
-                  <Text style={{ fontFamily: FONTS.bold, fontSize: 22, color: C.success }}>{claimedCount}</Text>
-                  <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.textSecondary, marginTop: 2 }}>Övertagna</Text>
+                  <Text style={{ fontFamily: FONTS.displayBold, fontSize: 22, color: "#7EC87A" }}>{claimedCount}</Text>
+                  <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textSecondary, marginTop: 2 }}>Övertagna</Text>
                 </Pressable>
                 <Pressable
                   testID="saved-restaurants-link"
                   accessibilityLabel="Visa sparade restauranger"
                   onPress={handleSavedPress}
-                  style={{ flex: 1, backgroundColor: C.bgCard, borderRadius: RADIUS.lg, borderWidth: 0.5, borderColor: C.borderLight, padding: 16, ...SHADOW.card, alignItems: "center" }}
+                  style={{ flex: 1, backgroundColor: C.bgCard, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: C.borderLight, padding: 12, ...SHADOW.card, alignItems: "center" }}
                 >
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                    <Heart size={16} color={C.coral} fill={savedCount > 0 ? C.coral : "transparent"} strokeWidth={2} />
-                    <Text style={{ fontFamily: FONTS.bold, fontSize: 22, color: C.coral }}>{savedCount}</Text>
-                  </View>
-                  <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.textSecondary, marginTop: 2 }}>Sparade</Text>
+                  <Text style={{ fontFamily: FONTS.displayBold, fontSize: 22, color: "#7EC87A" }}>{savedCount}</Text>
+                  <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textSecondary, marginTop: 2 }}>Sparade</Text>
                 </Pressable>
               </View>
             </Animated.View>
 
-            {/* Senaste aktivitet */}
-            <Animated.View entering={FadeInDown.delay(170).springify()} className="mx-5 mb-5">
+            {/* Tjäna credits */}
+            <Animated.View entering={FadeInDown.delay(170).springify()} className="mx-5 mb-5" testID="earn-credits-section">
               <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textTertiary, letterSpacing: 0.8, textTransform: "uppercase", marginBottom: SPACING.sm, paddingHorizontal: 4 }}>
-                Senaste aktivitet
+                Tjäna credits
               </Text>
               <View style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.xl, borderWidth: 0.5, borderColor: C.borderLight, overflow: "hidden", ...SHADOW.card }}>
-                {myReservations.length === 0 ? (
-                  <View style={{ padding: 24, alignItems: "center" }}>
-                    <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textTertiary }}>Ingen aktivitet ännu</Text>
+                <Pressable
+                  testID="earn-invite-friend"
+                  accessibilityLabel="Bjud in en vän"
+                  onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/invite"); }}
+                  style={{ flexDirection: "row", alignItems: "center", padding: 14, gap: 12, borderBottomWidth: 0.5, borderBottomColor: C.divider }}
+                >
+                  <View style={{ width: 38, height: 38, borderRadius: 11, backgroundColor: "rgba(201, 169, 110, 0.12)", alignItems: "center", justifyContent: "center" }}>
+                    <UserPlus size={18} color={C.gold} strokeWidth={2} />
                   </View>
-                ) : (
-                  myReservations.slice(0, 3).map((res, idx) => {
-                    const isSubmitter = res.submitterPhone === phone;
-                    const actionText = isSubmitter ? "Lade upp" : "Tog över";
-                    const actionColor = isSubmitter ? C.coral : C.success;
-                    const resDate = new Date(res.createdAt ?? res.reservationDate);
-                    const daysAgo = Math.floor((Date.now() - resDate.getTime()) / (1000 * 60 * 60 * 24));
-                    const timeLabel = daysAgo === 0 ? "Idag" : daysAgo === 1 ? "Igår" : `${daysAgo}d sedan`;
-                    return (
-                      <View key={res.id}>
-                        {idx > 0 ? <View style={{ height: 0.5, backgroundColor: C.divider, marginLeft: 54 }} /> : null}
-                        <View style={{ flexDirection: "row", alignItems: "center", padding: 14, gap: 12 }}>
-                          <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: isSubmitter ? C.coralLight : C.successLight, alignItems: "center", justifyContent: "center" }}>
-                            <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: isSubmitter ? "rgba(255,107,107,0.12)" : "rgba(126,200,122,0.12)", alignItems: "center", justifyContent: "center" }}>
-                              {isSubmitter
-                                ? <ArrowUpRight size={12} color="#FF6B6B" strokeWidth={2.5} />
-                                : <ArrowDownLeft size={12} color="#7EC87A" strokeWidth={2.5} />}
-                            </View>
-                          </View>
-                          <View style={{ flex: 1 }}>
-                            <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.textPrimary }} numberOfLines={1}>
-                              {actionText} · {res.restaurant?.name ?? "Restaurang"}
-                            </Text>
-                            <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary, marginTop: 1 }}>
-                              {timeLabel}
-                            </Text>
-                          </View>
-                          <Text style={{ fontFamily: FONTS.bold, fontSize: 13, color: actionColor }}>
-                            {isSubmitter ? "+2" : "−2"}
-                          </Text>
-                        </View>
-                      </View>
-                    );
-                  })
-                )}
+                  <Text style={{ fontFamily: FONTS.medium, fontSize: 15, color: C.textPrimary, flex: 1 }}>Bjud in en vän</Text>
+                  <View style={{ backgroundColor: C.successLight, paddingHorizontal: 8, paddingVertical: 3, borderRadius: RADIUS.sm }}>
+                    <Text style={{ fontFamily: FONTS.bold, fontSize: 11, color: C.success }}>+1 credit till er båda</Text>
+                  </View>
+                  <ChevronRight size={18} color={C.textTertiary} strokeWidth={2} />
+                </Pressable>
+                <Pressable
+                  testID="earn-submit-booking"
+                  accessibilityLabel="Lägg upp en bokning"
+                  onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/(tabs)/submit"); }}
+                  style={{ flexDirection: "row", alignItems: "center", padding: 14, gap: 12 }}
+                >
+                  <View style={{ width: 38, height: 38, borderRadius: 11, backgroundColor: C.coralLight, alignItems: "center", justifyContent: "center" }}>
+                    <ArrowUpRight size={18} color={C.coral} strokeWidth={2} />
+                  </View>
+                  <Text style={{ fontFamily: FONTS.medium, fontSize: 15, color: C.textPrimary, flex: 1 }}>Lägg upp en bokning</Text>
+                  <View style={{ backgroundColor: C.successLight, paddingHorizontal: 8, paddingVertical: 3, borderRadius: RADIUS.sm }}>
+                    <Text style={{ fontFamily: FONTS.bold, fontSize: 11, color: C.success }}>+2 credits</Text>
+                  </View>
+                  <ChevronRight size={18} color={C.textTertiary} strokeWidth={2} />
+                </Pressable>
               </View>
             </Animated.View>
 

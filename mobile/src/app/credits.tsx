@@ -449,36 +449,43 @@ export default function CreditsScreen() {
               >
                 1 credit = 39 kr
               </Text>
-              {[1, 3, 5].map((qty) => (
+              {[1, 2, 3].map((qty) => (
                 <AnimatedPressable
                   key={qty}
                   testID={`buy-${qty}-credits-btn`}
                   accessibilityLabel={`Köp ${qty} credit${qty > 1 ? "s" : ""} för ${qty * 39} kronor`}
                   onPress={() => handleBuyCredits(qty)}
                   style={{
-                    backgroundColor: qty === 3 ? C.coral : C.bgCard,
+                    backgroundColor: C.bgCard,
                     borderRadius: RADIUS.md,
                     paddingVertical: 14,
                     alignItems: "center",
                     justifyContent: "center",
-                    borderWidth: qty === 3 ? 0 : 0.5,
-                    borderColor: C.divider,
+                    borderWidth: qty === 2 ? 2 : 0.5,
+                    borderColor: qty === 2 ? "#7EC87A" : C.divider,
                     marginBottom: 8,
-                    ...(qty === 3 ? SHADOW.elevated : SHADOW.card),
+                    position: "relative" as const,
+                    overflow: "visible" as const,
+                    ...SHADOW.card,
                   }}
                 >
+                  {qty === 2 ? (
+                    <View style={{ position: "absolute", top: -10, right: 12, backgroundColor: "#7EC87A", paddingHorizontal: 8, paddingVertical: 2, borderRadius: RADIUS.sm }}>
+                      <Text style={{ fontFamily: FONTS.bold, fontSize: 10, color: "#111827" }}>Rekommenderat</Text>
+                    </View>
+                  ) : null}
                   {buyingQuantity === qty ? (
-                    <MiniSpinner color={qty === 3 ? "#111827" : C.coral} />
+                    <MiniSpinner color={C.coral} />
                   ) : (
                     <Text
                       style={{
                         fontFamily: FONTS.bold,
                         fontSize: 15,
-                        color: qty === 3 ? "#111827" : C.textPrimary,
+                        color: C.textPrimary,
                         letterSpacing: -0.1,
                       }}
                     >
-                      {qty === 1 ? "Köp 1 credit · 39 kr" : qty === 3 ? "Köp 3 credits · 117 kr" : "Köp 5 credits · 195 kr"}
+                      {qty === 1 ? "1 credit · 39 kr" : qty === 2 ? "2 credits · 78 kr" : "3 credits · 117 kr"}
                     </Text>
                   )}
                 </AnimatedPressable>
@@ -493,7 +500,7 @@ export default function CreditsScreen() {
           </Animated.View>
         </View>
 
-        {/* Få gratis credits */}
+        {/* Tjäna credits */}
         <View style={{ marginTop: 32, paddingHorizontal: SPACING.lg }}>
           <Animated.View entering={FadeInDown.delay(400).springify()}>
             <Text
@@ -505,7 +512,7 @@ export default function CreditsScreen() {
                 marginBottom: SPACING.md,
               }}
             >
-              Få gratis credits
+              Tjäna credits
             </Text>
           </Animated.View>
 
