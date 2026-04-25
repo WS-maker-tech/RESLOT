@@ -180,6 +180,7 @@ function RootLayoutNav() {
         <Stack.Screen name="settings" options={{ headerShown: false, animation: "slide_from_right" }} />
         <Stack.Screen name="change-password" options={{ headerShown: false, animation: "slide_from_right" }} />
         <Stack.Screen name="notification-settings" options={{ headerShown: false, animation: "slide_from_right" }} />
+        <Stack.Screen name="help" options={{ headerShown: false, animation: "slide_from_right" }} />
       </Stack>
 
       </ThemeProvider>

@@ -272,6 +272,17 @@ export default function CreditsScreen() {
           </View>
         </Animated.View>
 
+        <Pressable
+          testID="credit-history-link"
+          accessibilityLabel="Visa historik"
+          onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/credit-history"); }}
+          style={{ alignSelf: "flex-end", marginRight: SPACING.lg, marginTop: SPACING.sm }}
+        >
+          <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.textTertiary }}>
+            {"Visa historik →"}
+          </Text>
+        </Pressable>
+
         {/* Så fungerar det */}
         <View style={{ marginTop: 32, paddingHorizontal: SPACING.lg }}>
           <Animated.View entering={FadeInDown.delay(160).springify()}>

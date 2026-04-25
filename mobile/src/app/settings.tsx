@@ -18,7 +18,7 @@ import { useAuthStore } from "@/lib/auth-store";
 import { supabase } from "@/lib/supabase";
 import { C, FONTS, SPACING, RADIUS } from "@/lib/theme";
 
-const CITIES = ["Stockholm", "Göteborg", "Malmö", "Uppsala", "Västerås"];
+const CITIES = ["Stockholm", "Göteborg", "Malmö", "Uppsala", "Västerås", "Örebro", "Linköping", "Helsingborg", "Jönköping", "Norrköping"];
 
 function formatDate(date: Date): string {
   const months = [
@@ -47,6 +47,7 @@ export default function SettingsScreen() {
   const [showCityModal, setShowCityModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [citySearch, setCitySearch] = useState("");
   const [saving, setSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -310,7 +311,8 @@ export default function SettingsScreen() {
             }}
           >
             <Text style={{ fontFamily: FONTS.regular, fontSize: 15, color: C.textTertiary, width: 100 }}>
-              Födelsedag
+              Födelsedatum{" "}
+              <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary, opacity: 0.6 }}>(valfritt)</Text>
             </Text>
             <Text
               style={{
@@ -321,7 +323,7 @@ export default function SettingsScreen() {
                 textAlign: "right",
               }}
             >
-              {birthdate ? formatDate(birthdate) : "Ange födelsedag"}
+              {birthdate ? formatDate(birthdate) : "Ange födelsedatum"}
             </Text>
           </Pressable>
 
@@ -580,7 +582,7 @@ export default function SettingsScreen() {
                 }}
               >
                 <Text style={{ fontFamily: FONTS.displayBold, fontSize: 18, color: C.textPrimary, marginBottom: 16, textAlign: "center" }}>
-                  Välj födelsedag
+                  Välj födelsedatum
                 </Text>
                 <TextInput
                   testID="web-date-input"
@@ -638,11 +640,11 @@ export default function SettingsScreen() {
         visible={showCityModal}
         transparent
         animationType="fade"
-        onRequestClose={() => setShowCityModal(false)}
+        onRequestClose={() => { setShowCityModal(false); setCitySearch(""); }}
       >
         <Pressable
           style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.4)", alignItems: "center", justifyContent: "center" }}
-          onPress={() => setShowCityModal(false)}
+          onPress={() => { setShowCityModal(false); setCitySearch(""); }}
         >
           <Pressable
             onPress={() => {}}
@@ -651,44 +653,66 @@ export default function SettingsScreen() {
               borderRadius: RADIUS.xl,
               padding: 24,
               marginHorizontal: 32,
-              width: 280,
+              width: 320,
+              maxHeight: 480,
             }}
           >
-            <Text style={{ fontFamily: FONTS.displayBold, fontSize: 18, color: C.textPrimary, marginBottom: 16, textAlign: "center" }}>
+            <Text style={{ fontFamily: FONTS.displayBold, fontSize: 18, color: C.textPrimary, marginBottom: 12, textAlign: "center" }}>
               Välj stad
             </Text>
-            {CITIES.map((c) => (
-              <Pressable
-                key={c}
-                testID={`city-${c.toLowerCase()}`}
-                onPress={() => {
-                  setCity(c);
-                  setShowCityModal(false);
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                }}
-                style={{
-                  paddingVertical: 14,
-                  borderBottomWidth: c === CITIES[CITIES.length - 1] ? 0 : 0.5,
-                  borderBottomColor: C.divider,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Text
+            <TextInput
+              testID="city-search-input"
+              value={citySearch}
+              onChangeText={setCitySearch}
+              placeholder="Sök stad..."
+              placeholderTextColor={C.textTertiary}
+              autoFocus
+              style={{
+                fontFamily: FONTS.regular,
+                fontSize: 15,
+                color: C.textPrimary,
+                borderWidth: 1,
+                borderColor: C.borderLight,
+                borderRadius: RADIUS.md,
+                padding: 10,
+                marginBottom: 12,
+              }}
+            />
+            <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 320 }}>
+              {CITIES.filter((c) => c.toLowerCase().includes(citySearch.toLowerCase())).map((c, idx, arr) => (
+                <Pressable
+                  key={c}
+                  testID={`city-${c.toLowerCase()}`}
+                  onPress={() => {
+                    setCity(c);
+                    setShowCityModal(false);
+                    setCitySearch("");
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }}
                   style={{
-                    fontFamily: city === c ? FONTS.semiBold : FONTS.regular,
-                    fontSize: 16,
-                    color: city === c ? "#7EC87A" : C.textPrimary,
+                    paddingVertical: 14,
+                    borderBottomWidth: idx === arr.length - 1 ? 0 : 0.5,
+                    borderBottomColor: C.divider,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
                   }}
                 >
-                  {c}
-                </Text>
-                {city === c ? (
-                  <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: "#7EC87A" }} />
-                ) : null}
-              </Pressable>
-            ))}
+                  <Text
+                    style={{
+                      fontFamily: city === c ? FONTS.semiBold : FONTS.regular,
+                      fontSize: 16,
+                      color: city === c ? "#7EC87A" : C.textPrimary,
+                    }}
+                  >
+                    {c}
+                  </Text>
+                  {city === c ? (
+                    <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: "#7EC87A" }} />
+                  ) : null}
+                </Pressable>
+              ))}
+            </ScrollView>
           </Pressable>
         </Pressable>
       </Modal>

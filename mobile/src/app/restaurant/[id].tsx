@@ -1255,7 +1255,7 @@ ${shareUrl}`,
                   {r.rating.toFixed(1)}
                 </Text>
                 <View style={{ width: 3, height: 3, borderRadius: 1.5, backgroundColor: C.textTertiary, marginHorizontal: 2 }} />
-                <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.textSecondary }}>Google</Text>
+                <Text style={{ fontFamily: FONTS.regular, fontSize: 11, color: C.textSecondary }}>Google</Text>
               </>
             ) : null}
             <View style={{ width: 3, height: 3, borderRadius: 1.5, backgroundColor: C.textTertiary, marginHorizontal: 4 }} />
@@ -1291,13 +1291,13 @@ ${shareUrl}`,
           {(tags.length > 0 || vibeTags.length > 0) ? (
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 14 }}>
               {tags.filter((tag: string) => tag && tag.trim()).map((tag: string) => (
-                <View key={tag} style={{ backgroundColor: C.successLight, borderRadius: 16, paddingHorizontal: 10, paddingVertical: 5 }}>
-                  <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.success }}>{tag}</Text>
+                <View key={tag} style={{ backgroundColor: "#F3F4F6", borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 }}>
+                  <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.textSecondary }}>{tag}</Text>
                 </View>
               ))}
               {vibeTags.map((vt) => (
-                <View key={vt.label} style={{ backgroundColor: "rgba(201,169,110,0.10)", borderRadius: 16, paddingHorizontal: 10, paddingVertical: 5 }}>
-                  <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.gold }}>{vt.label}</Text>
+                <View key={vt.label} style={{ backgroundColor: "#F3F4F6", borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 }}>
+                  <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.textSecondary }}>{vt.label}</Text>
                 </View>
               ))}
             </View>
@@ -1454,7 +1454,7 @@ ${shareUrl}`,
                 <View>
                   <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary }}>Avbokningsavgift</Text>
                   {reservation.cancellationWindowHours ? (
-                    <Text style={{ fontFamily: FONTS.regular, fontSize: 11, color: C.textTertiary, marginTop: 1 }}>Inom {reservation.cancellationWindowHours}h före besöket</Text>
+                    <Text style={{ fontFamily: FONTS.regular, fontSize: 11, color: C.textTertiary, marginTop: 1 }}>Avbokning senast {reservation.cancellationWindowHours} timmar före</Text>
                   ) : null}
                 </View>
                 <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.coral }}>{reservation.cancelFee} SEK/pers · Totalt {reservation.cancelFee * reservation.partySize} SEK</Text>

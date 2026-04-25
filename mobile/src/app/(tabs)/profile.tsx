@@ -46,7 +46,7 @@ import { useAuthStore } from "@/lib/auth-store";
 import { LoginGate } from "@/components/LoginGate";
 import { C, FONTS, SPACING, SHADOW, RADIUS, ICON } from "../../lib/theme";
 import { Skeleton } from "@/components/Skeleton";
-import { TrustBadge } from "@/components/TrustBadge";
+
 import { LegalModal } from "@/components/LegalModal";
 import { TERMS_CONDITIONS, PRIVACY_POLICY } from "@/lib/legal-content";
 
@@ -138,9 +138,9 @@ const MenuItem = React.memo(function MenuItem({
       >
         <View
           style={{
-            width: 38,
-            height: 38,
-            borderRadius: 11,
+            width: 32,
+            height: 32,
+            borderRadius: 8,
             backgroundColor: bgColor,
             alignItems: "center",
             justifyContent: "center",
@@ -462,16 +462,12 @@ export default function ProfileScreen() {
                   <CheckCircle size={14} color={C.success} strokeWidth={ICON.strokeWidth} />
                 </View>
               ) : null}
-              {profile?.trustScore != null ? (
-                <Animated.View entering={ZoomIn.springify().delay(200)} style={{ marginTop: 10 }}>
-                  <TrustBadge score={profile.trustScore} />
-                </Animated.View>
-              ) : null}
+
             </Animated.View>
 
             {/* Credits card - simple dark background */}
             <Animated.View entering={FadeInDown.delay(60).springify()} className="mx-5 mb-5" testID="credits-card">
-              <View style={{
+              <Pressable onPress={handleBuyCreditsPress} style={{
                 backgroundColor: C.dark, borderRadius: RADIUS.lg, padding: 22,
                 ...SHADOW.card,
               }}>
@@ -503,171 +499,7 @@ export default function ProfileScreen() {
                     {"Visa historik →"}
                   </Text>
                 </Pressable>
-              </View>
-            </Animated.View>
-
-            <Animated.View
-              entering={FadeInDown.delay(120).springify()}
-              className="mx-5 mb-5"
-              testID="trust-card"
-            >
-              <View
-                style={{
-                  backgroundColor: C.bgCard,
-                  borderRadius: RADIUS.xl,
-                  borderWidth: 0.5,
-                  borderColor: C.borderLight,
-                  padding: SPACING.lg,
-                  ...SHADOW.card,
-                }}
-              >
-                <Text
-                  testID="section-trust"
-                  style={{
-                    fontFamily: FONTS.semiBold,
-                    fontSize: 14,
-                    color: C.textTertiary,
-                    letterSpacing: 0.5,
-                    textTransform: "uppercase",
-                    marginBottom: SPACING.md,
-                  }}
-                >
-                  Tillitsprofil
-                </Text>
-
-                {/* Trust score overview */}
-                <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 20, gap: 16 }}>
-                  <View style={{ width: 72, height: 72, borderRadius: 36, backgroundColor: C.coralLight, alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: C.coral }}>
-                    <Text testID="trust-score" style={{ fontFamily: FONTS.bold, fontSize: 28, color: C.coral, letterSpacing: -1 }}>
-                      {Math.min(100, Math.round((completedCount * 25) + (cancelledCount >= 1 ? 10 : 0) + (completedCount >= 3 ? 15 : 0)))}
-                    </Text>
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ fontFamily: FONTS.displayBold, fontSize: 16, color: C.textPrimary, letterSpacing: -0.2 }}>
-                      Trust Score
-                    </Text>
-                    <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textTertiary, marginTop: 2, lineHeight: 18 }}>
-                      Baserat på genomförda bokningar, avbokningar i tid och aktivitet
-                    </Text>
-                  </View>
-                </View>
-
-                {/* Score bar */}
-                <View style={{ height: 6, backgroundColor: C.bgInput, borderRadius: 3, marginBottom: 20, overflow: "hidden" }}>
-                  <View style={{ height: "100%", width: `${Math.min(100, Math.round((completedCount * 25) + (cancelledCount >= 1 ? 10 : 0) + (completedCount >= 3 ? 15 : 0)))}%`, backgroundColor: C.coral, borderRadius: 3 }} />
-                </View>
-
-                <View style={{ gap: 14 }}>
-                  {/* Genomförda bokningar */}
-                  <View className="flex-row items-center" style={{ gap: 12 }}>
-                    <View
-                      style={{
-                        width: 38,
-                        height: 38,
-                        borderRadius: 11,
-                        backgroundColor: C.successLight,
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <ShieldCheck size={18} color={C.success} strokeWidth={2} />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textTertiary }}>
-                        Genomförda bokningar
-                      </Text>
-                      <Text style={{ fontFamily: FONTS.regular, fontSize: 11, color: C.success }}>
-                        +25 poäng per bokning
-                      </Text>
-                    </View>
-                    <Text
-                      testID="completed-count"
-                      style={{ fontFamily: FONTS.bold, fontSize: 20, color: C.textPrimary, letterSpacing: -0.3 }}
-                    >
-                      {completedCount}
-                    </Text>
-                  </View>
-
-                  <View style={{ height: 0.5, backgroundColor: C.divider }} />
-
-                  {/* Avbokade i tid */}
-                  <View className="flex-row items-center" style={{ gap: 12 }}>
-                    <View
-                      style={{
-                        width: 38,
-                        height: 38,
-                        borderRadius: 11,
-                        backgroundColor: "rgba(201, 169, 110, 0.12)",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <Clock size={18} color={C.gold} strokeWidth={2} />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textTertiary }}>
-                        Avbokade i tid
-                      </Text>
-                      <Text style={{ fontFamily: FONTS.regular, fontSize: 11, color: C.gold }}>
-                        +10 poäng bonus
-                      </Text>
-                    </View>
-                    <Text
-                      testID="cancelled-count"
-                      style={{ fontFamily: FONTS.bold, fontSize: 20, color: C.textPrimary, letterSpacing: -0.3 }}
-                    >
-                      {cancelledCount}
-                    </Text>
-                  </View>
-
-                  <View style={{ height: 0.5, backgroundColor: C.divider }} />
-
-                  {/* Uteblivna */}
-                  <View className="flex-row items-center" style={{ gap: 12 }}>
-                    <View
-                      style={{
-                        width: 38,
-                        height: 38,
-                        borderRadius: 11,
-                        backgroundColor: C.coralLight,
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <AlertTriangle size={18} color={C.coral} strokeWidth={2} />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textTertiary }}>
-                        Uteblivna
-                      </Text>
-                      <Text style={{ fontFamily: FONTS.regular, fontSize: 11, color: C.error }}>
-                        −30 poäng per utebliven
-                      </Text>
-                    </View>
-                    <Text
-                      testID="noshow-count"
-                      style={{ fontFamily: FONTS.bold, fontSize: 20, color: C.textPrimary, letterSpacing: -0.3 }}
-                    >
-                      0
-                    </Text>
-                  </View>
-                </View>
-
-                {memberSince ? (
-                  <Text
-                    testID="member-since"
-                    style={{
-                      fontFamily: FONTS.regular,
-                      fontSize: 12,
-                      color: C.textTertiary,
-                      marginTop: SPACING.md,
-                      textAlign: "center",
-                    }}
-                  >
-                    Medlem sedan {memberSince}
-                  </Text>
-                ) : null}
-              </View>
+              </Pressable>
             </Animated.View>
 
             {/* Quick booking stats */}
@@ -700,6 +532,45 @@ export default function ProfileScreen() {
                   <Text style={{ fontFamily: FONTS.displayBold, fontSize: 22, color: "#7EC87A" }}>{savedCount}</Text>
                   <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textSecondary, marginTop: 2 }}>Sparade</Text>
                 </Pressable>
+              </View>
+            </Animated.View>
+
+            {/* Senaste aktivitet */}
+            <Animated.View entering={FadeInDown.delay(165).springify()} className="mx-5 mb-5" testID="recent-activity-section">
+              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textTertiary, letterSpacing: 0.8, textTransform: "uppercase", marginBottom: SPACING.sm, paddingHorizontal: 4 }}>
+                Senaste aktivitet
+              </Text>
+              <View style={{ backgroundColor: "#fff", borderRadius: RADIUS.lg, padding: 16, borderWidth: 0.5, borderColor: C.borderLight, ...SHADOW.card }}>
+                {myReservations.length === 0 ? (
+                  <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textTertiary, textAlign: "center", paddingVertical: 12 }}>
+                    Ingen aktivitet ännu
+                  </Text>
+                ) : (
+                  [...myReservations]
+                    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                    .slice(0, 3)
+                    .map((r, i, arr) => (
+                      <View key={r.id} style={{ flexDirection: "row", alignItems: "center", paddingVertical: 10, borderBottomWidth: i < arr.length - 1 ? 0.5 : 0, borderBottomColor: C.divider }}>
+                        <View style={{ flex: 1 }}>
+                          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.textPrimary }}>{r.restaurant?.name ?? "Restaurang"}</Text>
+                          <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary, marginTop: 2 }}>
+                            {new Date(r.reservationDate).toLocaleDateString("sv-SE", { day: "numeric", month: "short" })}
+                          </Text>
+                        </View>
+                        <View style={{
+                          backgroundColor: r.status === "completed" || r.status === "claimed" ? C.successLight : r.status === "cancelled" ? "rgba(239,68,68,0.1)" : "rgba(245,158,11,0.12)",
+                          paddingHorizontal: 8, paddingVertical: 3, borderRadius: RADIUS.sm,
+                        }}>
+                          <Text style={{
+                            fontFamily: FONTS.bold, fontSize: 11,
+                            color: r.status === "completed" || r.status === "claimed" ? C.success : r.status === "cancelled" ? C.error : "#F59E0B",
+                          }}>
+                            {r.status === "completed" ? "Genomförd" : r.status === "claimed" ? "Övertagen" : r.status === "cancelled" ? "Avbokad" : r.status === "active" ? "Aktiv" : r.status === "grace_period" ? "Ångerfrist" : "Utgången"}
+                          </Text>
+                        </View>
+                      </View>
+                    ))
+                )}
               </View>
             </Animated.View>
 
@@ -773,24 +644,24 @@ export default function ProfileScreen() {
                 <MenuItem
                   icon={UserPlus}
                   label="Bjud in vän"
-                  color={C.gold}
-                  bgColor="rgba(201, 169, 110, 0.12)"
+                  color="#F59E0B"
+                  bgColor="rgba(245, 158, 11, 0.12)"
                   onPress={handleInvitePress}
                   index={0}
                 />
                 <MenuItem
                   icon={CreditCard}
                   label="Betalningar"
-                  color={C.textSecondary}
-                  bgColor="rgba(107, 114, 128, 0.1)"
+                  color="#9CA3AF"
+                  bgColor="rgba(156, 163, 175, 0.12)"
                   onPress={handlePaymentPress}
                   index={1}
                 />
                 <MenuItem
                   icon={Shield}
                   label="Ansvarspolicy"
-                  color={C.warning}
-                  bgColor="rgba(245, 158, 11, 0.10)"
+                  color="#F59E0B"
+                  bgColor="rgba(245, 158, 11, 0.12)"
                   onPress={() => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     setShowLiabilityPolicy(true);
@@ -800,9 +671,9 @@ export default function ProfileScreen() {
                 <MenuItem
                   icon={HelpCircle}
                   label="Hjälp"
-                  color={C.gold}
-                  bgColor="rgba(201, 169, 110, 0.1)"
-                  onPress={handleSupportPress}
+                  color="#F59E0B"
+                  bgColor="rgba(245, 158, 11, 0.12)"
+                  onPress={() => router.push("/faq")}
                   index={3}
                 />
                 <MenuItem
@@ -823,21 +694,6 @@ export default function ProfileScreen() {
               className="mx-5 mb-5"
               testID="legal-section"
             >
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginBottom: SPACING.sm, paddingHorizontal: 4 }}>
-                <ShieldCheck size={14} color={C.textTertiary} strokeWidth={2} />
-                <Text
-                  testID="section-legal"
-                  style={{
-                    fontFamily: FONTS.semiBold,
-                    fontSize: 12,
-                    color: C.textTertiary,
-                    letterSpacing: 0.8,
-                    textTransform: "uppercase",
-                  }}
-                >
-                  Juridiskt
-                </Text>
-              </View>
               <View
                 className="rounded-2xl px-5"
                 style={{

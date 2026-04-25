@@ -1377,14 +1377,14 @@ export default function SubmitScreen() {
                     Avbokningsfönster (timmar)
                   </Text>
                   <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary, marginBottom: 8 }}>
-                    Antal timmar innan bokningstillfället som avbokning måste ske. Om sen avbokning sker övergår betalningsansvaret till den som tagit över bokningen.
+                    Inom hur många timmar före bokningen kan gästen avboka gratis?
                   </Text>
                   <TextInput
                     testID="cancellation-window-input"
                     value={cancellationWindowHours}
                     onChangeText={(v) => setField("cancellationWindowHours", v)}
                     keyboardType="numeric"
-                    placeholder="t.ex. 24"
+                    placeholder="24"
                     placeholderTextColor="#D1D5DB"
                     style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.md, paddingHorizontal: 16, paddingVertical: 13, fontFamily: FONTS.regular, fontSize: 15, color: C.dark, borderWidth: 0.5, borderColor: C.divider }}
                   />
