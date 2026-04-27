@@ -529,12 +529,24 @@ export default function SubmitScreen() {
       <SafeAreaView edges={["top"]} style={{ backgroundColor: C.bg }}>
         <Animated.View entering={FadeInDown.springify()} className="px-5 pt-2 pb-1">
           <Text
+            style={{
+              fontFamily: FONTS.semiBold,
+              fontSize: 11,
+              letterSpacing: 1.2,
+              textTransform: "uppercase",
+              color: C.textTertiary,
+              marginBottom: 4,
+            }}
+          >
+            Hjälp någon ikväll
+          </Text>
+          <Text
             testID="submit-header"
             style={{
               fontFamily: FONTS.displayBold,
-              fontSize: 24,
+              fontSize: 32,
               color: C.dark,
-              letterSpacing: -0.5,
+              letterSpacing: -1.0,
             }}
           >
             Lägg upp bokning
