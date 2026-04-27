@@ -30,3 +30,9 @@ export type { TagProps, TagVariant, TagStyle, TagSize } from "./Tag";
 
 export { ListItem } from "./ListItem";
 export type { ListItemProps, ListItemDensity } from "./ListItem";
+
+export { Avatar, AvatarGroup } from "./Avatar";
+export type { AvatarProps, AvatarGroupProps, AvatarSize } from "./Avatar";
+
+export { EmptyState } from "./EmptyState";
+export type { EmptyStateProps } from "./EmptyState";
