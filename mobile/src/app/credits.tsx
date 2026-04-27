@@ -179,10 +179,22 @@ export default function CreditsScreen() {
         >
           <Text
             style={{
+              fontFamily: FONTS.semiBold,
+              fontSize: 11,
+              letterSpacing: 1.2,
+              textTransform: "uppercase",
+              color: C.textTertiary,
+              marginBottom: 4,
+            }}
+          >
+            Saldo & paket
+          </Text>
+          <Text
+            style={{
               fontFamily: FONTS.displayBold,
-              fontSize: 28,
+              fontSize: 32,
               color: C.textPrimary,
-              letterSpacing: -0.8,
+              letterSpacing: -1.0,
             }}
           >
             Reslot credits
