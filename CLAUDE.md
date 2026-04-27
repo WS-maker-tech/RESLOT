@@ -1,5 +1,7 @@
 # Reslot — Claude Code Instructions
 
+> **🔑 Start här:** Läs `RESLOT-VAULT.md` i repo-roten först. Den innehåller full kontext, deploy-flöde, gotchas, stream-timeout-regel och pågående arbete. Denna fil (`CLAUDE.md`) är en kondenserad version.
+
 ## Project
 Reslot är en Expo React Native-app (web-build) + Vercel serverless API för ett andrahandsmarknadsplats av restaurangbokningar — användare kan lägga upp och ta över bokningar med credits.
 
