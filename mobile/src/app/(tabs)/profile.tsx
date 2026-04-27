@@ -431,10 +431,10 @@ export default function ProfileScreen() {
                 testID="profile-display-name"
                 style={{
                   fontFamily: FONTS.displayBold,
-                  fontSize: 22,
+                  fontSize: 30,
                   color: C.textPrimary,
                   marginTop: 14,
-                  letterSpacing: -0.5,
+                  letterSpacing: -0.9,
                 }}
               >
                 {displayName}
