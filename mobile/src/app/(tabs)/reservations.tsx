@@ -653,12 +653,24 @@ export default function ReservationsScreen() {
       <SafeAreaView edges={["top"]} style={{ backgroundColor: C.bg }}>
         <View className="px-5 pt-2 pb-4">
           <Text
+            style={{
+              fontFamily: FONTS.semiBold,
+              fontSize: 11,
+              letterSpacing: 1.2,
+              textTransform: "uppercase",
+              color: C.textTertiary,
+              marginBottom: 4,
+            }}
+          >
+            Översikt
+          </Text>
+          <Text
             testID="reservations-header"
             style={{
               fontFamily: FONTS.displayBold,
-              fontSize: 24,
+              fontSize: 32,
               color: C.textPrimary,
-              letterSpacing: -0.5,
+              letterSpacing: -1.0,
             }}
           >
             Mina bokningar
