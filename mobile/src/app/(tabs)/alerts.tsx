@@ -405,25 +405,7 @@ export default function AlertsScreen() {
               </Text>
             ) : null}
           </View>
-          {activeTab === "activity" ? (
-            <Pressable
-              testID="mark-all-read-button"
-              accessibilityLabel="Markera alla händelser som lästa"
-              onPress={handleMarkAllRead}
-              className="rounded-full px-3.5 py-2"
-              style={{ backgroundColor: "rgba(0,0,0,0.04)" }}
-            >
-              <Text
-                style={{
-                  fontFamily: FONTS.medium,
-                  fontSize: 12,
-                  color: C.textSecondary,
-                }}
-              >
-                Markera alla som lästa
-              </Text>
-            </Pressable>
-          ) : null}
+
         </View>
         {/* Tab navigation */}
         <View style={{ flexDirection: "row", backgroundColor: "rgba(0,0,0,0.05)", borderRadius: RADIUS.md, padding: 3, marginHorizontal: SPACING.lg, marginBottom: SPACING.sm }}>

@@ -24,6 +24,7 @@ import {
   X,
   Send,
   UtensilsCrossed,
+  Upload,
 } from "lucide-react-native";
 import { useAuthStore } from "@/lib/auth-store";
 import { LoginGate } from "@/components/LoginGate";
@@ -714,7 +715,7 @@ export default function ReservationsScreen() {
               {submittedReservations.length === 0 ? (
                 <Animated.View entering={FadeInDown.delay(100).springify()} style={{ paddingHorizontal: SPACING.lg, paddingVertical: 32, alignItems: "center" }}>
                   <Animated.View entering={ZoomIn.springify().delay(150)} style={{ width: 64, height: 64, borderRadius: 20, backgroundColor: C.coralLight, alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
-                    <Text style={{ fontSize: 28 }}>📤</Text>
+                    <Upload size={28} color={C.coral} strokeWidth={1.5} />
                   </Animated.View>
                   <Animated.View entering={FadeInDown.delay(200).springify()}>
                     <Text style={{ fontFamily: FONTS.displayBold, fontSize: 17, color: C.textPrimary, textAlign: "center", letterSpacing: -0.2 }}>Lägg upp din första bokning</Text>
