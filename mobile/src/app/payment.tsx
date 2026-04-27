@@ -70,7 +70,7 @@ export default function PaymentScreen() {
 
         {/* Existing card status */}
         {cardLoading ? (
-          <ActivityIndicator size="small" color={C.coral} style={{ marginBottom: 20 }} />
+          <ActivityIndicator size="small" color={C.pistachio} style={{ marginBottom: 20 }} />
         ) : cardStatus?.hasCard ? (
           <Animated.View entering={FadeInDown.delay(40).springify()} style={{ marginBottom: 20 }}>
             <View style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.lg, padding: SPACING.md, borderWidth: 0.5, borderColor: C.divider, ...SHADOW.card }}>

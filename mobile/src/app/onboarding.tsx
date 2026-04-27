@@ -53,7 +53,7 @@ const SCREEN_H = Platform.OS === "web" ? Math.min(_INIT_H, 932) : _INIT_H;
 // --- Colors ---
 const C = {
   ...ThemeC,
-  orange: ThemeC.coral,
+  orange: ThemeC.pistachio,
   text: ThemeC.textPrimary,
   gray: ThemeC.textSecondary,
   grayLight: ThemeC.textTertiary,
@@ -281,7 +281,7 @@ function PrimaryButton({
           scale.value = withSpring(1, SPRING_PRESS_OUT);
         }}
         style={{
-          backgroundColor: disabled ? C.coralPressed : C.orange,
+          backgroundColor: disabled ? C.pistachioPressed : C.orange,
           borderRadius: 28,
           paddingVertical: 17,
           alignItems: "center",
@@ -678,8 +678,8 @@ function PhoneStep({
                 height: 24,
                 borderRadius: 7,
                 borderWidth: 1.5,
-                borderColor: agreed ? C.coral : "rgba(0,0,0,0.18)",
-                backgroundColor: agreed ? C.coral : "transparent",
+                borderColor: agreed ? C.pistachio : "rgba(0,0,0,0.18)",
+                backgroundColor: agreed ? C.pistachio : "transparent",
                 alignItems: "center",
                 justifyContent: "center",
                 marginTop: 1,
@@ -906,7 +906,7 @@ function OTPStep({
                     fontSize: 22,
                     color: hasError ? C.error : C.text,
                     borderWidth: digit ? 1.5 : 0,
-                    borderColor: hasError ? "rgba(239,68,68,0.25)" : digit ? C.coralPressed : "transparent",
+                    borderColor: hasError ? "rgba(239,68,68,0.25)" : digit ? C.pistachioPressed : "transparent",
                   }}
                 />
               </React.Fragment>
@@ -1267,7 +1267,7 @@ function CityCard({
           alignItems: "center",
           paddingVertical: 16,
           paddingHorizontal: 16,
-          backgroundColor: isSelected ? C.coralLight : C.bgCard,
+          backgroundColor: isSelected ? C.pistachioLight : C.bgCard,
           borderRadius: 16,
           borderWidth: 1.5,
           borderColor: isSelected ? C.orange : C.divider,
@@ -1279,7 +1279,7 @@ function CityCard({
             width: 44,
             height: 44,
             borderRadius: 12,
-            backgroundColor: isSelected ? C.coralLight : "rgba(0,0,0,0.03)",
+            backgroundColor: isSelected ? C.pistachioLight : "rgba(0,0,0,0.03)",
             alignItems: "center",
             justifyContent: "center",
           }}
@@ -1338,7 +1338,7 @@ function CreditsIntroStep({ onContinue, onBack }: { onContinue: () => void; onBa
   const rows = [
     {
       icon: Upload,
-      iconBg: C.coralLight,
+      iconBg: C.pistachioLight,
       iconColor: C.orange,
       title: "Ledigtt bord? Lägg upp det.",
       subtitle: "Tar 30 sekunder. Borden hittar nya ägare.",
@@ -1365,7 +1365,7 @@ function CreditsIntroStep({ onContinue, onBack }: { onContinue: () => void; onBa
       title: "Snappa ett bord",
       subtitle: "Använd dina credits. Ta bordet. Njut av kvällen.",
       badge: "−2 credits",
-      badgeBg: C.coralLight,
+      badgeBg: C.pistachioLight,
       badgeColor: C.orange,
       step: 2,
     },
@@ -1735,7 +1735,7 @@ function WelcomeStep({ onContinue, firstName, cityName }: { onContinue: () => vo
                 width: 130,
                 height: 130,
                 borderRadius: 65,
-                backgroundColor: C.coralLight,
+                backgroundColor: C.pistachioLight,
                 alignItems: "center",
                 justifyContent: "center",
               }}
@@ -1745,7 +1745,7 @@ function WelcomeStep({ onContinue, firstName, cityName }: { onContinue: () => vo
                   width: 96,
                   height: 96,
                   borderRadius: 48,
-                  backgroundColor: C.coralPressed,
+                  backgroundColor: C.pistachioPressed,
                   alignItems: "center",
                   justifyContent: "center",
                 }}

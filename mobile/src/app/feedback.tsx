@@ -311,7 +311,7 @@ export default function FeedbackScreen() {
                 onPress={handleSubmit}
                 disabled={mutation.isPending}
                 style={{
-                  backgroundColor: C.coral,
+                  backgroundColor: C.pistachio,
                   borderRadius: RADIUS.md,
                   paddingVertical: 15,
                   alignItems: "center",

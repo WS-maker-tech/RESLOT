@@ -76,9 +76,9 @@ function MiniSpinner({ color }: { color: string }) {
   );
 }
 
-function CreditBadge({ label, color }: { label: string; color: "green" | "coral" }) {
-  const bgColor = color === "green" ? C.successLight : C.coralLight;
-  const textColor = color === "green" ? C.success : C.coral;
+function CreditBadge({ label, color }: { label: string; color: "green" | "pistachio" }) {
+  const bgColor = color === "green" ? C.successLight : C.pistachioLight;
+  const textColor = color === "green" ? C.success : C.pistachio;
   return (
     <View
       style={{
@@ -158,12 +158,12 @@ export default function CreditsScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }} edges={["top", "bottom"]}>
       {profileError ? (
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 32 }}>
-          <View style={{ width: 56, height: 56, borderRadius: RADIUS.lg, backgroundColor: C.coralLight, alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
-            <AlertCircle size={24} color={C.coral} strokeWidth={ICON.strokeWidth} />
+          <View style={{ width: 56, height: 56, borderRadius: RADIUS.lg, backgroundColor: C.pistachioLight, alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
+            <AlertCircle size={24} color={C.pistachio} strokeWidth={ICON.strokeWidth} />
           </View>
           <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.textPrimary, marginBottom: 4 }}>Något gick fel</Text>
           <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textTertiary, textAlign: "center", marginBottom: 20 }}>Kunde inte ladda credits. Försök igen senare.</Text>
-          <Pressable onPress={() => profileRefetch()} style={{ backgroundColor: C.coral, borderRadius: RADIUS.md, paddingVertical: 12, paddingHorizontal: 28 }}>
+          <Pressable onPress={() => profileRefetch()} style={{ backgroundColor: C.pistachio, borderRadius: RADIUS.md, paddingVertical: 12, paddingHorizontal: 28 }}>
             <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.dark }}>Försök igen</Text>
           </Pressable>
         </View>
@@ -227,7 +227,7 @@ export default function CreditsScreen() {
                 width: 100,
                 height: 100,
                 borderRadius: 50,
-                backgroundColor: C.coralLight,
+                backgroundColor: C.pistachioLight,
               }}
             />
 
@@ -320,12 +320,12 @@ export default function CreditsScreen() {
                     width: 40,
                     height: 40,
                     borderRadius: RADIUS.md,
-                    backgroundColor: C.coralLight,
+                    backgroundColor: C.pistachioLight,
                     alignItems: "center",
                     justifyContent: "center",
                   }}
                 >
-                  <Upload size={20} color={C.coral} strokeWidth={2} />
+                  <Upload size={20} color={C.pistachio} strokeWidth={2} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text
@@ -366,12 +366,12 @@ export default function CreditsScreen() {
                     width: 40,
                     height: 40,
                     borderRadius: RADIUS.md,
-                    backgroundColor: C.coralLight,
+                    backgroundColor: C.pistachioLight,
                     alignItems: "center",
                     justifyContent: "center",
                   }}
                 >
-                  <ArrowDownLeft size={20} color={C.coral} strokeWidth={2} />
+                  <ArrowDownLeft size={20} color={C.pistachio} strokeWidth={2} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text
@@ -385,7 +385,7 @@ export default function CreditsScreen() {
                     Ta över en bokning
                   </Text>
                 </View>
-                <CreditBadge label="-2 credits" color="coral" />
+                <CreditBadge label="-2 credits" color="pistachio" />
               </View>
             </Animated.View>
           </View>
@@ -450,7 +450,7 @@ export default function CreditsScreen() {
                     </View>
                   ) : null}
                   {buyingQuantity === qty ? (
-                    <MiniSpinner color={C.coral} />
+                    <MiniSpinner color={C.pistachio} />
                   ) : (
                     <Text
                       style={{
@@ -518,12 +518,12 @@ export default function CreditsScreen() {
                     width: 40,
                     height: 40,
                     borderRadius: RADIUS.md,
-                    backgroundColor: C.coralLight,
+                    backgroundColor: C.pistachioLight,
                     alignItems: "center",
                     justifyContent: "center",
                   }}
                 >
-                  <UserPlus size={20} color={C.coral} strokeWidth={2} />
+                  <UserPlus size={20} color={C.pistachio} strokeWidth={2} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text
@@ -568,12 +568,12 @@ export default function CreditsScreen() {
                     width: 40,
                     height: 40,
                     borderRadius: RADIUS.md,
-                    backgroundColor: C.coralLight,
+                    backgroundColor: C.pistachioLight,
                     alignItems: "center",
                     justifyContent: "center",
                   }}
                 >
-                  <Upload size={20} color={C.coral} strokeWidth={2} />
+                  <Upload size={20} color={C.pistachio} strokeWidth={2} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text

@@ -269,14 +269,14 @@ const Header = React.memo(function Header({
             style={{
               fontFamily: FONTS.displayBold,
               fontSize: 20,
-              color: C.coral,
+              color: C.pistachio,
               letterSpacing: -0.5,
               opacity: 0.9,
             }}
           >
             {selectedCity}
           </Text>
-          <ChevronDown size={14} color={C.coral} strokeWidth={ICON.strokeWidth} style={{ marginLeft: 2 }} />
+          <ChevronDown size={14} color={C.pistachio} strokeWidth={ICON.strokeWidth} style={{ marginLeft: 2 }} />
         </Pressable>
 
         <View className="flex-row items-center" style={{ gap: 6 }}>
@@ -577,7 +577,7 @@ const MissedBookingCard = React.memo(function MissedBookingCard({
             <View
               style={{
                 marginTop: 10,
-                backgroundColor: C.coral,
+                backgroundColor: C.pistachio,
                 borderRadius: 10,
                 paddingVertical: 8,
                 alignItems: "center",
@@ -674,7 +674,7 @@ function MissedBookingsSection({ city }: { city: string }) {
             router.push("/add-watch");
           }}
           style={{
-            backgroundColor: C.coral,
+            backgroundColor: C.pistachio,
             borderRadius: 10,
             paddingHorizontal: 12,
             paddingVertical: 7,
@@ -949,12 +949,12 @@ function CalendarModal({
                     <View style={{
                       width: 36, height: 36, borderRadius: 18,
                       alignItems: "center", justifyContent: "center",
-                      backgroundColor: isSelected ? C.coral : isToday ? C.coralLight : "transparent",
+                      backgroundColor: isSelected ? C.pistachio : isToday ? C.pistachioLight : "transparent",
                     }}>
                       <Text style={{
                         fontFamily: isSelected ? FONTS.bold : FONTS.medium,
                         fontSize: 15,
-                        color: isSelected ? C.dark : isPast ? "#D1D5DB" : isToday ? C.coral : C.dark,
+                        color: isSelected ? C.dark : isPast ? "#D1D5DB" : isToday ? C.pistachio : C.dark,
                       }}>
                         {date.getDate()}
                       </Text>
@@ -1088,14 +1088,14 @@ function CityPickerModal({
                       style={{
                         fontFamily: FONTS.displaySemiBold,
                         fontSize: 16,
-                        color: isSelected ? C.coral : C.dark,
+                        color: isSelected ? C.pistachio : C.dark,
                         letterSpacing: -0.2,
                       }}
                     >
                       {city}
                     </Text>
                     {isSelected ? (
-                      <Check size={18} color={C.coral} strokeWidth={ICON.strokeWidth} />
+                      <Check size={18} color={C.pistachio} strokeWidth={ICON.strokeWidth} />
                     ) : null}
                   </Pressable>
                   {!isLast ? (
@@ -1373,7 +1373,7 @@ export default function HomeScreen() {
             testID="home-refresh-control"
             refreshing={isRefetching}
             onRefresh={refetch}
-            tintColor={C.coral}
+            tintColor={C.pistachio}
           />
         }
         ListHeaderComponent={
@@ -1460,7 +1460,7 @@ export default function HomeScreen() {
               </View>
             ) : reservationsError ? (
               <View testID="error-state" style={{ alignItems: "center", justifyContent: "center", paddingTop: 60 }}>
-                <AlertCircle size={40} color={C.coral} strokeWidth={ICON.strokeWidth} />
+                <AlertCircle size={40} color={C.pistachio} strokeWidth={ICON.strokeWidth} />
                 <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.dark, marginTop: 12 }}>
                   Något gick fel
                 </Text>
@@ -1473,7 +1473,7 @@ export default function HomeScreen() {
                   onPress={() => refetch()}
                   style={{
                     marginTop: 16,
-                    backgroundColor: C.coral,
+                    backgroundColor: C.pistachio,
                     borderRadius: RADIUS.md,
                     paddingHorizontal: 24,
                     paddingVertical: 12,
@@ -1510,7 +1510,7 @@ export default function HomeScreen() {
                   width: 88,
                   height: 88,
                   borderRadius: 44,
-                  backgroundColor: C.coralLight,
+                  backgroundColor: C.pistachioLight,
                   alignItems: "center",
                   justifyContent: "center",
                   marginBottom: 24,
@@ -1574,7 +1574,7 @@ export default function HomeScreen() {
                   }}
                   style={{
                     marginTop: 24,
-                    backgroundColor: C.coral,
+                    backgroundColor: C.pistachio,
                     borderRadius: RADIUS.md,
                     paddingVertical: 14,
                     paddingHorizontal: 28,

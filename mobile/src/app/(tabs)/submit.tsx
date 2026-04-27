@@ -103,7 +103,7 @@ function WebDatePicker({ value, onChange }: { value: Date; onChange: (d: Date) =
           {cells.slice(row*7, row*7+7).map((d, i) => (
             <Pressable key={i} accessibilityLabel={d ? `Välj dag ${d}` : undefined} onPress={() => { if (!d || isPast(d)) return; Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); const next = new Date(value); next.setFullYear(year, month, d); onChange(next); }}
               style={{ flex: 1, height: 38, alignItems: "center", justifyContent: "center",
-                backgroundColor: d && isSelected(d) ? C.coral : "transparent",
+                backgroundColor: d && isSelected(d) ? C.pistachio : "transparent",
                 borderRadius: 19, opacity: d && isPast(d) ? 0.3 : 1 }}>
               {d ? <Text style={{ fontFamily: isSelected(d) ? FONTS.semiBold : FONTS.regular, fontSize: 14,
                 color: isSelected(d) ? C.dark : C.dark }}>{d}</Text> : null}
@@ -132,7 +132,7 @@ function WebTimePicker({ value, onChange }: { value: Date; onChange: (d: Date) =
         return (
           <Pressable key={t} accessibilityLabel={`Välj tid ${t}`} onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); const [h,m] = t.split(":").map(Number); const next = new Date(value); next.setHours(h!,m!,0,0); onChange(next); }}
             style={{ paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20,
-              backgroundColor: selected ? C.coral : "rgba(0,0,0,0.05)" }}>
+              backgroundColor: selected ? C.pistachio : "rgba(0,0,0,0.05)" }}>
             <Text style={{ fontFamily: selected ? FONTS.semiBold : FONTS.regular, fontSize: 14,
               color: selected ? C.dark : C.textSecondary }}>{t}</Text>
           </Pressable>
@@ -564,7 +564,7 @@ export default function SubmitScreen() {
             <Animated.View
               style={[
                 progressBarStyle,
-                { height: 2, backgroundColor: C.coral, borderRadius: 2 },
+                { height: 2, backgroundColor: C.pistachio, borderRadius: 2 },
               ]}
             />
           </View>
@@ -579,7 +579,7 @@ export default function SubmitScreen() {
               style={{
                 fontFamily: FONTS.semiBold,
                 fontSize: 11,
-                color: C.coral,
+                color: C.pistachio,
               }}
             >
               {STEP_LABELS[step]}
@@ -630,7 +630,7 @@ export default function SubmitScreen() {
                   borderRadius: RADIUS.md,
                   paddingHorizontal: 16,
                   borderWidth: 1,
-                  borderColor: searchQuery.length > 0 ? C.coralPressed : C.borderLight,
+                  borderColor: searchQuery.length > 0 ? C.pistachioPressed : C.borderLight,
                   ...SHADOW.card,
                 }}
               >
@@ -672,7 +672,7 @@ export default function SubmitScreen() {
                           paddingHorizontal: 16,
                           paddingVertical: 14,
                           borderWidth: 1.5,
-                          borderColor: isSelected ? C.coral : "rgba(0,0,0,0.05)",
+                          borderColor: isSelected ? C.pistachio : "rgba(0,0,0,0.05)",
                           flexDirection: "row",
                           alignItems: "center",
                         }}
@@ -682,7 +682,7 @@ export default function SubmitScreen() {
                             style={{
                               fontFamily: isSelected ? FONTS.semiBold : FONTS.medium,
                               fontSize: 15,
-                              color: isSelected ? C.coral : C.dark,
+                              color: isSelected ? C.pistachio : C.dark,
                             }}
                           >
                             {restaurant.name}
@@ -706,7 +706,7 @@ export default function SubmitScreen() {
                               width: 24,
                               height: 24,
                               borderRadius: 12,
-                              backgroundColor: C.coral,
+                              backgroundColor: C.pistachio,
                               alignItems: "center",
                               justifyContent: "center",
                             }}
@@ -749,7 +749,7 @@ export default function SubmitScreen() {
                     borderRadius: RADIUS.lg,
                     backgroundColor: location === "indoor" ? "rgba(224,106,78,0.06)" : C.bgCard,
                     borderWidth: 1.5,
-                    borderColor: location === "indoor" ? C.coral : "rgba(0,0,0,0.05)",
+                    borderColor: location === "indoor" ? C.pistachio : "rgba(0,0,0,0.05)",
                     alignItems: "center",
                     justifyContent: "center",
                     ...SHADOW.card,
@@ -757,7 +757,7 @@ export default function SubmitScreen() {
                 >
                   <Armchair
                     size={30}
-                    color={location === "indoor" ? C.coral : C.textTertiary}
+                    color={location === "indoor" ? C.pistachio : C.textTertiary}
                     strokeWidth={ICON.strokeWidth}
                     style={{ marginBottom: 8 }}
                   />
@@ -765,7 +765,7 @@ export default function SubmitScreen() {
                     style={{
                       fontFamily: location === "indoor" ? FONTS.bold : FONTS.semiBold,
                       fontSize: 16,
-                      color: location === "indoor" ? C.coral : C.dark,
+                      color: location === "indoor" ? C.pistachio : C.dark,
                     }}
                   >
                     Inomhus
@@ -786,7 +786,7 @@ export default function SubmitScreen() {
                     borderRadius: RADIUS.lg,
                     backgroundColor: location === "outdoor" ? "rgba(224,106,78,0.06)" : C.bgCard,
                     borderWidth: 1.5,
-                    borderColor: location === "outdoor" ? C.coral : "rgba(0,0,0,0.05)",
+                    borderColor: location === "outdoor" ? C.pistachio : "rgba(0,0,0,0.05)",
                     alignItems: "center",
                     justifyContent: "center",
                     ...SHADOW.card,
@@ -794,7 +794,7 @@ export default function SubmitScreen() {
                 >
                   <Trees
                     size={30}
-                    color={location === "outdoor" ? C.coral : C.textTertiary}
+                    color={location === "outdoor" ? C.pistachio : C.textTertiary}
                     strokeWidth={ICON.strokeWidth}
                     style={{ marginBottom: 8 }}
                   />
@@ -802,7 +802,7 @@ export default function SubmitScreen() {
                     style={{
                       fontFamily: location === "outdoor" ? FONTS.bold : FONTS.semiBold,
                       fontSize: 16,
-                      color: location === "outdoor" ? C.coral : C.dark,
+                      color: location === "outdoor" ? C.pistachio : C.dark,
                     }}
                   >
                     Utomhus
@@ -837,12 +837,12 @@ export default function SubmitScreen() {
                         borderRadius: RADIUS.md,
                         backgroundColor: mealType === type ? "rgba(224,106,78,0.06)" : C.bgCard,
                         borderWidth: 1.5,
-                        borderColor: mealType === type ? C.coral : "rgba(0,0,0,0.05)",
+                        borderColor: mealType === type ? C.pistachio : "rgba(0,0,0,0.05)",
                         alignItems: "center",
                         ...SHADOW.card,
                       }}
                     >
-                      <Text style={{ fontFamily: mealType === type ? FONTS.bold : FONTS.semiBold, fontSize: 14, color: mealType === type ? C.coral : C.dark }}>
+                      <Text style={{ fontFamily: mealType === type ? FONTS.bold : FONTS.semiBold, fontSize: 14, color: mealType === type ? C.pistachio : C.dark }}>
                         {type.charAt(0).toUpperCase() + type.slice(1)}
                       </Text>
                     </Pressable>
@@ -1026,7 +1026,7 @@ export default function SubmitScreen() {
             <Animated.View entering={FadeInRight.duration(400)}>
               <Animated.View entering={FadeInDown.delay(0 * 50).springify()} className="mb-5">
                 <View className="flex-row items-center mb-3" style={{ gap: 8 }}>
-                  <User size={18} color={C.coral} strokeWidth={2} />
+                  <User size={18} color={C.pistachio} strokeWidth={2} />
                   <Text
                     style={{
                       fontFamily: FONTS.semiBold,
@@ -1056,7 +1056,7 @@ export default function SubmitScreen() {
                     paddingHorizontal: 16,
                     paddingVertical: 16,
                     borderWidth: 1,
-                    borderColor: validationErrors.firstName ? C.error : firstName.length > 0 ? C.coralPressed : C.borderLight,
+                    borderColor: validationErrors.firstName ? C.error : firstName.length > 0 ? C.pistachioPressed : C.borderLight,
                     ...SHADOW.card,
                   }}
                 />
@@ -1071,7 +1071,7 @@ export default function SubmitScreen() {
 
               <Animated.View entering={FadeInDown.delay(1 * 50).springify()} className="mb-5">
                 <View className="flex-row items-center mb-3" style={{ gap: 8 }}>
-                  <User size={18} color={C.coral} strokeWidth={2} />
+                  <User size={18} color={C.pistachio} strokeWidth={2} />
                   <Text
                     style={{
                       fontFamily: FONTS.semiBold,
@@ -1101,7 +1101,7 @@ export default function SubmitScreen() {
                     paddingHorizontal: 16,
                     paddingVertical: 16,
                     borderWidth: 1,
-                    borderColor: validationErrors.lastName ? C.error : lastName.length > 0 ? C.coralPressed : C.borderLight,
+                    borderColor: validationErrors.lastName ? C.error : lastName.length > 0 ? C.pistachioPressed : C.borderLight,
                     ...SHADOW.card,
                   }}
                 />
@@ -1134,7 +1134,7 @@ export default function SubmitScreen() {
 
               <Animated.View entering={FadeInDown.delay(3 * 50).springify()} style={{ paddingBottom: 16 }}>
                 <View className="flex-row items-center mb-3" style={{ gap: 8 }}>
-                  <Users size={18} color={C.coral} strokeWidth={2} />
+                  <Users size={18} color={C.pistachio} strokeWidth={2} />
                   <Text
                     style={{
                       fontFamily: FONTS.semiBold,
@@ -1205,12 +1205,12 @@ export default function SubmitScreen() {
                           width: 40,
                           height: 40,
                           borderRadius: RADIUS.md,
-                          backgroundColor: C.coralLight,
+                          backgroundColor: C.pistachioLight,
                           alignItems: "center",
                           justifyContent: "center",
                         }}
                       >
-                        <Banknote size={20} color={C.coral} strokeWidth={2} />
+                        <Banknote size={20} color={C.pistachio} strokeWidth={2} />
                       </View>
                       <View style={{ flex: 1 }}>
                         <Text
@@ -1242,7 +1242,7 @@ export default function SubmitScreen() {
                         if (!val) setField("cancelFeeAmount", "");
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                       }}
-                      trackColor={{ false: "#E5E5E0", true: C.coral }}
+                      trackColor={{ false: "#E5E5E0", true: C.pistachio }}
                       thumbColor=C.white
                     />
                   </View>
@@ -1331,7 +1331,7 @@ export default function SubmitScreen() {
                         if (!val) setField("prepaidFeeAmount", "");
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                       }}
-                      trackColor={{ false: "#E5E5E0", true: C.coral }}
+                      trackColor={{ false: "#E5E5E0", true: C.pistachio }}
                       thumbColor=C.white
                     />
                   </View>
@@ -1462,7 +1462,7 @@ export default function SubmitScreen() {
                   </Text>
                   <View style={{ gap: 8 }}>
                     <View className="flex-row items-center" style={{ gap: 10 }}>
-                      <CalendarDays size={15} color={C.coral} strokeWidth={2} />
+                      <CalendarDays size={15} color={C.pistachio} strokeWidth={2} />
                       <Text
                         style={{
                           fontFamily: FONTS.medium,
@@ -1474,7 +1474,7 @@ export default function SubmitScreen() {
                       </Text>
                     </View>
                     <View className="flex-row items-center" style={{ gap: 10 }}>
-                      <Clock size={15} color={C.coral} strokeWidth={2} />
+                      <Clock size={15} color={C.pistachio} strokeWidth={2} />
                       <Text
                         style={{
                           fontFamily: FONTS.medium,
@@ -1505,7 +1505,7 @@ export default function SubmitScreen() {
                     padding: SPACING.lg,
                     marginBottom: 12,
                     borderWidth: 1.5,
-                    borderColor: verifyMethod === "link" ? C.coral : "rgba(0,0,0,0.05)",
+                    borderColor: verifyMethod === "link" ? C.pistachio : "rgba(0,0,0,0.05)",
                     ...SHADOW.card,
                   }}
                 >
@@ -1516,7 +1516,7 @@ export default function SubmitScreen() {
                         height: 48,
                         borderRadius: RADIUS.md,
                         backgroundColor: verifyMethod === "link"
-                          ? C.coralLight
+                          ? C.pistachioLight
                           : "rgba(0,0,0,0.04)",
                         alignItems: "center",
                         justifyContent: "center",
@@ -1524,7 +1524,7 @@ export default function SubmitScreen() {
                     >
                       <Link
                         size={22}
-                        color={verifyMethod === "link" ? C.coral : C.textSecondary}
+                        color={verifyMethod === "link" ? C.pistachio : C.textSecondary}
                         strokeWidth={2}
                       />
                     </View>
@@ -1533,7 +1533,7 @@ export default function SubmitScreen() {
                         style={{
                           fontFamily: FONTS.semiBold,
                           fontSize: 16,
-                          color: verifyMethod === "link" ? C.coral : C.dark,
+                          color: verifyMethod === "link" ? C.pistachio : C.dark,
                         }}
                       >
                         Inbjudningslänk
@@ -1555,7 +1555,7 @@ export default function SubmitScreen() {
                           width: 24,
                           height: 24,
                           borderRadius: 12,
-                          backgroundColor: C.coral,
+                          backgroundColor: C.pistachio,
                           alignItems: "center",
                           justifyContent: "center",
                         }}
@@ -1583,7 +1583,7 @@ export default function SubmitScreen() {
                     padding: SPACING.lg,
                     marginBottom: 16,
                     borderWidth: 1.5,
-                    borderColor: verifyMethod === "screenshot" ? C.coral : "rgba(0,0,0,0.05)",
+                    borderColor: verifyMethod === "screenshot" ? C.pistachio : "rgba(0,0,0,0.05)",
                     ...SHADOW.card,
                   }}
                 >
@@ -1594,7 +1594,7 @@ export default function SubmitScreen() {
                         height: 48,
                         borderRadius: RADIUS.md,
                         backgroundColor: verifyMethod === "screenshot"
-                          ? C.coralLight
+                          ? C.pistachioLight
                           : "rgba(0,0,0,0.04)",
                         alignItems: "center",
                         justifyContent: "center",
@@ -1602,7 +1602,7 @@ export default function SubmitScreen() {
                     >
                       <Camera
                         size={22}
-                        color={verifyMethod === "screenshot" ? C.coral : C.textSecondary}
+                        color={verifyMethod === "screenshot" ? C.pistachio : C.textSecondary}
                         strokeWidth={2}
                       />
                     </View>
@@ -1611,7 +1611,7 @@ export default function SubmitScreen() {
                         style={{
                           fontFamily: FONTS.semiBold,
                           fontSize: 16,
-                          color: verifyMethod === "screenshot" ? C.coral : C.dark,
+                          color: verifyMethod === "screenshot" ? C.pistachio : C.dark,
                         }}
                       >
                         Skärmdump
@@ -1633,7 +1633,7 @@ export default function SubmitScreen() {
                           width: 24,
                           height: 24,
                           borderRadius: 12,
-                          backgroundColor: C.coral,
+                          backgroundColor: C.pistachio,
                           alignItems: "center",
                           justifyContent: "center",
                         }}
@@ -1675,7 +1675,7 @@ export default function SubmitScreen() {
                     style={{
                       borderWidth: 2,
                       borderStyle: "dashed",
-                      borderColor: C.coralPressed,
+                      borderColor: C.pistachioPressed,
                       borderRadius: RADIUS.lg,
                       paddingVertical: 28,
                       alignItems: "center",
@@ -1691,8 +1691,8 @@ export default function SubmitScreen() {
                       </>
                     ) : (
                       <>
-                        <Upload size={28} color={C.coral} strokeWidth={ICON.strokeWidth} />
-                        <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.coral, marginTop: 10 }}>Ladda upp bekräftelse</Text>
+                        <Upload size={28} color={C.pistachio} strokeWidth={ICON.strokeWidth} />
+                        <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.pistachio, marginTop: 10 }}>Ladda upp bekräftelse</Text>
                         <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary, marginTop: 4 }}>JPG eller PNG</Text>
                       </>
                     )}
@@ -1765,7 +1765,7 @@ export default function SubmitScreen() {
         {submissionError ? (
           <View
             style={{
-              backgroundColor: C.coralLight,
+              backgroundColor: C.pistachioLight,
               borderRadius: RADIUS.sm,
               padding: 10,
               marginBottom: 10,
@@ -1774,8 +1774,8 @@ export default function SubmitScreen() {
               gap: 8,
             }}
           >
-            <AlertCircle size={14} color={C.coral} strokeWidth={2} />
-            <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.coral, flex: 1 }}>
+            <AlertCircle size={14} color={C.pistachio} strokeWidth={2} />
+            <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.pistachio, flex: 1 }}>
               {submissionError}
             </Text>
           </View>
@@ -1816,13 +1816,13 @@ export default function SubmitScreen() {
               style={[
                 buttonStyle,
                 {
-                  backgroundColor: canAdvance() ? C.coral : C.coralPressed,
+                  backgroundColor: canAdvance() ? C.pistachio : C.pistachioPressed,
                   borderRadius: 26,
                   paddingVertical: 16,
                   alignItems: "center",
                   justifyContent: "center",
                   flexDirection: "row",
-                  shadowColor: canAdvance() ? C.coral : "transparent",
+                  shadowColor: canAdvance() ? C.pistachio : "transparent",
                   shadowOffset: { width: 0, height: 4 },
                   shadowOpacity: canAdvance() ? 0.25 : 0,
                   shadowRadius: 8,
@@ -1971,12 +1971,12 @@ export default function SubmitScreen() {
                 handleActualSubmit();
               }}
               style={{
-                backgroundColor: C.coral,
+                backgroundColor: C.pistachio,
                 borderRadius: RADIUS.full,
                 paddingVertical: 16,
                 alignItems: "center",
                 justifyContent: "center",
-                shadowColor: C.coral,
+                shadowColor: C.pistachio,
                 shadowOffset: { width: 0, height: 4 },
                 shadowOpacity: 0.25,
                 shadowRadius: 8,

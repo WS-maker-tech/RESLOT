@@ -102,7 +102,7 @@ export default function MapScreen() {
             >
               <MapPin
                 size={16}
-                color={selectedRestaurant?.id === restaurant.id ? C.white : C.coral}
+                color={selectedRestaurant?.id === restaurant.id ? C.white : C.pistachio}
                 strokeWidth={2.5}
                 fill={selectedRestaurant?.id === restaurant.id ? C.white : "transparent"}
               />
@@ -149,7 +149,7 @@ export default function MapScreen() {
       {isLoading ? (
         <View style={styles.loadingOverlay}>
           <View style={styles.loadingPill}>
-            <ActivityIndicator size="small" color={C.coral} />
+            <ActivityIndicator size="small" color={C.pistachio} />
             <Text style={styles.loadingText}>Laddar restauranger...</Text>
           </View>
         </View>
@@ -288,18 +288,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
-    borderColor: C.coral,
+    borderColor: C.pistachio,
     ...SHADOW.card,
   },
   markerSelected: {
-    backgroundColor: C.coral,
-    borderColor: C.coral,
+    backgroundColor: C.pistachio,
+    borderColor: C.pistachio,
     transform: [{ scale: 1.15 }],
   },
   markerTail: {
     width: 8,
     height: 8,
-    backgroundColor: C.coral,
+    backgroundColor: C.pistachio,
     transform: [{ rotate: "45deg" }],
     alignSelf: "center",
     marginTop: -5,
@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
   cardBookedBadge: {
-    backgroundColor: C.coralLight,
+    backgroundColor: C.pistachioLight,
     borderRadius: 6,
     paddingHorizontal: 8,
     paddingVertical: 3,
@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
   cardBookedText: {
     fontFamily: FONTS.semiBold,
     fontSize: 10,
-    color: C.coral,
+    color: C.pistachio,
     letterSpacing: -0.1,
   },
   cardArrow: {

@@ -77,7 +77,7 @@ function getStatusBadge(status: string, isSubmitter: boolean) {
       return { label: "Under ångerfrist", bg: "rgba(245,158,11,0.12)", color: C.warning, subtext: "5 min att ångra" };
     case "claimed":
     case "completed":
-      return { label: "Bekräftad", bg: "rgba(126,200,122,0.10)", color: C.coral, subtext: "Ansvar överfört" };
+      return { label: "Bekräftad", bg: "rgba(126,200,122,0.10)", color: C.pistachio, subtext: "Ansvar överfört" };
     case "cancelled":
       return { label: "Avbokad", bg: "rgba(220,38,38,0.1)", color: C.danger, subtext: null };
     case "expired":
@@ -354,10 +354,10 @@ function ReservationCard({
                 style={{
                   padding: 8,
                   borderRadius: RADIUS.sm,
-                  backgroundColor: C.coralLight,
+                  backgroundColor: C.pistachioLight,
                 }}
               >
-                <Trash2 size={14} color={C.coral} strokeWidth={2} />
+                <Trash2 size={14} color={C.pistachio} strokeWidth={2} />
               </Pressable>
             )}
           </View>
@@ -473,7 +473,7 @@ function FeedbackPrompt({
           onPress={handleSubmit}
           style={{
             marginTop: 10,
-            backgroundColor: C.coral,
+            backgroundColor: C.pistachio,
             borderRadius: RADIUS.sm,
             paddingVertical: 10,
             flexDirection: "row",
@@ -542,12 +542,12 @@ function FeedbackPrompt({
             minHeight: 44,
           }}
         >
-          <Check size={14} color={C.coral} strokeWidth={2.5} />
+          <Check size={14} color={C.pistachio} strokeWidth={2.5} />
           <Text
             style={{
               fontFamily: FONTS.semiBold,
               fontSize: 13,
-              color: C.coral,
+              color: C.pistachio,
             }}
           >
             Ja
@@ -687,7 +687,7 @@ export default function ReservationsScreen() {
           <ReservationsSkeleton />
         ) : error ? (
           <View testID="reservations-error" style={{ alignItems: "center", justifyContent: "center", paddingTop: 60 }}>
-            <AlertCircle size={40} color={C.coral} strokeWidth={ICON.strokeWidth} />
+            <AlertCircle size={40} color={C.pistachio} strokeWidth={ICON.strokeWidth} />
             <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.textPrimary, marginTop: 12 }}>
               Något gick fel
             </Text>
@@ -698,7 +698,7 @@ export default function ReservationsScreen() {
               testID="reservations-retry-button"
               accessibilityLabel="Försök igen"
               onPress={() => refetch()}
-              style={{ marginTop: SPACING.md, backgroundColor: C.coral, borderRadius: RADIUS.md, paddingVertical: 12, paddingHorizontal: 28 }}
+              style={{ marginTop: SPACING.md, backgroundColor: C.pistachio, borderRadius: RADIUS.md, paddingVertical: 12, paddingHorizontal: 28 }}
             >
               <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.dark }}>
                 Försök igen
@@ -714,8 +714,8 @@ export default function ReservationsScreen() {
               </Text>
               {submittedReservations.length === 0 ? (
                 <Animated.View entering={FadeInDown.delay(100).springify()} style={{ paddingHorizontal: SPACING.lg, paddingVertical: 32, alignItems: "center" }}>
-                  <Animated.View entering={ZoomIn.springify().delay(150)} style={{ width: 64, height: 64, borderRadius: 20, backgroundColor: C.coralLight, alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
-                    <Upload size={28} color={C.coral} strokeWidth={1.5} />
+                  <Animated.View entering={ZoomIn.springify().delay(150)} style={{ width: 64, height: 64, borderRadius: 20, backgroundColor: C.pistachioLight, alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
+                    <Upload size={28} color={C.pistachio} strokeWidth={1.5} />
                   </Animated.View>
                   <Animated.View entering={FadeInDown.delay(200).springify()}>
                     <Text style={{ fontFamily: FONTS.displayBold, fontSize: 17, color: C.textPrimary, textAlign: "center", letterSpacing: -0.2 }}>Lägg upp din första bokning</Text>

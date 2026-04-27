@@ -122,7 +122,7 @@ Sätts i Vercel dashboard, inte i koden.
 
 ### Tokens i `mobile/src/lib/theme.ts`
 - **Färger (`C`):** `pistachio` (#7EC87A), `gold` (#C9A96E), `dark` (#111827), `bg` (#FAFAF8), `bgCard`, `bgInput`, text-hierarki, semantic (success/error/warning/info), interaction-variants (Light/Pressed/Bg), overlays
-- **OBS namn-bug:** `coral` är ALIAS för `pistachio` (samma värde `#7EC87A`). `coral` ska tas bort i Sprint 1, allt ska heta `pistachio`. CLAUDE.md säger fortfarande att coral är `#E06A4E` — det är fel mot kod.
+- **`coral` är borttaget (PR 1.6).** Allt heter nu `pistachio`. `coralLight`/`coralPressed` migrerades till `pistachioLight`/`pistachioPressed`. CLAUDE.md uppdaterad — felaktiga `coral=#E06A4E`-raden bytt till `error=#EF4444`.
 - **Fonts (`FONTS`):** Plus Jakarta Sans-familjen (regular/medium/semiBold/bold). Inga andra typsnittspaket. **Inga font-byten är godkända** för designrevolutionen.
 - **Spacing (`SPACING`):** xs/sm/md/lg/xl/xxl (4/8/16/20/28/48). Underdimensionerad — Sprint 1 utvidgar med xxs/xss/lg2/xl2/xxxl + RADIUS.full → 999 (idag 28).
 - **Radius (`RADIUS`):** sm/md/lg/xl/full
@@ -197,7 +197,7 @@ Sätts i Vercel dashboard, inte i koden.
 ### Sprint-status
 | Sprint | Innehåll | Status |
 |--------|----------|--------|
-| 1 — Foundation | Token-utvidgning + 5 primitives + codemod hårdkodade värden | Pågår — bryts i 6 små PRs (1.1 tokens, 1.2 Button+Card, 1.3 Input+FormField, 1.4 Tag+ListItem, 1.5 codemod, 1.6 coral→pistachio + dev/components-route) |
+| 1 — Foundation | Token-utvidgning + 6 primitives + codemod hårdkodade värden + coral-rensning | ✅ KLAR (6/6 PRs mergade till main) |
 | 2 — Hem + Restaurang/Claim | Visuell upgrade av tunga hjältarna | Ej startad |
 | 3 — Submit + Profil | Visuell upgrade av största delta | Ej startad |
 | 4 — Alerts + Reservations + Credits | Visuell upgrade av listsidor | Ej startad |
@@ -286,6 +286,15 @@ Be **inte** William om ursäkt med "jag skrev för mycket". Det är fel diagnos.
 ## 11. Sessions-logg (kronologisk)
 
 Varje session lägger till en kort post nederst med datum, vad som hände och status. Senast överst i listan.
+
+### 2026-04-27 (natt) — Sprint 1 (foundation) genomfört autonomt
+- 6 PRs mergade till main: tokens (1.1) → Button+Card (1.2) → Input+FormField (1.3) → Tag+ListItem (1.4) → codemod 137 hex (1.5) → coral-rensning + /dev-components-route + docs (1.6)
+- 0 typecheck-fel genom hela kedjan, varje merge auto-deployade via Action (~80–180s build-tid)
+- Inga regressions — inga befintliga komponenter rörda, inga screens migrerades till primitives (det börjar i Sprint 2)
+- Alla coral-namn borta: `coral`/`coralLight`/`coralPressed` ersatta av `pistachio`/`pistachioLight`/`pistachioPressed` på 173 platser
+- Codemod-script i `scripts/codemod-colors.mjs` så framtida sessioner kan köra det igen
+- Nya primitives katalogiserade på `/dev-components`-route (visas inte i navbar)
+- **Nästa:** Sprint 2 — Hem (`(tabs)/index.tsx`) + Restaurangdetalj/Claim (`restaurant/[id].tsx`) visuell omarbetning med Sprint 1-primitives
 
 ### 2026-04-27 — kontext-vault skapad + designrevolution-plan godkänd
 - Verifierade deploy-flöde end-to-end (Action triggas på push till main, ~3 min build)

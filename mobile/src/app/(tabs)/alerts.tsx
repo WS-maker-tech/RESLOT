@@ -70,7 +70,7 @@ const ALERT_ICONS: Record<
   ActivityAlert["type"],
   { icon: typeof Flame; color: string; bg: string }
 > = {
-  drop: { icon: Flame, color: C.coral, bg: C.coralLight },
+  drop: { icon: Flame, color: C.pistachio, bg: C.pistachioLight },
   claim: { icon: CheckCircle2, color: C.success, bg: C.successLight },
   credit: { icon: Coins, color: C.gold, bg: "rgba(201, 169, 110, 0.10)" },
   premium: { icon: Crown, color: C.gold, bg: "rgba(201, 169, 110, 0.10)" },
@@ -254,7 +254,7 @@ function AlertItem({ alert, index }: { alert: ActivityAlert; index: number }) {
                   width: 7,
                   height: 7,
                   borderRadius: 4,
-                  backgroundColor: C.coral,
+                  backgroundColor: C.pistachio,
                   marginLeft: 8,
                 }}
               />
@@ -397,7 +397,7 @@ export default function AlertsScreen() {
                 style={{
                   fontFamily: FONTS.regular,
                   fontSize: 13,
-                  color: C.coral,
+                  color: C.pistachio,
                   marginTop: 2,
                 }}
               >
@@ -435,7 +435,7 @@ export default function AlertsScreen() {
           <AlertsSkeleton />
         ) : alertsError ? (
           <View testID="alerts-error" style={{ alignItems: "center", justifyContent: "center", paddingTop: 60 }}>
-            <AlertCircle size={40} color={C.coral} strokeWidth={ICON.strokeWidth} />
+            <AlertCircle size={40} color={C.pistachio} strokeWidth={ICON.strokeWidth} />
             <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.dark, marginTop: 12 }}>
               Något gick fel
             </Text>
@@ -446,7 +446,7 @@ export default function AlertsScreen() {
               testID="alerts-retry-button"
               accessibilityLabel="Försök igen"
               onPress={() => { alertsRefetch(); restaurantAlertsRefetch(); watchesRefetch(); }}
-              style={{ marginTop: SPACING.md, backgroundColor: C.coral, borderRadius: RADIUS.md, paddingVertical: 12, paddingHorizontal: 28 }}
+              style={{ marginTop: SPACING.md, backgroundColor: C.pistachio, borderRadius: RADIUS.md, paddingVertical: 12, paddingHorizontal: 28 }}
             >
               <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.dark }}>
                 Försök igen
@@ -473,7 +473,7 @@ export default function AlertsScreen() {
                     </Text>
                     <View
                       style={{
-                        backgroundColor: C.coralLight,
+                        backgroundColor: C.pistachioLight,
                         paddingHorizontal: 8,
                         paddingVertical: 3,
                         borderRadius: RADIUS.sm,
@@ -483,7 +483,7 @@ export default function AlertsScreen() {
                         style={{
                           fontFamily: FONTS.semiBold,
                           fontSize: 11,
-                          color: C.coral,
+                          color: C.pistachio,
                         }}
                       >
                         {enabledAlerts} / {totalAlerts}
@@ -547,12 +547,12 @@ export default function AlertsScreen() {
                       width: 34,
                       height: 34,
                       borderRadius: 10,
-                      backgroundColor: C.coralLight,
+                      backgroundColor: C.pistachioLight,
                       alignItems: "center",
                       justifyContent: "center",
                     }}
                   >
-                    <Plus size={16} color={C.coral} strokeWidth={ICON.strokeWidth} />
+                    <Plus size={16} color={C.pistachio} strokeWidth={ICON.strokeWidth} />
                   </View>
                   <Text
                     style={{
@@ -615,13 +615,13 @@ export default function AlertsScreen() {
                     width: 64,
                     height: 64,
                     borderRadius: 32,
-                    backgroundColor: C.coralLight,
+                    backgroundColor: C.pistachioLight,
                     alignItems: "center",
                     justifyContent: "center",
                     marginBottom: 16,
                   }}
                 >
-                  <Bell size={28} color={C.coral} strokeWidth={ICON.strokeWidth} />
+                  <Bell size={28} color={C.pistachio} strokeWidth={ICON.strokeWidth} />
                 </Animated.View>
                 <Animated.Text
                   entering={FadeInDown.delay(200).springify()}
@@ -657,7 +657,7 @@ export default function AlertsScreen() {
               testID="add-watch-button"
               accessibilityLabel="Lägg till bevakning"
               onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/add-watch"); }}
-              style={{ marginHorizontal: SPACING.lg, marginTop: SPACING.md, marginBottom: SPACING.sm, backgroundColor: C.coral, borderRadius: RADIUS.md, paddingVertical: 14, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 }}
+              style={{ marginHorizontal: SPACING.lg, marginTop: SPACING.md, marginBottom: SPACING.sm, backgroundColor: C.pistachio, borderRadius: RADIUS.md, paddingVertical: 14, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 }}
             >
               <Plus size={18} color=C.dark strokeWidth={ICON.strokeWidth} />
               <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.dark }}>Lägg till bevakning</Text>
@@ -729,7 +729,7 @@ export default function AlertsScreen() {
                     }}
                     style={{
                       marginTop: 20,
-                      backgroundColor: C.coral,
+                      backgroundColor: C.pistachio,
                       borderRadius: RADIUS.md,
                       paddingVertical: 14,
                       paddingHorizontal: 28,
@@ -774,9 +774,9 @@ export default function AlertsScreen() {
                             testID={`delete-watch-${watch.id}`}
                             accessibilityLabel={`Ta bort bevakning för ${watch.restaurant?.name ?? "valfri restaurang"}`}
                             onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); deleteWatch({ id: watch.id, userPhone: phone! }); }}
-                            style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: C.coralLight, alignItems: "center", justifyContent: "center" }}
+                            style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: C.pistachioLight, alignItems: "center", justifyContent: "center" }}
                           >
-                            <Trash2 size={15} color={C.coral} strokeWidth={2} />
+                            <Trash2 size={15} color={C.pistachio} strokeWidth={2} />
                           </Pressable>
                         </View>
                         {/* Smart filter tags */}
@@ -796,8 +796,8 @@ export default function AlertsScreen() {
                             ) : null}
                             {filters.partySize ? (
                               <View style={{ flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: "rgba(224,106,78,0.08)", borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 }}>
-                                <Users size={11} color={C.coral} strokeWidth={2} />
-                                <Text style={{ fontFamily: FONTS.medium, fontSize: 11, color: C.coral }}>{filters.partySize} pers</Text>
+                                <Users size={11} color={C.pistachio} strokeWidth={2} />
+                                <Text style={{ fontFamily: FONTS.medium, fontSize: 11, color: C.pistachio }}>{filters.partySize} pers</Text>
                               </View>
                             ) : null}
                           </View>
@@ -888,7 +888,7 @@ export default function AlertsScreen() {
                 paddingHorizontal: 14,
                 height: 44,
                 borderWidth: 1,
-                borderColor: searchQuery ? C.coralPressed : C.divider,
+                borderColor: searchQuery ? C.pistachioPressed : C.divider,
               }}
             >
               <Search size={16} color={C.textTertiary} strokeWidth={2} />
@@ -1003,7 +1003,7 @@ export default function AlertsScreen() {
                               borderRadius: 14,
                               backgroundColor: alreadyAdded
                                 ? "rgba(74,140,107,0.15)"
-                                : C.coralLight,
+                                : C.pistachioLight,
                               alignItems: "center",
                               justifyContent: "center",
                               marginLeft: 10,
@@ -1012,7 +1012,7 @@ export default function AlertsScreen() {
                             {alreadyAdded ? (
                               <Check size={14} color={C.success} strokeWidth={ICON.strokeWidth} />
                             ) : (
-                              <Plus size={14} color={C.coral} strokeWidth={ICON.strokeWidth} />
+                              <Plus size={14} color={C.pistachio} strokeWidth={ICON.strokeWidth} />
                             )}
                           </View>
                         </Pressable>

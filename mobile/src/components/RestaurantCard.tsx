@@ -53,7 +53,7 @@ function PulsingGreenDot({ size = 8 }: { size?: number }) {
   );
 }
 
-// --- Pulsing Urgency Dot (coral/red) ---
+// --- Pulsing Urgency Dot (red) ---
 function PulsingUrgencyDot({ size = 7 }: { size?: number }) {
   const scale = useSharedValue(1);
   const dotOpacity = useSharedValue(1);

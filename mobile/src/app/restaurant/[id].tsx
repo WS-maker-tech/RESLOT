@@ -163,7 +163,7 @@ const SuccessOverlay = React.memo(function SuccessOverlay({
 
   if (!visible) return null;
 
-  const confettiColors = [C.coral, C.gold, C.info, "#A855F7", "#F472B6", "#FBBF24", "#34D399", "#FB923C", "#818CF8"];
+  const confettiColors = [C.pistachio, C.gold, C.info, "#A855F7", "#F472B6", "#FBBF24", "#34D399", "#FB923C", "#818CF8"];
   const particles = Array.from({ length: 55 }, (_, i) => ({
     id: i,
     delay: Math.random() * 600,
@@ -199,10 +199,10 @@ const SuccessOverlay = React.memo(function SuccessOverlay({
           width: 120,
           height: 120,
           borderRadius: 60,
-          backgroundColor: C.coral,
+          backgroundColor: C.pistachio,
           alignItems: "center",
           justifyContent: "center",
-          shadowColor: C.coral,
+          shadowColor: C.pistachio,
           shadowOffset: { width: 0, height: 0 },
           shadowOpacity: 0.5,
           shadowRadius: 30,
@@ -256,7 +256,7 @@ const SuccessOverlay = React.memo(function SuccessOverlay({
       <Animated.View
         entering={FadeInDown.delay(360).springify()}
         style={{
-          backgroundColor: C.coralPressed,
+          backgroundColor: C.pistachioPressed,
           borderRadius: RADIUS.full,
           paddingHorizontal: 16,
           paddingVertical: 8,
@@ -418,11 +418,11 @@ const GracePeriodOverlay = React.memo(function GracePeriodOverlay({
             width: 56,
             height: 56,
             borderRadius: 28,
-            backgroundColor: C.coral,
+            backgroundColor: C.pistachio,
             alignItems: "center",
             justifyContent: "center",
             marginBottom: 16,
-            shadowColor: C.coral,
+            shadowColor: C.pistachio,
             shadowOffset: { width: 0, height: 4 },
             shadowOpacity: 0.3,
             shadowRadius: 12,
@@ -515,7 +515,7 @@ const GracePeriodOverlay = React.memo(function GracePeriodOverlay({
             style={{
               width: `${progress * 100}%`,
               height: "100%",
-              backgroundColor: isUrgent ? C.error : C.coral,
+              backgroundColor: isUrgent ? C.error : C.pistachio,
               borderRadius: 3,
             }}
           />
@@ -558,7 +558,7 @@ const GracePeriodOverlay = React.memo(function GracePeriodOverlay({
             onDone();
           }}
           style={({ pressed }) => ({
-            backgroundColor: C.coral,
+            backgroundColor: C.pistachio,
             borderRadius: RADIUS.lg,
             paddingVertical: 16,
             paddingHorizontal: 24,
@@ -566,7 +566,7 @@ const GracePeriodOverlay = React.memo(function GracePeriodOverlay({
             alignItems: "center",
             justifyContent: "center",
             transform: [{ scale: pressed ? 0.97 : 1 }],
-            shadowColor: C.coral,
+            shadowColor: C.pistachio,
             shadowOffset: { width: 0, height: 6 },
             shadowOpacity: 0.3,
             shadowRadius: 14,
@@ -950,8 +950,8 @@ ${shareUrl}`,
           </View>
         </SafeAreaView>
         <View testID="error-view" style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 32 }}>
-          <View style={{ width: 72, height: 72, borderRadius: 36, backgroundColor: C.coralLight, alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
-            <AlertCircle size={36} color={C.coral} strokeWidth={2} />
+          <View style={{ width: 72, height: 72, borderRadius: 36, backgroundColor: C.pistachioLight, alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
+            <AlertCircle size={36} color={C.pistachio} strokeWidth={2} />
           </View>
           <Text style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: C.textPrimary, textAlign: "center", letterSpacing: -0.5 }}>
             Bokningen hittades inte
@@ -965,13 +965,13 @@ ${shareUrl}`,
             onPress={handleGoBack}
             style={({ pressed }) => ({
               marginTop: 28,
-              backgroundColor: C.coral,
+              backgroundColor: C.pistachio,
               borderRadius: RADIUS.lg,
               paddingVertical: 15,
               paddingHorizontal: 32,
               transform: [{ scale: pressed ? 0.97 : 1 }],
               ...SHADOW.elevated,
-              shadowColor: C.coral,
+              shadowColor: C.pistachio,
               shadowOpacity: 0.25,
             })}
           >
@@ -1405,7 +1405,7 @@ ${shareUrl}`,
                 flexShrink: 0,
               }}
             >
-              <Shield size={18} color={C.coral} strokeWidth={2.2} />
+              <Shield size={18} color={C.pistachio} strokeWidth={2.2} />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={{ fontFamily: FONTS.bold, fontSize: 15, color: C.dark, marginBottom: 4 }}>
@@ -1457,7 +1457,7 @@ ${shareUrl}`,
                     <Text style={{ fontFamily: FONTS.regular, fontSize: 11, color: C.textTertiary, marginTop: 1 }}>Avbokning senast {reservation.cancellationWindowHours} timmar före</Text>
                   ) : null}
                 </View>
-                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.coral }}>{reservation.cancelFee} SEK/pers · Totalt {reservation.cancelFee * reservation.partySize} SEK</Text>
+                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.pistachio }}>{reservation.cancelFee} SEK/pers · Totalt {reservation.cancelFee * reservation.partySize} SEK</Text>
               </View>
             ) : (
               <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingVertical: 13, borderBottomWidth: 0.5, borderBottomColor: C.divider }}>
@@ -1472,7 +1472,7 @@ ${shareUrl}`,
                   <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary }}>Förbetalt belopp</Text>
                   <Text style={{ fontFamily: FONTS.regular, fontSize: 11, color: C.textTertiary, marginTop: 1 }}>Betalas vid avbokning</Text>
                 </View>
-                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.coral }}>{reservation.prepaidAmount} SEK</Text>
+                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.pistachio }}>{reservation.prepaidAmount} SEK</Text>
               </View>
             ) : null}
             {/* Extra info */}
@@ -1526,7 +1526,7 @@ ${shareUrl}`,
               alignItems: "center",
               justifyContent: "center",
             }}>
-              <Check size={14} color={C.coral} strokeWidth={3} />
+              <Check size={14} color={C.pistachio} strokeWidth={3} />
             </View>
             <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: C.dark, flex: 1 }}>
               Reslot-garanti: fungerar inte överlåtelsen? Credits tillbaka.
@@ -1635,9 +1635,9 @@ ${shareUrl}`,
                     borderWidth: 2,
                     borderColor: "rgba(126,200,122,0.3)",
                   }}>
-                    <Users size={20} color={C.coral} strokeWidth={2} />
+                    <Users size={20} color={C.pistachio} strokeWidth={2} />
                   </View>
-                  <Text style={{ fontFamily: FONTS.bold, fontSize: 12, color: C.coral }}>
+                  <Text style={{ fontFamily: FONTS.bold, fontSize: 12, color: C.pistachio }}>
                     Du
                   </Text>
                 </View>
@@ -1884,12 +1884,12 @@ ${shareUrl}`,
                 width: 72,
                 height: 72,
                 borderRadius: 36,
-                backgroundColor: C.coralLight,
+                backgroundColor: C.pistachioLight,
                 alignItems: "center",
                 justifyContent: "center",
                 marginBottom: 16,
               }}>
-                <Check size={36} color={C.coral} strokeWidth={2.5} />
+                <Check size={36} color={C.pistachio} strokeWidth={2.5} />
               </View>
               <Text style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: C.textPrimary, textAlign: "center", letterSpacing: -0.4 }}>
                 Tack för din rapport
@@ -1917,20 +1917,20 @@ ${shareUrl}`,
                     flexDirection: "row",
                     alignItems: "center",
                     gap: 12,
-                    backgroundColor: reportReason === r.key ? C.coralLight : C.bgCard,
+                    backgroundColor: reportReason === r.key ? C.pistachioLight : C.bgCard,
                     borderRadius: RADIUS.md,
                     paddingVertical: 16,
                     paddingHorizontal: 16,
                     marginBottom: 8,
                     borderWidth: 1.5,
-                    borderColor: reportReason === r.key ? C.coral : C.borderLight,
+                    borderColor: reportReason === r.key ? C.pistachio : C.borderLight,
                     minHeight: 44,
                     transform: [{ scale: pressed ? 0.98 : 1 }],
                   })}
                 >
                   <AlertTriangle
                     size={18}
-                    color={reportReason === r.key ? C.coral : C.textTertiary}
+                    color={reportReason === r.key ? C.pistachio : C.textTertiary}
                     strokeWidth={2}
                   />
                   <Text style={{
@@ -1946,7 +1946,7 @@ ${shareUrl}`,
                       width: 22,
                       height: 22,
                       borderRadius: 11,
-                      backgroundColor: C.coral,
+                      backgroundColor: C.pistachio,
                       alignItems: "center",
                       justifyContent: "center",
                     }}>
@@ -1990,7 +1990,7 @@ ${shareUrl}`,
                     onPress={handleSubmitReport}
                     disabled={reportMutation.isPending}
                     style={({ pressed }) => ({
-                      backgroundColor: C.coral,
+                      backgroundColor: C.pistachio,
                       borderRadius: RADIUS.lg,
                       paddingVertical: 16,
                       alignItems: "center",
@@ -1999,7 +1999,7 @@ ${shareUrl}`,
                       minHeight: 52,
                       opacity: reportMutation.isPending ? 0.7 : 1,
                       transform: [{ scale: pressed ? 0.97 : 1 }],
-                      shadowColor: C.coral,
+                      shadowColor: C.pistachio,
                       shadowOffset: { width: 0, height: 6 },
                       shadowOpacity: 0.25,
                       shadowRadius: 14,
@@ -2078,8 +2078,8 @@ ${shareUrl}`,
                   height: 22,
                   borderRadius: 7,
                   borderWidth: 1.5,
-                  borderColor: accepted ? C.coral : "rgba(0,0,0,0.18)",
-                  backgroundColor: accepted ? C.coral : "transparent",
+                  borderColor: accepted ? C.pistachio : "rgba(0,0,0,0.18)",
+                  backgroundColor: accepted ? C.pistachio : "transparent",
                   alignItems: "center",
                   justifyContent: "center",
                   marginTop: 1,
@@ -2099,7 +2099,7 @@ ${shareUrl}`,
               onPress={() => setShowTermsModal(true)}
               style={{ marginLeft: 32, marginTop: 4 }}
             >
-              <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.coral, textDecorationLine: "underline" }}>
+              <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.pistachio, textDecorationLine: "underline" }}>
                 Läs villkor
               </Text>
             </Pressable>
@@ -2121,11 +2121,11 @@ ${shareUrl}`,
             disabled={claimMutation.isPending || isClaimed || !hasEnoughCredits}
             style={{
               backgroundColor: isClaimed
-                ? C.coral
+                ? C.pistachio
                 : !hasEnoughCredits
                 ? C.textTertiary
                 : accepted
-                ? C.coral
+                ? C.pistachio
                 : "rgba(0,0,0,0.06)",
               borderRadius: RADIUS.lg,
               paddingVertical: 18,
@@ -2135,7 +2135,7 @@ ${shareUrl}`,
               gap: 10,
               ...(accepted && !isClaimed && hasEnoughCredits
                 ? {
-                    shadowColor: C.coral,
+                    shadowColor: C.pistachio,
                     shadowOffset: { width: 0, height: 10 },
                     shadowOpacity: 0.4,
                     shadowRadius: 24,
@@ -2144,7 +2144,7 @@ ${shareUrl}`,
                 : {}),
               ...(isClaimed
                 ? {
-                    shadowColor: C.coral,
+                    shadowColor: C.pistachio,
                     shadowOffset: { width: 0, height: 6 },
                     shadowOpacity: 0.25,
                     shadowRadius: 16,
@@ -2230,7 +2230,7 @@ ${shareUrl}`,
               accessibilityLabel="Stäng villkor"
               onPress={() => setShowTermsModal(false)}
               style={({ pressed }) => ({
-                backgroundColor: C.coral,
+                backgroundColor: C.pistachio,
                 borderRadius: RADIUS.lg,
                 paddingVertical: 16,
                 alignItems: "center",

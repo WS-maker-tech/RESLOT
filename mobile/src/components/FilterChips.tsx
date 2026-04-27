@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   chipActive: {
-    backgroundColor: C.coral,
+    backgroundColor: C.pistachio,
     borderWidth: 0,
   },
   chipInactive: {

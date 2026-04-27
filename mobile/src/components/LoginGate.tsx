@@ -45,13 +45,13 @@ export function LoginGate({ title, subtitle }: LoginGateProps) {
           width: 72,
           height: 72,
           borderRadius: 36,
-          backgroundColor: C.coralLight,
+          backgroundColor: C.pistachioLight,
           alignItems: "center",
           justifyContent: "center",
           marginBottom: SPACING.xl,
         }}
       >
-        <LogIn size={32} color={C.coral} strokeWidth={ICON.strokeWidth} />
+        <LogIn size={32} color={C.pistachio} strokeWidth={ICON.strokeWidth} />
       </Animated.View>
 
       {/* Text */}
@@ -87,7 +87,7 @@ export function LoginGate({ title, subtitle }: LoginGateProps) {
           testID="login-gate-btn"
           onPress={handleLogin}
           style={{
-            backgroundColor: C.coral,
+            backgroundColor: C.pistachio,
             borderRadius: RADIUS.full,
             paddingVertical: SPACING.md,
             alignItems: "center",
@@ -116,7 +116,7 @@ export function LoginGate({ title, subtitle }: LoginGateProps) {
             style={{
               fontFamily: FONTS.medium,
               fontSize: 14,
-              color: C.coral,
+              color: C.pistachio,
             }}
           >
             Skapa konto

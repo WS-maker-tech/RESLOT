@@ -58,9 +58,9 @@ export const DayPicker = React.memo(function DayPicker({
               }}
               style={[
                 styles.dayButton,
-                { backgroundColor: isSelected ? C.coral : "transparent" },
+                { backgroundColor: isSelected ? C.pistachio : "transparent" },
                 ...(isSelected ? [{
-                  shadowColor: C.coral,
+                  shadowColor: C.pistachio,
                   shadowOffset: { width: 0, height: 3 },
                   shadowOpacity: 0.25,
                   shadowRadius: 6,
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     width: 5,
     height: 5,
     borderRadius: 2.5,
-    backgroundColor: C.coral,
+    backgroundColor: C.pistachio,
     marginTop: 4,
   },
   todayDotPlaceholder: {

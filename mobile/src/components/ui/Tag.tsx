@@ -58,7 +58,7 @@ function getColors(variant: TagVariant, appearance: TagStyle) {
   // soft
   switch (variant) {
     case "brand":
-      return { bg: C.coralLight, fg: C.pistachio };
+      return { bg: C.pistachioLight, fg: C.pistachio };
     case "success":
       return { bg: C.successLight, fg: C.success };
     case "warning":
