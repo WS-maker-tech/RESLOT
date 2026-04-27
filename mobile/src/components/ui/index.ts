@@ -48,3 +48,9 @@ export type { RatingProps } from "./Rating";
 
 export { Stepper } from "./Stepper";
 export type { StepperProps } from "./Stepper";
+
+export { Toast } from "./Toast";
+export type { ToastProps, ToastVariant, ToastPosition } from "./Toast";
+
+export { Tabs } from "./Tabs";
+export type { TabsProps, TabItem } from "./Tabs";
