@@ -164,9 +164,9 @@ export default function SettingsScreen() {
           <Text
             style={{
               fontFamily: FONTS.displayBold,
-              fontSize: 20,
+              fontSize: 22,
               color: C.textPrimary,
-              letterSpacing: -0.3,
+              letterSpacing: -0.6,
             }}
           >
             Kontoinställningar
