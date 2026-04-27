@@ -270,7 +270,7 @@ export default function MapScreen() {
                 ]}
               >
                 <Text style={styles.ctaText}>Visa bord</Text>
-                <ChevronRight size={16} color="#FFFFFF" strokeWidth={2.5} />
+                <ChevronRight size={16} color=C.white strokeWidth={2.5} />
               </Pressable>
             </View>
           </View>
@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
     color: C.textSecondary,
   },
   cityPillTextActive: {
-    color: "#FFFFFF",
+    color: C.white,
   },
 
   // Native placeholder
@@ -466,7 +466,7 @@ const styles = StyleSheet.create({
   ctaText: {
     fontFamily: FONTS.bold,
     fontSize: 15,
-    color: "#FFFFFF",
+    color: C.white,
     letterSpacing: -0.2,
   },
 });

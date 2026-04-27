@@ -298,7 +298,7 @@ function PrimaryButton({
           style={{
             fontFamily: FONTS.bold,
             fontSize: 16,
-            color: "#111827",
+            color: C.dark,
             letterSpacing: -0.2,
           }}
         >
@@ -489,7 +489,7 @@ function SplashStep({ onGetStarted, onExplore, onRegister }: { onGetStarted: () 
           testID="get-started-btn"
           label="Logga in"
           onPress={onGetStarted}
-          icon={<ArrowRight size={18} color="#111827" strokeWidth={2.5} />}
+          icon={<ArrowRight size={18} color=C.dark strokeWidth={2.5} />}
         />
         <GhostButton testID="register-btn" label="Registrera dig" onPress={onRegister} />
 
@@ -1613,10 +1613,10 @@ function AnimatedCoinIcon() {
 
 // ── Floating celebration particle (geometric, no emoji) ──
 const PARTICLE_SHAPES = [
-  { shape: "circle", color: "#7EC87A" },
+  { shape: "circle", color: C.pistachio },
   { shape: "square", color: "#FF6B6B" },
-  { shape: "circle", color: "#111827" },
-  { shape: "square", color: "#7EC87A" },
+  { shape: "circle", color: C.dark },
+  { shape: "square", color: C.pistachio },
   { shape: "circle", color: "#FF6B6B" },
 ];
 function FloatingParticle({ index, delay: d, startX, startY }: { index: number; delay: number; startX: number; startY: number }) {
@@ -1839,7 +1839,7 @@ function WelcomeStep({ onContinue, firstName, cityName }: { onContinue: () => vo
           testID="welcome-continue-btn"
           label="Visa mig borden"
           onPress={onContinue}
-          icon={<ArrowRight size={18} color="#111827" strokeWidth={2.5} />}
+          icon={<ArrowRight size={18} color=C.dark strokeWidth={2.5} />}
         />
       </Animated.View>
     </View>

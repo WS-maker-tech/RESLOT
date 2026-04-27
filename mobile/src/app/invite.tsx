@@ -92,11 +92,11 @@ export default function InviteScreen() {
               }}
             >
               {copied ? (
-                <CheckCircle size={16} color="#7EC87A" strokeWidth={2} />
+                <CheckCircle size={16} color=C.pistachio strokeWidth={2} />
               ) : (
                 <Copy size={16} color={C.white} strokeWidth={2} />
               )}
-              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: copied ? "#7EC87A" : C.white }}>
+              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: copied ? C.pistachio : C.white }}>
                 {copied ? "Kopierad! ✓" : "Kopiera kod"}
               </Text>
             </Pressable>
@@ -110,7 +110,7 @@ export default function InviteScreen() {
             accessibilityLabel="Dela med vän"
             onPress={handleShare}
             style={{
-              backgroundColor: "#7EC87A",
+              backgroundColor: C.pistachio,
               borderRadius: RADIUS.full,
               paddingVertical: 16,
               flexDirection: "row",
@@ -121,8 +121,8 @@ export default function InviteScreen() {
               ...SHADOW.elevated,
             }}
           >
-            <Share2 size={18} color="#111827" strokeWidth={ICON.strokeWidth} />
-            <Text style={{ fontFamily: FONTS.bold, fontSize: 16, color: "#111827" }}>Dela med vän</Text>
+            <Share2 size={18} color=C.dark strokeWidth={ICON.strokeWidth} />
+            <Text style={{ fontFamily: FONTS.bold, fontSize: 16, color: C.dark }}>Dela med vän</Text>
           </Pressable>
         </Animated.View>
 

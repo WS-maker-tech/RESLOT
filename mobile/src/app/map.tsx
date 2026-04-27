@@ -102,9 +102,9 @@ export default function MapScreen() {
             >
               <MapPin
                 size={16}
-                color={selectedRestaurant?.id === restaurant.id ? "#FFFFFF" : C.coral}
+                color={selectedRestaurant?.id === restaurant.id ? C.white : C.coral}
                 strokeWidth={2.5}
-                fill={selectedRestaurant?.id === restaurant.id ? "#FFFFFF" : "transparent"}
+                fill={selectedRestaurant?.id === restaurant.id ? C.white : "transparent"}
               />
             </View>
             <View style={styles.markerTail} />
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
   },
   card: {
     flexDirection: "row",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: C.white,
     borderRadius: RADIUS.xl,
     overflow: "hidden",
     ...SHADOW.elevated,

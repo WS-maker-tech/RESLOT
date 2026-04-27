@@ -163,7 +163,7 @@ const SuccessOverlay = React.memo(function SuccessOverlay({
 
   if (!visible) return null;
 
-  const confettiColors = [C.coral, C.gold, "#3B82F6", "#A855F7", "#F472B6", "#FBBF24", "#34D399", "#FB923C", "#818CF8"];
+  const confettiColors = [C.coral, C.gold, C.info, "#A855F7", "#F472B6", "#FBBF24", "#34D399", "#FB923C", "#818CF8"];
   const particles = Array.from({ length: 55 }, (_, i) => ({
     id: i,
     delay: Math.random() * 600,
@@ -975,7 +975,7 @@ ${shareUrl}`,
               shadowOpacity: 0.25,
             })}
           >
-            <Text style={{ fontFamily: FONTS.bold, fontSize: 15, color: "#111827" }}>Gå tillbaka</Text>
+            <Text style={{ fontFamily: FONTS.bold, fontSize: 15, color: C.dark }}>Gå tillbaka</Text>
           </Pressable>
         </View>
       </View>

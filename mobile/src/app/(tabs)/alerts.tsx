@@ -448,7 +448,7 @@ export default function AlertsScreen() {
               onPress={() => { alertsRefetch(); restaurantAlertsRefetch(); watchesRefetch(); }}
               style={{ marginTop: SPACING.md, backgroundColor: C.coral, borderRadius: RADIUS.md, paddingVertical: 12, paddingHorizontal: 28 }}
             >
-              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: "#111827" }}>
+              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.dark }}>
                 Försök igen
               </Text>
             </Pressable>
@@ -659,8 +659,8 @@ export default function AlertsScreen() {
               onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/add-watch"); }}
               style={{ marginHorizontal: SPACING.lg, marginTop: SPACING.md, marginBottom: SPACING.sm, backgroundColor: C.coral, borderRadius: RADIUS.md, paddingVertical: 14, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 }}
             >
-              <Plus size={18} color="#111827" strokeWidth={ICON.strokeWidth} />
-              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: "#111827" }}>Lägg till bevakning</Text>
+              <Plus size={18} color=C.dark strokeWidth={ICON.strokeWidth} />
+              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.dark }}>Lägg till bevakning</Text>
             </Pressable>
 
             {watchesLoading ? (
@@ -738,8 +738,8 @@ export default function AlertsScreen() {
                       gap: 8,
                     }}
                   >
-                    <Plus size={16} color="#111827" strokeWidth={ICON.strokeWidth} />
-                    <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: "#111827" }}>
+                    <Plus size={16} color=C.dark strokeWidth={ICON.strokeWidth} />
+                    <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.dark }}>
                       Lägg till bevakning
                     </Text>
                   </Pressable>
@@ -784,8 +784,8 @@ export default function AlertsScreen() {
                           <View style={{ flexDirection: "row", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
                             {filters.timeRange ? (
                               <View style={{ flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: "rgba(59,130,246,0.08)", borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 }}>
-                                <Clock size={11} color="#3B82F6" strokeWidth={2} />
-                                <Text style={{ fontFamily: FONTS.medium, fontSize: 11, color: "#3B82F6" }}>{filters.timeRange[0]}–{filters.timeRange[1]}</Text>
+                                <Clock size={11} color=C.info strokeWidth={2} />
+                                <Text style={{ fontFamily: FONTS.medium, fontSize: 11, color: C.info }}>{filters.timeRange[0]}–{filters.timeRange[1]}</Text>
                               </View>
                             ) : null}
                             {filters.weekdays && filters.weekdays.length > 0 ? (

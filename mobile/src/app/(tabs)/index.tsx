@@ -123,7 +123,7 @@ const SkeletonCard = React.memo(function SkeletonCard({ index = 0 }: { index?: n
           sweepStyle,
           {
             ...StyleSheet.absoluteFillObject,
-            backgroundColor: "#FFFFFF",
+            backgroundColor: C.white,
           },
         ]}
       />
@@ -313,12 +313,12 @@ const Header = React.memo(function Header({
               width: 36,
               height: 36,
               borderRadius: 18,
-              backgroundColor: "#7EC87A",
+              backgroundColor: C.pistachio,
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <MapPin size={18} color="#FFFFFF" strokeWidth={2.5} />
+            <MapPin size={18} color=C.white strokeWidth={2.5} />
           </Pressable>
           <Pressable
             testID="search-toggle"
@@ -461,7 +461,7 @@ const MissedBookingCard = React.memo(function MissedBookingCard({
                 position: "absolute",
                 top: 10,
                 left: 10,
-                backgroundColor: "#EF4444",
+                backgroundColor: C.error,
                 borderRadius: 6,
                 paddingHorizontal: 8,
                 paddingVertical: 4,
@@ -470,12 +470,12 @@ const MissedBookingCard = React.memo(function MissedBookingCard({
                 gap: 4,
               }}
             >
-              <Flame size={10} color="#FFFFFF" fill="#FFFFFF" strokeWidth={0} />
+              <Flame size={10} color=C.white fill=C.white strokeWidth={0} />
               <Text
                 style={{
                   fontFamily: FONTS.bold,
                   fontSize: 10,
-                  color: "#FFFFFF",
+                  color: C.white,
                   textTransform: "uppercase",
                   letterSpacing: 0.8,
                 }}
@@ -499,12 +499,12 @@ const MissedBookingCard = React.memo(function MissedBookingCard({
                   gap: 4,
                 }}
               >
-                <Clock size={10} color="#FFFFFF" strokeWidth={2.5} />
+                <Clock size={10} color=C.white strokeWidth={2.5} />
                 <Text
                   style={{
                     fontFamily: FONTS.bold,
                     fontSize: 10,
-                    color: "#FFFFFF",
+                    color: C.white,
                     letterSpacing: -0.1,
                   }}
                 >
@@ -586,12 +586,12 @@ const MissedBookingCard = React.memo(function MissedBookingCard({
                 gap: 5,
               }}
             >
-              <Eye size={13} color="#111827" strokeWidth={2.5} />
+              <Eye size={13} color=C.dark strokeWidth={2.5} />
               <Text
                 style={{
                   fontFamily: FONTS.bold,
                   fontSize: 12.5,
-                  color: "#111827",
+                  color: C.dark,
                   letterSpacing: -0.1,
                 }}
               >
@@ -641,7 +641,7 @@ function MissedBookingsSection({ city }: { city: string }) {
               justifyContent: "center",
             }}
           >
-            <Flame size={15} color="#EF4444" fill="#EF4444" strokeWidth={0} />
+            <Flame size={15} color=C.error fill=C.error strokeWidth={0} />
           </View>
           <View>
             <Text
@@ -683,12 +683,12 @@ function MissedBookingsSection({ city }: { city: string }) {
             gap: 4,
           }}
         >
-          <Eye size={12} color="#111827" strokeWidth={2.5} />
+          <Eye size={12} color=C.dark strokeWidth={2.5} />
           <Text
             style={{
               fontFamily: FONTS.bold,
               fontSize: 12,
-              color: "#111827",
+              color: C.dark,
               letterSpacing: -0.1,
             }}
           >
@@ -819,8 +819,8 @@ function NewOnReslotSection() {
                 cachePolicy="memory-disk"
               />
               <View style={{ position: "absolute", top: 8, left: 8, backgroundColor: "rgba(126,200,122,0.90)", borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, flexDirection: "row", alignItems: "center", gap: 4 }}>
-                <Sparkles size={10} color="#111827" strokeWidth={2.5} />
-                <Text style={{ fontFamily: FONTS.bold, fontSize: 10, color: "#111827", textTransform: "uppercase", letterSpacing: 0.8 }}>Ny</Text>
+                <Sparkles size={10} color=C.dark strokeWidth={2.5} />
+                <Text style={{ fontFamily: FONTS.bold, fontSize: 10, color: C.dark, textTransform: "uppercase", letterSpacing: 0.8 }}>Ny</Text>
               </View>
               <View style={{ padding: 12, gap: 2 }}>
                 <Text
@@ -954,7 +954,7 @@ function CalendarModal({
                       <Text style={{
                         fontFamily: isSelected ? FONTS.bold : FONTS.medium,
                         fontSize: 15,
-                        color: isSelected ? "#111827" : isPast ? "#D1D5DB" : isToday ? C.coral : C.dark,
+                        color: isSelected ? C.dark : isPast ? "#D1D5DB" : isToday ? C.coral : C.dark,
                       }}>
                         {date.getDate()}
                       </Text>
@@ -1157,7 +1157,7 @@ function CountUpText({ value, suffix, city }: { value: number; suffix: string; c
           justifyContent: "center",
         }}
       >
-        <TrendingUp size={16} color="#3B82F6" strokeWidth={2.5} />
+        <TrendingUp size={16} color=C.info strokeWidth={2.5} />
       </View>
       <View style={{ flex: 1 }}>
         <Text
@@ -1437,7 +1437,7 @@ export default function HomeScreen() {
                     style={{
                       fontFamily: FONTS.bold,
                       fontSize: 13,
-                      color: "#FFFFFF",
+                      color: C.white,
                     }}
                   >
                     {todayBookings.length}
@@ -1479,7 +1479,7 @@ export default function HomeScreen() {
                     paddingVertical: 12,
                   }}
                 >
-                  <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: "#111827" }}>
+                  <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.dark }}>
                     Försök igen
                   </Text>
                 </Pressable>
@@ -1583,8 +1583,8 @@ export default function HomeScreen() {
                     gap: 8,
                   }}
                 >
-                  <Eye size={16} color="#111827" strokeWidth={2} />
-                  <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: "#111827" }}>
+                  <Eye size={16} color=C.dark strokeWidth={2} />
+                  <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.dark }}>
                     Bevaka restaurang
                   </Text>
                 </Pressable>

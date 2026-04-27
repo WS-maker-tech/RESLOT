@@ -164,7 +164,7 @@ export default function CreditsScreen() {
           <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.textPrimary, marginBottom: 4 }}>Något gick fel</Text>
           <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textTertiary, textAlign: "center", marginBottom: 20 }}>Kunde inte ladda credits. Försök igen senare.</Text>
           <Pressable onPress={() => profileRefetch()} style={{ backgroundColor: C.coral, borderRadius: RADIUS.md, paddingVertical: 12, paddingHorizontal: 28 }}>
-            <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: "#111827" }}>Försök igen</Text>
+            <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.dark }}>Försök igen</Text>
           </Pressable>
         </View>
       ) : (
@@ -251,7 +251,7 @@ export default function CreditsScreen() {
                 style={{
                   fontFamily: FONTS.bold,
                   fontSize: 52,
-                  color: "#FFFFFF",
+                  color: C.white,
                   letterSpacing: -2,
                   lineHeight: 56,
                 }}
@@ -431,13 +431,13 @@ export default function CreditsScreen() {
                   accessibilityLabel={`Köp ${qty} credit${qty > 1 ? "s" : ""} för ${qty * 39} kronor`}
                   onPress={() => handleBuyCredits(qty)}
                   style={{
-                    backgroundColor: qty === 2 ? "#7EC87A" : C.bgCard,
+                    backgroundColor: qty === 2 ? C.pistachio : C.bgCard,
                     borderRadius: RADIUS.md,
                     paddingVertical: 14,
                     alignItems: "center",
                     justifyContent: "center",
                     borderWidth: qty === 2 ? 0 : 0.5,
-                    borderColor: qty === 2 ? "#7EC87A" : C.divider,
+                    borderColor: qty === 2 ? C.pistachio : C.divider,
                     marginBottom: 8,
                     position: "relative" as const,
                     overflow: "visible" as const,
@@ -446,7 +446,7 @@ export default function CreditsScreen() {
                 >
                   {qty === 2 ? (
                     <View style={{ position: "absolute", top: -10, right: 12, backgroundColor: C.dark, paddingHorizontal: 8, paddingVertical: 2, borderRadius: RADIUS.sm }}>
-                      <Text style={{ fontFamily: FONTS.bold, fontSize: 10, color: "#FFFFFF" }}>Rekommenderat</Text>
+                      <Text style={{ fontFamily: FONTS.bold, fontSize: 10, color: C.white }}>Rekommenderat</Text>
                     </View>
                   ) : null}
                   {buyingQuantity === qty ? (
@@ -456,7 +456,7 @@ export default function CreditsScreen() {
                       style={{
                         fontFamily: FONTS.bold,
                         fontSize: 15,
-                        color: qty === 2 ? "#FFFFFF" : C.textPrimary,
+                        color: qty === 2 ? C.white : C.textPrimary,
                         letterSpacing: -0.1,
                       }}
                     >

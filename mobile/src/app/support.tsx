@@ -407,11 +407,11 @@ export default function SupportScreen() {
                       }}
                     >
                       {submitMutation.isPending ? (
-                        <ActivityIndicator size="small" color="#111827" />
+                        <ActivityIndicator size="small" color=C.dark />
                       ) : (
                         <>
-                          <Send size={16} color="#111827" strokeWidth={2} />
-                          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: "#111827" }}>
+                          <Send size={16} color=C.dark strokeWidth={2} />
+                          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.dark }}>
                             Skicka
                           </Text>
                         </>

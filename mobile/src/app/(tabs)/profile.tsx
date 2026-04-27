@@ -74,7 +74,7 @@ const AnimatedCreditsCount = React.memo(function AnimatedCreditsCount({ value }:
   }, [value]);
 
   return (
-    <Text testID="credits-amount" style={{ fontFamily: FONTS.displayBold, fontSize: 40, color: "#F59E0B" }}>
+    <Text testID="credits-amount" style={{ fontFamily: FONTS.displayBold, fontSize: 40, color: C.warning }}>
       {displayValue}
     </Text>
   );
@@ -372,7 +372,7 @@ export default function ProfileScreen() {
                 style={{
                   fontFamily: FONTS.semiBold,
                   fontSize: 15,
-                  color: "#111827",
+                  color: C.dark,
                 }}
               >
                 Försök igen
@@ -400,7 +400,7 @@ export default function ProfileScreen() {
                       height: 84,
                       borderRadius: 42,
                       borderWidth: 3,
-                      borderColor: "#7EC87A",
+                      borderColor: C.pistachio,
                       backgroundColor: C.bgInput,
                     }}
                     cachePolicy="memory-disk"
@@ -412,8 +412,8 @@ export default function ProfileScreen() {
                       height: 84,
                       borderRadius: 42,
                       borderWidth: 3,
-                      borderColor: "#7EC87A",
-                      backgroundColor: "#7EC87A",
+                      borderColor: C.pistachio,
+                      backgroundColor: C.pistachio,
                       alignItems: "center",
                       justifyContent: "center",
                     }}
@@ -423,7 +423,7 @@ export default function ProfileScreen() {
                     </Text>
                   </View>
                 )}
-                <View style={{ position: "absolute", bottom: 0, right: 0, width: 26, height: 26, borderRadius: 13, backgroundColor: "#7EC87A", alignItems: "center", justifyContent: "center", borderWidth: 2, borderColor: C.bg }}>
+                <View style={{ position: "absolute", bottom: 0, right: 0, width: 26, height: 26, borderRadius: 13, backgroundColor: C.pistachio, alignItems: "center", justifyContent: "center", borderWidth: 2, borderColor: C.bg }}>
                   <Camera size={14} color={C.white} strokeWidth={ICON.strokeWidth} />
                 </View>
               </Pressable>
@@ -485,8 +485,8 @@ export default function ProfileScreen() {
                   onPressOut={() => { buyScale.value = withSpring(1, { damping: 12, stiffness: 200 }); }}
                   onPress={handleBuyCreditsPress}
                 >
-                  <Animated.View style={[buyAnimStyle, { marginTop: 12, backgroundColor: "#7EC87A", borderRadius: RADIUS.full, paddingVertical: 10, alignItems: "center" }]}>
-                    <Text style={{ fontFamily: FONTS.bold, fontSize: 14, color: "#111827" }}>Köp credits</Text>
+                  <Animated.View style={[buyAnimStyle, { marginTop: 12, backgroundColor: C.pistachio, borderRadius: RADIUS.full, paddingVertical: 10, alignItems: "center" }]}>
+                    <Text style={{ fontFamily: FONTS.bold, fontSize: 14, color: C.dark }}>Köp credits</Text>
                   </Animated.View>
                 </Pressable>
                 <Pressable
@@ -511,7 +511,7 @@ export default function ProfileScreen() {
                   onPress={handleUploadedPress}
                   style={{ flex: 1, backgroundColor: C.bgCard, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: C.borderLight, padding: 12, alignItems: "center" }}
                 >
-                  <Text style={{ fontFamily: FONTS.displayBold, fontSize: 22, color: "#7EC87A" }}>{submittedCount}</Text>
+                  <Text style={{ fontFamily: FONTS.displayBold, fontSize: 22, color: C.pistachio }}>{submittedCount}</Text>
                   <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textSecondary, marginTop: 2 }}>Upplagda</Text>
                 </Pressable>
                 <Pressable
@@ -520,7 +520,7 @@ export default function ProfileScreen() {
                   onPress={handleClaimedPress}
                   style={{ flex: 1, backgroundColor: C.bgCard, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: C.borderLight, padding: 12, alignItems: "center" }}
                 >
-                  <Text style={{ fontFamily: FONTS.displayBold, fontSize: 22, color: "#7EC87A" }}>{claimedCount}</Text>
+                  <Text style={{ fontFamily: FONTS.displayBold, fontSize: 22, color: C.pistachio }}>{claimedCount}</Text>
                   <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textSecondary, marginTop: 2 }}>Övertagna</Text>
                 </Pressable>
                 <Pressable
@@ -529,7 +529,7 @@ export default function ProfileScreen() {
                   onPress={handleSavedPress}
                   style={{ flex: 1, backgroundColor: C.bgCard, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: C.borderLight, padding: 12, ...SHADOW.card, alignItems: "center" }}
                 >
-                  <Text style={{ fontFamily: FONTS.displayBold, fontSize: 22, color: "#7EC87A" }}>{savedCount}</Text>
+                  <Text style={{ fontFamily: FONTS.displayBold, fontSize: 22, color: C.pistachio }}>{savedCount}</Text>
                   <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textSecondary, marginTop: 2 }}>Sparade</Text>
                 </Pressable>
               </View>
@@ -540,7 +540,7 @@ export default function ProfileScreen() {
               <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textTertiary, letterSpacing: 0.8, textTransform: "uppercase", marginBottom: SPACING.sm, paddingHorizontal: 4 }}>
                 Senaste aktivitet
               </Text>
-              <View style={{ backgroundColor: "#fff", borderRadius: RADIUS.lg, padding: 16, borderWidth: 0.5, borderColor: C.borderLight, ...SHADOW.card }}>
+              <View style={{ backgroundColor: C.white, borderRadius: RADIUS.lg, padding: 16, borderWidth: 0.5, borderColor: C.borderLight, ...SHADOW.card }}>
                 {myReservations.length === 0 ? (
                   <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textTertiary, textAlign: "center", paddingVertical: 12 }}>
                     Ingen aktivitet ännu
@@ -563,7 +563,7 @@ export default function ProfileScreen() {
                         }}>
                           <Text style={{
                             fontFamily: FONTS.bold, fontSize: 11,
-                            color: r.status === "completed" || r.status === "claimed" ? C.success : r.status === "cancelled" ? C.error : "#F59E0B",
+                            color: r.status === "completed" || r.status === "claimed" ? C.success : r.status === "cancelled" ? C.error : C.warning,
                           }}>
                             {r.status === "completed" ? "Genomförd" : r.status === "claimed" ? "Övertagen" : r.status === "cancelled" ? "Avbokad" : r.status === "active" ? "Aktiv" : r.status === "grace_period" ? "Ångerfrist" : "Utgången"}
                           </Text>
@@ -644,7 +644,7 @@ export default function ProfileScreen() {
                 <MenuItem
                   icon={UserPlus}
                   label="Bjud in vän"
-                  color="#F59E0B"
+                  color=C.warning
                   bgColor="rgba(245, 158, 11, 0.12)"
                   onPress={handleInvitePress}
                   index={0}
@@ -652,7 +652,7 @@ export default function ProfileScreen() {
                 <MenuItem
                   icon={CreditCard}
                   label="Betalningar"
-                  color="#9CA3AF"
+                  color=C.grayLight
                   bgColor="rgba(156, 163, 175, 0.12)"
                   onPress={handlePaymentPress}
                   index={1}
@@ -660,7 +660,7 @@ export default function ProfileScreen() {
                 <MenuItem
                   icon={Shield}
                   label="Ansvarspolicy"
-                  color="#F59E0B"
+                  color=C.warning
                   bgColor="rgba(245, 158, 11, 0.12)"
                   onPress={() => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -671,7 +671,7 @@ export default function ProfileScreen() {
                 <MenuItem
                   icon={HelpCircle}
                   label="Hjälp"
-                  color="#F59E0B"
+                  color=C.warning
                   bgColor="rgba(245, 158, 11, 0.12)"
                   onPress={() => router.push("/faq")}
                   index={3}
@@ -764,7 +764,7 @@ export default function ProfileScreen() {
             accessibilityLabel="Ansvarspolicy"
             onPress={() => {}}
             style={{
-              backgroundColor: "#FFFFFF",
+              backgroundColor: C.white,
               borderRadius: 20,
               padding: 28,
               marginHorizontal: 24,
@@ -787,13 +787,13 @@ export default function ProfileScreen() {
                   justifyContent: "center",
                 }}
               >
-                <Shield size={22} color="#F59E0B" strokeWidth={2} />
+                <Shield size={22} color=C.warning strokeWidth={2} />
               </View>
               <Text
                 style={{
                   fontFamily: "PlusJakartaSans_700Bold",
                   fontSize: 20,
-                  color: "#111827",
+                  color: C.dark,
                   letterSpacing: -0.4,
                 }}
               >
@@ -802,42 +802,42 @@ export default function ProfileScreen() {
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false}>
-              <Text style={{ fontFamily: "PlusJakartaSans_700Bold", fontSize: 15, color: "#111827", marginBottom: 8 }}>
+              <Text style={{ fontFamily: "PlusJakartaSans_700Bold", fontSize: 15, color: C.dark, marginBottom: 8 }}>
                 Hur fungerar ansvar på Reslot?
               </Text>
-              <Text style={{ fontFamily: "PlusJakartaSans_400Regular", fontSize: 14, color: "#6B7280", lineHeight: 22, marginBottom: 16 }}>
+              <Text style={{ fontFamily: "PlusJakartaSans_400Regular", fontSize: 14, color: C.textSecondary, lineHeight: 22, marginBottom: 16 }}>
                 När du tar över en bokning via Reslot, övergår ansvaret för den bokningen gradvis till dig. Så här fungerar det:
               </Text>
 
               <View style={{ backgroundColor: "rgba(126,200,122,0.06)", borderRadius: 12, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: "rgba(126,200,122,0.15)" }}>
-                <Text style={{ fontFamily: "PlusJakartaSans_600SemiBold", fontSize: 14, color: "#7EC87A", marginBottom: 4 }}>
+                <Text style={{ fontFamily: "PlusJakartaSans_600SemiBold", fontSize: 14, color: C.pistachio, marginBottom: 4 }}>
                   1. Ångerfrist (5 minuter)
                 </Text>
-                <Text style={{ fontFamily: "PlusJakartaSans_400Regular", fontSize: 13, color: "#6B7280", lineHeight: 20 }}>
+                <Text style={{ fontFamily: "PlusJakartaSans_400Regular", fontSize: 13, color: C.textSecondary, lineHeight: 20 }}>
                   Direkt efter övertagande har du 5 minuter att ångra dig helt kostnadsfritt. Credits och serviceavgift återbetalas omedelbart.
                 </Text>
               </View>
 
               <View style={{ backgroundColor: "rgba(245,158,11,0.05)", borderRadius: 12, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: "rgba(245,158,11,0.12)" }}>
-                <Text style={{ fontFamily: "PlusJakartaSans_600SemiBold", fontSize: 14, color: "#F59E0B", marginBottom: 4 }}>
+                <Text style={{ fontFamily: "PlusJakartaSans_600SemiBold", fontSize: 14, color: C.warning, marginBottom: 4 }}>
                   2. Bekräftad bokning
                 </Text>
-                <Text style={{ fontFamily: "PlusJakartaSans_400Regular", fontSize: 13, color: "#6B7280", lineHeight: 20 }}>
+                <Text style={{ fontFamily: "PlusJakartaSans_400Regular", fontSize: 13, color: C.textSecondary, lineHeight: 20 }}>
                   Efter att ångerfristen löpt ut är bokningen din. Du förväntas dyka upp på utsatt tid och datum.
                 </Text>
               </View>
 
               <View style={{ backgroundColor: "rgba(239,68,68,0.04)", borderRadius: 12, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: "rgba(239,68,68,0.10)" }}>
-                <Text style={{ fontFamily: "PlusJakartaSans_600SemiBold", fontSize: 14, color: "#EF4444", marginBottom: 4 }}>
+                <Text style={{ fontFamily: "PlusJakartaSans_600SemiBold", fontSize: 14, color: C.error, marginBottom: 4 }}>
                   3. No-show
                 </Text>
-                <Text style={{ fontFamily: "PlusJakartaSans_400Regular", fontSize: 13, color: "#6B7280", lineHeight: 20 }}>
+                <Text style={{ fontFamily: "PlusJakartaSans_400Regular", fontSize: 13, color: C.textSecondary, lineHeight: 20 }}>
                   Om du inte dyker upp efter att ångerfristen löpt ut kan restaurangen debitera en no-show-avgift. Denna avgift sätts av restaurangen, inte av Reslot.
                 </Text>
               </View>
 
               <View style={{ backgroundColor: "rgba(0,0,0,0.025)", borderRadius: 12, padding: 14 }}>
-                <Text style={{ fontFamily: "PlusJakartaSans_500Medium", fontSize: 13, color: "#6B7280", lineHeight: 20, textAlign: "center" }}>
+                <Text style={{ fontFamily: "PlusJakartaSans_500Medium", fontSize: 13, color: C.textSecondary, lineHeight: 20, textAlign: "center" }}>
                   Vi debiterar dig bara om du inte dyker upp efter att ångerfristen löpt ut. Du har alltid möjlighet att ångra inom 5 minuter.
                 </Text>
               </View>
@@ -849,13 +849,13 @@ export default function ProfileScreen() {
               onPress={() => setShowLiabilityPolicy(false)}
               style={{
                 marginTop: 20,
-                backgroundColor: "#111827",
+                backgroundColor: C.dark,
                 borderRadius: 12,
                 paddingVertical: 14,
                 alignItems: "center",
               }}
             >
-              <Text style={{ fontFamily: "PlusJakartaSans_600SemiBold", fontSize: 15, color: "#FFFFFF" }}>
+              <Text style={{ fontFamily: "PlusJakartaSans_600SemiBold", fontSize: 15, color: C.white }}>
                 Jag förstår
               </Text>
             </Pressable>
@@ -941,7 +941,7 @@ export default function ProfileScreen() {
                 style={{
                   fontFamily: FONTS.semiBold,
                   fontSize: 15,
-                  color: "#FFFFFF",
+                  color: C.white,
                 }}
               >
                 Stäng

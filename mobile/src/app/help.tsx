@@ -12,8 +12,8 @@ const CONTACT_OPTIONS = [
     key: "chat",
     label: "Chatta med oss",
     icon: MessageCircle,
-    iconBg: "#7EC87A",
-    iconColor: "#FFFFFF",
+    iconBg: C.pistachio,
+    iconColor: C.white,
     action: "chat",
   },
   {
@@ -21,7 +21,7 @@ const CONTACT_OPTIONS = [
     label: "Skicka e-post",
     icon: Mail,
     iconBg: "#E5E7EB",
-    iconColor: "#6B7280",
+    iconColor: C.textSecondary,
     action: "email",
   },
   {
@@ -29,7 +29,7 @@ const CONTACT_OPTIONS = [
     label: "Vanliga fr\u00e5gor",
     icon: HelpCircle,
     iconBg: "#E5E7EB",
-    iconColor: "#6B7280",
+    iconColor: C.textSecondary,
     action: "faq",
   },
 ] as const;

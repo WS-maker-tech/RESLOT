@@ -105,9 +105,9 @@ function WebSupportBubbleInner() {
           })}
         >
           {isOpen ? (
-            <X size={24} color="#FFFFFF" strokeWidth={2} />
+            <X size={24} color=C.white strokeWidth={2} />
           ) : (
-            <Headphones size={24} color="#FFFFFF" strokeWidth={2} />
+            <Headphones size={24} color=C.white strokeWidth={2} />
           )}
         </Pressable>
       </Animated.View>
