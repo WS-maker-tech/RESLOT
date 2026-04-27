@@ -257,9 +257,9 @@ const Header = React.memo(function Header({
           <Text
             style={{
               fontFamily: FONTS.displayBold,
-              fontSize: 20,
+              fontSize: 28,
               color: C.dark,
-              letterSpacing: -0.5,
+              letterSpacing: -0.8,
             }}
             numberOfLines={1}
           >
@@ -268,15 +268,15 @@ const Header = React.memo(function Header({
           <Text
             style={{
               fontFamily: FONTS.displayBold,
-              fontSize: 20,
+              fontSize: 28,
               color: C.pistachio,
-              letterSpacing: -0.5,
-              opacity: 0.9,
+              letterSpacing: -0.8,
+              opacity: 0.95,
             }}
           >
             {selectedCity}
           </Text>
-          <ChevronDown size={14} color={C.pistachio} strokeWidth={ICON.strokeWidth} style={{ marginLeft: 2 }} />
+          <ChevronDown size={18} color={C.pistachio} strokeWidth={ICON.strokeWidth} style={{ marginLeft: 4 }} />
         </Pressable>
 
         <View className="flex-row items-center" style={{ gap: 6 }}>
@@ -646,10 +646,22 @@ function MissedBookingsSection({ city }: { city: string }) {
           <View>
             <Text
               style={{
+                fontFamily: FONTS.semiBold,
+                fontSize: 11,
+                letterSpacing: 1.2,
+                textTransform: "uppercase",
+                color: C.textTertiary,
+                marginBottom: 2,
+              }}
+            >
+              Tagna nyligen
+            </Text>
+            <Text
+              style={{
                 fontFamily: FONTS.displayBold,
-                fontSize: 17,
+                fontSize: 22,
                 color: C.dark,
-                letterSpacing: -0.4,
+                letterSpacing: -0.6,
               }}
             >
               Du missade
@@ -657,9 +669,9 @@ function MissedBookingsSection({ city }: { city: string }) {
             <Text
               style={{
                 fontFamily: FONTS.regular,
-                fontSize: 12,
+                fontSize: 13,
                 color: C.textTertiary,
-                marginTop: 0,
+                marginTop: 2,
               }}
             >
               {missed.length} bokningar tagna nyligen
@@ -762,10 +774,22 @@ function NewOnReslotSection() {
           <View>
             <Text
               style={{
+                fontFamily: FONTS.semiBold,
+                fontSize: 11,
+                letterSpacing: 1.2,
+                textTransform: "uppercase",
+                color: C.textTertiary,
+                marginBottom: 2,
+              }}
+            >
+              Premiär
+            </Text>
+            <Text
+              style={{
                 fontFamily: FONTS.displayBold,
-                fontSize: 17,
+                fontSize: 22,
                 color: C.dark,
-                letterSpacing: -0.4,
+                letterSpacing: -0.6,
               }}
             >
               Nya på Reslot
@@ -773,9 +797,9 @@ function NewOnReslotSection() {
             <Text
               style={{
                 fontFamily: FONTS.regular,
-                fontSize: 12,
+                fontSize: 13,
                 color: C.textTertiary,
-                marginTop: 0,
+                marginTop: 2,
               }}
             >
               Restauranger med sin första bokning
