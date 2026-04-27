@@ -1,0 +1,20 @@
+/**
+ * UI Primitives — Reslot designsystem
+ *
+ * Återanvändbara primitives som ersätter inline Pressable + View + StyleSheet
+ * blocks runt om i appen. Alla bygger på tokens från `@/lib/theme`.
+ *
+ * Sprint 1 introducerar:
+ * - Button (PR 1.2)
+ * - Card (PR 1.2)
+ * - Input + FormField (PR 1.3)
+ * - Tag + ListItem (PR 1.4)
+ *
+ * Använd hellre dessa än att handrita motsvarande styling i varje skärm.
+ */
+
+export { Button } from "./Button";
+export type { ButtonProps, ButtonVariant, ButtonSize } from "./Button";
+
+export { Card } from "./Card";
+export type { CardProps, CardVariant, CardPaddingKey } from "./Card";
