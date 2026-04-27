@@ -87,9 +87,9 @@ export default function HelpScreen() {
           <Text
             style={{
               fontFamily: FONTS.displayBold,
-              fontSize: 20,
+              fontSize: 22,
               color: C.textPrimary,
-              letterSpacing: -0.4,
+              letterSpacing: -0.6,
             }}
           >
             Hj\u00e4lp & support

@@ -197,7 +197,7 @@ export default function SupportScreen() {
           >
             <ChevronLeft size={20} color={C.textSecondary} strokeWidth={2} />
           </Pressable>
-          <Text style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: C.textPrimary, letterSpacing: -0.4 }}>
+          <Text style={{ fontFamily: FONTS.displayBold, fontSize: 22, color: C.textPrimary, letterSpacing: -0.6 }}>
             Hjälp och support
           </Text>
         </View>
