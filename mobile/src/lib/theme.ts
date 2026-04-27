@@ -143,12 +143,17 @@ export const FONTS = {
 } as const;
 
 export const SPACING = {
+  xxs: 2,
+  xss: 3,
   xs: 4,
   sm: 8,
   md: 16,
   lg: 20,
+  lg2: 24,
   xl: 28,
+  xl2: 32,
   xxl: 48,
+  xxxl: 64,
 } as const;
 
 export const RADIUS = {
@@ -156,10 +161,19 @@ export const RADIUS = {
   md: 12,
   lg: 16,
   xl: 20,
+  xxl: 24,
   full: 28,
+  pill: 999,
 } as const;
 
 export const SHADOW = {
+  subtle: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 1,
+  },
   card: {
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -167,12 +181,33 @@ export const SHADOW = {
     shadowRadius: 10,
     elevation: 2,
   },
+  raised: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+  },
   elevated: {
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.12,
     shadowRadius: 16,
     elevation: 6,
+  },
+  floating: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.16,
+    shadowRadius: 24,
+    elevation: 12,
+  },
+  pressed: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 3,
+    elevation: 1,
   },
 } as const;
 
@@ -232,6 +267,25 @@ export const TYPO = {
     fontSize: 16,
     color: C.dark,
   },
+  displayXL: {
+    fontFamily: FONTS.displayBold,
+    fontSize: 44,
+    lineHeight: 48,
+    letterSpacing: -1.2,
+    color: C.textPrimary,
+  },
+  eyebrow: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 11,
+    letterSpacing: 1.2,
+    textTransform: "uppercase" as const,
+    color: C.textTertiary,
+  },
+  numeric: {
+    fontFamily: FONTS.bold,
+    fontVariant: ["tabular-nums"] as const,
+    color: C.textPrimary,
+  },
 } as const;
 
 export const ICON = {
@@ -241,4 +295,56 @@ export const ICON = {
     md: 20,
     lg: 24,
   },
+} as const;
+
+/** Motion / animation tokens — Reanimated + native Animated samklang */
+export const MOTION = {
+  duration: {
+    instant: 100,
+    fast: 180,
+    ease: 250,
+    slow: 400,
+    hero: 500,
+  },
+  easing: {
+    standard: [0.2, 0.0, 0.0, 1.0] as const,
+    decelerate: [0.0, 0.0, 0.2, 1.0] as const,
+    accelerate: [0.4, 0.0, 1.0, 1.0] as const,
+    spring: {
+      damping: 18,
+      stiffness: 220,
+      mass: 1,
+    },
+    springSoft: {
+      damping: 22,
+      stiffness: 160,
+      mass: 1,
+    },
+    springBouncy: {
+      damping: 12,
+      stiffness: 280,
+      mass: 1,
+    },
+  },
+} as const;
+
+/** Image aspect ratios — använd för konsekvent bild-presentation */
+export const IMG = {
+  hero: 3 / 4,
+  list: 4 / 5,
+  thumb: 1,
+  banner: 16 / 9,
+  square: 1,
+} as const;
+
+/** Semantic wrappers — ger meningsbärande namn ovanpå primitiva tokens */
+export const SEMANTIC = {
+  brand: C.pistachio,
+  surface: C.bg,
+  surfaceRaised: C.bgCard,
+  surfaceInput: C.bgInput,
+  onBrand: C.dark,
+  onSurface: C.textPrimary,
+  onSurfaceMuted: C.textSecondary,
+  onSurfaceFaint: C.textTertiary,
 } as const;
