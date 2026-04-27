@@ -6,9 +6,13 @@ Reslot är en Expo React Native-app (web-build) + Vercel serverless API för ett
 ## Repo & Workflow
 - **Repo:** https://github.com/WS-maker-tech/RESLOT.git (detta är origin — single source of truth)
 - **Före varje session:** `git pull origin main` — flera agenter jobbar mot samma repo
-- **Branch-strategi:** direkt mot `main` för nu (feature branches vid behov: `feat/<slug>`)
-- **Push:** `git add -A && git commit -m "..." && git push origin main`
-- **Deploy:** `cd mobile && npx vercel --prod --force` (alltid `--force` — Vercel cachar aggressivt)
+- **Branch-strategi:** jobba alltid på en feature branch (`feat/<slug>` eller `claude/<slug>`), aldrig direkt på `main`
+- **Flöde:**
+  1. `git checkout -b feat/<slug>` — skapa feature branch
+  2. Commita ändringar på feature branchen
+  3. `git checkout main && git pull origin main && git merge feat/<slug> && git push origin main` — merga in i main
+  4. Deploya: automatiskt via Vercel git-integration ELLER manuellt med `cd mobile && npx vercel --prod --force`
+- **PR-review skippas** — William reviewar direkt i Claude Code innan merge
 - **Pakethanterare:** `bun` — **aldrig npm**, ta bort `package-lock.json` om den dyker upp
 - **Konflikthantering:** jobba aldrig i samma fil samtidigt som annan agent — koordinera via William
 
@@ -23,7 +27,9 @@ npx vercel --prod --force   # production deploy
 ## Deploy
 - **Production URL:** https://mobile-three-sable.vercel.app
 - **Vercel project:** `clawmax12-langs-projects/mobile`
-- **Deploy-kommando:** `cd mobile && npx vercel --prod --force`
+- **Trigger:** push till `main` deployar (auto via Vercel git-integration), eller kör manuellt
+- **Manuellt deploy-kommando:** `cd mobile && npx vercel --prod --force` (alltid `--force` — Vercel cachar aggressivt)
+- **Om produktionen inte uppdateras:** kör `npx vercel --prod --force` igen
 - **API routing:** `/api/:path*` → `/api?path=:path*` (catch-all i `mobile/api/index.ts`)
 
 ## Tech Stack
