@@ -202,8 +202,31 @@ Sätts i Vercel dashboard, inte i koden.
 | 3 — Submit + Profil | Visuell upgrade av största delta | ✅ KLAR (2/2 PRs) |
 | 4 — Alerts + Reservations + Credits | Visuell upgrade av listsidor | ✅ KLAR (3/3 PRs) |
 | 5 — Settings + Payment + Support | Visuell polish | ✅ KLAR (3/3 PRs) |
+| 6 — Foundation utbyggnad | 11 nya primitives + dev-components-uppdatering | ✅ KLAR (6/6 PRs) |
 
-**Total: 16 PRs mergade till main, autonomt under natten 2026-04-27.**
+**Total: 23 PRs mergade till main + 1 vault-update PR = 24 PRs autonomt under natten 2026-04-27.**
+
+### Komponentbiblioteket (`mobile/src/components/ui/`) — 17 primitives klara
+| Primitive | Sprint | Status |
+|-----------|--------|--------|
+| Button | 1 (PR 1.2) | ✅ |
+| Card | 1 (PR 1.2) | ✅ |
+| Input | 1 (PR 1.3) | ✅ |
+| FormField | 1 (PR 1.3) | ✅ |
+| Tag | 1 (PR 1.4) | ✅ |
+| ListItem | 1 (PR 1.4) | ✅ |
+| Avatar + AvatarGroup | 6 (PR 6.1) | ✅ |
+| EmptyState | 6 (PR 6.1) | ✅ |
+| CountdownPill | 6 (PR 6.2) | ✅ |
+| Divider | 6 (PR 6.2) | ✅ |
+| Rating | 6 (PR 6.3) | ✅ |
+| Stepper | 6 (PR 6.3) | ✅ |
+| Toast | 6 (PR 6.4) | ✅ |
+| Tabs | 6 (PR 6.4) | ✅ |
+| Chip | 6 (PR 6.5) | ✅ |
+| ErrorState | 6 (PR 6.5) | ✅ |
+
+Alla visualiserade på `/dev-components`-route (PR 6.6).
 
 ### Branch-konvention för sprintar
 `feat/sprint-1-1-tokens`, `feat/sprint-1-2-button-card`, etc.
@@ -323,15 +346,31 @@ Varje session lägger till en kort post nederst med datum, vad som hände och st
 - Designsystem-mognad: 3/10 → 6/10 (P0-foundation komplett, primitives klara att rullas ut på skärmar)
 - Hierarki-kvalitet: alla 11 huvudskärmar har nu eyebrow + dominant rubrik
 
-**Vad som inte gjordes (för säker autonom körning, kommer i framtida sprintar):**
-- Migrering av befintliga skärmar till `<Button>`/`<Card>`/`<Input>`/`<Tag>`/`<ListItem>` (kräver djupare layout-omarbetningar)
-- Emoji-fix i payment.tsx säkerhetssektion (🔒 ✓ 🛡️ → lucide-ikoner)
-- `<CountdownPill>`, `<Avatar>`, `<RestaurantImage>`-primitives (Prio 1)
+**Sprint 6 — utvidgad foundation (efter Sprint 5):**
+- 11 nya primitives byggda: Avatar, AvatarGroup, EmptyState, CountdownPill, Divider, Rating, Stepper, Toast, Tabs, Chip, ErrorState
+- `/dev-components`-route uppdaterad med visuell katalog över alla 17 primitives
+- Total foundation: **17 primitives** klara att rullas ut på skärmar i framtida session
+
+**Vad som inte gjordes (kommer i framtida sprintar):**
+- **Migrering av befintliga skärmar till primitives** — detta är där "Airbnb-WOW" levereras på riktigt. Primitives finns; de behöver bara rullas ut. Konkreta första steg: Hem-restaurangkort → `<Card interactive>`, Settings-rader → `<ListItem>`, formulär-knappar → `<Button>`, Alerts-tabs → `<Tabs>`, FilterChips → `<Chip>`
+- Emoji-fix i payment.tsx säkerhetssektion (🔒 ✓ 🛡️ → lucide-ikoner i `<Tag soft>`)
+- `<RestaurantImage>` primitive med blur-up
+- `<BottomSheet>` primitive (formSheet → BottomSheet)
 - Sticky bottom CTA på restaurangdetalj
 - Stripe-aktig kort-animation
-- Onboarding state-coverage
+- Hero-bilder växer från 70×70 till 4:5-ratio på reservations-kort
+- Visual regression-testing av prod efter migreringar
 
-**Nästa session:** börja med PR-migrering — använd Sprint 1-primitives på en skärm åt gången (t.ex. Hem-restaurangkort använder `<Card interactive>`, Settings-rader använder `<ListItem>`, formulär-knappar använder `<Button>`). Detta är där "Airbnb-WOW" levereras på riktigt — primitives finns, de behöver bara rullas ut.
+**Nästa session — rekommenderad ordning:**
+1. PR: Hem `RestaurantCard` använder `<Card interactive>` (lågrisk, hög impact)
+2. PR: Settings/Account-settings rader använder `<ListItem>`
+3. PR: Submit step-progress använder `<Stepper>`
+4. PR: Alerts-tabs använder `<Tabs>`-primitivet
+5. PR: Reservations bilder växer (4:5-ratio), använder `<Tag>` på status, `<CountdownPill>` på aktiva
+6. PR: Restaurangdetalj sticky bottom CTA
+7. PR: Payment emoji → ikon-fix
+
+Detta är där "designinvesterare lutar sig fram"-effekten kommer.
 
 
 
