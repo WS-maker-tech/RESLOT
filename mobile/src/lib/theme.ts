@@ -1,10 +1,11 @@
 type ColorPalette = Record<
-  | "coral" | "gold" | "dark" | "bg"
+  | "pistachio" | "pistachioLight" | "pistachioPressed"
+  | "gold" | "dark" | "bg"
   | "bgCard" | "bgInput"
   | "textPrimary" | "textSecondary" | "textTertiary"
   | "divider" | "borderLight"
   | "success" | "successBright" | "error" | "danger" | "warning" | "info"
-  | "coralLight" | "coralPressed" | "successLight" | "successBg" | "pistachio" | "grayLight"
+  | "successLight" | "successBg" | "grayLight"
   | "white" | "goldLight" | "goldBorder" | "goldPressed"
   | "errorBg" | "errorBorder" | "errorLight"
   | "infoBg" | "infoBorder" | "infoLight"
@@ -14,7 +15,6 @@ type ColorPalette = Record<
 
 export const C = {
   // Primary — Reslot brand palette
-  coral: "#7EC87A",  // pistachio
   pistachio: "#7EC87A",
   grayLight: "#9CA3AF",
   gold: "#C9A96E",
@@ -43,8 +43,8 @@ export const C = {
   info: "#3B82F6",
 
   // Pressed/interaction variants
-  coralLight: "rgba(126,200,122,0.15)",
-  coralPressed: "rgba(126,200,122,0.25)",
+  pistachioLight: "rgba(126,200,122,0.15)",
+  pistachioPressed: "rgba(126,200,122,0.25)",
   successLight: "rgba(139,158,126,0.10)",
   successBg: "rgba(139,158,126,0.08)",
 
@@ -78,7 +78,6 @@ export const C = {
  * No existing components are changed — this is infrastructure only.
  */
 export const DARK_COLORS: ColorPalette = {
-  coral: "#7EC87A",
   pistachio: "#7EC87A",
   grayLight: "#9CA3AF",
   gold: "#D4B87E",
@@ -102,8 +101,8 @@ export const DARK_COLORS: ColorPalette = {
   warning: "#FBBF24",
   info: "#60A5FA",
 
-  coralLight: "rgba(126,200,122,0.15)",
-  coralPressed: "rgba(126,200,122,0.20)",
+  pistachioLight: "rgba(126,200,122,0.15)",
+  pistachioPressed: "rgba(126,200,122,0.20)",
   successLight: "rgba(157,175,144,0.15)",
   successBg: "rgba(157,175,144,0.10)",
 

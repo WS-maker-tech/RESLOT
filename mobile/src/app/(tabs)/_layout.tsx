@@ -68,14 +68,14 @@ function TabIcon({
     return (
       <View
         style={{
-          backgroundColor: C.coral,
+          backgroundColor: C.pistachio,
           width: 48,
           height: 48,
           borderRadius: 24,
           alignItems: "center",
           justifyContent: "center",
           marginTop: -12,
-          shadowColor: C.coral,
+          shadowColor: C.pistachio,
           shadowOffset: { width: 0, height: 4 },
           shadowOpacity: 0.3,
           shadowRadius: 10,
@@ -277,7 +277,7 @@ export default function TabLayout() {
             }) => <TabIcon icon={Bell} color={color} focused={focused} />,
             tabBarBadge: badgeCount,
             tabBarBadgeStyle: {
-              backgroundColor: C.coral,
+              backgroundColor: C.pistachio,
               color: C.white,
               fontSize: 10,
               fontFamily: FONTS.semiBold,

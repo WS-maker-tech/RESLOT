@@ -43,7 +43,7 @@ export default function SavedScreen() {
           <Text style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: C.textPrimary, letterSpacing: -0.4, flex: 1 }}>
             Sparade restauranger
           </Text>
-          <Heart size={20} color={C.coral} fill={saved.length > 0 ? C.coral : "transparent"} strokeWidth={2} />
+          <Heart size={20} color={C.pistachio} fill={saved.length > 0 ? C.pistachio : "transparent"} strokeWidth={2} />
         </View>
       </SafeAreaView>
 
@@ -55,8 +55,8 @@ export default function SavedScreen() {
         </View>
       ) : saved.length === 0 ? (
         <Animated.View entering={FadeInDown.springify()} style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 40 }}>
-          <View style={{ width: 64, height: 64, borderRadius: 24, backgroundColor: C.coralLight, alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
-            <Heart size={28} color={C.coral} strokeWidth={2} />
+          <View style={{ width: 64, height: 64, borderRadius: 24, backgroundColor: C.pistachioLight, alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
+            <Heart size={28} color={C.pistachio} strokeWidth={2} />
           </View>
           <Text style={{ fontFamily: FONTS.displayBold, fontSize: 18, color: C.textPrimary, textAlign: "center", letterSpacing: -0.3 }}>
             Inga sparade restauranger
@@ -105,7 +105,7 @@ export default function SavedScreen() {
                   onPress={() => handleUnsave(item.restaurantId)}
                   style={{ padding: 16 }}
                 >
-                  <Trash2 size={18} color={C.coral} strokeWidth={2} />
+                  <Trash2 size={18} color={C.pistachio} strokeWidth={2} />
                 </Pressable>
               </Pressable>
             </Animated.View>

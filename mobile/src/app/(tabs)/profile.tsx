@@ -152,7 +152,7 @@ const MenuItem = React.memo(function MenuItem({
           style={{
             fontFamily: FONTS.medium,
             fontSize: 15,
-            color: color === C.coral ? C.coral : C.textPrimary,
+            color: color === C.pistachio ? C.pistachio : C.textPrimary,
             marginLeft: 14,
             flex: 1,
           }}
@@ -333,7 +333,7 @@ export default function ProfileScreen() {
             }}
             testID="error-state"
           >
-            <AlertCircle size={40} color={C.coral} strokeWidth={ICON.strokeWidth} />
+            <AlertCircle size={40} color={C.pistachio} strokeWidth={ICON.strokeWidth} />
             <Text
               style={{
                 fontFamily: FONTS.semiBold,
@@ -362,7 +362,7 @@ export default function ProfileScreen() {
               onPress={handleRetryPress}
               style={{
                 marginTop: SPACING.md,
-                backgroundColor: C.coral,
+                backgroundColor: C.pistachio,
                 borderRadius: RADIUS.md,
                 paddingVertical: 12,
                 paddingHorizontal: 28,
@@ -601,8 +601,8 @@ export default function ProfileScreen() {
                   onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/(tabs)/submit"); }}
                   style={{ flexDirection: "row", alignItems: "center", padding: 14, gap: 12 }}
                 >
-                  <View style={{ width: 38, height: 38, borderRadius: 11, backgroundColor: C.coralLight, alignItems: "center", justifyContent: "center" }}>
-                    <ArrowUpRight size={18} color={C.coral} strokeWidth={2} />
+                  <View style={{ width: 38, height: 38, borderRadius: 11, backgroundColor: C.pistachioLight, alignItems: "center", justifyContent: "center" }}>
+                    <ArrowUpRight size={18} color={C.pistachio} strokeWidth={2} />
                   </View>
                   <Text style={{ fontFamily: FONTS.medium, fontSize: 15, color: C.textPrimary, flex: 1 }}>Lägg upp en bokning</Text>
                   <View style={{ backgroundColor: C.successLight, paddingHorizontal: 8, paddingVertical: 3, borderRadius: RADIUS.sm }}>
@@ -679,8 +679,8 @@ export default function ProfileScreen() {
                 <MenuItem
                   icon={LogOut}
                   label="Logga ut"
-                  color={C.coral}
-                  bgColor={C.coralLight}
+                  color={C.pistachio}
+                  bgColor={C.pistachioLight}
                   isLast
                   onPress={handleLogoutPress}
                   index={4}
@@ -894,13 +894,13 @@ export default function ProfileScreen() {
                 width: 52,
                 height: 52,
                 borderRadius: RADIUS.lg,
-                backgroundColor: C.coralLight,
+                backgroundColor: C.pistachioLight,
                 alignItems: "center",
                 justifyContent: "center",
                 marginBottom: SPACING.md,
               }}
             >
-              <Settings size={24} color={C.coral} strokeWidth={2} />
+              <Settings size={24} color={C.pistachio} strokeWidth={2} />
             </View>
             <Text
               style={{

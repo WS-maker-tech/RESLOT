@@ -134,13 +134,13 @@ function AccordionItem({
               width: 26,
               height: 26,
               borderRadius: 8,
-              backgroundColor: open ? C.coralLight : "rgba(0,0,0,0.04)",
+              backgroundColor: open ? C.pistachioLight : "rgba(0,0,0,0.04)",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
             <Animated.View style={chevronStyle}>
-              <ChevronRight size={13} color={open ? C.coral : C.textTertiary} strokeWidth={2.5} />
+              <ChevronRight size={13} color={open ? C.pistachio : C.textTertiary} strokeWidth={2.5} />
             </Animated.View>
           </View>
         </View>
@@ -250,10 +250,10 @@ export default function SupportScreen() {
                   paddingVertical: 12,
                 }}
               >
-                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.coral }}>
+                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.pistachio }}>
                   Se alla frågor och svar
                 </Text>
-                <ChevronRight size={16} color={C.coral} strokeWidth={2} />
+                <ChevronRight size={16} color={C.pistachio} strokeWidth={2} />
               </Pressable>
             </Animated.View>
           </View>
@@ -261,7 +261,7 @@ export default function SupportScreen() {
           {/* Common Problems */}
           <Animated.View entering={FadeInDown.delay(200).springify()}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 12 }}>
-              <AlertCircle size={18} color={C.coral} strokeWidth={2} />
+              <AlertCircle size={18} color={C.pistachio} strokeWidth={2} />
               <Text style={{ fontFamily: FONTS.displayBold, fontSize: 16, color: C.textPrimary, letterSpacing: -0.3 }}>
                 Vanliga problem
               </Text>
@@ -306,8 +306,8 @@ export default function SupportScreen() {
                   ...SHADOW.card,
                 }}
               >
-                <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: C.coralLight, alignItems: "center", justifyContent: "center" }}>
-                  <Mail size={20} color={C.coral} strokeWidth={2} />
+                <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: C.pistachioLight, alignItems: "center", justifyContent: "center" }}>
+                  <Mail size={20} color={C.pistachio} strokeWidth={2} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.dark }}>Skicka e-post</Text>
@@ -362,7 +362,7 @@ export default function SupportScreen() {
                       }}
                       style={{ marginTop: 12 }}
                     >
-                      <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.coral }}>
+                      <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.pistachio }}>
                         Skicka ett till
                       </Text>
                     </Pressable>
@@ -396,7 +396,7 @@ export default function SupportScreen() {
                       disabled={!feedbackMessage.trim() || submitMutation.isPending}
                       style={{
                         marginTop: 12,
-                        backgroundColor: feedbackMessage.trim() ? C.coral : C.textTertiary,
+                        backgroundColor: feedbackMessage.trim() ? C.pistachio : C.textTertiary,
                         borderRadius: RADIUS.md,
                         paddingVertical: 13,
                         alignItems: "center",
@@ -425,8 +425,8 @@ export default function SupportScreen() {
 
           {/* Info banner */}
           <Animated.View entering={FadeInDown.delay(520).springify()}>
-            <View style={{ backgroundColor: C.coralLight, borderRadius: RADIUS.lg, padding: 16, flexDirection: "row", alignItems: "flex-start", gap: 12 }}>
-              <Bell size={16} color={C.coral} strokeWidth={2} style={{ marginTop: 2 }} />
+            <View style={{ backgroundColor: C.pistachioLight, borderRadius: RADIUS.lg, padding: 16, flexDirection: "row", alignItems: "flex-start", gap: 12 }}>
+              <Bell size={16} color={C.pistachio} strokeWidth={2} style={{ marginTop: 2 }} />
               <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textSecondary, lineHeight: 20, flex: 1 }}>
                 Vi svarar vanligtvis inom 24 timmar. Du får en push-notis när vi svarar på ditt ärende.
               </Text>

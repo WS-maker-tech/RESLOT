@@ -141,14 +141,14 @@ export default function AccountSettingsScreen() {
             <ChevronLeft size={20} color={C.textSecondary} strokeWidth={2} />
           </Pressable>
           <Text style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: C.textPrimary, letterSpacing: -0.4, flex: 1 }}>Kontoinställningar</Text>
-          <Pressable testID="save-button" accessibilityLabel="Spara ändringar" onPress={handleSave} disabled={saving} style={{ backgroundColor: C.coral, borderRadius: RADIUS.md, paddingHorizontal: 16, paddingVertical: 8 }}>
+          <Pressable testID="save-button" accessibilityLabel="Spara ändringar" onPress={handleSave} disabled={saving} style={{ backgroundColor: C.pistachio, borderRadius: RADIUS.md, paddingHorizontal: 16, paddingVertical: 8 }}>
             {saving ? <ActivityIndicator color=C.dark size="small" /> : <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.dark }}>Spara</Text>}
           </Pressable>
         </View>
       </SafeAreaView>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 80 }}>
-        {isLoading ? <ActivityIndicator color={C.coral} style={{ marginTop: 40 }} /> : (
+        {isLoading ? <ActivityIndicator color={C.pistachio} style={{ marginTop: 40 }} /> : (
           <>
             <Animated.View entering={FadeInDown.springify()}>
               <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textTertiary, letterSpacing: 1, textTransform: "uppercase", marginBottom: 14, marginTop: 8 }}>Personuppgifter</Text>
@@ -169,9 +169,9 @@ export default function AccountSettingsScreen() {
                 testID="delete-account-button"
                 accessibilityLabel="Radera konto"
                 onPress={() => { setShowDeleteConfirm(true); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); }}
-                style={{ marginTop: 40, paddingVertical: 14, borderRadius: 14, borderWidth: 1, borderColor: C.coralPressed, alignItems: "center" }}
+                style={{ marginTop: 40, paddingVertical: 14, borderRadius: 14, borderWidth: 1, borderColor: C.pistachioPressed, alignItems: "center" }}
               >
-                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.coral }}>Radera konto</Text>
+                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.pistachio }}>Radera konto</Text>
               </Pressable>
             </Animated.View>
           </>
@@ -181,8 +181,8 @@ export default function AccountSettingsScreen() {
       <Modal visible={showDeleteConfirm} transparent animationType="fade" onRequestClose={() => setShowDeleteConfirm(false)}>
         <Pressable accessibilityLabel="Stäng dialogrutan" style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)", alignItems: "center", justifyContent: "center" }} onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setShowDeleteConfirm(false); }}>
           <Pressable accessibilityLabel="Bekräfta radering av konto" onPress={() => {}} style={{ backgroundColor: C.bgCard, borderRadius: 24, padding: 28, marginHorizontal: 32, alignItems: "center" }}>
-            <View style={{ width: 52, height: 52, borderRadius: 16, backgroundColor: C.coralLight, alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
-              <AlertTriangle size={24} color={C.coral} strokeWidth={2} />
+            <View style={{ width: 52, height: 52, borderRadius: 16, backgroundColor: C.pistachioLight, alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
+              <AlertTriangle size={24} color={C.pistachio} strokeWidth={2} />
             </View>
             <Text style={{ fontFamily: FONTS.bold, fontSize: 18, color: C.textPrimary, letterSpacing: -0.3, textAlign: "center" }}>Radera konto?</Text>
             <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary, marginTop: 8, textAlign: "center", lineHeight: 20 }}>
@@ -192,7 +192,7 @@ export default function AccountSettingsScreen() {
               <Pressable accessibilityLabel="Avbryt" onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setShowDeleteConfirm(false); }} style={{ flex: 1, paddingVertical: 13, borderRadius: 12, backgroundColor: C.borderLight, alignItems: "center" }}>
                 <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.textPrimary }}>Avbryt</Text>
               </Pressable>
-              <Pressable testID="confirm-delete-button" accessibilityLabel="Bekräfta radering" onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); handleDeleteAccount(); }} style={{ flex: 1, paddingVertical: 13, borderRadius: RADIUS.md, backgroundColor: C.coral, alignItems: "center" }}>
+              <Pressable testID="confirm-delete-button" accessibilityLabel="Bekräfta radering" onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); handleDeleteAccount(); }} style={{ flex: 1, paddingVertical: 13, borderRadius: RADIUS.md, backgroundColor: C.pistachio, alignItems: "center" }}>
                 <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.dark }}>Radera</Text>
               </Pressable>
             </View>

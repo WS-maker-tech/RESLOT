@@ -107,7 +107,7 @@ Definierade i `mobile/src/lib/theme.ts` — använd alltid dessa, inte hårdkoda
 |-------|-------|------------|
 | `C.pistachio` / `#7EC87A` | Pistachio grön | Primary brand, knappar, accenter |
 | `C.dark` / `#111827` | Nästan svart | Bakgrund mörka kort, text |
-| `C.coral` / `#E06A4E` | Korall | Varningar, sekundär accent |
+| `C.error` / `#EF4444` | Röd | Varningar, fel-state |
 | `C.gold` / `#F59E0B` | Guld | Credits, ratings |
 | `C.cream` / `#FAFAF8` | Krämvit | App-bakgrund |
 | `FONTS.displayBold` | Rubrikfont | Stora rubriker |

@@ -111,7 +111,7 @@ export default function AddWatchScreen() {
             paddingHorizontal: 14,
             height: 48,
             borderWidth: 1,
-            borderColor: searchQuery ? C.coral : C.borderLight,
+            borderColor: searchQuery ? C.pistachio : C.borderLight,
           }}>
             <Search size={17} color={C.textTertiary} strokeWidth={2} />
             <TextInput

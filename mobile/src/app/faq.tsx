@@ -140,7 +140,7 @@ function FaqItem({ question, answer, delay }: { question: string; answer: string
               width: 28,
               height: 28,
               borderRadius: 8,
-              backgroundColor: open ? C.coralLight : "rgba(0,0,0,0.04)",
+              backgroundColor: open ? C.pistachioLight : "rgba(0,0,0,0.04)",
               alignItems: "center",
               justifyContent: "center",
             }}
@@ -148,7 +148,7 @@ function FaqItem({ question, answer, delay }: { question: string; answer: string
             <Animated.View style={chevronStyle}>
               <ChevronRight
                 size={14}
-                color={open ? C.coral : C.textTertiary}
+                color={open ? C.pistachio : C.textTertiary}
                 strokeWidth={2.5}
               />
             </Animated.View>

@@ -122,19 +122,19 @@ function CountdownTimer({
         testID="countdown-timer"
         style={{
           alignItems: "center",
-          backgroundColor: C.coralLight,
+          backgroundColor: C.pistachioLight,
           borderRadius: RADIUS.xl,
           padding: SPACING.lg,
           borderWidth: 1,
-          borderColor: C.coralPressed,
+          borderColor: C.pistachioPressed,
         }}
       >
-        <Timer size={24} color={C.coral} strokeWidth={2} />
+        <Timer size={24} color={C.pistachio} strokeWidth={2} />
         <Text
           style={{
             fontFamily: FONTS.bold,
             fontSize: 14,
-            color: C.coral,
+            color: C.pistachio,
             marginTop: SPACING.sm,
             letterSpacing: 0.3,
             textTransform: "uppercase",
@@ -147,7 +147,7 @@ function CountdownTimer({
           style={{
             fontFamily: FONTS.bold,
             fontSize: 42,
-            color: C.coral,
+            color: C.pistachio,
             marginTop: SPACING.xs,
             letterSpacing: -1,
           }}
@@ -159,7 +159,7 @@ function CountdownTimer({
           style={{
             width: "100%",
             height: 4,
-            backgroundColor: C.coralLight,
+            backgroundColor: C.pistachioLight,
             borderRadius: 2,
             marginTop: SPACING.md,
             overflow: "hidden",
@@ -169,7 +169,7 @@ function CountdownTimer({
             style={{
               width: `${progress * 100}%`,
               height: "100%",
-              backgroundColor: C.coral,
+              backgroundColor: C.pistachio,
               borderRadius: 2,
             }}
           />
@@ -335,7 +335,7 @@ export default function BookingConfirmationScreen() {
   if (isLoading) {
     return (
       <View style={{ flex: 1, backgroundColor: C.bg, alignItems: "center", justifyContent: "center" }}>
-        <ActivityIndicator testID="loading-indicator" size="large" color={C.coral} />
+        <ActivityIndicator testID="loading-indicator" size="large" color={C.pistachio} />
       </View>
     );
   }
@@ -356,7 +356,7 @@ export default function BookingConfirmationScreen() {
           </View>
         </SafeAreaView>
         <View testID="error-state" style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 32 }}>
-          <AlertCircle size={40} color={C.coral} strokeWidth={ICON.strokeWidth} />
+          <AlertCircle size={40} color={C.pistachio} strokeWidth={ICON.strokeWidth} />
           <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.textPrimary, marginTop: 12 }}>
             Kunde inte ladda bokningen
           </Text>
@@ -442,8 +442,8 @@ export default function BookingConfirmationScreen() {
                 {/* Booking details grid */}
                 <View style={{ gap: 14 }}>
                   <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-                    <View style={{ width: 38, height: 38, borderRadius: 11, backgroundColor: C.coralLight, alignItems: "center", justifyContent: "center" }}>
-                      <Calendar size={18} color={C.coral} strokeWidth={2} />
+                    <View style={{ width: 38, height: 38, borderRadius: 11, backgroundColor: C.pistachioLight, alignItems: "center", justifyContent: "center" }}>
+                      <Calendar size={18} color={C.pistachio} strokeWidth={2} />
                     </View>
                     <View>
                       <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary }}>Datum</Text>
@@ -454,8 +454,8 @@ export default function BookingConfirmationScreen() {
                   </View>
 
                   <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-                    <View style={{ width: 38, height: 38, borderRadius: 11, backgroundColor: C.coralLight, alignItems: "center", justifyContent: "center" }}>
-                      <Clock size={18} color={C.coral} strokeWidth={2} />
+                    <View style={{ width: 38, height: 38, borderRadius: 11, backgroundColor: C.pistachioLight, alignItems: "center", justifyContent: "center" }}>
+                      <Clock size={18} color={C.pistachio} strokeWidth={2} />
                     </View>
                     <View>
                       <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary }}>Tid</Text>
@@ -466,8 +466,8 @@ export default function BookingConfirmationScreen() {
                   </View>
 
                   <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-                    <View style={{ width: 38, height: 38, borderRadius: 11, backgroundColor: C.coralLight, alignItems: "center", justifyContent: "center" }}>
-                      <Users size={18} color={C.coral} strokeWidth={2} />
+                    <View style={{ width: 38, height: 38, borderRadius: 11, backgroundColor: C.pistachioLight, alignItems: "center", justifyContent: "center" }}>
+                      <Users size={18} color={C.pistachio} strokeWidth={2} />
                     </View>
                     <View>
                       <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary }}>Antal gäster</Text>
@@ -478,8 +478,8 @@ export default function BookingConfirmationScreen() {
                   </View>
 
                   <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-                    <View style={{ width: 38, height: 38, borderRadius: 11, backgroundColor: C.coralLight, alignItems: "center", justifyContent: "center" }}>
-                      <User size={18} color={C.coral} strokeWidth={2} />
+                    <View style={{ width: 38, height: 38, borderRadius: 11, backgroundColor: C.pistachioLight, alignItems: "center", justifyContent: "center" }}>
+                      <User size={18} color={C.pistachio} strokeWidth={2} />
                     </View>
                     <View>
                       <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary }}>Bokningsnamn</Text>
@@ -550,7 +550,7 @@ export default function BookingConfirmationScreen() {
               <View
                 testID="reslot-garanti-badge"
                 style={{
-                  backgroundColor: C.coralLight,
+                  backgroundColor: C.pistachioLight,
                   borderRadius: RADIUS.lg,
                   paddingVertical: 12,
                   paddingHorizontal: SPACING.md,
@@ -559,7 +559,7 @@ export default function BookingConfirmationScreen() {
                   gap: 10,
                 }}
               >
-                <ShieldCheck size={18} color={C.coral} strokeWidth={2} />
+                <ShieldCheck size={18} color={C.pistachio} strokeWidth={2} />
                 <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: C.textSecondary, flex: 1, lineHeight: 19 }}>
                   Fungerar inte överlåtelsen? Credits tillbaka.
                 </Text>
@@ -612,9 +612,9 @@ export default function BookingConfirmationScreen() {
                     onPress={() => {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     }}
-                    style={{ width: 38, height: 38, borderRadius: 11, backgroundColor: C.coralLight, alignItems: "center", justifyContent: "center" }}
+                    style={{ width: 38, height: 38, borderRadius: 11, backgroundColor: C.pistachioLight, alignItems: "center", justifyContent: "center" }}
                   >
-                    <Copy size={16} color={C.coral} strokeWidth={2} />
+                    <Copy size={16} color={C.pistachio} strokeWidth={2} />
                   </Pressable>
                 </View>
 
@@ -640,7 +640,7 @@ export default function BookingConfirmationScreen() {
                       ...SHADOW.card,
                     }}
                   >
-                    <CalendarPlus size={18} color={C.coral} strokeWidth={2} />
+                    <CalendarPlus size={18} color={C.pistachio} strokeWidth={2} />
                     <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.textPrimary }}>
                       Kalender
                     </Text>
@@ -658,7 +658,7 @@ export default function BookingConfirmationScreen() {
                     }}
                     style={{
                       flex: 1,
-                      backgroundColor: C.coral,
+                      backgroundColor: C.pistachio,
                       borderRadius: RADIUS.lg,
                       paddingVertical: 14,
                       flexDirection: "row",
@@ -716,7 +716,7 @@ export default function BookingConfirmationScreen() {
             <Animated.View entering={FadeInDown.delay(420).springify()} style={{ marginTop: SPACING.xl }}>
               <View
                 style={{
-                  backgroundColor: C.coralLight,
+                  backgroundColor: C.pistachioLight,
                   borderRadius: RADIUS.lg,
                   padding: SPACING.md,
                   flexDirection: "row",
@@ -724,7 +724,7 @@ export default function BookingConfirmationScreen() {
                   gap: 12,
                 }}
               >
-                <AlertCircle size={16} color={C.coral} strokeWidth={2} style={{ marginTop: 2 }} />
+                <AlertCircle size={16} color={C.pistachio} strokeWidth={2} style={{ marginTop: 2 }} />
                 <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textSecondary, lineHeight: 20, flex: 1 }}>
                   {graceExpired
                     ? "Bokningen är bekräftad. Kom ihåg att följa restaurangens avbokningsvillkor om du inte kan komma."
