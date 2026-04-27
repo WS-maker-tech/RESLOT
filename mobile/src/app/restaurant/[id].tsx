@@ -1135,13 +1135,13 @@ ${shareUrl}`,
             <Text
               style={{
                 fontFamily: FONTS.displayBold,
-                fontSize: 28,
+                fontSize: 36,
                 color: C.white,
-                letterSpacing: -0.8,
-                lineHeight: 34,
-                textShadowColor: "rgba(0,0,0,0.3)",
-                textShadowOffset: { width: 0, height: 1 },
-                textShadowRadius: 4,
+                letterSpacing: -1.0,
+                lineHeight: 42,
+                textShadowColor: "rgba(0,0,0,0.4)",
+                textShadowOffset: { width: 0, height: 2 },
+                textShadowRadius: 8,
               }}
               numberOfLines={2}
             >
@@ -1430,10 +1430,22 @@ ${shareUrl}`,
           entering={FadeInDown.delay(295).springify()}
           style={{ paddingHorizontal: SPACING.lg, paddingTop: 16 }}
         >
-          <Text style={{ fontFamily: FONTS.displayBold, fontSize: 17, color: C.textPrimary, marginBottom: 12, letterSpacing: -0.3 }}>
+          <Text
+            style={{
+              fontFamily: FONTS.semiBold,
+              fontSize: 11,
+              letterSpacing: 1.2,
+              textTransform: "uppercase",
+              color: C.textTertiary,
+              marginBottom: 4,
+            }}
+          >
+            Detaljer
+          </Text>
+          <Text style={{ fontFamily: FONTS.displayBold, fontSize: 22, color: C.textPrimary, marginBottom: 14, letterSpacing: -0.6 }}>
             Bokningsinformation
           </Text>
-          <View style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: C.borderLight, overflow: "hidden" }}>
+          <View style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.lg, overflow: "hidden", ...SHADOW.raised }}>
             {/* Name on reservation */}
             {reservation.nameOnReservation ? (
               <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingVertical: 13, borderBottomWidth: 0.5, borderBottomColor: C.divider }}>
