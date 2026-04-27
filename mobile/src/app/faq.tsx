@@ -203,9 +203,9 @@ export default function FaqScreen() {
           <Text
             style={{
               fontFamily: FONTS.displayBold,
-              fontSize: 28,
+              fontSize: 32,
               color: C.textPrimary,
-              letterSpacing: -0.8,
+              letterSpacing: -1.0,
             }}
           >
             Frågor & svar
