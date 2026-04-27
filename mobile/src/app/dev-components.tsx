@@ -10,15 +10,27 @@
 import React, { useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { Stack } from "expo-router";
-import { ChevronRight, Heart, Mail, MapPin, Phone, Star } from "lucide-react-native";
+import { ChevronRight, Heart, Inbox, Mail, MapPin, Phone, Star } from "lucide-react-native";
 
 import {
+  Avatar,
+  AvatarGroup,
   Button,
   Card,
+  Chip,
+  CountdownPill,
+  Divider,
+  EmptyState,
+  ErrorState,
   FormField,
   Input,
   ListItem,
+  Rating,
+  Stepper,
+  Tabs,
   Tag,
+  Toast,
+  type TabItem,
   type TagVariant,
 } from "@/components/ui";
 import { C, FONTS, ICON, SPACING, TYPO } from "@/lib/theme";
@@ -73,10 +85,27 @@ const TAG_VARIANTS: TagVariant[] = [
   "neutral",
 ];
 
+type DemoTabKey = "alla" | "aktiva" | "klara";
+
 export default function DevComponentsScreen() {
   const [text, setText] = useState("");
   const [phone, setPhone] = useState("");
   const [errorText, setErrorText] = useState("");
+  const [demoRating, setDemoRating] = useState(4);
+  const [demoChip, setDemoChip] = useState(true);
+  const [demoTab, setDemoTab] = useState<DemoTabKey>("alla");
+  const [toastVisible, setToastVisible] = useState(false);
+
+  const demoTabs: TabItem<DemoTabKey>[] = [
+    { key: "alla", label: "Alla", badge: 24 },
+    { key: "aktiva", label: "Aktiva", badge: 3 },
+    { key: "klara", label: "Klara" },
+  ];
+
+  // Mock-tider för CountdownPill demo
+  const inOneHour = new Date(Date.now() + 60 * 60 * 1000);
+  const inFifteenMin = new Date(Date.now() + 15 * 60 * 1000);
+  const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000);
 
   return (
     <>
@@ -235,8 +264,134 @@ export default function DevComponentsScreen() {
           </Card>
         </Section>
 
+        {/* SPRINT 6 PRIMITIVES */}
+
+        <Section title="Avatar (Sprint 6)">
+          <Subhead>Sizes</Subhead>
+          <Row>
+            <Avatar size="xs" name="William Svanqvist" />
+            <Avatar size="sm" name="William Svanqvist" />
+            <Avatar size="md" name="William Svanqvist" />
+            <Avatar size="lg" name="William Svanqvist" />
+            <Avatar size="xl" name="William Svanqvist" />
+          </Row>
+          <Subhead>Med bild + bordered</Subhead>
+          <Row>
+            <Avatar
+              size="lg"
+              source="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200"
+              bordered
+            />
+            <Avatar size="lg" name="Anna Andersson" bordered />
+          </Row>
+          <Subhead>AvatarGroup</Subhead>
+          <AvatarGroup
+            size="md"
+            avatars={[
+              { name: "William" },
+              { name: "Anna" },
+              { name: "Bob" },
+              { name: "Carla" },
+              { name: "David" },
+              { name: "Eva" },
+            ]}
+            max={4}
+          />
+        </Section>
+
+        <Section title="Tabs (Sprint 6)">
+          <Tabs items={demoTabs} active={demoTab} onChange={setDemoTab} />
+          <Text style={TYPO.body}>Aktiv: {demoTab}</Text>
+        </Section>
+
+        <Section title="Chip (Sprint 6)">
+          <Subhead>Toggle</Subhead>
+          <Row>
+            <Chip
+              label="Stockholm"
+              selected={demoChip}
+              onToggle={setDemoChip}
+              showCheckWhenSelected
+            />
+            <Chip label="Göteborg" selected={false} onToggle={() => {}} />
+            <Chip label="Malmö" selected={false} onToggle={() => {}} />
+          </Row>
+          <Subhead>Removable</Subhead>
+          <Row>
+            <Chip label="Italienskt" selected removable onRemove={() => {}} />
+            <Chip label="Sushi" selected removable onRemove={() => {}} />
+          </Row>
+        </Section>
+
+        <Section title="CountdownPill (Sprint 6)">
+          <Subhead>Olika tids-stadier</Subhead>
+          <Row>
+            <CountdownPill targetAt={inOneHour} />
+            <CountdownPill targetAt={inFifteenMin} prefix="Försvinner om" />
+            <CountdownPill targetAt={fiveMinAgo} prefix="Tagen för" />
+          </Row>
+        </Section>
+
+        <Section title="Rating (Sprint 6)">
+          <Subhead>Display med numeric</Subhead>
+          <Rating value={4.6} showNumeric />
+          <Subhead>Interaktiv (klickbara stjärnor)</Subhead>
+          <Rating value={demoRating} onChange={setDemoRating} starSize={28} />
+          <Text style={TYPO.body}>Vald: {demoRating}/5</Text>
+        </Section>
+
+        <Section title="Stepper (Sprint 6)">
+          <Stepper current={2} total={6} showLabel size="md" />
+          <Stepper current={4} total={6} showLabel size="sm" />
+        </Section>
+
+        <Section title="Divider (Sprint 6)">
+          <Card variant="flat" padding="md">
+            <Text style={TYPO.body}>Hairline (default)</Text>
+            <Divider variant="hairline" spacingY="sm" />
+            <Text style={TYPO.body}>Thin 1px</Text>
+            <Divider variant="thin" spacingY="sm" />
+            <Text style={TYPO.body}>Med label</Text>
+            <Divider variant="thin" label="eller" spacingY="md" />
+            <Text style={TYPO.body}>(Section = whitespace separator, syns ej här)</Text>
+          </Card>
+        </Section>
+
+        <Section title="EmptyState (Sprint 6)">
+          <Card variant="flat" padding="none">
+            <EmptyState
+              icon={<Inbox size={36} color={C.pistachio} strokeWidth={ICON.strokeWidth} />}
+              title="Inga bokningar än"
+              body="När du lägger upp eller övertar en bokning visas den här."
+              cta={{ label: "Lägg upp bokning", onPress: () => {} }}
+              secondaryCta={{ label: "Läs mer", onPress: () => {} }}
+            />
+          </Card>
+        </Section>
+
+        <Section title="ErrorState (Sprint 6)">
+          <Card variant="flat" padding="none">
+            <ErrorState variant="network" onRetry={() => {}} />
+          </Card>
+        </Section>
+
+        <Section title="Toast (Sprint 6)">
+          <Row>
+            <Button onPress={() => setToastVisible(true)}>Visa toast</Button>
+          </Row>
+          <Toast
+            visible={toastVisible}
+            variant="success"
+            message="Bokning sparad"
+            detail="Vi skickar en bekräftelse till din e-post."
+            onDismiss={() => setToastVisible(false)}
+            position="bottom"
+            duration={3500}
+          />
+        </Section>
+
         <Text style={[TYPO.caption, { textAlign: "center", marginTop: SPACING.lg }]}>
-          /dev-components — Sprint 1 (foundation)
+          /dev-components — Sprint 1 + Sprint 6 (17 primitives totalt)
         </Text>
       </ScrollView>
     </>
