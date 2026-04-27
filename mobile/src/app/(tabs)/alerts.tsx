@@ -381,12 +381,24 @@ export default function AlertsScreen() {
         <View className="flex-row items-center justify-between px-5 pt-2 pb-2">
           <View>
             <Text
+              style={{
+                fontFamily: FONTS.semiBold,
+                fontSize: 11,
+                letterSpacing: 1.2,
+                textTransform: "uppercase",
+                color: C.textTertiary,
+                marginBottom: 4,
+              }}
+            >
+              Aktivitet
+            </Text>
+            <Text
               testID="alerts-header"
               style={{
                 fontFamily: FONTS.displayBold,
-                fontSize: 24,
+                fontSize: 32,
                 color: C.dark,
-                letterSpacing: -0.5,
+                letterSpacing: -1.0,
               }}
             >
               Bevakningar
