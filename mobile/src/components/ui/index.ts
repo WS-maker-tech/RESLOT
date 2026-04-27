@@ -36,3 +36,9 @@ export type { AvatarProps, AvatarGroupProps, AvatarSize } from "./Avatar";
 
 export { EmptyState } from "./EmptyState";
 export type { EmptyStateProps } from "./EmptyState";
+
+export { CountdownPill } from "./CountdownPill";
+export type { CountdownPillProps } from "./CountdownPill";
+
+export { Divider } from "./Divider";
+export type { DividerProps, DividerVariant, DividerOrientation } from "./Divider";
