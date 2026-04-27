@@ -24,3 +24,9 @@ export type { InputProps, InputVariant, InputSize } from "./Input";
 
 export { FormField } from "./FormField";
 export type { FormFieldProps } from "./FormField";
+
+export { Tag } from "./Tag";
+export type { TagProps, TagVariant, TagStyle, TagSize } from "./Tag";
+
+export { ListItem } from "./ListItem";
+export type { ListItemProps, ListItemDensity } from "./ListItem";
