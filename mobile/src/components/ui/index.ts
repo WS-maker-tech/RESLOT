@@ -54,3 +54,9 @@ export type { ToastProps, ToastVariant, ToastPosition } from "./Toast";
 
 export { Tabs } from "./Tabs";
 export type { TabsProps, TabItem } from "./Tabs";
+
+export { Chip } from "./Chip";
+export type { ChipProps, ChipSize } from "./Chip";
+
+export { ErrorState } from "./ErrorState";
+export type { ErrorStateProps, ErrorStateVariant } from "./ErrorState";
