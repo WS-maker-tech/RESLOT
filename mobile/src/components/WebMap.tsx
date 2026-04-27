@@ -186,7 +186,7 @@ export function WebMap({
         <View style={{
           position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
           alignItems: "center", justifyContent: "center",
-          backgroundColor: "#FAFAF8", zIndex: 1,
+          backgroundColor: C.bg, zIndex: 1,
         }}>
           <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.textTertiary }}>
             Laddar karta...

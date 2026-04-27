@@ -68,7 +68,7 @@ export default function SupportWidget({
           right: 0,
           width: 320,
           height: 440,
-          backgroundColor: C.bgCard ?? "#FFFFFF",
+          backgroundColor: C.bgCard ?? C.white,
           borderRadius: 24,
           overflow: "hidden",
           flexDirection: "column",
@@ -134,7 +134,7 @@ export default function SupportWidget({
               paddingHorizontal: 14,
               paddingVertical: 10,
             }}>
-              <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: msg.role === "user" ? "#FFFFFF" : C.textPrimary, lineHeight: 20 }}>
+              <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: msg.role === "user" ? C.white : C.textPrimary, lineHeight: 20 }}>
                 {msg.text}
               </Text>
             </View>
@@ -176,7 +176,7 @@ export default function SupportWidget({
               opacity: pressed ? 0.85 : 1,
             })}
           >
-            <Send size={16} color={input.trim() && isConnected ? "#FFFFFF" : C.textTertiary} strokeWidth={2} />
+            <Send size={16} color={input.trim() && isConnected ? C.white : C.textTertiary} strokeWidth={2} />
           </Pressable>
         </View>
         <Text style={{ fontFamily: FONTS.regular, fontSize: 10, color: C.textTertiary, textAlign: "center", paddingBottom: 8, opacity: 0.5 }}>

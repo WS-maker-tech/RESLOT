@@ -82,7 +82,7 @@ function TabIcon({
           elevation: 6,
         }}
       >
-        <Icon size={24} color="#FFFFFF" strokeWidth={2} />
+        <Icon size={24} color=C.white strokeWidth={2} />
       </View>
     );
   }
@@ -278,7 +278,7 @@ export default function TabLayout() {
             tabBarBadge: badgeCount,
             tabBarBadgeStyle: {
               backgroundColor: C.coral,
-              color: "#FFFFFF",
+              color: C.white,
               fontSize: 10,
               fontFamily: FONTS.semiBold,
               minWidth: 18,

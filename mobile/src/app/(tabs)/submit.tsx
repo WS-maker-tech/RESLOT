@@ -106,7 +106,7 @@ function WebDatePicker({ value, onChange }: { value: Date; onChange: (d: Date) =
                 backgroundColor: d && isSelected(d) ? C.coral : "transparent",
                 borderRadius: 19, opacity: d && isPast(d) ? 0.3 : 1 }}>
               {d ? <Text style={{ fontFamily: isSelected(d) ? FONTS.semiBold : FONTS.regular, fontSize: 14,
-                color: isSelected(d) ? "#111827" : C.dark }}>{d}</Text> : null}
+                color: isSelected(d) ? C.dark : C.dark }}>{d}</Text> : null}
             </Pressable>
           ))}
         </View>
@@ -134,7 +134,7 @@ function WebTimePicker({ value, onChange }: { value: Date; onChange: (d: Date) =
             style={{ paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20,
               backgroundColor: selected ? C.coral : "rgba(0,0,0,0.05)" }}>
             <Text style={{ fontFamily: selected ? FONTS.semiBold : FONTS.regular, fontSize: 14,
-              color: selected ? "#111827" : C.textSecondary }}>{t}</Text>
+              color: selected ? C.dark : C.textSecondary }}>{t}</Text>
           </Pressable>
         );
       })}
@@ -508,7 +508,7 @@ export default function SubmitScreen() {
                 onPress={resetForm}
                 style={{ backgroundColor: C.dark, borderRadius: RADIUS.full, paddingVertical: 14, paddingHorizontal: 32, alignSelf: "center", marginTop: 16 }}
               >
-                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: "#FFFFFF" }}>Lägg upp en till</Text>
+                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.white }}>Lägg upp en till</Text>
               </Pressable>
               <Pressable
                 accessibilityLabel="Gå till mina bokningar"
@@ -711,7 +711,7 @@ export default function SubmitScreen() {
                               justifyContent: "center",
                             }}
                           >
-                            <Check size={14} color="#111827" strokeWidth={ICON.strokeWidth} />
+                            <Check size={14} color=C.dark strokeWidth={ICON.strokeWidth} />
                           </View>
                         ) : null}
                       </Pressable>
@@ -1172,7 +1172,7 @@ export default function SubmitScreen() {
                         style={{
                           fontFamily: FONTS.semiBold,
                           fontSize: 17,
-                          color: partySize === size ? "#FFFFFF" : C.dark,
+                          color: partySize === size ? C.white : C.dark,
                         }}
                       >
                         {size}
@@ -1243,7 +1243,7 @@ export default function SubmitScreen() {
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                       }}
                       trackColor={{ false: "#E5E5E0", true: C.coral }}
-                      thumbColor="#FFFFFF"
+                      thumbColor=C.white
                     />
                   </View>
                   {hasCancelFee ? (
@@ -1332,7 +1332,7 @@ export default function SubmitScreen() {
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                       }}
                       trackColor={{ false: "#E5E5E0", true: C.coral }}
-                      thumbColor="#FFFFFF"
+                      thumbColor=C.white
                     />
                   </View>
                   {hasPrepaidFee ? (
@@ -1560,7 +1560,7 @@ export default function SubmitScreen() {
                           justifyContent: "center",
                         }}
                       >
-                        <Check size={14} color="#111827" strokeWidth={ICON.strokeWidth} />
+                        <Check size={14} color=C.dark strokeWidth={ICON.strokeWidth} />
                       </View>
                     ) : null}
                   </View>
@@ -1638,7 +1638,7 @@ export default function SubmitScreen() {
                           justifyContent: "center",
                         }}
                       >
-                        <Check size={14} color="#111827" strokeWidth={ICON.strokeWidth} />
+                        <Check size={14} color=C.dark strokeWidth={ICON.strokeWidth} />
                       </View>
                     ) : null}
                   </View>
@@ -1831,14 +1831,14 @@ export default function SubmitScreen() {
               ]}
             >
               {submitReservationMutation.isPending ? (
-                <ActivityIndicator size="small" color="#111827" />
+                <ActivityIndicator size="small" color=C.dark />
               ) : (
                 <>
                   <Text
                     style={{
                       fontFamily: FONTS.bold,
                       fontSize: 15,
-                      color: "#111827",
+                      color: C.dark,
                     }}
                   >
                     {NEXT_LABELS[step]}
@@ -1846,7 +1846,7 @@ export default function SubmitScreen() {
                   {step < 5 ? (
                     <ChevronRight
                       size={18}
-                      color="#111827"
+                      color=C.dark
                       strokeWidth={ICON.strokeWidth}
                       style={{ marginLeft: 4 }}
                     />
@@ -1984,9 +1984,9 @@ export default function SubmitScreen() {
               }}
             >
               {submitReservationMutation.isPending ? (
-                <ActivityIndicator size="small" color="#111827" />
+                <ActivityIndicator size="small" color=C.dark />
               ) : (
-                <Text style={{ fontFamily: FONTS.bold, fontSize: 15, color: "#111827" }}>
+                <Text style={{ fontFamily: FONTS.bold, fontSize: 15, color: C.dark }}>
                   Lägg upp bokning
                 </Text>
               )}

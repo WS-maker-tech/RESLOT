@@ -61,8 +61,8 @@ function ToggleRow({
       <Switch
         value={value}
         onValueChange={(v) => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); onValueChange(v); }}
-        trackColor={{ false: C.overlayMedium, true: "#7EC87A" }}
-        thumbColor="#FFFFFF"
+        trackColor={{ false: C.overlayMedium, true: C.pistachio }}
+        thumbColor=C.white
       />
     </Pressable>
   );

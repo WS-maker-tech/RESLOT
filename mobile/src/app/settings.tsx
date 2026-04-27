@@ -182,7 +182,7 @@ export default function SettingsScreen() {
               style={{
                 fontFamily: FONTS.semiBold,
                 fontSize: 15,
-                color: isDirty ? "#7EC87A" : C.textTertiary,
+                color: isDirty ? C.pistachio : C.textTertiary,
                 opacity: isDirty ? 1 : 0.4,
               }}
             >
@@ -702,13 +702,13 @@ export default function SettingsScreen() {
                     style={{
                       fontFamily: city === c ? FONTS.semiBold : FONTS.regular,
                       fontSize: 16,
-                      color: city === c ? "#7EC87A" : C.textPrimary,
+                      color: city === c ? C.pistachio : C.textPrimary,
                     }}
                   >
                     {c}
                   </Text>
                   {city === c ? (
-                    <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: "#7EC87A" }} />
+                    <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: C.pistachio }} />
                   ) : null}
                 </Pressable>
               ))}

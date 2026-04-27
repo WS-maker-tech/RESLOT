@@ -64,10 +64,10 @@ export default function CreditHistoryScreen() {
                 const msgLower = (alert.message ?? alert.title ?? "").toLowerCase();
                 const isSpent = msgLower.includes("köp") || msgLower.includes("tog över") || msgLower.includes("−") || msgLower.includes("debit");
                 const isIncoming = !isSpent;
-                const iconColor = isIncoming ? "#7EC87A" : C.error;
+                const iconColor = isIncoming ? C.pistachio : C.error;
                 const IconComponent = isIncoming ? ArrowUpRight : ArrowDownLeft;
                 const iconBg = isIncoming ? "rgba(126,200,122,0.12)" : "rgba(239,68,68,0.08)";
-                const amountColor = isIncoming ? "#7EC87A" : C.error;
+                const amountColor = isIncoming ? C.pistachio : C.error;
 
                 return (
                   <Animated.View
