@@ -4,11 +4,13 @@
 Reslot är en Expo React Native-app (web-build) + Vercel serverless API för ett andrahandsmarknadsplats av restaurangbokningar — användare kan lägga upp och ta över bokningar med credits.
 
 ## Repo & Workflow
-- **Repo:** https://github.com/WS-maker-tech/RESLOT.git (detta är origin — pushar direkt hit)
+- **Repo:** https://github.com/WS-maker-tech/RESLOT.git (detta är origin — single source of truth)
+- **Före varje session:** `git pull origin main` — flera agenter jobbar mot samma repo
 - **Branch-strategi:** direkt mot `main` för nu (feature branches vid behov: `feat/<slug>`)
 - **Push:** `git add -A && git commit -m "..." && git push origin main`
 - **Deploy:** `cd mobile && npx vercel --prod --force` (alltid `--force` — Vercel cachar aggressivt)
 - **Pakethanterare:** `bun` — **aldrig npm**, ta bort `package-lock.json` om den dyker upp
+- **Konflikthantering:** jobba aldrig i samma fil samtidigt som annan agent — koordinera via William
 
 ## Quick Start
 ```bash
