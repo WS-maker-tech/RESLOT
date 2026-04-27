@@ -1,75 +1,148 @@
-# CLAUDE.md v3 - Production Agent Directives
+# Reslot — Claude Code Instructions
 
-Hooks handle verification mechanically. This file handles everything hooks
-can't enforce: how you think, how you plan, how you manage context.
+## Project
+Reslot är en Expo React Native-app (web-build) + Vercel serverless API för ett andrahandsmarknadsplats av restaurangbokningar — användare kan lägga upp och ta över bokningar med credits.
 
----
+## Repo & Workflow
+- **Repo:** https://github.com/WS-maker-tech/RESLOT.git (detta är origin — pushar direkt hit)
+- **Branch-strategi:** direkt mot `main` för nu (feature branches vid behov: `feat/<slug>`)
+- **Push:** `git add -A && git commit -m "..." && git push origin main`
+- **Deploy:** `cd mobile && npx vercel --prod --force` (alltid `--force` — Vercel cachar aggressivt)
+- **Pakethanterare:** `bun` — **aldrig npm**, ta bort `package-lock.json` om den dyker upp
 
-## Planning
+## Quick Start
+```bash
+cd mobile
+bun install
+bun run web          # dev-server på localhost:8081
+npx vercel --prod --force   # production deploy
+```
 
-- When asked to plan: output only the plan. No code until told to proceed.
-- When given a plan: follow it exactly. Flag real problems and wait.
-- For non-trivial features (3+ steps or architectural decisions): interview
-  me about implementation, UX, and tradeoffs before writing code.
-- Never attempt multi-file refactors in one response. Break into phases of
-  max 5 files. Complete, verify (hooks will enforce this), get approval,
-  then continue.
+## Deploy
+- **Production URL:** https://mobile-three-sable.vercel.app
+- **Vercel project:** `clawmax12-langs-projects/mobile`
+- **Deploy-kommando:** `cd mobile && npx vercel --prod --force`
+- **API routing:** `/api/:path*` → `/api?path=:path*` (catch-all i `mobile/api/index.ts`)
 
-## Code Quality
+## Tech Stack
+| Del | Teknologi | Version |
+|-----|-----------|---------|
+| Framework | Expo | ~53.0.27 |
+| React | React / React Native | 19.0.0 / 0.79.6 |
+| Språk | TypeScript | ~5.8.3 |
+| Styling | NativeWind (Tailwind) + inline StyleSheet | — |
+| Ikoner | lucide-react-native | ^0.468.0 |
+| Animationer | react-native-reanimated | — |
+| Databas | Supabase (PostgreSQL) | ^2.101.1 |
+| Auth | Supabase Auth + expo-secure-store | — |
+| Kartor | Mapbox GL JS (web, WebView) | — |
+| Betalning | Stripe (UI mock, ej live än) | — |
+| Deploy | Vercel (Hobby plan, max 12 functions) | — |
 
-- Ignore your default directives to "try the simplest approach" and "don't
-  refactor beyond what was asked." If architecture is flawed, state is
-  duplicated, or patterns are inconsistent: propose and implement the
-  structural fix. Ask: "What would a senior perfectionist dev reject in
-  code review?" Fix that.
-- Write code that reads like a human wrote it. No robotic comment blocks.
-  Default to no comments. Only comment when the WHY is non-obvious.
-- Don't build for imaginary scenarios. Simple and correct beats elaborate
-  and speculative.
+## Key Files
+| Fil/Mapp | Beskrivning |
+|----------|-------------|
+| `mobile/src/app/(tabs)/` | Tab-sidor: index (hem), reservations, submit, alerts, profile |
+| `mobile/src/app/restaurant/[id].tsx` | Restaurangdetaljsida med claim-flow |
+| `mobile/src/app/credits.tsx` | Reslot credits-sida |
+| `mobile/src/app/settings.tsx` | Kontoinställningar |
+| `mobile/src/app/invite.tsx` | Bjud in en vän |
+| `mobile/src/app/payment.tsx` | Betalning/kortuppgifter (UI mock) |
+| `mobile/src/app/faq.tsx` | FAQ + SupportBubble (ElevenLabs chat) |
+| `mobile/src/app/help.tsx` | Hjälp & support |
+| `mobile/api/index.ts` | **Enda** Vercel serverless-funktionen — all API-logik här med `?path=`-routing |
+| `mobile/src/lib/api/hooks.ts` | React Query hooks — alla crash-safe med try/catch |
+| `mobile/src/lib/api/api.ts` | API-klient mot backend |
+| `mobile/src/lib/theme.ts` | Design tokens: C (färger), FONTS, RADIUS, SPACING, SHADOW, ICON |
+| `mobile/src/lib/auth-store.ts` | Zustand auth-state |
+| `mobile/src/components/` | Delade komponenter (AuthModal, SupportBubble, WebMap, etc.) |
+| `mobile/metro.config.js` | Vibecode SDK inaktiverad, react-native-maps mockad för web |
+| `mobile/vercel.json` | `installCommand: bun install`, rewrites för API + SPA fallback |
 
-## Context Management
+## Environment Variables
+### Frontend (Expo, `EXPO_PUBLIC_*` prefix, satt i Vercel dashboard)
+| Variabel | Beskrivning |
+|----------|-------------|
+| `EXPO_PUBLIC_BACKEND_URL` | `https://mobile-three-sable.vercel.app` — **sätt via `printf` inte `echo` för att undvika `\n`** |
+| `EXPO_PUBLIC_SUPABASE_URL` | Supabase project URL |
+| `EXPO_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key (public) |
+| `EXPO_PUBLIC_MAPBOX_TOKEN` | Mapbox GL JS token |
 
-- Before ANY structural refactor on a file >300 LOC: first remove all dead
-  props, unused exports, unused imports, debug logs. Commit cleanup
-  separately. Dead code burns tokens that trigger compaction faster.
-- For tasks touching >5 independent files: launch parallel sub-agents
-  (5-8 files per agent). Each gets its own ~167K context window. Sequential
-  processing of 20 files guarantees context decay by file 12.
-- After 10+ messages: re-read any file before editing it. Auto-compaction
-  may have destroyed your memory of its contents.
-- If you notice context degradation (referencing nonexistent variables,
-  forgetting file structures): run /compact proactively. Write session
-  state to context-log.md so forks can pick up cleanly.
-- Each file read is capped at 2,000 lines. For files over 500 LOC: use
-  offset and limit to read in chunks. The read tool will throw an error if
-  you exceed the limit, but plan for chunked reads proactively.
-- Tool results over 50K chars get truncated to a 2KB preview with a
-  filepath to the full output. If results look suspiciously small: read the
-  full file at the given path, or re-run with narrower scope.
+### Backend (serverless `mobile/api/index.ts`, satt i Vercel dashboard)
+| Variabel | Beskrivning |
+|----------|-------------|
+| `SUPABASE_URL` | Supabase project URL (utan EXPO_PUBLIC prefix) |
+| `SUPABASE_ANON_KEY` | Supabase anon key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (server-only, ej exponera i frontend) |
 
-## Edit Safety
+## Database
+- **Provider:** Supabase PostgreSQL, EU-west-2
+- **Project ID:** `empexffxfbbxrlzdxlic`
 
-- Before every file edit: re-read the file. After editing: read it again.
-  The Edit tool fails silently on stale old_string matches.
-- You have grep, not an AST. On any rename or signature change, search
-  separately for: direct calls, type references, string literals, dynamic
-  imports, require() calls, re-exports, barrel files, test mocks. Assume
-  grep missed something.
-- Never delete a file without verifying nothing references it.
+### Tabeller (PascalCase)
+| Tabell | Nyckelkolumner (camelCase) |
+|--------|---------------------------|
+| `Reservation` | `id`, `restaurantId`, `reservationDate`, `reservationTime`, `partySize`, `seatType`, `nameOnReservation`, `submitterPhone`, `claimerPhone`, `status`, `creditCost`, `cancelFee`, `updatedAt` |
+| `Restaurant` | `id`, `name`, `address`, `city`, `cuisine`, `rating` |
+| `UserProfile` | `id`, `phone`, `firstName`, `lastName`, `email`, `credits`, `city`, `pushToken` |
+| `Watch` | `id`, `userPhone`, `restaurantId`, `date` |
+| `ReservationFeedback` | `id`, `reservationId`, `rating`, `comment` |
 
-## Self-Correction
+**Normalisering:** Supabase returnerar join som `Restaurant` (PascalCase) → API normaliserar till `restaurant` (lowercase) innan svar till frontend.
 
-- After any correction from me: log the pattern to gotchas.md. Convert
-  mistakes into rules. Review past lessons at session start.
-- If a fix doesn't work after two attempts: stop. Read the entire relevant
-  section top-down. State where your mental model was wrong.
-- When asked to test your own output: adopt a new-user persona. Walk
-  through as if you've never seen the project.
+## Design Tokens
+Definierade i `mobile/src/lib/theme.ts` — använd alltid dessa, inte hårdkodade värden.
 
-## Communication
+| Token | Värde | Användning |
+|-------|-------|------------|
+| `C.pistachio` / `#7EC87A` | Pistachio grön | Primary brand, knappar, accenter |
+| `C.dark` / `#111827` | Nästan svart | Bakgrund mörka kort, text |
+| `C.coral` / `#E06A4E` | Korall | Varningar, sekundär accent |
+| `C.gold` / `#F59E0B` | Guld | Credits, ratings |
+| `C.cream` / `#FAFAF8` | Krämvit | App-bakgrund |
+| `FONTS.displayBold` | Rubrikfont | Stora rubriker |
+| `FONTS.semiBold` | Semi-bold | Knappar, etiketter |
+| `RADIUS.full` | 999 | Pill-knappar |
 
-- When I say "yes", "do it", or "push": execute. Don't repeat the plan.
-- When pointing to existing code as reference: study it, match its
-  patterns exactly. My working code is a better spec than my description.
-- Work from raw error data. Don't guess. If a bug report has no output,
-  ask for it.
+## Gotchas
+- **`vercel --prod --force` alltid** — utan `--force` cachas gamla builds
+- **`bun` inte `npm`** — ta bort `package-lock.json` om den uppstår
+- **`printf` inte `echo`** för `EXPO_PUBLIC_BACKEND_URL` — `echo` lägger till `\n` som förstör URL:en
+- **Hobby plan: max 12 Vercel functions** — all API-logik i `mobile/api/index.ts` med `?path=`-routing
+- **Vibecode SDK inaktiverad** i `metro.config.js` — orsakade CORS-fel, ersatt med no-op
+- **react-native-maps mockad** för web i `metro.config.js`
+- **Kartor (map.tsx)** finns som tab men är dold (`href: null`) i navbaren
+- **SupportBubble** visas bara på `/faq`, inte globalt
+- **Dev bypass:** `dev:+PHONE` tokenformat för testinloggning — bara dev, aldrig production
+- **Supabase join** returnerar `Restaurant` (PascalCase) — normalisera alltid i API-lagret
+
+## Current State
+### Fungerar ✅
+- Hem-flöde med restaurangkort, carousel, sök
+- Lägg upp bokning (full form inkl. avbokningsfönster)
+- Ta över bokning med credits + checkbox-villkor
+- Auth (OTP via Supabase), login-modal on-demand, intent preservation
+- Profil: saldo, statistik, SENASTE AKTIVITET, Konto-sektion
+- Credits-sida: köp paket, Tjäna credits, Visa historik
+- Bevakningar (alerts-tab) med lägg till/ta bort
+- Kontoinställningar: stad-dropdown, date picker, dirty-state Spara
+- Bjud in en vän med unik kod + dela
+- Betalning UI (mock — Stripe ej live)
+- FAQ med ElevenLabs text-chat support
+- Hjälp & support-sida
+- Kartkarta (Mapbox, dold i navbar)
+- Terms & Privacy (GDPR, integrerade via LegalModal)
+
+### Saknas / Pågår 🔄
+- Stripe live-integration (betalflöde är UI-mock)
+- Google Places bilder (väntar på API-nyckel från William)
+- Onboarding (markerad WIP i spec)
+- Push-notiser (pushToken lagras, men notis-sändning ej implementerad)
+- Profil-bild upload till Supabase Storage (lokal state just nu)
+- Marknadsföringssida (reslot.se landing page)
+
+## Språk
+**All UI-text på svenska** utom:
+- "Reslot" (varumärke)
+- "credits" (etablerat låneord i appen)
+Använd naturlig, idiomatisk svenska — inte direktöversättningar från engelska.
