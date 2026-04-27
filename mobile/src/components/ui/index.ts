@@ -42,3 +42,9 @@ export type { CountdownPillProps } from "./CountdownPill";
 
 export { Divider } from "./Divider";
 export type { DividerProps, DividerVariant, DividerOrientation } from "./Divider";
+
+export { Rating } from "./Rating";
+export type { RatingProps } from "./Rating";
+
+export { Stepper } from "./Stepper";
+export type { StepperProps } from "./Stepper";
