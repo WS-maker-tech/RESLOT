@@ -489,7 +489,7 @@ function SplashStep({ onGetStarted, onExplore, onRegister }: { onGetStarted: () 
           testID="get-started-btn"
           label="Logga in"
           onPress={onGetStarted}
-          icon={<ArrowRight size={18} color=C.dark strokeWidth={2.5} />}
+          icon={<ArrowRight size={18} color={C.dark} strokeWidth={2.5} />}
         />
         <GhostButton testID="register-btn" label="Registrera dig" onPress={onRegister} />
 
@@ -1839,7 +1839,7 @@ function WelcomeStep({ onContinue, firstName, cityName }: { onContinue: () => vo
           testID="welcome-continue-btn"
           label="Visa mig borden"
           onPress={onContinue}
-          icon={<ArrowRight size={18} color=C.dark strokeWidth={2.5} />}
+          icon={<ArrowRight size={18} color={C.dark} strokeWidth={2.5} />}
         />
       </Animated.View>
     </View>

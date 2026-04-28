@@ -644,7 +644,7 @@ export default function ProfileScreen() {
                 <MenuItem
                   icon={UserPlus}
                   label="Bjud in vän"
-                  color=C.warning
+                  color={C.warning}
                   bgColor="rgba(245, 158, 11, 0.12)"
                   onPress={handleInvitePress}
                   index={0}
@@ -652,7 +652,7 @@ export default function ProfileScreen() {
                 <MenuItem
                   icon={CreditCard}
                   label="Betalningar"
-                  color=C.grayLight
+                  color={C.grayLight}
                   bgColor="rgba(156, 163, 175, 0.12)"
                   onPress={handlePaymentPress}
                   index={1}
@@ -660,7 +660,7 @@ export default function ProfileScreen() {
                 <MenuItem
                   icon={Shield}
                   label="Ansvarspolicy"
-                  color=C.warning
+                  color={C.warning}
                   bgColor="rgba(245, 158, 11, 0.12)"
                   onPress={() => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -671,7 +671,7 @@ export default function ProfileScreen() {
                 <MenuItem
                   icon={HelpCircle}
                   label="Hjälp"
-                  color=C.warning
+                  color={C.warning}
                   bgColor="rgba(245, 158, 11, 0.12)"
                   onPress={() => router.push("/faq")}
                   index={3}
@@ -787,7 +787,7 @@ export default function ProfileScreen() {
                   justifyContent: "center",
                 }}
               >
-                <Shield size={22} color=C.warning strokeWidth={2} />
+                <Shield size={22} color={C.warning} strokeWidth={2} />
               </View>
               <Text
                 style={{

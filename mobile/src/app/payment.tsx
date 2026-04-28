@@ -61,7 +61,7 @@ export default function PaymentScreen() {
         {/* Security info box */}
         <Animated.View entering={FadeInDown.springify()}>
           <View style={{ backgroundColor: "rgba(126,200,122,0.08)", borderRadius: RADIUS.lg, padding: SPACING.md, flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 20, borderWidth: 1, borderColor: "rgba(126,200,122,0.15)" }}>
-            <ShieldCheck size={22} color=C.pistachio strokeWidth={ICON.strokeWidth} />
+            <ShieldCheck size={22} color={C.pistachio} strokeWidth={ICON.strokeWidth} />
             <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textSecondary, flex: 1, lineHeight: 20 }}>
               Ditt kort används bara som säkerhet. Du debiteras aldrig enbart för att lägga in kortuppgifter.
             </Text>

@@ -240,7 +240,7 @@ function CelebrationView() {
               justifyContent: "center",
             }}
           >
-            <PartyPopper size={36} color=C.white strokeWidth={2} />
+            <PartyPopper size={36} color={C.white} strokeWidth={2} />
           </View>
         </Animated.View>
       </Animated.View>
@@ -668,7 +668,7 @@ export default function BookingConfirmationScreen() {
                       ...SHADOW.elevated,
                     }}
                   >
-                    <Share2 size={18} color=C.dark strokeWidth={2} />
+                    <Share2 size={18} color={C.dark} strokeWidth={2} />
                     <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.dark }}>
                       Dela
                     </Text>
