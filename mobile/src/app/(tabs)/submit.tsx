@@ -723,7 +723,7 @@ export default function SubmitScreen() {
                               justifyContent: "center",
                             }}
                           >
-                            <Check size={14} color=C.dark strokeWidth={ICON.strokeWidth} />
+                            <Check size={14} color={C.dark} strokeWidth={ICON.strokeWidth} />
                           </View>
                         ) : null}
                       </Pressable>
@@ -1255,7 +1255,7 @@ export default function SubmitScreen() {
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                       }}
                       trackColor={{ false: "#E5E5E0", true: C.pistachio }}
-                      thumbColor=C.white
+                      thumbColor={C.white}
                     />
                   </View>
                   {hasCancelFee ? (
@@ -1344,7 +1344,7 @@ export default function SubmitScreen() {
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                       }}
                       trackColor={{ false: "#E5E5E0", true: C.pistachio }}
-                      thumbColor=C.white
+                      thumbColor={C.white}
                     />
                   </View>
                   {hasPrepaidFee ? (
@@ -1572,7 +1572,7 @@ export default function SubmitScreen() {
                           justifyContent: "center",
                         }}
                       >
-                        <Check size={14} color=C.dark strokeWidth={ICON.strokeWidth} />
+                        <Check size={14} color={C.dark} strokeWidth={ICON.strokeWidth} />
                       </View>
                     ) : null}
                   </View>
@@ -1650,7 +1650,7 @@ export default function SubmitScreen() {
                           justifyContent: "center",
                         }}
                       >
-                        <Check size={14} color=C.dark strokeWidth={ICON.strokeWidth} />
+                        <Check size={14} color={C.dark} strokeWidth={ICON.strokeWidth} />
                       </View>
                     ) : null}
                   </View>
@@ -1843,7 +1843,7 @@ export default function SubmitScreen() {
               ]}
             >
               {submitReservationMutation.isPending ? (
-                <ActivityIndicator size="small" color=C.dark />
+                <ActivityIndicator size="small" color={C.dark} />
               ) : (
                 <>
                   <Text
@@ -1858,7 +1858,7 @@ export default function SubmitScreen() {
                   {step < 5 ? (
                     <ChevronRight
                       size={18}
-                      color=C.dark
+                      color={C.dark}
                       strokeWidth={ICON.strokeWidth}
                       style={{ marginLeft: 4 }}
                     />
@@ -1996,7 +1996,7 @@ export default function SubmitScreen() {
               }}
             >
               {submitReservationMutation.isPending ? (
-                <ActivityIndicator size="small" color=C.dark />
+                <ActivityIndicator size="small" color={C.dark} />
               ) : (
                 <Text style={{ fontFamily: FONTS.bold, fontSize: 15, color: C.dark }}>
                   Lägg upp bokning

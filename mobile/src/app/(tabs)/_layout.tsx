@@ -82,7 +82,7 @@ function TabIcon({
           elevation: 6,
         }}
       >
-        <Icon size={24} color=C.white strokeWidth={2} />
+        <Icon size={24} color={C.white} strokeWidth={2} />
       </View>
     );
   }
