@@ -142,7 +142,7 @@ export default function AccountSettingsScreen() {
           </Pressable>
           <Text style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: C.textPrimary, letterSpacing: -0.4, flex: 1 }}>Kontoinställningar</Text>
           <Pressable testID="save-button" accessibilityLabel="Spara ändringar" onPress={handleSave} disabled={saving} style={{ backgroundColor: C.pistachio, borderRadius: RADIUS.md, paddingHorizontal: 16, paddingVertical: 8 }}>
-            {saving ? <ActivityIndicator color=C.dark size="small" /> : <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.dark }}>Spara</Text>}
+            {saving ? <ActivityIndicator color={C.dark} size="small" /> : <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.dark }}>Spara</Text>}
           </Pressable>
         </View>
       </SafeAreaView>

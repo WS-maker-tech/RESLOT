@@ -270,7 +270,7 @@ export default function MapScreen() {
                 ]}
               >
                 <Text style={styles.ctaText}>Visa bord</Text>
-                <ChevronRight size={16} color=C.white strokeWidth={2.5} />
+                <ChevronRight size={16} color={C.white} strokeWidth={2.5} />
               </Pressable>
             </View>
           </View>

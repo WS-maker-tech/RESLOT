@@ -483,7 +483,7 @@ function FeedbackPrompt({
             minHeight: 44,
           }}
         >
-          <Send size={14} color=C.dark strokeWidth={2} />
+          <Send size={14} color={C.dark} strokeWidth={2} />
           <Text
             style={{
               fontFamily: FONTS.semiBold,

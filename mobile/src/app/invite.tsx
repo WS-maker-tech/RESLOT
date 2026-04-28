@@ -92,7 +92,7 @@ export default function InviteScreen() {
               }}
             >
               {copied ? (
-                <CheckCircle size={16} color=C.pistachio strokeWidth={2} />
+                <CheckCircle size={16} color={C.pistachio} strokeWidth={2} />
               ) : (
                 <Copy size={16} color={C.white} strokeWidth={2} />
               )}
@@ -121,7 +121,7 @@ export default function InviteScreen() {
               ...SHADOW.elevated,
             }}
           >
-            <Share2 size={18} color=C.dark strokeWidth={ICON.strokeWidth} />
+            <Share2 size={18} color={C.dark} strokeWidth={ICON.strokeWidth} />
             <Text style={{ fontFamily: FONTS.bold, fontSize: 16, color: C.dark }}>Dela med vän</Text>
           </Pressable>
         </Animated.View>
