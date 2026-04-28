@@ -245,40 +245,6 @@ const Header = React.memo(function Header({
           <HelpCircle size={20} color={C.textTertiary} strokeWidth={2} />
         </Pressable>
 
-        <Pressable
-          testID="city-picker-button"
-          accessibilityLabel="Välj stad"
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            onCityPress();
-          }}
-          style={{ flexDirection: "row", alignItems: "center", flexShrink: 1 }}
-        >
-          <Text
-            style={{
-              fontFamily: FONTS.displayBold,
-              fontSize: 28,
-              color: C.dark,
-              letterSpacing: -0.8,
-            }}
-            numberOfLines={1}
-          >
-            Bokningar i{" "}
-          </Text>
-          <Text
-            style={{
-              fontFamily: FONTS.displayBold,
-              fontSize: 28,
-              color: C.pistachio,
-              letterSpacing: -0.8,
-              opacity: 0.95,
-            }}
-          >
-            {selectedCity}
-          </Text>
-          <ChevronDown size={18} color={C.pistachio} strokeWidth={ICON.strokeWidth} style={{ marginLeft: 4 }} />
-        </Pressable>
-
         <View className="flex-row items-center" style={{ gap: 6 }}>
           <Pressable
             testID="credits-pill"
@@ -337,6 +303,36 @@ const Header = React.memo(function Header({
           </Pressable>
         </View>
       </View>
+
+      <Pressable
+        testID="city-picker-button"
+        accessibilityLabel="Välj stad"
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          onCityPress();
+        }}
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          paddingHorizontal: 20,
+          paddingTop: 4,
+          paddingBottom: 4,
+        }}
+      >
+        <Text
+          style={{
+            fontFamily: FONTS.displayBold,
+            fontSize: 28,
+            color: C.dark,
+            letterSpacing: -0.8,
+          }}
+          numberOfLines={1}
+        >
+          Bokningar i{" "}
+          <Text style={{ color: C.pistachio, opacity: 0.95 }}>{selectedCity}</Text>
+        </Text>
+        <ChevronDown size={18} color={C.pistachio} strokeWidth={ICON.strokeWidth} style={{ marginLeft: 4 }} />
+      </Pressable>
       {showSearch ? (
         <View style={{ paddingHorizontal: SPACING.lg, paddingBottom: SPACING.sm }}>
           <TextInput
