@@ -1296,13 +1296,7 @@ export default function HomeScreen() {
   });
 
   const headerAnimStyle = useAnimatedStyle(() => {
-    const height = interpolate(
-      scrollY.value,
-      [0, 40],
-      [60, 48],
-      Extrapolation.CLAMP
-    );
-    return { height, overflow: 'hidden' as const };
+    return {};
   });
 
   const subtitleAnimStyle = useAnimatedStyle(() => {
