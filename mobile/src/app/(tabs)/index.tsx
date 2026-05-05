@@ -242,8 +242,7 @@ const Header = React.memo(function Header({
             style={{ flexDirection: "row", alignItems: "center", backgroundColor: C.goldLight, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 6 }}
             onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); onCreditsPress(); }}
           >
-            <Coins size={14} color={C.gold} strokeWidth={ICON.strokeWidth} />
-            <Text style={{ fontFamily: FONTS.bold, fontSize: 13, color: C.gold, marginLeft: 4 }}>{isLoading ? "..." : credits}</Text>
+            <Text style={{ fontFamily: FONTS.bold, fontSize: 13, color: C.gold }}>{isLoading ? "..." : `${credits} credits`}</Text>
           </Pressable>
           <Pressable
             testID="map-button"
