@@ -24,17 +24,13 @@ import {
   MapPin,
   ChevronLeft,
   Share2,
-  Instagram,
-  Globe,
   AlertCircle,
   Check,
   Shield,
   Undo2,
-  Timer,
   Flag,
   X,
   AlertTriangle,
-  CheckCircle,
 } from "lucide-react-native";
 import Animated, {
   FadeInDown,
@@ -60,7 +56,6 @@ import {
   useReportReservation,
 } from "@/lib/api/hooks";
 import { useAuthStore } from "@/lib/auth-store";
-import { parseTagsWithCount, parseTags } from "@/lib/api/types";
 import { C, FONTS, SPACING, SHADOW, RADIUS } from "../../lib/theme";
 import { WebMap } from "@/components/WebMap";
 
@@ -701,8 +696,6 @@ export default function RestaurantDetailScreen() {
 
   // These useMemo hooks MUST be before any early returns to satisfy Rules of Hooks
   const restaurant = reservation?.restaurant;
-  const tags = useMemo(() => parseTags(restaurant?.tags ?? "[]"), [restaurant?.tags]);
-  const vibeTags = useMemo(() => parseTagsWithCount(restaurant?.vibeTags ?? "[]"), [restaurant?.vibeTags]);
   const displayDate = useMemo(() => reservation ? formatReservationDate(reservation.reservationDate) : "", [reservation?.reservationDate]);
   const displayTime = useMemo(() => reservation ? reservation.reservationTime.substring(0, 5) : "", [reservation?.reservationTime]);
   const isClaimed = useMemo(() => claimSuccess || reservation?.status === "claimed" || reservation?.status === "grace_period", [claimSuccess, reservation?.status]);
@@ -720,9 +713,13 @@ export default function RestaurantDetailScreen() {
       });
       return;
     }
-    if (!accepted || !reservation) return;
+    if (!reservation) return;
     if (!phone) return;
-    if (!hasEnoughCredits) return;
+    if (!hasEnoughCredits) {
+      router.push("/credits");
+      return;
+    }
+    if (!accepted) return;
     setClaimError(null);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     scaleBtn.value = withSpring(0.96, { damping: 10 }, () => {
@@ -807,17 +804,6 @@ export default function RestaurantDetailScreen() {
     Linking.openURL(url);
   }, [reservation]);
 
-  const handleOpenWebsite = useCallback(() => {
-    if (!reservation?.restaurant.website) return;
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    Linking.openURL(reservation.restaurant.website);
-  }, [reservation]);
-
-  const handleOpenInstagram = useCallback(() => {
-    if (!reservation?.restaurant.instagram) return;
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    Linking.openURL(`https://instagram.com/${reservation.restaurant.instagram}`);
-  }, [reservation]);
 
   const handleShare = useCallback(async () => {
     if (!reservation) return;
@@ -1262,10 +1248,6 @@ ${shareUrl}`,
             <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.textSecondary }}>
               {r.cuisine}
             </Text>
-            <View style={{ width: 3, height: 3, borderRadius: 1.5, backgroundColor: C.textTertiary, marginHorizontal: 2 }} />
-            <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.textSecondary }}>
-              {"€".repeat(r.priceLevel)}
-            </Text>
           </View>
 
           {/* Address */}
@@ -1287,67 +1269,14 @@ ${shareUrl}`,
             </Text>
           </Pressable>
 
-          {/* Tags row */}
-          {(tags.length > 0 || vibeTags.length > 0) ? (
-            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 14 }}>
-              {tags.filter((tag: string) => tag && tag.trim()).map((tag: string) => (
-                <View key={tag} style={{ backgroundColor: "#F3F4F6", borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 }}>
-                  <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.textSecondary }}>{tag}</Text>
-                </View>
-              ))}
-              {vibeTags.map((vt) => (
-                <View key={vt.label} style={{ backgroundColor: "#F3F4F6", borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 }}>
-                  <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.textSecondary }}>{vt.label}</Text>
-                </View>
-              ))}
+          {/* Cuisine tag */}
+          {r.cuisine ? (
+            <View style={{ flexDirection: "row", marginTop: 14 }}>
+              <View style={{ backgroundColor: "#F3F4F6", borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 }}>
+                <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.textSecondary }}>{r.cuisine}</Text>
+              </View>
             </View>
           ) : null}
-
-          {/* Links — pill style */}
-          <View style={{ flexDirection: "row", gap: 8, marginTop: 14, flexWrap: "wrap" }}>
-            {r.website ? (
-              <Pressable
-                testID="website-link"
-                accessibilityLabel="Besök hemsida"
-                onPress={handleOpenWebsite}
-                style={({ pressed }) => ({
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 5,
-                  backgroundColor: "rgba(0,0,0,0.04)",
-                  borderRadius: 20,
-                  paddingHorizontal: 12,
-                  paddingVertical: 6,
-                  opacity: pressed ? 0.7 : 1,
-                })}
-              >
-                <Globe size={13} color={C.textSecondary} strokeWidth={2} />
-                <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.textSecondary }}>
-                  {r.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}
-                </Text>
-              </Pressable>
-            ) : null}
-            {r.instagram ? (
-              <Pressable
-                testID="instagram-link"
-                accessibilityLabel="Öppna Instagram"
-                onPress={handleOpenInstagram}
-                style={({ pressed }) => ({
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 5,
-                  backgroundColor: "rgba(0,0,0,0.04)",
-                  borderRadius: 20,
-                  paddingHorizontal: 12,
-                  paddingVertical: 6,
-                  opacity: pressed ? 0.7 : 1,
-                })}
-              >
-                <Instagram size={13} color={C.textSecondary} strokeWidth={2} />
-                <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.textSecondary }}>{r.instagram?.startsWith("@") ? r.instagram : `@${r.instagram}`}</Text>
-              </Pressable>
-            ) : null}
-          </View>
         </Animated.View>
 
         {/* Divider */}
@@ -1425,247 +1354,41 @@ ${shareUrl}`,
           </View>
         </Animated.View>
 
-        {/* Booking details — full transparency */}
+        {/* Cancellation info */}
         <Animated.View
           entering={FadeInDown.delay(295).springify()}
           style={{ paddingHorizontal: SPACING.lg, paddingTop: 16 }}
         >
-          <Text
-            style={{
-              fontFamily: FONTS.semiBold,
-              fontSize: 11,
-              letterSpacing: 1.2,
-              textTransform: "uppercase",
-              color: C.textTertiary,
-              marginBottom: 4,
-            }}
-          >
-            Detaljer
-          </Text>
-          <Text style={{ fontFamily: FONTS.displayBold, fontSize: 22, color: C.textPrimary, marginBottom: 14, letterSpacing: -0.6 }}>
-            Bokningsinformation
-          </Text>
-          <View style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.lg, overflow: "hidden", ...SHADOW.raised }}>
-            {/* Name on reservation */}
-            {reservation.nameOnReservation ? (
-              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingVertical: 13, borderBottomWidth: 0.5, borderBottomColor: C.divider }}>
-                <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary }}>Namn på bokning</Text>
-                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.textPrimary }}>{reservation.nameOnReservation}</Text>
-              </View>
-            ) : null}
-            {/* Seat type */}
-            {reservation.seatType ? (
-              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingVertical: 13, borderBottomWidth: 0.5, borderBottomColor: C.divider }}>
-                <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary }}>Placering</Text>
-                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.textPrimary }}>{seatTypeLabel}</Text>
-              </View>
-            ) : null}
-            {/* Cancel fee */}
+          <View style={{
+            backgroundColor: C.bgCard,
+            borderRadius: RADIUS.lg,
+            overflow: "hidden",
+            ...SHADOW.raised,
+          }}>
             {reservation.cancelFee && reservation.cancelFee > 0 ? (
-              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingVertical: 13, borderBottomWidth: 0.5, borderBottomColor: C.divider }}>
-                <View>
-                  <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary }}>Avbokningsavgift</Text>
-                  {reservation.cancellationWindowHours ? (
-                    <Text style={{ fontFamily: FONTS.regular, fontSize: 11, color: C.textTertiary, marginTop: 1 }}>Avbokning senast {reservation.cancellationWindowHours} timmar före</Text>
-                  ) : null}
+              <View style={{ paddingHorizontal: 16, paddingVertical: 14 }}>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                  <AlertTriangle size={15} color={C.warning} strokeWidth={2.2} />
+                  <Text style={{ fontFamily: FONTS.bold, fontSize: 14, color: C.textPrimary }}>Avbokningsavgift</Text>
                 </View>
-                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.pistachio }}>{reservation.cancelFee} SEK/pers · Totalt {reservation.cancelFee * reservation.partySize} SEK</Text>
-              </View>
-            ) : (
-              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingVertical: 13, borderBottomWidth: 0.5, borderBottomColor: C.divider }}>
-                <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary }}>Avbokningsavgift</Text>
-                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.success }}>Ingen ✕</Text>
-              </View>
-            )}
-            {/* Prepaid amount */}
-            {reservation.prepaidAmount && reservation.prepaidAmount > 0 ? (
-              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingVertical: 13, borderBottomWidth: 0.5, borderBottomColor: C.divider }}>
-                <View>
-                  <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary }}>Förbetalt belopp</Text>
-                  <Text style={{ fontFamily: FONTS.regular, fontSize: 11, color: C.textTertiary, marginTop: 1 }}>Betalas vid avbokning</Text>
-                </View>
-                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.pistachio }}>{reservation.prepaidAmount} SEK</Text>
-              </View>
-            ) : null}
-            {/* Extra info */}
-            {reservation.extraInfo ? (
-              <View style={{ paddingHorizontal: 16, paddingVertical: 13, borderBottomWidth: 0.5, borderBottomColor: C.divider }}>
-                <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary, marginBottom: 4 }}>Mer info</Text>
-                <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textPrimary }}>{reservation.extraInfo}</Text>
-              </View>
-            ) : null}
-            {/* Verification link */}
-            {reservation.verificationLink ? (
-              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingVertical: 13 }}>
-                <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary }}>Verifiering</Text>
-                <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                  <CheckCircle size={14} color={C.success} strokeWidth={2} />
-                  <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.success }}>Verifierad</Text>
-                </View>
-              </View>
-            ) : (
-              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingVertical: 13 }}>
-                <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary }}>Verifiering</Text>
-                <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textTertiary }}>Skärmdump</Text>
-              </View>
-            )}
-          </View>
-        </Animated.View>
-
-        {/* Guarantee badge — pistachio accent */}
-        <Animated.View
-          entering={FadeInDown.delay(310).springify()}
-          style={{ paddingHorizontal: SPACING.lg, paddingTop: 10 }}
-        >
-          <View
-            testID="guarantee-badge"
-            style={{
-              backgroundColor: "rgba(126,200,122,0.06)",
-              borderRadius: RADIUS.lg,
-              padding: 14,
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 10,
-              borderWidth: 1,
-              borderColor: "rgba(126,200,122,0.15)",
-            }}
-          >
-            <View style={{
-              width: 26,
-              height: 26,
-              borderRadius: 13,
-              backgroundColor: "rgba(126,200,122,0.15)",
-              alignItems: "center",
-              justifyContent: "center",
-            }}>
-              <Check size={14} color={C.pistachio} strokeWidth={3} />
-            </View>
-            <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: C.dark, flex: 1 }}>
-              Reslot-garanti: fungerar inte överlåtelsen? Credits tillbaka.
-            </Text>
-          </View>
-        </Animated.View>
-
-
-        {/* Liability transfer — trust builder */}
-        {!isClaimed ? (
-          <Animated.View
-            entering={FadeInDown.delay(370).springify()}
-            style={{ paddingHorizontal: SPACING.lg, paddingTop: 16 }}
-          >
-            <View
-              testID="liability-transfer-card"
-              style={{
-                backgroundColor: "rgba(245,158,11,0.04)",
-                borderRadius: RADIUS.xl,
-                padding: 20,
-                borderWidth: 1.5,
-                borderColor: "rgba(245,158,11,0.15)",
-              }}
-            >
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 16 }}>
-                <View
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 10,
-                    backgroundColor: "rgba(245,158,11,0.12)",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Shield size={18} color={C.warning} strokeWidth={2.2} />
-                </View>
-                <Text style={{ fontFamily: FONTS.displayBold, fontSize: 16, color: C.dark, letterSpacing: -0.3 }}>
-                  Ansvarsövergång
+                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.dark }}>
+                  {reservation.cancelFee} kr/pers — totalt {reservation.cancelFee * reservation.partySize} kr
                 </Text>
-              </View>
-
-              {/* Visual transfer: original booker → you */}
-              <View style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 12,
-                backgroundColor: "rgba(0,0,0,0.025)",
-                borderRadius: RADIUS.lg,
-                paddingVertical: 16,
-                paddingHorizontal: 14,
-                marginBottom: 14,
-              }}>
-                {/* Original booker */}
-                <View style={{ alignItems: "center", flex: 1 }}>
-                  <View style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: 22,
-                    backgroundColor: "rgba(156,163,175,0.12)",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginBottom: 6,
-                  }}>
-                    <Users size={20} color={C.textTertiary} strokeWidth={2} />
-                  </View>
-                  <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textTertiary }}>
-                    Originalbokare
+                {reservation.cancellationWindowHours ? (
+                  <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textSecondary, marginTop: 4 }}>
+                    Avbokning senast {reservation.cancellationWindowHours} timmar före
                   </Text>
-                </View>
-
-                {/* Arrow */}
-                <View style={{ alignItems: "center", paddingBottom: 18 }}>
-                  <View style={{
-                    width: 40,
-                    height: 2,
-                    backgroundColor: C.warning,
-                    borderRadius: 1,
-                  }} />
-                  <View style={{
-                    position: "absolute",
-                    right: -2,
-                    top: -4,
-                    width: 0,
-                    height: 0,
-                    borderTopWidth: 5,
-                    borderBottomWidth: 5,
-                    borderLeftWidth: 8,
-                    borderTopColor: "transparent",
-                    borderBottomColor: "transparent",
-                    borderLeftColor: C.warning,
-                  }} />
-                </View>
-
-                {/* You */}
-                <View style={{ alignItems: "center", flex: 1 }}>
-                  <View style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: 22,
-                    backgroundColor: "rgba(126,200,122,0.15)",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginBottom: 6,
-                    borderWidth: 2,
-                    borderColor: "rgba(126,200,122,0.3)",
-                  }}>
-                    <Users size={20} color={C.pistachio} strokeWidth={2} />
-                  </View>
-                  <Text style={{ fontFamily: FONTS.bold, fontSize: 12, color: C.pistachio }}>
-                    Du
-                  </Text>
-                </View>
+                ) : null}
               </View>
+            ) : (
+              <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 16, paddingVertical: 14, gap: 8 }}>
+                <Check size={15} color={C.success} strokeWidth={2.5} />
+                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.success }}>Ingen avbokningsavgift</Text>
+              </View>
+            )}
+          </View>
+        </Animated.View>
 
-              <Text style={{
-                fontFamily: FONTS.regular,
-                fontSize: 13,
-                color: C.textSecondary,
-                lineHeight: 20,
-              }}>
-                När du tar över bokningen övergår ansvaret för eventuella avbokningsavgifter till dig efter 5 minuters ångerfrist. Under ångerfristen kan du ångra kostnadsfritt.
-              </Text>
-            </View>
-          </Animated.View>
-        ) : null}
 
         {/* Error message with shake */}
         {claimError ? (
@@ -2130,12 +1853,12 @@ ${shareUrl}`,
             onPressOut={() => {
               scaleBtn.value = withSpring(1, { damping: 10, stiffness: 180 });
             }}
-            disabled={claimMutation.isPending || isClaimed || !hasEnoughCredits}
+            disabled={claimMutation.isPending || isClaimed || (!hasEnoughCredits ? false : !accepted)}
             style={{
               backgroundColor: isClaimed
                 ? C.pistachio
                 : !hasEnoughCredits
-                ? C.textTertiary
+                ? C.gold
                 : accepted
                 ? C.pistachio
                 : "rgba(0,0,0,0.06)",
@@ -2175,7 +1898,7 @@ ${shareUrl}`,
                 </Text>
               </>
             ) : !hasEnoughCredits ? (
-              <Text style={{ fontFamily: FONTS.bold, fontSize: 16, color: C.white }}>
+              <Text style={{ fontFamily: FONTS.bold, fontSize: 16, color: C.dark }}>
                 Köp credits
               </Text>
             ) : (
