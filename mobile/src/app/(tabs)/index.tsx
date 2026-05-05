@@ -225,7 +225,8 @@ const Header = React.memo(function Header({
 }) {
   return (
     <View>
-      <View className="flex-row items-center justify-between px-5 pt-2 pb-1">
+      <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 16, paddingTop: 8, paddingBottom: 6, gap: 8 }}>
+        {/* Vänster: ? knapp */}
         <Pressable
           testID="faq-button"
           accessibilityLabel="Vanliga frågor"
@@ -234,55 +235,56 @@ const Header = React.memo(function Header({
             onFAQPress();
           }}
           style={{
-            width: 36,
-            height: 36,
-            borderRadius: 18,
+            width: 36, height: 36, borderRadius: 18,
             backgroundColor: C.borderLight,
-            alignItems: "center",
-            justifyContent: "center",
+            alignItems: "center", justifyContent: "center",
+            flexShrink: 0,
           }}
         >
           <HelpCircle size={20} color={C.textTertiary} strokeWidth={2} />
         </Pressable>
 
-        <View className="flex-row items-center" style={{ gap: 6 }}>
+        {/* Mitten: Bokningar i [Stad] */}
+        <Pressable
+          testID="city-picker-button"
+          accessibilityLabel="Välj stad"
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            onCityPress();
+          }}
+          style={{ flex: 1, flexDirection: "row", alignItems: "center" }}
+        >
+          <Text
+            style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: C.dark, letterSpacing: -0.5 }}
+            numberOfLines={1}
+          >
+            Bokningar i{" "}
+            <Text style={{ color: C.pistachio }}>{selectedCity}</Text>
+          </Text>
+          <ChevronDown size={16} color={C.pistachio} strokeWidth={2} style={{ marginLeft: 2 }} />
+        </Pressable>
+
+        {/* Höger: credits + karta + sök */}
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 6, flexShrink: 0 }}>
           <Pressable
             testID="credits-pill"
             accessibilityLabel="Visa credits"
-            className="flex-row items-center rounded-full px-3 py-1.5"
-            style={{ backgroundColor: C.goldLight }}
+            style={{ flexDirection: "row", alignItems: "center", backgroundColor: C.goldLight, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 6 }}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               onCreditsPress();
             }}
           >
             <Coins size={14} color={C.gold} strokeWidth={ICON.strokeWidth} />
-            <Text
-              style={{
-                fontFamily: FONTS.bold,
-                fontSize: 13,
-                color: C.gold,
-                marginLeft: 4,
-              }}
-            >
+            <Text style={{ fontFamily: FONTS.bold, fontSize: 13, color: C.gold, marginLeft: 4 }}>
               {isLoading ? "..." : credits}
             </Text>
           </Pressable>
           <Pressable
             testID="map-button"
             accessibilityLabel="Visa karta"
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              onMapPress();
-            }}
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 18,
-              backgroundColor: C.pistachio,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); onMapPress(); }}
+            style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: C.pistachio, alignItems: "center", justifyContent: "center" }}
           >
             <MapPin size={18} color={C.white} strokeWidth={2.5} />
           </Pressable>
@@ -290,49 +292,12 @@ const Header = React.memo(function Header({
             testID="search-toggle"
             accessibilityLabel="Sök restaurang"
             onPress={onSearchToggle}
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 18,
-              backgroundColor: C.borderLight,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+            style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: C.borderLight, alignItems: "center", justifyContent: "center" }}
           >
             <Search size={18} color={C.textTertiary} strokeWidth={2} />
           </Pressable>
         </View>
       </View>
-
-      <Pressable
-        testID="city-picker-button"
-        accessibilityLabel="Välj stad"
-        onPress={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          onCityPress();
-        }}
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          paddingHorizontal: 20,
-          paddingTop: 4,
-          paddingBottom: 4,
-        }}
-      >
-        <Text
-          style={{
-            fontFamily: FONTS.displayBold,
-            fontSize: 28,
-            color: C.dark,
-            letterSpacing: -0.8,
-          }}
-          numberOfLines={1}
-        >
-          Bokningar i{" "}
-          <Text style={{ color: C.pistachio, opacity: 0.95 }}>{selectedCity}</Text>
-        </Text>
-        <ChevronDown size={18} color={C.pistachio} strokeWidth={ICON.strokeWidth} style={{ marginLeft: 4 }} />
-      </Pressable>
       {showSearch ? (
         <View style={{ paddingHorizontal: SPACING.lg, paddingBottom: SPACING.sm }}>
           <TextInput
