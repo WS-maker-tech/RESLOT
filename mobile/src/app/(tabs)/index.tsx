@@ -225,60 +225,41 @@ const Header = React.memo(function Header({
 }) {
   return (
     <View>
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 16, paddingTop: 8, paddingBottom: 6 }}>
-        {/* Vänster: ? knapp */}
+      {/* Header — ? | [Bokningar i Stad centrerat] | credits+karta+sök */}
+      <View style={{ height: 52, paddingHorizontal: 16, paddingTop: 8, paddingBottom: 6 }}>
+        {/* Vänster: ? */}
         <Pressable
           testID="faq-button"
           accessibilityLabel="Vanliga frågor"
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            onFAQPress();
-          }}
-          style={{
-            width: 36, height: 36, borderRadius: 18,
-            backgroundColor: C.borderLight,
-            alignItems: "center", justifyContent: "center",
-            flexShrink: 0,
-          }}
+          onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); onFAQPress(); }}
+          style={{ position: "absolute", left: 16, top: 8, width: 36, height: 36, borderRadius: 18, backgroundColor: C.borderLight, alignItems: "center", justifyContent: "center", zIndex: 1 }}
         >
           <HelpCircle size={20} color={C.textTertiary} strokeWidth={2} />
         </Pressable>
 
-        {/* Mitten: Bokningar i [Stad] */}
+        {/* Mitten: absolut centrerad */}
         <Pressable
           testID="city-picker-button"
           accessibilityLabel="Välj stad"
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            onCityPress();
-          }}
-          style={{ flex: 1, flexDirection: "row", alignItems: "center" }}
+          onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); onCityPress(); }}
+          style={{ position: "absolute", left: 0, right: 0, top: 8, alignItems: "center", justifyContent: "center", flexDirection: "row", height: 36, zIndex: 0 }}
         >
-          <Text
-            style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: C.dark, letterSpacing: -0.5 }}
-            numberOfLines={1}
-          >
-            Bokningar i{" "}
-            <Text style={{ color: C.pistachio }}>{selectedCity}</Text>
+          <Text style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: C.dark, letterSpacing: -0.5 }} numberOfLines={1}>
+            Bokningar i <Text style={{ color: C.pistachio }}>{selectedCity}</Text>
           </Text>
           <ChevronDown size={16} color={C.pistachio} strokeWidth={2} style={{ marginLeft: 2 }} />
         </Pressable>
 
         {/* Höger: credits + karta + sök */}
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 6, flexShrink: 0 }}>
+        <View style={{ position: "absolute", right: 16, top: 8, flexDirection: "row", alignItems: "center", gap: 6, zIndex: 1 }}>
           <Pressable
             testID="credits-pill"
             accessibilityLabel="Visa credits"
             style={{ flexDirection: "row", alignItems: "center", backgroundColor: C.goldLight, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 6 }}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              onCreditsPress();
-            }}
+            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); onCreditsPress(); }}
           >
             <Coins size={14} color={C.gold} strokeWidth={ICON.strokeWidth} />
-            <Text style={{ fontFamily: FONTS.bold, fontSize: 13, color: C.gold, marginLeft: 4 }}>
-              {isLoading ? "..." : credits}
-            </Text>
+            <Text style={{ fontFamily: FONTS.bold, fontSize: 13, color: C.gold, marginLeft: 4 }}>{isLoading ? "..." : credits}</Text>
           </Pressable>
           <Pressable
             testID="map-button"
