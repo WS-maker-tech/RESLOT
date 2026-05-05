@@ -225,7 +225,7 @@ const Header = React.memo(function Header({
 }) {
   return (
     <View>
-      <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 16, paddingTop: 8, paddingBottom: 6, gap: 8 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 16, paddingTop: 8, paddingBottom: 6 }}>
         {/* Vänster: ? knapp */}
         <Pressable
           testID="faq-button"
