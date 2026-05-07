@@ -15,7 +15,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import {
   Clock,
-  Coins,
   Search,
   ChevronRight,
   ChevronLeft,
@@ -202,10 +201,7 @@ const Header = React.memo(function Header({
   selectedCity,
   onCityPress,
   onFAQPress,
-  onCreditsPress,
   onMapPress,
-  credits,
-  isLoading,
   showSearch,
   onSearchToggle,
   searchQuery,
@@ -214,10 +210,7 @@ const Header = React.memo(function Header({
   selectedCity: string;
   onCityPress: () => void;
   onFAQPress: () => void;
-  onCreditsPress: () => void;
   onMapPress: () => void;
-  credits: number;
-  isLoading?: boolean;
   showSearch: boolean;
   onSearchToggle: () => void;
   searchQuery: string;
@@ -225,8 +218,8 @@ const Header = React.memo(function Header({
 }) {
   return (
     <View>
-      {/* En rad: [?  flex:1] [Bokningar i Stockholm] [flex:1  credits·karta·sök] */}
-      <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 16, paddingTop: 8, paddingBottom: 6 }}>
+      {/* En rad: [?  flex:1] [Bokningar i Stockholm] [flex:1  karta·sök] */}
+      <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 16, paddingTop: 4, paddingBottom: 6 }}>
         <View style={{ flex: 1 }}>
           <Pressable
             testID="faq-button"
@@ -243,21 +236,12 @@ const Header = React.memo(function Header({
           onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); onCityPress(); }}
           style={{ flexDirection: "row", alignItems: "center" }}
         >
-          <Text style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: C.dark, letterSpacing: -0.5 }}>
+          <Text style={{ fontFamily: FONTS.displayBold, fontSize: 18, color: C.dark, letterSpacing: -0.5 }}>
             Bokningar i <Text style={{ color: C.pistachio }}>{selectedCity}</Text>
           </Text>
           <ChevronDown size={16} color={C.pistachio} strokeWidth={2} style={{ marginLeft: 2 }} />
         </Pressable>
         <View style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "flex-end", gap: 6 }}>
-          <Pressable
-            testID="credits-pill"
-            accessibilityLabel="Visa credits"
-            style={{ flexDirection: "row", alignItems: "center", backgroundColor: C.goldLight, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 6 }}
-            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); onCreditsPress(); }}
-          >
-            <Coins size={14} color={C.gold} strokeWidth={ICON.strokeWidth} />
-            <Text style={{ fontFamily: FONTS.bold, fontSize: 13, color: C.gold, marginLeft: 4 }}>{isLoading ? "..." : credits}</Text>
-          </Pressable>
           <Pressable
             testID="map-button"
             accessibilityLabel="Visa karta"
@@ -1167,7 +1151,6 @@ export default function HomeScreen() {
   // Stable callbacks for child components
   const onCityPress = useCallback(() => setShowCityPicker(true), []);
   const onFAQPress = useCallback(() => router.push("/faq"), [router]);
-  const onCreditsPress = useCallback(() => router.push("/credits"), [router]);
   const onMapPress = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     router.push("/map");
@@ -1275,10 +1258,7 @@ export default function HomeScreen() {
             selectedCity={selectedCity}
             onCityPress={onCityPress}
             onFAQPress={onFAQPress}
-            onCreditsPress={onCreditsPress}
             onMapPress={onMapPress}
-            credits={profile?.credits ?? 0}
-            isLoading={profileLoading}
             showSearch={showSearch}
             onSearchToggle={onSearchToggle}
             searchQuery={searchQuery}
