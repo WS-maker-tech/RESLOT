@@ -44,6 +44,7 @@ import * as Haptics from "expo-haptics";
 import { useAuthStore } from "@/lib/auth-store";
 import { supabase } from "@/lib/supabase";
 import { C as ThemeC, FONTS } from "../lib/theme";
+import IntroCarousel from "@/components/onboarding/IntroCarousel";
 
 // Use static fallback for constants needed at module level (card sizes etc)
 const { width: _INIT_W, height: _INIT_H } = Dimensions.get("window");
@@ -244,7 +245,7 @@ function PulsingDot() {
 }
 
 // --- Step Enum ---
-type Step = "splash" | "phone" | "otp" | "register" | "city" | "credits_intro" | "welcome" | "login";
+type Step = "splash" | "intro" | "phone" | "otp" | "register" | "city" | "credits_intro" | "welcome" | "login";
 
 // --- Shared Button ---
 function PrimaryButton({
@@ -1968,9 +1969,21 @@ export default function OnboardingScreen() {
             }}
             onRegister={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              setStep("phone");
+              setStep("intro");
             }}
             onExplore={() => router.replace('/(tabs)')}
+          />
+        ) : null}
+
+        {step === "intro" ? (
+          <IntroCarousel
+            onComplete={() => setStep("phone")}
+            onLogin={() => setStep("login")}
+            onBack={() => setStep("splash")}
+            onSkipToTabs={() => {
+              setGuestMode();
+              router.replace("/(tabs)");
+            }}
           />
         ) : null}
 
