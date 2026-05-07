@@ -1,5 +1,6 @@
 # Claude / AI agent files
-.claude/
+.claude/*
+!.claude/skills/
 AUDIT.md
 CLAUDE.clean-claude.md
 logo-preview.html

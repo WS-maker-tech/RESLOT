@@ -2,6 +2,14 @@
 
 > **🔑 Start här:** Läs `RESLOT-VAULT.md` i repo-roten först. Den innehåller full kontext, deploy-flöde, gotchas, stream-timeout-regel och pågående arbete. Denna fil (`CLAUDE.md`) är en kondenserad version.
 
+## ⚙️ Refero MCP & Skill — ALLTID TILLGÄNGLIGT
+Detta projekt har **Refero** permanent installerat. Du behöver inte fråga vad det är, inte installera om det, inte autentisera. Det funkar.
+
+- **MCP-server:** konfigurerad i `.mcp.json` (project root) med literal bearer-token. Verktyg blir tillgängliga som `refero_search_screens`, `refero_search_flows`, `refero_get_screen_content`, `refero_get_similar_screens`, `refero_get_flow`.
+- **Skill:** `refero-design` ligger i `.claude/skills/refero-design/` (committad). Aktiveras via `/refero-design` eller automatiskt när användaren ber om UI/design-jobb.
+- **Användning:** vid varje design-/UI-uppgift, börja med `refero_search_screens` (platform `web` eller `ios`) för att hitta riktiga referenser innan du designar något.
+- **Fungerar inte direkt?** Token är giltig (verifierad mot `https://api.refero.design/mcp`). Om verktygen saknas vid sessionstart: be användaren bekräfta MCP-trust för project-scoped servers, sedan starta om Claude Code en gång. Återinstallera ALDRIG och kör ALDRIG OAuth-flödet — bearer-tokenen i `.mcp.json` är auktoritativ.
+
 ## Project
 Reslot är en Expo React Native-app (web-build) + Vercel serverless API för ett andrahandsmarknadsplats av restaurangbokningar — användare kan lägga upp och ta över bokningar med credits.
 
