@@ -19,6 +19,7 @@ import { useAddWatch, useRestaurants } from "@/lib/api/hooks";
 import { useAuthStore } from "@/lib/auth-store";
 import type { WatchFilterOptions } from "@/lib/api/types";
 import { C, FONTS, SPACING, RADIUS, ICON } from "@/lib/theme";
+import { Heading } from "@/components/Heading";
 
 const WEEKDAY_LABELS = ["Alla", "Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"];
 const PARTY_SIZES = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -96,9 +97,11 @@ export default function AddWatchScreen() {
           >
             <ChevronLeft size={20} color={C.textSecondary} strokeWidth={2} />
           </Pressable>
-          <Text style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: C.textPrimary, letterSpacing: -0.4, flex: 1 }}>
-            Bevaka restaurang
-          </Text>
+          <View style={{ flex: 1 }}>
+            <Heading variant="h2" tone="ink">
+              {`*Bevaka* restaurang`}
+            </Heading>
+          </View>
         </View>
 
         {/* Search bar */}
