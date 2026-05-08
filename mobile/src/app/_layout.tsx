@@ -9,6 +9,15 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useAuthStore } from '@/lib/auth-store';
 import { Modal } from 'react-native';
 import { useFonts } from 'expo-font';
+import {
+  Fraunces_400Regular,
+  Fraunces_400Regular_Italic,
+  Fraunces_500Medium,
+  Fraunces_600SemiBold,
+  Fraunces_600SemiBold_Italic,
+  Fraunces_700Bold,
+  Fraunces_700Bold_Italic,
+} from '@expo-google-fonts/fraunces';
 import { registerForPushNotificationsAsync, setupNotificationHandlers } from '@/lib/notifications';
 import { router as expoRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase'; // cache-bust 2
@@ -188,7 +197,15 @@ function RootLayoutNav() {
 }
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({});
+  const [fontsLoaded] = useFonts({
+    Fraunces_400Regular,
+    Fraunces_400Regular_Italic,
+    Fraunces_500Medium,
+    Fraunces_600SemiBold,
+    Fraunces_600SemiBold_Italic,
+    Fraunces_700Bold,
+    Fraunces_700Bold_Italic,
+  });
   const notificationCleanupRef = useRef<(() => void) | null>(null);
 
   // Set up push notifications on mount
