@@ -16,6 +16,7 @@ import Animated, {
 import { useProfile, usePurchaseCredits } from "@/lib/api/hooks";
 import { useAuthStore } from "@/lib/auth-store";
 import { C, FONTS, SPACING, SHADOW, RADIUS, ICON } from "../lib/theme";
+import { Heading } from "@/components/Heading";
 
 function AnimatedPressable({
   children,
@@ -177,28 +178,12 @@ export default function CreditsScreen() {
           entering={FadeInDown.springify()}
           style={{ paddingHorizontal: SPACING.lg, paddingTop: SPACING.xl, paddingBottom: SPACING.xs }}
         >
-          <Text
-            style={{
-              fontFamily: FONTS.semiBold,
-              fontSize: 11,
-              letterSpacing: 1.2,
-              textTransform: "uppercase",
-              color: C.textTertiary,
-              marginBottom: 4,
-            }}
-          >
+          <Heading variant="eyebrow" tone="inkSoft" style={{ marginBottom: 4 }}>
             Saldo & paket
-          </Text>
-          <Text
-            style={{
-              fontFamily: FONTS.displayBold,
-              fontSize: 32,
-              color: C.textPrimary,
-              letterSpacing: -1.0,
-            }}
-          >
-            Reslot credits
-          </Text>
+          </Heading>
+          <Heading variant="h1" tone="ink">
+            {`*Sparade* bord`}
+          </Heading>
         </Animated.View>
 
         {/* Balance card */}
