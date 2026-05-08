@@ -9,12 +9,36 @@ type ColorPalette = Record<
   | "white" | "goldLight" | "goldBorder" | "goldPressed"
   | "errorBg" | "errorBorder" | "errorLight"
   | "infoBg" | "infoBorder" | "infoLight"
-  | "overlayDark" | "overlayLight" | "overlayMedium",
+  | "overlayDark" | "overlayLight" | "overlayMedium"
+  | "cream" | "creamSoft" | "creamDeep"
+  | "forest" | "forestDeep" | "forestSoft"
+  | "ink" | "inkSoft" | "inkFaint"
+  | "coral" | "coralSoft"
+  | "pastelYellow" | "pastelBlue" | "pastelGreen" | "pastelPeach"
+  | "ringForest",
   string
 >;
 
 export const C = {
-  // Primary — Reslot brand palette
+  // ─── Reslot Identity v2 (Pi-tier — primary going forward) ───
+  cream: "#FAF3EB",         // App-bg (samma värde som legacy `bg`)
+  creamSoft: "#FAF7F0",     // Lighter cream — subtle layering, on-cream cards
+  creamDeep: "#F0E6D5",     // Inputs, sunken surfaces (samma som legacy `bgInput`)
+  forest: "#1F4D2A",        // Primary brand — hero typo, primary CTAs, links
+  forestDeep: "#143620",    // Pressed states, depth
+  forestSoft: "rgba(31,77,42,0.10)",  // Tinted divider/ring/halo
+  ringForest: "rgba(31,77,42,0.18)",  // Avatar/icon ring
+  ink: "#1A1A1A",           // Body text (warmer than legacy dark)
+  inkSoft: "#6B6B6B",       // Secondary text
+  inkFaint: "#9B9B9B",      // Tertiary / captions
+  coral: "#D97757",         // Delight token — endast success/welcome (max 3 skärmar)
+  coralSoft: "rgba(217,119,87,0.12)",
+  pastelYellow: "#FBF3D5",  // Status-chip "tillgänglig", info
+  pastelBlue: "#D8E5F2",    // Status-chip "bevakat"
+  pastelGreen: "#D8E8D5",   // Status-chip "bekräftad"
+  pastelPeach: "#F5E0CC",   // Status-chip "snart"
+
+  // ─── Legacy palette (kvar — komponenter migreras gradvis) ───
   pistachio: "#7EC87A",
   grayLight: "#9CA3AF",
   gold: "#C9A96E",
@@ -78,6 +102,24 @@ export const C = {
  * No existing components are changed — this is infrastructure only.
  */
 export const DARK_COLORS: ColorPalette = {
+  // Identity v2 dark counterparts (infrastructure only — ej använt än)
+  cream: "#1A1A1A",
+  creamSoft: "#222222",
+  creamDeep: "#2A2A2A",
+  forest: "#9CD0A2",
+  forestDeep: "#7BB081",
+  forestSoft: "rgba(156,208,162,0.14)",
+  ringForest: "rgba(156,208,162,0.22)",
+  ink: "#FAFAFA",
+  inkSoft: "#C8C8C8",
+  inkFaint: "#8A8A8A",
+  coral: "#E89070",
+  coralSoft: "rgba(232,144,112,0.18)",
+  pastelYellow: "rgba(251,243,213,0.18)",
+  pastelBlue: "rgba(216,229,242,0.18)",
+  pastelGreen: "rgba(216,232,213,0.18)",
+  pastelPeach: "rgba(245,224,204,0.18)",
+
   pistachio: "#7EC87A",
   grayLight: "#9CA3AF",
   gold: "#D4B87E",
@@ -131,14 +173,24 @@ export function getTheme(mode: "light" | "dark"): ColorPalette {
 }
 
 export const FONTS = {
-  // Display — Plus Jakarta Sans (all headings)
-  displayBold: "PlusJakartaSans_700Bold",
-  displaySemiBold: "PlusJakartaSans_600SemiBold",
-  // Body/UI — Plus Jakarta Sans
+  // ─── UI / body — Plus Jakarta Sans (default everywhere) ───
   bold: "PlusJakartaSans_700Bold",
   semiBold: "PlusJakartaSans_600SemiBold",
   medium: "PlusJakartaSans_500Medium",
   regular: "PlusJakartaSans_400Regular",
+
+  // Display sans (LEGACY alias kvar — pekar på sans, inte serif, så befintliga TYPO-presets ändrar sig EJ automatiskt)
+  displayBold: "PlusJakartaSans_700Bold",
+  displaySemiBold: "PlusJakartaSans_600SemiBold",
+
+  // ─── Identity v2 — Fraunces serif (opt-in via Heading-komponent eller TYPO.serif*) ───
+  serifBold: "Fraunces_700Bold",
+  serifBoldItalic: "Fraunces_700Bold_Italic",
+  serifSemiBold: "Fraunces_600SemiBold",
+  serifSemiBoldItalic: "Fraunces_600SemiBold_Italic",
+  serifMedium: "Fraunces_500Medium",
+  serifRegular: "Fraunces_400Regular",
+  serifItalic: "Fraunces_400Regular_Italic",
 } as const;
 
 export const SPACING = {
@@ -284,6 +336,74 @@ export const TYPO = {
     fontFamily: FONTS.bold,
     fontVariant: ["tabular-nums"] as const,
     color: C.textPrimary,
+  },
+
+  // ─── Identity v2 — serif presets (opt-in via Heading-komponent) ───
+  serifDisplay: {
+    fontFamily: FONTS.serifBold,
+    fontSize: 44,
+    lineHeight: 50,
+    letterSpacing: -1.4,
+    color: C.ink,
+  },
+  serifDisplayItalic: {
+    fontFamily: FONTS.serifBoldItalic,
+    fontSize: 44,
+    lineHeight: 50,
+    letterSpacing: -1.4,
+    color: C.ink,
+    fontStyle: "italic" as const,
+  },
+  serifH1: {
+    fontFamily: FONTS.serifBold,
+    fontSize: 32,
+    lineHeight: 36,
+    letterSpacing: -0.9,
+    color: C.ink,
+  },
+  serifH1Italic: {
+    fontFamily: FONTS.serifBoldItalic,
+    fontSize: 32,
+    lineHeight: 36,
+    letterSpacing: -0.9,
+    color: C.ink,
+    fontStyle: "italic" as const,
+  },
+  serifH2: {
+    fontFamily: FONTS.serifSemiBold,
+    fontSize: 24,
+    lineHeight: 28,
+    letterSpacing: -0.5,
+    color: C.ink,
+  },
+  serifH2Italic: {
+    fontFamily: FONTS.serifSemiBoldItalic,
+    fontSize: 24,
+    lineHeight: 28,
+    letterSpacing: -0.5,
+    color: C.ink,
+    fontStyle: "italic" as const,
+  },
+  serifH3: {
+    fontFamily: FONTS.serifSemiBold,
+    fontSize: 18,
+    lineHeight: 24,
+    letterSpacing: -0.2,
+    color: C.ink,
+  },
+  serifEyebrow: {
+    fontFamily: FONTS.serifItalic,
+    fontSize: 13,
+    letterSpacing: 0.3,
+    color: C.inkSoft,
+    fontStyle: "italic" as const,
+  },
+  wordmark: {
+    fontFamily: FONTS.serifSemiBoldItalic,
+    fontSize: 28,
+    letterSpacing: -0.6,
+    color: C.forest,
+    fontStyle: "italic" as const,
   },
 } as const;
 
