@@ -45,6 +45,7 @@ import { useProfile, useMyReservations, useSavedRestaurants } from "@/lib/api/ho
 import { useAuthStore } from "@/lib/auth-store";
 import { LoginGate } from "@/components/LoginGate";
 import { C, FONTS, SPACING, SHADOW, RADIUS, ICON } from "../../lib/theme";
+import { Heading } from "@/components/Heading";
 import { Skeleton } from "@/components/Skeleton";
 
 import { LegalModal } from "@/components/LegalModal";
@@ -294,17 +295,14 @@ export default function ProfileScreen() {
     <View style={{ flex: 1, backgroundColor: C.bg }}>
       <SafeAreaView edges={["top"]} style={{ backgroundColor: C.bg }}>
         <View className="flex-row items-center justify-between px-5 pt-2 pb-3">
-          <Text
+          {/* Editorial header — bara en h1, profil ÄR personen, ingen italic-tvång */}
+          <Heading
+            variant="h1"
+            tone="ink"
             testID="profile-title"
-            style={{
-              fontFamily: FONTS.displayBold,
-              fontSize: 24,
-              color: C.textPrimary,
-              letterSpacing: -0.5,
-            }}
           >
             Profil
-          </Text>
+          </Heading>
           <Pressable
             testID="settings-button"
             accessibilityLabel="Inställningar"
