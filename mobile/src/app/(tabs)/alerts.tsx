@@ -47,6 +47,7 @@ import Animated, { FadeInDown, ZoomIn } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { C, FONTS, SPACING, RADIUS, ICON } from "../../lib/theme";
+import { Heading } from "@/components/Heading";
 import { Skeleton } from "@/components/Skeleton";
 import { LoginGate } from "@/components/LoginGate";
 
@@ -380,29 +381,17 @@ export default function AlertsScreen() {
       <SafeAreaView edges={["top"]} style={{ backgroundColor: C.bg }}>
         <View className="flex-row items-center justify-between px-5 pt-2 pb-2">
           <View>
-            <Text
-              style={{
-                fontFamily: FONTS.semiBold,
-                fontSize: 11,
-                letterSpacing: 1.2,
-                textTransform: "uppercase",
-                color: C.textTertiary,
-                marginBottom: 4,
-              }}
-            >
+            {/* Editorial header — eyebrow → serif h1 italic-on-verb */}
+            <Heading variant="eyebrow" tone="inkSoft" style={{ marginBottom: 4 }}>
               Aktivitet
-            </Text>
-            <Text
+            </Heading>
+            <Heading
+              variant="h1"
+              tone="ink"
               testID="alerts-header"
-              style={{
-                fontFamily: FONTS.displayBold,
-                fontSize: 32,
-                color: C.dark,
-                letterSpacing: -1.0,
-              }}
             >
-              Bevakningar
-            </Text>
+              {`*Vaktade* favoriter`}
+            </Heading>
             {unreadCount > 0 && activeTab === "activity" ? (
               <Text
                 testID="unread-count"
