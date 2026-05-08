@@ -24,7 +24,7 @@ scripts/design-research/*.json
 
 # Night-job artifacts (autonomous design overhaul 2026-05-08)
 .refero-cache/
-mobile/screenshots/
 NIGHT_SKIPPED.md
 NIGHT_HALTED.md
 NIGHT_NOTES.md
+# mobile/screenshots/ är committade så William kan se BEFORE/AFTER imorgon
