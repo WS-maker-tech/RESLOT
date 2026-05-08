@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 140" width="200" height="140" role="img" aria-label="Reslot mascot — bord med vingar">
+  <g fill="#1F4D2A">
+    <!-- Left wing -->
+    <path d="M100 62 C 78 50, 50 42, 22 50 C 42 60, 64 64, 100 70 Z" opacity="0.92"/>
+    <path d="M100 68 C 76 60, 50 58, 28 68 C 50 76, 76 78, 100 76 Z" opacity="0.78"/>
+    <path d="M100 74 C 78 72, 56 76, 38 86 C 60 88, 80 84, 100 80 Z" opacity="0.62"/>
+    <!-- Right wing -->
+    <path d="M100 62 C 122 50, 150 42, 178 50 C 158 60, 136 64, 100 70 Z" opacity="0.92"/>
+    <path d="M100 68 C 124 60, 150 58, 172 68 C 150 76, 124 78, 100 76 Z" opacity="0.78"/>
+    <path d="M100 74 C 122 72, 144 76, 162 86 C 140 88, 120 84, 100 80 Z" opacity="0.62"/>
+    <!-- Tabletop -->
+    <path d="M70 66 L130 66 Q134 66, 134 70 L134 74 Q134 78, 130 78 L70 78 Q66 78, 66 74 L66 70 Q66 66, 70 66 Z"/>
+    <!-- Plate -->
+    <circle cx="100" cy="72" r="2.4" fill="#FAF3EB"/>
+    <!-- Legs -->
+    <path d="M76 78 L72 108 L78 108 L82 78 Z"/>
+    <path d="M124 78 L122 108 L128 108 L130 78 Z"/>
+    <!-- Sparkles -->
+    <path d="M28 28 l 1.6 -3 l 1.6 3 l 3 1.6 l -3 1.6 l -1.6 3 l -1.6 -3 l -3 -1.6 z" opacity="0.7"/>
+    <path d="M170 24 l 1.4 -2.6 l 1.4 2.6 l 2.6 1.4 l -2.6 1.4 l -1.4 2.6 l -1.4 -2.6 l -2.6 -1.4 z" opacity="0.7"/>
+    <path d="M158 110 l 1.2 -2.2 l 1.2 2.2 l 2.2 1.2 l -2.2 1.2 l -1.2 2.2 l -1.2 -2.2 l -2.2 -1.2 z" opacity="0.5"/>
+  </g>
+</svg>
