@@ -39,7 +39,7 @@ type IntroSlide = {
 const SLIDES: IntroSlide[] = [
   {
     id: "hej",
-    smallWord: "Vi är",
+    smallWord: null,
     bigWord: "Hej",
     hero:
       "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=900&q=80&auto=format&fit=crop&crop=center",
