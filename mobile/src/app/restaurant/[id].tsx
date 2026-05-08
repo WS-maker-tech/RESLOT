@@ -57,6 +57,7 @@ import {
 } from "@/lib/api/hooks";
 import { useAuthStore } from "@/lib/auth-store";
 import { C, FONTS, SPACING, SHADOW, RADIUS } from "../../lib/theme";
+import { Heading } from "@/components/Heading";
 import { WebMap } from "@/components/WebMap";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
@@ -1199,24 +1200,27 @@ ${shareUrl}`,
           </View>
         </View>
 
-        {/* Restaurant info */}
+        {/* Restaurant info — editorial header
+            Hierarchy: serif eyebrow (cuisine · neighborhood) → serif h1 (name).
+            No italic forced — restaurant names are nouns, italic feels twee. Empty heading
+            without forced verb-italic per William's beslut 4. */}
         <Animated.View
           entering={FadeInDown.springify().damping(16)}
           style={{ paddingHorizontal: SPACING.lg, paddingTop: 18 }}
         >
-          <Text
+          {(r.cuisine || r.neighborhood) ? (
+            <Heading variant="eyebrow" tone="inkSoft" style={{ marginBottom: 4 }}>
+              {[r.cuisine, r.neighborhood].filter(Boolean).join(" · ")}
+            </Heading>
+          ) : null}
+          <Heading
+            variant="h1"
+            tone="ink"
             testID="restaurant-name"
-            style={{
-              fontFamily: FONTS.displayBold,
-              fontSize: 24,
-              color: C.textPrimary,
-              letterSpacing: -0.6,
-              lineHeight: 30,
-            }}
             numberOfLines={2}
           >
             {r.name}
-          </Text>
+          </Heading>
 
           {/* Rating + cuisine row */}
           <View style={{ flexDirection: "row", alignItems: "center", flexWrap: "wrap", marginTop: 10, gap: 6 }}>
