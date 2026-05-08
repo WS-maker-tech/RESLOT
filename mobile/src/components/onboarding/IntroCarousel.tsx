@@ -20,16 +20,12 @@ import Animated, {
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import * as Haptics from "expo-haptics";
 import { ArrowLeft } from "lucide-react-native";
-import {
-  useFonts,
-  PlayfairDisplay_400Regular_Italic,
-  PlayfairDisplay_900Black,
-} from "@expo-google-fonts/playfair-display";
-import { FONTS, RADIUS, SPACING } from "@/lib/theme";
+import { C, FONTS, RADIUS, SPACING } from "@/lib/theme";
 
-// Pi-screen palette — deep green big-word matches Pi exactly. One-off intro accent.
+// Pi-screen palette — deep green for big-word matches Pi exactly.
+// Defined locally (not in theme.ts) since this is a one-off intro accent.
 const INTRO_DARK_GREEN = "#1F4D2A";
-const INTRO_BG = "#FAF5F0";
+const INTRO_BG = "#FAF5F0"; // Cream — lite varmare än C.bg för Pi-match
 
 type IntroSlide = {
   id: "hej" | "bord" | "klara";
@@ -67,6 +63,7 @@ const SLIDES: IntroSlide[] = [
   },
 ];
 
+// ── Pagination dots ──
 function PaginationDots({ index, total }: { index: number; total: number }) {
   return (
     <View
@@ -112,6 +109,7 @@ function Dot({ active }: { active: boolean }) {
   );
 }
 
+// ── Primary CTA — Pi-stil pill, dark green fill, cream text ──
 function IntroPrimaryButton({
   label,
   onPress,
@@ -226,40 +224,40 @@ function IntroGhostButton({
   );
 }
 
+// ── A single slide ──
 function IntroSlideView({
   slide,
   windowW,
   bigWordSize,
-  serifLoaded,
   onCreateAccount,
   onSkip,
 }: {
   slide: IntroSlide;
   windowW: number;
   bigWordSize: number;
-  serifLoaded: boolean;
   onCreateAccount: () => void;
   onSkip: () => void;
 }) {
-  // Pi-stil hero — kvadratisk, top-left, ~55% av container-bredden
-  const heroSize = Math.min(windowW * 0.55, 240);
+  const heroW = Math.min(windowW - SPACING.lg2 * 2, 360);
+  const heroH = heroW * 1.18; // Aspect ~1:1.18 — matchar Pi:s hero-ratio
 
   return (
     <View
       style={{
         flex: 1,
-        alignItems: "flex-start",
+        alignItems: "center",
         justifyContent: "flex-start",
         paddingHorizontal: SPACING.lg2,
       }}
     >
+      {/* Hero photo */}
       <Animated.View
         key={`hero-${slide.id}`}
         entering={FadeIn.duration(420).easing(Easing.out(Easing.quad))}
         style={{
           marginTop: SPACING.md,
-          width: heroSize,
-          height: heroSize,
+          width: heroW,
+          height: heroH,
           borderRadius: RADIUS.xxl,
           overflow: "hidden",
           backgroundColor: "rgba(31,77,42,0.08)",
@@ -277,11 +275,13 @@ function IntroSlideView({
         />
       </Animated.View>
 
+      {/* Text block */}
       <View
         style={{
-          alignSelf: "stretch",
-          alignItems: "flex-start",
+          alignItems: "center",
+          justifyContent: "center",
           marginTop: SPACING.xl,
+          paddingHorizontal: SPACING.md,
         }}
       >
         {slide.smallWord ? (
@@ -292,16 +292,13 @@ function IntroSlideView({
               .damping(14)
               .stiffness(130)}
             style={{
-              fontFamily: serifLoaded
-                ? "PlayfairDisplay_400Regular_Italic"
-                : FONTS.medium,
-              fontStyle: serifLoaded ? "normal" : "italic",
-              fontSize: 36,
-              lineHeight: 40,
+              fontFamily: FONTS.medium,
+              fontSize: 28,
+              lineHeight: 32,
               color: INTRO_DARK_GREEN,
               letterSpacing: -0.5,
-              textAlign: "left",
-              marginBottom: SPACING.xs,
+              textAlign: "center",
+              marginBottom: -2,
             }}
           >
             {slide.smallWord}
@@ -317,14 +314,12 @@ function IntroSlideView({
           numberOfLines={2}
           adjustsFontSizeToFit
           style={{
-            fontFamily: serifLoaded
-              ? "PlayfairDisplay_900Black"
-              : FONTS.displayBold,
+            fontFamily: FONTS.displayBold,
             fontSize: bigWordSize,
-            lineHeight: bigWordSize * 0.92,
-            letterSpacing: -bigWordSize * 0.04,
+            lineHeight: bigWordSize * 0.95,
+            letterSpacing: -bigWordSize * 0.045,
             color: INTRO_DARK_GREEN,
-            textAlign: "left",
+            textAlign: "center",
           }}
         >
           {slide.bigWord}
@@ -341,7 +336,7 @@ function IntroSlideView({
               fontSize: 15,
               lineHeight: 22,
               color: "rgba(31,77,42,0.65)",
-              textAlign: "left",
+              textAlign: "center",
               marginTop: SPACING.md,
               maxWidth: 320,
             }}
@@ -351,6 +346,7 @@ function IntroSlideView({
         ) : null}
       </View>
 
+      {/* CTA-block — bara på sista steget */}
       {slide.isCTA ? (
         <Animated.View
           entering={FadeInDown.delay(260)
@@ -380,6 +376,7 @@ function IntroSlideView({
   );
 }
 
+// ── Main carousel ──
 export default function IntroCarousel({
   onComplete,
   onLogin,
@@ -391,17 +388,12 @@ export default function IntroCarousel({
   onBack: () => void;
   onSkipToTabs: () => void;
 }) {
-  const { width: winW } = useWindowDimensions();
+  const { width: winW, height: winH } = useWindowDimensions();
   const [index, setIndex] = useState(0);
   const containerW = Platform.OS === "web" ? Math.min(winW, 430) : winW;
 
-  const [serifLoaded] = useFonts({
-    PlayfairDisplay_400Regular_Italic,
-    PlayfairDisplay_900Black,
-  });
-
-  // Pi-stil — bigWord MASSIVE, fyller bredden med editorial impact
-  const baseBig = Math.min(containerW * 0.55, 240);
+  // Big-word size scales with viewport — tight letter-spacing keeps it impactful
+  const baseBig = Math.min(containerW * 0.42, 168);
   const slide = SLIDES[index];
 
   const advance = useCallback(() => {
@@ -424,6 +416,7 @@ export default function IntroCarousel({
     }
   }, [index, onBack]);
 
+  // Swipe gesture — left = next, right = previous
   const swipe = Gesture.Pan()
     .activeOffsetX([-12, 12])
     .failOffsetY([-32, 32])
@@ -436,12 +429,14 @@ export default function IntroCarousel({
       }
     });
 
+  // Tap-to-advance — bara aktivt på icke-CTA-steg så vi inte tar tap från knappar
   const handleTap = useCallback(() => {
     if (!slide.isCTA) advance();
   }, [slide.isCTA, advance]);
 
   return (
     <View style={{ flex: 1, backgroundColor: INTRO_BG }}>
+      {/* Top bar — back-arrow + login/skip-länk */}
       <View
         style={{
           flexDirection: "row",
@@ -491,6 +486,7 @@ export default function IntroCarousel({
         </Pressable>
       </View>
 
+      {/* Slide area — gesture + tap-to-advance */}
       <GestureDetector gesture={swipe}>
         <Pressable
           testID="intro-slide-tap"
@@ -501,13 +497,13 @@ export default function IntroCarousel({
             slide={slide}
             windowW={containerW}
             bigWordSize={baseBig}
-            serifLoaded={!!serifLoaded}
             onCreateAccount={onComplete}
             onSkip={onSkipToTabs}
           />
         </Pressable>
       </GestureDetector>
 
+      {/* Pagination dots — bottom-centered */}
       <View
         style={{
           paddingBottom: SPACING.lg2,
