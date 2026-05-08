@@ -23,7 +23,7 @@ export const C = {
 
   // Surfaces
   bgCard: "#FFFFFF",
-  bgInput: "#F0F0EE",
+  bgInput: "#F0E6D5",
 
   // Text
   textPrimary: "#111827",
