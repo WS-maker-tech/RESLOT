@@ -44,6 +44,8 @@ import * as Haptics from "expo-haptics";
 import { useReservation, useCancelClaim } from "@/lib/api/hooks";
 import { useAuthStore } from "@/lib/auth-store";
 import { C, FONTS, SPACING, SHADOW, RADIUS, ICON } from "../lib/theme";
+import { Heading } from "@/components/Heading";
+import { TableWingsMascot } from "@/components/mascot/TableWingsMascot";
 
 const GRACE_PERIOD_SECONDS = 5 * 60; // 5 minutes
 
@@ -244,18 +246,20 @@ function CelebrationView() {
           </View>
         </Animated.View>
       </Animated.View>
-      <Text
+      {/* Success-state Pi-mönster: single-word serif italic ("Nice." → "Snappat.")
+          Mascoten lyfts in nedan (success är 1 av 3 mascot-skärmar). Coral är
+          reserverad för success men vi håller forest här tills William godkänt. */}
+      <View style={{ marginTop: SPACING.md, marginBottom: 4 }}>
+        <TableWingsMascot size={88} tone="forest" />
+      </View>
+      <Heading
+        variant="display"
+        tone="forest"
+        align="center"
         testID="confirmed-text"
-        style={{
-          fontFamily: FONTS.displayBold,
-          fontSize: 24,
-          color: C.success,
-          marginTop: SPACING.md,
-          letterSpacing: -0.5,
-        }}
       >
-        Bokningen är din!
-      </Text>
+        {`*Snappat*.`}
+      </Heading>
       <Text
         style={{
           fontFamily: FONTS.regular,
