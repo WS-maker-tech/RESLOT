@@ -19,7 +19,7 @@ export const C = {
   grayLight: "#9CA3AF",
   gold: "#C9A96E",
   dark: "#111827",
-  bg: "#FAFAF8",
+  bg: "#FAF3EB",
 
   // Surfaces
   bgCard: "#FFFFFF",
