@@ -42,6 +42,7 @@ import Animated, {
 } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { C, FONTS, SPACING, SHADOW, RADIUS, TYPO, ICON } from "../../lib/theme";
+import { Heading } from "@/components/Heading";
 import { Skeleton } from "@/components/Skeleton";
 
 function ReservationsSkeleton() {
@@ -650,37 +651,27 @@ export default function ReservationsScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>
+      {/* Editorial reservation-list header
+          Hierarchy: serif italic eyebrow ("Översikt") → serif h1 italic-on-noun
+          ("Dina *bord*"). Counter förblir sans regular, subdued. */}
       <SafeAreaView edges={["top"]} style={{ backgroundColor: C.bg }}>
         <View className="px-5 pt-2 pb-4">
-          <Text
-            style={{
-              fontFamily: FONTS.semiBold,
-              fontSize: 11,
-              letterSpacing: 1.2,
-              textTransform: "uppercase",
-              color: C.textTertiary,
-              marginBottom: 4,
-            }}
-          >
+          <Heading variant="eyebrow" tone="inkSoft" style={{ marginBottom: 4 }}>
             Översikt
-          </Text>
-          <Text
+          </Heading>
+          <Heading
+            variant="h1"
+            tone="ink"
             testID="reservations-header"
-            style={{
-              fontFamily: FONTS.displayBold,
-              fontSize: 32,
-              color: C.textPrimary,
-              letterSpacing: -1.0,
-            }}
           >
-            Mina bokningar
-          </Text>
+            {`Dina *bord*`}
+          </Heading>
           <Text
             testID="reservations-count"
             style={{
               fontFamily: FONTS.regular,
               fontSize: 13,
-              color: C.textTertiary,
+              color: C.inkFaint,
               marginTop: SPACING.xs,
             }}
           >
