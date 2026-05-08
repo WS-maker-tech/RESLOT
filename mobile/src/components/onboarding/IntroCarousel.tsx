@@ -238,7 +238,7 @@ function IntroSlideView({
   onCreateAccount: () => void;
   onSkip: () => void;
 }) {
-  const heroW = Math.min(windowW - SPACING.lg2 * 2, 360);
+  const heroW = Math.min(windowW - SPACING.lg2 * 2, 400);
   const heroH = heroW * 1.18; // Aspect ~1:1.18 — matchar Pi:s hero-ratio
 
   return (
@@ -316,10 +316,11 @@ function IntroSlideView({
           style={{
             fontFamily: FONTS.displayBold,
             fontSize: bigWordSize,
-            lineHeight: bigWordSize * 0.95,
+            lineHeight: bigWordSize * 1.15,
             letterSpacing: -bigWordSize * 0.045,
             color: INTRO_DARK_GREEN,
             textAlign: "center",
+            paddingBottom: bigWordSize * 0.08,
           }}
         >
           {slide.bigWord}
