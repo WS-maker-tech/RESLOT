@@ -9,6 +9,7 @@ import Animated, { FadeInDown, ZoomIn } from "react-native-reanimated";
 import { useReferralCode } from "@/lib/api/hooks";
 import { useAuthStore } from "@/lib/auth-store";
 import { C, FONTS, SPACING, RADIUS, SHADOW, ICON } from "@/lib/theme";
+import { Heading } from "@/components/Heading";
 
 export default function InviteScreen() {
   const router = useRouter();
@@ -43,7 +44,7 @@ export default function InviteScreen() {
           >
             <ChevronLeft size={20} color={C.textSecondary} strokeWidth={2} />
           </Pressable>
-          <Text style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: C.textPrimary, letterSpacing: -0.4 }}>Bjud in en vän</Text>
+          <Heading variant="h2" tone="ink">{`*Bjud* in en vän`}</Heading>
         </View>
       </SafeAreaView>
 

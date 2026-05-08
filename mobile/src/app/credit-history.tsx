@@ -9,6 +9,7 @@ import { useActivityAlerts } from "@/lib/api/hooks";
 import type { ActivityAlert } from "@/lib/api/types";
 import { useAuthStore } from "@/lib/auth-store";
 import { C, FONTS, SPACING, SHADOW, RADIUS, ICON } from "../lib/theme";
+import { Heading } from "@/components/Heading";
 
 function formatRelativeDate(dateString: string): string {
   const date = new Date(dateString);
@@ -39,9 +40,7 @@ export default function CreditHistoryScreen() {
         >
           <ChevronLeft size={24} color={C.textPrimary} strokeWidth={2} />
         </Pressable>
-        <Text style={{ fontFamily: FONTS.displayBold, fontSize: 24, color: C.textPrimary, letterSpacing: -0.5 }}>
-          Historik
-        </Text>
+        <Heading variant="h2" tone="ink">Historik</Heading>
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>

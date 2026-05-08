@@ -17,6 +17,7 @@ import { useProfile } from "@/lib/api/hooks";
 import { useAuthStore } from "@/lib/auth-store";
 import { supabase } from "@/lib/supabase";
 import { C, FONTS, SPACING, RADIUS } from "@/lib/theme";
+import { Heading } from "@/components/Heading";
 
 const CITIES = ["Stockholm", "Göteborg", "Malmö", "Uppsala", "Västerås", "Örebro", "Linköping", "Helsingborg", "Jönköping", "Norrköping"];
 
@@ -161,16 +162,7 @@ export default function SettingsScreen() {
             <ChevronLeft size={24} color={C.textPrimary} strokeWidth={2} />
           </Pressable>
 
-          <Text
-            style={{
-              fontFamily: FONTS.displayBold,
-              fontSize: 22,
-              color: C.textPrimary,
-              letterSpacing: -0.6,
-            }}
-          >
-            Kontoinställningar
-          </Text>
+          <Heading variant="h2" tone="ink">Inställningar</Heading>
 
           <Pressable
             testID="settings-save"

@@ -7,6 +7,7 @@ import * as Haptics from "expo-haptics";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { C, FONTS, SPACING, RADIUS } from "@/lib/theme";
+import { Heading } from "@/components/Heading";
 
 type ToggleKey =
   | "notif_push_new_booking"
@@ -107,9 +108,9 @@ export default function NotificationSettingsScreen() {
           >
             <ChevronLeft size={20} color={C.textSecondary} strokeWidth={2} />
           </Pressable>
-          <Text style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: C.textPrimary, letterSpacing: -0.4, flex: 1, textAlign: "center", marginRight: 48 }}>
-            Notisinställningar
-          </Text>
+          <View style={{ flex: 1, alignItems: "center", marginRight: 48 }}>
+            <Heading variant="h2" tone="ink">Notiser</Heading>
+          </View>
         </View>
       </SafeAreaView>
 

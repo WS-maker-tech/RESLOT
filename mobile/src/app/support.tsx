@@ -33,6 +33,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { C, FONTS, SPACING, RADIUS, SHADOW } from "@/lib/theme";
+import { Heading } from "@/components/Heading";
 import { useSubmitSupportMessage } from "@/lib/api/hooks";
 import { useAuthStore } from "@/lib/auth-store";
 
@@ -197,9 +198,7 @@ export default function SupportScreen() {
           >
             <ChevronLeft size={20} color={C.textSecondary} strokeWidth={2} />
           </Pressable>
-          <Text style={{ fontFamily: FONTS.displayBold, fontSize: 22, color: C.textPrimary, letterSpacing: -0.6 }}>
-            Hjälp och support
-          </Text>
+          <Heading variant="h2" tone="ink">Hjälp och support</Heading>
         </View>
       </SafeAreaView>
 

@@ -12,6 +12,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { C, FONTS, SPACING, RADIUS, SHADOW, ICON } from "@/lib/theme";
+import { Heading } from "@/components/Heading";
 
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -200,16 +201,7 @@ export default function FaqScreen() {
             justifyContent: "space-between",
           }}
         >
-          <Text
-            style={{
-              fontFamily: FONTS.displayBold,
-              fontSize: 32,
-              color: C.textPrimary,
-              letterSpacing: -1.0,
-            }}
-          >
-            Frågor & svar
-          </Text>
+          <Heading variant="h1" tone="ink">Frågor & svar</Heading>
           <Pressable
             testID="faq-close-button"
             accessibilityLabel="Stäng"
