@@ -29,8 +29,9 @@ for (const r of targets) {
     const page = await context.newPage();
     const url = `${HOST}${r.path}`;
     try {
-      await page.goto(url, { waitUntil: "networkidle", timeout: 25000 });
-      await page.waitForTimeout(500);
+      await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60000 });
+      try { await page.waitForLoadState("load", { timeout: 15000 }); } catch (_) {}
+      await page.waitForTimeout(2500);
       await page.screenshot({ path: file, fullPage: true });
       console.log(`  ok  ${vp.padEnd(6)} ${r.slug.padEnd(28)} → ${path.relative(ROOT, file)}`);
     } catch (e) {
