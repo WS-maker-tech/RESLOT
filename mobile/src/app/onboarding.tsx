@@ -44,6 +44,8 @@ import * as Haptics from "expo-haptics";
 import { useAuthStore } from "@/lib/auth-store";
 import { supabase } from "@/lib/supabase";
 import { C as ThemeC, FONTS } from "../lib/theme";
+import { Heading } from "@/components/Heading";
+import { ReslotMark } from "@/components/ReslotMark";
 
 // Use static fallback for constants needed at module level (card sizes etc)
 const { width: _INIT_W, height: _INIT_H } = Dimensions.get("window");
@@ -448,35 +450,22 @@ function SplashStep({ onGetStarted, onExplore, onRegister }: { onGetStarted: () 
         />
       </View>
 
-      {/* Copy Section */}
+      {/*
+        Welcome hero — Pi-tier editorial:
+        Hierarchy: ReslotMark (Fraunces SemiBold Italic, hero size) → serif display
+        med italic-on-verb. Single forest accent (wordmark itself). No mascot här —
+        sparingly, mascot reserveras för success-states.
+        References: amo welcome (clean italic emphasis), Pi welcome restraint, 222.
+      */}
       <View style={{ paddingHorizontal: 28, paddingBottom: 12, marginTop: -24 }}>
-        {/* Logo — dramatic entrance, tighter spring for punch */}
         <Animated.View entering={FadeInUp.delay(50).springify().damping(14).stiffness(140)} style={{ marginTop: 0 }}>
-          <Text
-            style={{
-              fontFamily: FONTS.displayBold,
-              fontSize: 38,
-              letterSpacing: -1.4,
-            }}
-          >
-            <Text style={{ color: C.textPrimary }}>Re</Text><Text style={{ color: C.pistachio }}>slot</Text>
-          </Text>
+          <ReslotMark size="xl" variant="onCream" testID="welcome-wordmark" />
         </Animated.View>
 
-        {/* Tagline — 50ms stagger after logo */}
         <Animated.View entering={FadeInUp.delay(100).springify().damping(16).stiffness(120)} style={{ marginTop: 10 }}>
-          <Text
-            style={{
-              fontFamily: FONTS.displayBold,
-              fontSize: 27,
-              color: C.text,
-              letterSpacing: -0.7,
-              lineHeight: 35,
-            }}
-          >
-            Bord som andra{"\n"}inte kan ta
-          </Text>
-
+          <Heading variant="h1" tone="ink">
+            {`Bord du *trodde*${"\n"}var fullbokade.`}
+          </Heading>
         </Animated.View>
       </View>
 
