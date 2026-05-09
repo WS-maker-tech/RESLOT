@@ -21,3 +21,11 @@ backend/prisma/dev.db
 backend/prisma/dev.db-journal
 scripts/design-research/*.json
 /tmp/
+
+# Night-job artifacts (autonomous design overhaul 2026-05-08)
+.refero-cache/
+NIGHT_SKIPPED.md
+NIGHT_HALTED.md
+NIGHT_NOTES.md
+mobile/preview-dist/
+# mobile/screenshots/ är committade så William kan se BEFORE/AFTER imorgon

@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, MessageCircle, Mail, HelpCircle } from "luci
 import * as Haptics from "expo-haptics";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { C, FONTS, SPACING, RADIUS } from "@/lib/theme";
+import { Heading } from "@/components/Heading";
 
 const CONTACT_OPTIONS = [
   {
@@ -84,16 +85,7 @@ export default function HelpScreen() {
           >
             <ChevronLeft size={20} color={C.dark} strokeWidth={2} />
           </Pressable>
-          <Text
-            style={{
-              fontFamily: FONTS.displayBold,
-              fontSize: 22,
-              color: C.textPrimary,
-              letterSpacing: -0.6,
-            }}
-          >
-            Hj\u00e4lp & support
-          </Text>
+          <Heading variant="h2" tone="ink">Hj\u00e4lp & support</Heading>
         </View>
       </SafeAreaView>
 

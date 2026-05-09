@@ -9,6 +9,7 @@ import * as Haptics from "expo-haptics";
 import { useSavedRestaurants, useUnsaveRestaurant } from "@/lib/api/hooks";
 import { useAuthStore } from "@/lib/auth-store";
 import { C, FONTS, SPACING, RADIUS, SHADOW } from "@/lib/theme";
+import { Heading } from "@/components/Heading";
 import { Skeleton } from "@/components/Skeleton";
 import type { SavedRestaurant } from "@/lib/api/types";
 
@@ -40,9 +41,11 @@ export default function SavedScreen() {
           >
             <ChevronLeft size={20} color={C.textSecondary} strokeWidth={2} />
           </Pressable>
-          <Text style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: C.textPrimary, letterSpacing: -0.4, flex: 1 }}>
-            Sparade restauranger
-          </Text>
+          <View style={{ flex: 1 }}>
+            <Heading variant="h2" tone="ink">
+              {`*Sparade* favoriter`}
+            </Heading>
+          </View>
           <Heart size={20} color={C.pistachio} fill={saved.length > 0 ? C.pistachio : "transparent"} strokeWidth={2} />
         </View>
       </SafeAreaView>

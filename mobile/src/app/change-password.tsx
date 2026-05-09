@@ -6,6 +6,7 @@ import { ChevronLeft, Eye, EyeOff, CheckCircle } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
 import { C, FONTS, SPACING, RADIUS } from "@/lib/theme";
+import { Heading } from "@/components/Heading";
 import { supabase } from "@/lib/supabase";
 
 export default function ChangePasswordScreen() {
@@ -83,9 +84,9 @@ export default function ChangePasswordScreen() {
           >
             <ChevronLeft size={20} color={C.textSecondary} strokeWidth={2} />
           </Pressable>
-          <Text style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: C.textPrimary, letterSpacing: -0.4, flex: 1, textAlign: "center", marginRight: 48 }}>
-            Byt lösenord
-          </Text>
+          <View style={{ flex: 1, alignItems: "center", marginRight: 48 }}>
+            <Heading variant="h2" tone="ink">Byt lösenord</Heading>
+          </View>
         </View>
       </SafeAreaView>
 

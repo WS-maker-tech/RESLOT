@@ -15,6 +15,7 @@ import { ThumbsUp, ThumbsDown, X, CheckCircle } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import Animated, { FadeInDown, FadeIn } from "react-native-reanimated";
 import { C, FONTS, SPACING, RADIUS, SHADOW } from "@/lib/theme";
+import { Heading } from "@/components/Heading";
 import { useAuthStore } from "@/lib/auth-store";
 
 export default function FeedbackScreen() {
@@ -77,17 +78,9 @@ export default function FeedbackScreen() {
         <SafeAreaView style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
           <Animated.View entering={FadeIn.duration(300)} style={{ alignItems: "center" }}>
             <CheckCircle size={56} color={C.success} strokeWidth={1.8} />
-            <Text
-              style={{
-                fontFamily: FONTS.displayBold,
-                fontSize: 24,
-                color: C.textPrimary,
-                marginTop: SPACING.md,
-                letterSpacing: -0.5,
-              }}
-            >
-              Tack!
-            </Text>
+            <Heading variant="display" tone="forest" align="center" style={{ marginTop: SPACING.md }}>
+              {`*Tack*.`}
+            </Heading>
             <Text
               style={{
                 fontFamily: FONTS.regular,
@@ -118,16 +111,7 @@ export default function FeedbackScreen() {
           }}
         >
           <View style={{ width: 36 }} />
-          <Text
-            style={{
-              fontFamily: FONTS.displayBold,
-              fontSize: 17,
-              color: C.textPrimary,
-              letterSpacing: -0.3,
-            }}
-          >
-            Feedback
-          </Text>
+          <Heading variant="h3" tone="ink">Feedback</Heading>
           <Pressable
             testID="feedback-close"
             accessibilityLabel="Stäng"

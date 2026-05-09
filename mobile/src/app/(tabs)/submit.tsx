@@ -49,6 +49,7 @@ import { useSubmitReservation, useRestaurants, useProfile } from "@/lib/api/hook
 import { useAuthStore } from "@/lib/auth-store";
 import type { Restaurant } from "@/lib/api/types";
 import { C, FONTS, SPACING, SHADOW, RADIUS, ICON } from "../../lib/theme";
+import { Heading } from "@/components/Heading";
 
 // ── Web Date Picker ──
 const MONTHS_SV = ["Januari","Februari","Mars","April","Maj","Juni","Juli","Augusti","September","Oktober","November","December"];
@@ -528,29 +529,12 @@ export default function SubmitScreen() {
     <View style={{ flex: 1, backgroundColor: C.bg }}>
       <SafeAreaView edges={["top"]} style={{ backgroundColor: C.bg }}>
         <Animated.View entering={FadeInDown.springify()} className="px-5 pt-2 pb-1">
-          <Text
-            style={{
-              fontFamily: FONTS.semiBold,
-              fontSize: 11,
-              letterSpacing: 1.2,
-              textTransform: "uppercase",
-              color: C.textTertiary,
-              marginBottom: 4,
-            }}
-          >
+          <Heading variant="eyebrow" tone="inkSoft" style={{ marginBottom: 4 }}>
             Hjälp någon ikväll
-          </Text>
-          <Text
-            testID="submit-header"
-            style={{
-              fontFamily: FONTS.displayBold,
-              fontSize: 32,
-              color: C.dark,
-              letterSpacing: -1.0,
-            }}
-          >
-            Lägg upp bokning
-          </Text>
+          </Heading>
+          <Heading variant="h1" tone="ink" testID="submit-header">
+            {`*Bjud* någon på ditt bord`}
+          </Heading>
           <Text
             style={{
               fontFamily: FONTS.regular,

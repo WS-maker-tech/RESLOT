@@ -7,6 +7,7 @@ import * as Haptics from "expo-haptics";
 import * as WebBrowser from "expo-web-browser";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { C, FONTS, SPACING, RADIUS, SHADOW, ICON } from "@/lib/theme";
+import { Heading } from "@/components/Heading";
 import { useCardStatus, useSetupCard } from "@/lib/api/hooks";
 import { useAuthStore } from "@/lib/auth-store";
 
@@ -53,7 +54,7 @@ export default function PaymentScreen() {
           >
             <ChevronLeft size={20} color={C.textSecondary} strokeWidth={2} />
           </Pressable>
-          <Text style={{ fontFamily: FONTS.displayBold, fontSize: 22, color: C.textPrimary, letterSpacing: -0.6 }}>Betalning</Text>
+          <Heading variant="h2" tone="ink">Betalning</Heading>
         </View>
       </SafeAreaView>
 

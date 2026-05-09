@@ -1,0 +1,41 @@
+{
+  "_meta": {
+    "generatedFor": "night/identity-overhaul-2026-05-08",
+    "anchor": "bb797b6",
+    "viewports": {
+      "mobile": { "width": 390, "height": 844, "deviceScaleFactor": 3, "isMobile": true },
+      "web": { "width": 1280, "height": 800, "deviceScaleFactor": 2 }
+    },
+    "host": "http://localhost:8081"
+  },
+  "routes": [
+    { "n": 1,  "tier": 1, "slug": "home",                 "path": "/",                       "archetype": "home/discovery",        "file": "mobile/src/app/(tabs)/index.tsx" },
+    { "n": 2,  "tier": 1, "slug": "restaurant-detail",    "path": "/restaurant/1",           "archetype": "detail/listing",        "file": "mobile/src/app/restaurant/[id].tsx" },
+    { "n": 3,  "tier": 1, "slug": "onboarding",           "path": "/onboarding",             "archetype": "onboarding/welcome",    "file": "mobile/src/app/onboarding.tsx" },
+    { "n": 4,  "tier": 1, "slug": "reservations",         "path": "/reservations",           "archetype": "list/owned",            "file": "mobile/src/app/(tabs)/reservations.tsx" },
+
+    { "n": 5,  "tier": 2, "slug": "add-watch",            "path": "/add-watch",              "archetype": "form/quick",            "file": "mobile/src/app/add-watch.tsx" },
+    { "n": 6,  "tier": 2, "slug": "booking-confirmation", "path": "/booking-confirmation",   "archetype": "confirmation/celebrate", "file": "mobile/src/app/booking-confirmation.tsx" },
+    { "n": 7,  "tier": 2, "slug": "payment",              "path": "/payment",                "archetype": "form/payment",          "file": "mobile/src/app/payment.tsx" },
+    { "n": 8,  "tier": 2, "slug": "alerts",               "path": "/alerts",                 "archetype": "list/watches",          "file": "mobile/src/app/(tabs)/alerts.tsx" },
+    { "n": 9,  "tier": 2, "slug": "profile",              "path": "/profile",                "archetype": "profile/account",       "file": "mobile/src/app/(tabs)/profile.tsx" },
+    { "n": 10, "tier": 2, "slug": "submit",               "path": "/submit",                 "archetype": "form/multistep",        "file": "mobile/src/app/(tabs)/submit.tsx" },
+    { "n": 11, "tier": 2, "slug": "saved",                "path": "/saved",                  "archetype": "list/saved",            "file": "mobile/src/app/saved.tsx" },
+    { "n": 12, "tier": 2, "slug": "credits",              "path": "/credits",                "archetype": "wallet/balance",        "file": "mobile/src/app/credits.tsx" },
+
+    { "n": 13, "tier": 3, "slug": "account-settings",     "path": "/account-settings",       "archetype": "settings/account",      "file": "mobile/src/app/account-settings.tsx" },
+    { "n": 14, "tier": 3, "slug": "change-password",      "path": "/change-password",        "archetype": "settings/security",     "file": "mobile/src/app/change-password.tsx" },
+    { "n": 15, "tier": 3, "slug": "notification-settings","path": "/notification-settings",  "archetype": "settings/notifications","file": "mobile/src/app/notification-settings.tsx" },
+    { "n": 16, "tier": 3, "slug": "settings",             "path": "/settings",               "archetype": "settings/index",        "file": "mobile/src/app/settings.tsx" },
+    { "n": 17, "tier": 3, "slug": "faq",                  "path": "/faq",                    "archetype": "info/accordion",        "file": "mobile/src/app/faq.tsx" },
+    { "n": 18, "tier": 3, "slug": "help",                 "path": "/help",                   "archetype": "info/help",             "file": "mobile/src/app/help.tsx" },
+    { "n": 19, "tier": 3, "slug": "support",              "path": "/support",                "archetype": "info/contact",          "file": "mobile/src/app/support.tsx" },
+    { "n": 20, "tier": 3, "slug": "feedback",             "path": "/feedback",               "archetype": "form/feedback",         "file": "mobile/src/app/feedback.tsx" },
+    { "n": 21, "tier": 3, "slug": "invite",               "path": "/invite",                 "archetype": "share/invite",          "file": "mobile/src/app/invite.tsx" },
+    { "n": 22, "tier": 3, "slug": "rewards",              "path": "/rewards",                "archetype": "rewards/list",          "file": "mobile/src/app/rewards.tsx" },
+    { "n": 23, "tier": 3, "slug": "credit-history",       "path": "/credit-history",         "archetype": "history/list",          "file": "mobile/src/app/credit-history.tsx" },
+    { "n": 24, "tier": 3, "slug": "dev-components",       "path": "/dev-components",         "archetype": "dev/showcase",          "file": "mobile/src/app/dev-components.tsx" },
+    { "n": 25, "tier": 3, "slug": "map-root",             "path": "/map",                    "archetype": "map/full",              "file": "mobile/src/app/map.tsx" },
+    { "n": 26, "tier": 3, "slug": "not-found",            "path": "/this-route-does-not-exist", "archetype": "error/404",          "file": "mobile/src/app/+not-found.tsx" }
+  ]
+}

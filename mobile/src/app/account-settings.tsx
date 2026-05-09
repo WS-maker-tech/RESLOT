@@ -8,6 +8,7 @@ import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
 import { useProfile } from "@/lib/api/hooks";
 import { useAuthStore } from "@/lib/auth-store";
 import { C, FONTS, SPACING, RADIUS, SHADOW, ICON } from "@/lib/theme";
+import { Heading } from "@/components/Heading";
 
 function InputField({
   label, value, onChangeText, placeholder, keyboardType = "default", verified, editable = true,
@@ -140,7 +141,7 @@ export default function AccountSettingsScreen() {
           <Pressable testID="back-button" accessibilityLabel="Gå tillbaka" onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.back(); }} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: C.borderLight, alignItems: "center", justifyContent: "center", marginRight: 12 }}>
             <ChevronLeft size={20} color={C.textSecondary} strokeWidth={2} />
           </Pressable>
-          <Text style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: C.textPrimary, letterSpacing: -0.4, flex: 1 }}>Kontoinställningar</Text>
+          <View style={{ flex: 1 }}><Heading variant="h2" tone="ink">Kontoinställningar</Heading></View>
           <Pressable testID="save-button" accessibilityLabel="Spara ändringar" onPress={handleSave} disabled={saving} style={{ backgroundColor: C.pistachio, borderRadius: RADIUS.md, paddingHorizontal: 16, paddingVertical: 8 }}>
             {saving ? <ActivityIndicator color={C.dark} size="small" /> : <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.dark }}>Spara</Text>}
           </Pressable>
