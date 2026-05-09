@@ -218,66 +218,68 @@ const Header = React.memo(function Header({
 }) {
   return (
     <View>
-      {/* En rad: [?  flex:1] [Bokningar i Stockholm] [flex:1  karta·sök] */}
-      <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 16, paddingTop: 4, paddingBottom: 6 }}>
-        <View style={{ flex: 1 }}>
-          <Pressable
-            testID="faq-button"
-            accessibilityLabel="Vanliga frågor"
-            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); onFAQPress(); }}
-            style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: C.borderLight, alignItems: "center", justifyContent: "center" }}
-          >
-            <HelpCircle size={20} color={C.textTertiary} strokeWidth={2} />
-          </Pressable>
-        </View>
+      {/* Top utility-row — höger-justerad så hero-headingen får visuell vikt */}
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "flex-end", paddingHorizontal: 16, paddingTop: 4, paddingBottom: 4, gap: 6 }}>
+        <Pressable
+          testID="faq-button"
+          accessibilityLabel="Vanliga frågor"
+          onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); onFAQPress(); }}
+          style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: C.creamSoft, alignItems: "center", justifyContent: "center" }}
+        >
+          <HelpCircle size={18} color={C.inkSoft} strokeWidth={1.6} />
+        </Pressable>
+        <Pressable
+          testID="search-toggle"
+          accessibilityLabel="Sök restaurang"
+          onPress={onSearchToggle}
+          style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: C.creamSoft, alignItems: "center", justifyContent: "center" }}
+        >
+          <Search size={18} color={C.inkSoft} strokeWidth={1.6} />
+        </Pressable>
+        <Pressable
+          testID="map-button"
+          accessibilityLabel="Visa karta"
+          onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); onMapPress(); }}
+          style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: C.forest, alignItems: "center", justifyContent: "center" }}
+        >
+          <MapPin size={17} color={C.cream} strokeWidth={2} />
+        </Pressable>
+      </View>
+
+      {/* Hero — eyebrow (clickable city) + bold display heading */}
+      <View style={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 14 }}>
         <Pressable
           testID="city-picker-button"
           accessibilityLabel="Välj stad"
           onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); onCityPress(); }}
-          style={{ flexDirection: "row", alignItems: "center" }}
+          style={{ flexDirection: "row", alignItems: "center", marginBottom: 4 }}
         >
-          <Text style={{ fontFamily: FONTS.displayBold, fontSize: 18, color: C.dark, letterSpacing: -0.5 }}>
-            Bokningar i <Text style={{ color: C.pistachio }}>{selectedCity}</Text>
+          <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.inkSoft, letterSpacing: 0.1 }}>
+            Bord i {selectedCity}
           </Text>
-          <ChevronDown size={16} color={C.pistachio} strokeWidth={2} style={{ marginLeft: 2 }} />
+          <ChevronDown size={13} color={C.forest} strokeWidth={2} style={{ marginLeft: 4 }} />
         </Pressable>
-        <View style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "flex-end", gap: 6 }}>
-          <Pressable
-            testID="map-button"
-            accessibilityLabel="Visa karta"
-            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); onMapPress(); }}
-            style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: C.pistachio, alignItems: "center", justifyContent: "center" }}
-          >
-            <MapPin size={18} color={C.white} strokeWidth={2.5} />
-          </Pressable>
-          <Pressable
-            testID="search-toggle"
-            accessibilityLabel="Sök restaurang"
-            onPress={onSearchToggle}
-            style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: C.borderLight, alignItems: "center", justifyContent: "center" }}
-          >
-            <Search size={18} color={C.textTertiary} strokeWidth={2} />
-          </Pressable>
-        </View>
+        <Text style={{ fontFamily: FONTS.displayBold, fontSize: 32, color: C.ink, letterSpacing: -0.9, lineHeight: 38 }}>
+          Hitta ditt nästa bord
+        </Text>
       </View>
+
       {showSearch ? (
         <View style={{ paddingHorizontal: SPACING.lg, paddingBottom: SPACING.sm }}>
           <TextInput
             testID="search-input"
             value={searchQuery}
             onChangeText={onSearchChange}
-            placeholder="Sök restaurang..."
-            placeholderTextColor={C.textTertiary}
+            placeholder="Sök restaurang …"
+            placeholderTextColor={C.inkFaint}
             style={{
-              backgroundColor: C.bgCard,
+              backgroundColor: C.creamDeep,
               borderRadius: RADIUS.md,
-              paddingHorizontal: 14,
-              paddingVertical: 10,
+              paddingHorizontal: 16,
+              paddingVertical: 12,
               fontFamily: FONTS.regular,
-              fontSize: 14,
-              color: C.dark,
-              borderWidth: 0.5,
-              borderColor: C.borderLight,
+              fontSize: 15,
+              color: C.ink,
             }}
           />
         </View>
