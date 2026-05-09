@@ -33,11 +33,12 @@ import { usePendingFeedback } from "@/lib/use-pending-feedback";
 
 /**
  * Tab-bar — Identity v2 upgrade (2026-05-09):
- *   - FAB i forest (matchar map-pill, en primary brand-accent över hela appen)
- *   - Active-state: forest icon + label + 4px forest-dot under label
+ *   - Icon-only (no labels) — clean minimalistic look
+ *   - FAB i forest (matchar map-pill — en primary brand-accent över hela appen)
+ *   - Active-state: forest icon + 4px forest-dot under icon (scale-spring 0→1)
  *   - Inactive: inkSoft strokes, no fill
  *   - Bg: creamSoft (warmer integration än vit)
- *   - Scale-bounce on tap (spring 220ms)
+ *   - Scale-bounce på icon vid tap (spring overshoot)
  *   - FAB shadow: forest-tinted, soft
  */
 
@@ -51,6 +52,7 @@ function TabIcon({
   isCenter?: boolean;
 }) {
   const scale = useSharedValue(focused ? 1 : 0.94);
+  const dotScale = useSharedValue(focused ? 1 : 0);
 
   useEffect(() => {
     if (focused) {
@@ -58,13 +60,19 @@ function TabIcon({
         withSpring(1.18, { damping: 9, stiffness: 380 }),
         withSpring(1.04, { damping: 16, stiffness: 220 })
       );
+      dotScale.value = withSpring(1, { damping: 14, stiffness: 240 });
     } else {
       scale.value = withSpring(0.94, { damping: 16, stiffness: 220 });
+      dotScale.value = withSpring(0, { damping: 16, stiffness: 240 });
     }
-  }, [focused, scale]);
+  }, [focused, scale, dotScale]);
 
   const animStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
+  }));
+  const dotStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: dotScale.value }],
+    opacity: dotScale.value,
   }));
 
   if (isCenter) {
@@ -94,40 +102,14 @@ function TabIcon({
   }
 
   return (
-    <Animated.View style={animStyle}>
-      <Icon
-        size={22}
-        color={focused ? C.forest : C.inkSoft}
-        strokeWidth={focused ? 2.3 : 1.7}
-      />
-    </Animated.View>
-  );
-}
-
-function TabLabel({ label, focused }: { label: string; focused: boolean }) {
-  const dotScale = useSharedValue(focused ? 1 : 0);
-
-  useEffect(() => {
-    dotScale.value = withSpring(focused ? 1 : 0, { damping: 16, stiffness: 240 });
-  }, [focused, dotScale]);
-
-  const dotStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: dotScale.value }],
-    opacity: dotScale.value,
-  }));
-
-  return (
-    <View style={{ alignItems: "center", gap: 3, marginTop: 3 }}>
-      <Text
-        style={{
-          fontFamily: focused ? FONTS.semiBold : FONTS.medium,
-          fontSize: 10,
-          color: focused ? C.forest : C.inkSoft,
-          letterSpacing: 0.15,
-        }}
-      >
-        {label}
-      </Text>
+    <View style={{ alignItems: "center", justifyContent: "center", gap: 6, paddingTop: 4 }}>
+      <Animated.View style={animStyle}>
+        <Icon
+          size={24}
+          color={focused ? C.forest : C.inkSoft}
+          strokeWidth={focused ? 2.3 : 1.7}
+        />
+      </Animated.View>
       <Animated.View
         style={[
           {
@@ -223,7 +205,7 @@ export default function TabLayout() {
       <Tabs
         screenOptions={{
           headerShown: false,
-          tabBarShowLabel: true,
+          tabBarShowLabel: false,
           tabBarStyle: {
             position: "absolute",
             bottom: 0,
@@ -232,7 +214,7 @@ export default function TabLayout() {
             backgroundColor: C.creamSoft,
             borderTopWidth: 1,
             borderTopColor: C.forestSoft,
-            height: 78,
+            height: 64,
             paddingTop: 10,
             paddingBottom: 10,
             elevation: 0,
@@ -248,7 +230,6 @@ export default function TabLayout() {
           options={{
             title: "Hem",
             tabBarIcon: ({ focused }) => <TabIcon icon={Home} focused={focused} />,
-            tabBarLabel: ({ focused }) => <TabLabel label="Hem" focused={focused} />,
           }}
         />
         <Tabs.Screen
@@ -256,7 +237,6 @@ export default function TabLayout() {
           options={{
             title: "Bokningar",
             tabBarIcon: ({ focused }) => <TabIcon icon={CalendarCheck} focused={focused} />,
-            tabBarLabel: ({ focused }) => <TabLabel label="Bokningar" focused={focused} />,
           }}
         />
         <Tabs.Screen
@@ -270,7 +250,6 @@ export default function TabLayout() {
             tabBarIcon: ({ focused }) => (
               <TabIcon icon={PlusCircle} focused={focused} isCenter />
             ),
-            tabBarLabel: () => null,
           }}
         />
         <Tabs.Screen
@@ -278,7 +257,6 @@ export default function TabLayout() {
           options={{
             title: "Bevakningar",
             tabBarIcon: ({ focused }) => <TabIcon icon={Bell} focused={focused} />,
-            tabBarLabel: ({ focused }) => <TabLabel label="Bevakningar" focused={focused} />,
             tabBarBadge: badgeCount,
             tabBarBadgeStyle: {
               backgroundColor: C.coral,
@@ -297,7 +275,6 @@ export default function TabLayout() {
           options={{
             title: "Profil",
             tabBarIcon: ({ focused }) => <TabIcon icon={User} focused={focused} />,
-            tabBarLabel: ({ focused }) => <TabLabel label="Profil" focused={focused} />,
           }}
         />
       </Tabs>
