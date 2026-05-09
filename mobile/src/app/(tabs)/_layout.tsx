@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import { Tabs } from "expo-router";
-import { BlurView } from "expo-blur";
 import {
   Home,
   PlusCircle,
@@ -31,32 +30,36 @@ import { useAuthStore } from "@/lib/auth-store";
 import { C, FONTS } from "@/lib/theme";
 import type { ActivityAlert } from "@/lib/api/types";
 import { usePendingFeedback } from "@/lib/use-pending-feedback";
-// SupportBubble visas endast på FAQ-sidan
+
+/**
+ * Tab-bar — Identity v2 upgrade (2026-05-09):
+ *   - FAB i forest (matchar map-pill, en primary brand-accent över hela appen)
+ *   - Active-state: forest icon + label + 4px forest-dot under label
+ *   - Inactive: inkSoft strokes, no fill
+ *   - Bg: creamSoft (warmer integration än vit)
+ *   - Scale-bounce on tap (spring 220ms)
+ *   - FAB shadow: forest-tinted, soft
+ */
 
 function TabIcon({
   icon: Icon,
-  color,
   focused,
   isCenter,
 }: {
   icon: typeof Home;
-  color: string;
   focused: boolean;
   isCenter?: boolean;
 }) {
-  const scale = useSharedValue(focused ? 1.05 : 0.92);
+  const scale = useSharedValue(focused ? 1 : 0.94);
 
   useEffect(() => {
     if (focused) {
       scale.value = withSequence(
-        withSpring(1.25, { damping: 8, stiffness: 400 }),
-        withSpring(1.08, { damping: 14, stiffness: 220 })
+        withSpring(1.18, { damping: 9, stiffness: 380 }),
+        withSpring(1.04, { damping: 16, stiffness: 220 })
       );
     } else {
-      scale.value = withSpring(0.92, {
-        damping: 14,
-        stiffness: 220,
-      });
+      scale.value = withSpring(0.94, { damping: 16, stiffness: 220 });
     }
   }, [focused, scale]);
 
@@ -66,24 +69,27 @@ function TabIcon({
 
   if (isCenter) {
     return (
-      <View
-        style={{
-          backgroundColor: C.pistachio,
-          width: 48,
-          height: 48,
-          borderRadius: 24,
-          alignItems: "center",
-          justifyContent: "center",
-          marginTop: -12,
-          shadowColor: C.pistachio,
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 10,
-          elevation: 6,
-        }}
+      <Animated.View
+        style={[
+          {
+            backgroundColor: C.forest,
+            width: 54,
+            height: 54,
+            borderRadius: 27,
+            alignItems: "center",
+            justifyContent: "center",
+            marginTop: -16,
+            shadowColor: C.forest,
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.32,
+            shadowRadius: 14,
+            elevation: 8,
+          },
+          animStyle,
+        ]}
       >
-        <Icon size={24} color={C.white} strokeWidth={2} />
-      </View>
+        <Icon size={26} color={C.cream} strokeWidth={2.4} />
+      </Animated.View>
     );
   }
 
@@ -91,10 +97,49 @@ function TabIcon({
     <Animated.View style={animStyle}>
       <Icon
         size={22}
-        color={color}
-        strokeWidth={focused ? 2.2 : 1.8}
+        color={focused ? C.forest : C.inkSoft}
+        strokeWidth={focused ? 2.3 : 1.7}
       />
     </Animated.View>
+  );
+}
+
+function TabLabel({ label, focused }: { label: string; focused: boolean }) {
+  const dotScale = useSharedValue(focused ? 1 : 0);
+
+  useEffect(() => {
+    dotScale.value = withSpring(focused ? 1 : 0, { damping: 16, stiffness: 240 });
+  }, [focused, dotScale]);
+
+  const dotStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: dotScale.value }],
+    opacity: dotScale.value,
+  }));
+
+  return (
+    <View style={{ alignItems: "center", gap: 3, marginTop: 3 }}>
+      <Text
+        style={{
+          fontFamily: focused ? FONTS.semiBold : FONTS.medium,
+          fontSize: 10,
+          color: focused ? C.forest : C.inkSoft,
+          letterSpacing: 0.15,
+        }}
+      >
+        {label}
+      </Text>
+      <Animated.View
+        style={[
+          {
+            width: 4,
+            height: 4,
+            borderRadius: 2,
+            backgroundColor: C.forest,
+          },
+          dotStyle,
+        ]}
+      />
+    </View>
   );
 }
 
@@ -159,7 +204,8 @@ export default function TabLayout() {
               letterSpacing: -0.8,
             }}
           >
-            <Text style={{ color: C.textPrimary }}>Re</Text><Text style={{ color: C.pistachio }}>slot</Text>
+            <Text style={{ color: C.textPrimary }}>Re</Text>
+            <Text style={{ color: C.pistachio }}>slot</Text>
           </Text>
           <Text
             style={{
@@ -177,66 +223,40 @@ export default function TabLayout() {
       <Tabs
         screenOptions={{
           headerShown: false,
-          tabBarActiveTintColor: C.dark,
-          tabBarInactiveTintColor: C.textSecondary,
           tabBarShowLabel: true,
-          tabBarLabelStyle: {
-            fontFamily: FONTS.semiBold,
-            fontSize: 9,
-            marginTop: 4,
-          },
           tabBarStyle: {
             position: "absolute",
             bottom: 0,
             left: 0,
             right: 0,
-            backgroundColor: "rgba(250,250,248,0.97)",
-            borderTopWidth: 0.5,
-            borderTopColor: C.divider,
-            height: 72,
-            paddingTop: 6,
-            paddingBottom: 8,
+            backgroundColor: C.creamSoft,
+            borderTopWidth: 1,
+            borderTopColor: C.forestSoft,
+            height: 78,
+            paddingTop: 10,
+            paddingBottom: 10,
             elevation: 0,
             shadowColor: "#000",
-            shadowOffset: { width: 0, height: -2 },
-            shadowOpacity: 0.06,
-            shadowRadius: 12,
+            shadowOffset: { width: 0, height: -4 },
+            shadowOpacity: 0.04,
+            shadowRadius: 16,
           },
-          tabBarBackground: () => (
-            <BlurView
-              intensity={60}
-              tint="light"
-              style={StyleSheet.absoluteFill}
-            />
-          ),
         }}
       >
         <Tabs.Screen
           name="index"
           options={{
             title: "Hem",
-            tabBarIcon: ({
-              color,
-              focused,
-            }: {
-              color: string;
-              focused: boolean;
-            }) => <TabIcon icon={Home} color={color} focused={focused} />,
+            tabBarIcon: ({ focused }) => <TabIcon icon={Home} focused={focused} />,
+            tabBarLabel: ({ focused }) => <TabLabel label="Hem" focused={focused} />,
           }}
         />
         <Tabs.Screen
           name="reservations"
           options={{
             title: "Bokningar",
-            tabBarIcon: ({
-              color,
-              focused,
-            }: {
-              color: string;
-              focused: boolean;
-            }) => (
-              <TabIcon icon={CalendarCheck} color={color} focused={focused} />
-            ),
+            tabBarIcon: ({ focused }) => <TabIcon icon={CalendarCheck} focused={focused} />,
+            tabBarLabel: ({ focused }) => <TabLabel label="Bokningar" focused={focused} />,
           }}
         />
         <Tabs.Screen
@@ -247,19 +267,8 @@ export default function TabLayout() {
           name="submit"
           options={{
             title: "Lägg upp",
-            tabBarIcon: ({
-              color,
-              focused,
-            }: {
-              color: string;
-              focused: boolean;
-            }) => (
-              <TabIcon
-                icon={PlusCircle}
-                color={color}
-                focused={focused}
-                isCenter
-              />
+            tabBarIcon: ({ focused }) => (
+              <TabIcon icon={PlusCircle} focused={focused} isCenter />
             ),
             tabBarLabel: () => null,
           }}
@@ -268,17 +277,12 @@ export default function TabLayout() {
           name="alerts"
           options={{
             title: "Bevakningar",
-            tabBarIcon: ({
-              color,
-              focused,
-            }: {
-              color: string;
-              focused: boolean;
-            }) => <TabIcon icon={Bell} color={color} focused={focused} />,
+            tabBarIcon: ({ focused }) => <TabIcon icon={Bell} focused={focused} />,
+            tabBarLabel: ({ focused }) => <TabLabel label="Bevakningar" focused={focused} />,
             tabBarBadge: badgeCount,
             tabBarBadgeStyle: {
-              backgroundColor: C.pistachio,
-              color: C.white,
+              backgroundColor: C.coral,
+              color: C.cream,
               fontSize: 10,
               fontFamily: FONTS.semiBold,
               minWidth: 18,
@@ -292,18 +296,11 @@ export default function TabLayout() {
           name="profile"
           options={{
             title: "Profil",
-            tabBarIcon: ({
-              color,
-              focused,
-            }: {
-              color: string;
-              focused: boolean;
-            }) => <TabIcon icon={User} color={color} focused={focused} />,
+            tabBarIcon: ({ focused }) => <TabIcon icon={User} focused={focused} />,
+            tabBarLabel: ({ focused }) => <TabLabel label="Profil" focused={focused} />,
           }}
         />
-
       </Tabs>
-      {/* SupportBubble moved to FAQ page only */}
     </View>
   );
 }
