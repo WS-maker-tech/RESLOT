@@ -9,12 +9,35 @@ type ColorPalette = Record<
   | "white" | "goldLight" | "goldBorder" | "goldPressed"
   | "errorBg" | "errorBorder" | "errorLight"
   | "infoBg" | "infoBorder" | "infoLight"
-  | "overlayDark" | "overlayLight" | "overlayMedium",
+  | "overlayDark" | "overlayLight" | "overlayMedium"
+  | "cream" | "creamSoft" | "creamDeep"
+  | "forest" | "forestDeep" | "forestSoft" | "ringForest"
+  | "ink" | "inkSoft" | "inkFaint"
+  | "coral" | "coralSoft"
+  | "pastelYellow" | "pastelBlue" | "pastelGreen" | "pastelPeach",
   string
 >;
 
 export const C = {
-  // Primary — Reslot brand palette
+  // ─── Identity v2 — extra färg-tokens (additivt, behåller alla legacy nedan) ───
+  cream: "#FAF3EB",         // = bg, för ny användning
+  creamSoft: "#FAF7F0",     // Lighter cream, subtle layering
+  creamDeep: "#F0E6D5",     // = bgInput, för ny användning
+  forest: "#1F4D2A",        // Dark green — primary accent (icons, links, CTAs)
+  forestDeep: "#143620",    // Pressed states
+  forestSoft: "rgba(31,77,42,0.10)",
+  ringForest: "rgba(31,77,42,0.18)",
+  ink: "#1A1A1A",           // Warmer body text
+  inkSoft: "#6B6B6B",
+  inkFaint: "#9B9B9B",
+  coral: "#D97757",         // Reserverad delight-token (success/welcome — ej i bruk än)
+  coralSoft: "rgba(217,119,87,0.12)",
+  pastelYellow: "#FBF3D5",
+  pastelBlue: "#D8E5F2",
+  pastelGreen: "#D8E8D5",
+  pastelPeach: "#F5E0CC",
+
+  // ─── Legacy palette (oförändrad) ───
   pistachio: "#7EC87A",
   grayLight: "#9CA3AF",
   gold: "#C9A96E",
@@ -23,7 +46,7 @@ export const C = {
 
   // Surfaces
   bgCard: "#FFFFFF",
-  bgInput: "#F0F0EE",
+  bgInput: "#F0E6D5",
 
   // Text
   textPrimary: "#111827",
@@ -78,6 +101,24 @@ export const C = {
  * No existing components are changed — this is infrastructure only.
  */
 export const DARK_COLORS: ColorPalette = {
+  // Identity v2 dark counterparts (infrastructure only — ej använt)
+  cream: "#1A1A1A",
+  creamSoft: "#222222",
+  creamDeep: "#2A2A2A",
+  forest: "#9CD0A2",
+  forestDeep: "#7BB081",
+  forestSoft: "rgba(156,208,162,0.14)",
+  ringForest: "rgba(156,208,162,0.22)",
+  ink: "#FAFAFA",
+  inkSoft: "#C8C8C8",
+  inkFaint: "#8A8A8A",
+  coral: "#E89070",
+  coralSoft: "rgba(232,144,112,0.18)",
+  pastelYellow: "rgba(251,243,213,0.18)",
+  pastelBlue: "rgba(216,229,242,0.18)",
+  pastelGreen: "rgba(216,232,213,0.18)",
+  pastelPeach: "rgba(245,224,204,0.18)",
+
   pistachio: "#7EC87A",
   grayLight: "#9CA3AF",
   gold: "#D4B87E",

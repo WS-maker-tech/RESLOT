@@ -1272,7 +1272,7 @@ ${shareUrl}`,
           {/* Cuisine tag */}
           {r.cuisine ? (
             <View style={{ flexDirection: "row", marginTop: 14 }}>
-              <View style={{ backgroundColor: "#F3F4F6", borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 }}>
+              <View style={{ backgroundColor: C.bgInput, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 }}>
                 <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.textSecondary }}>{r.cuisine}</Text>
               </View>
             </View>
