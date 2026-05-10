@@ -246,22 +246,23 @@ const Header = React.memo(function Header({
         </Pressable>
       </View>
 
-      {/* Hero — eyebrow (clickable city) + bold display heading */}
+      {/* Hero — small lead-in label + city-picker som primary navigation
+           (stadnamn i Reslots "slot"-grön — pistachio — för att signalera klickbar brand-action) */}
       <View style={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 14 }}>
+        <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.inkSoft, letterSpacing: 0.1, marginBottom: 4 }}>
+          Hitta ditt nästa bord
+        </Text>
         <Pressable
           testID="city-picker-button"
           accessibilityLabel="Välj stad"
           onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); onCityPress(); }}
-          style={{ flexDirection: "row", alignItems: "center", marginBottom: 4 }}
+          style={{ flexDirection: "row", alignItems: "center" }}
         >
-          <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.inkSoft, letterSpacing: 0.1 }}>
-            Bord i {selectedCity}
+          <Text style={{ fontFamily: FONTS.displayBold, fontSize: 32, color: C.ink, letterSpacing: -0.9, lineHeight: 38 }}>
+            Bord i <Text style={{ color: C.pistachio }}>{selectedCity}</Text>
           </Text>
-          <ChevronDown size={13} color={C.forest} strokeWidth={2} style={{ marginLeft: 4 }} />
+          <ChevronDown size={22} color={C.pistachio} strokeWidth={2.4} style={{ marginLeft: 6, marginTop: 4 }} />
         </Pressable>
-        <Text style={{ fontFamily: FONTS.displayBold, fontSize: 32, color: C.ink, letterSpacing: -0.9, lineHeight: 38 }}>
-          Hitta ditt nästa bord
-        </Text>
       </View>
 
       {showSearch ? (
