@@ -44,6 +44,7 @@ import Animated, {
   interpolate,
   Extrapolation,
   runOnJS,
+  Easing,
 } from "react-native-reanimated";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import * as Haptics from "expo-haptics";
@@ -64,29 +65,27 @@ import { Skeleton } from "@/components/Skeleton";
 const CITIES = ["Stockholm", "Göteborg", "Malmö", "Uppsala"];
 
 // --- Skeleton Card with shimmer sweep ---
+// Snabbare loop = perceived faster app (Emil's principle).
+// Linear easing (Emil: continuous loops = linear, never spring).
+// Single-direction pulse istället för 3-step → cleaner.
 const SkeletonCard = React.memo(function SkeletonCard({ index = 0 }: { index?: number }) {
   const opacity1 = useSharedValue(0.3);
-  const opacity2 = useSharedValue(0.15);
-  // Stagger duration per card for organic feel
-  const baseDuration = 900 + index * 150;
+  const opacity2 = useSharedValue(0);
+  const baseDuration = 700 + index * 80;
 
   React.useEffect(() => {
-    // Primary layer: three-step pulse (low → mid → low)
     opacity1.value = withRepeat(
       withSequence(
-        withTiming(0.15, { duration: baseDuration * 0.4 }),
-        withTiming(0.5, { duration: baseDuration * 0.3 }),
-        withTiming(0.3, { duration: baseDuration * 0.3 }),
+        withTiming(0.5, { duration: baseDuration / 2, easing: Easing.linear }),
+        withTiming(0.2, { duration: baseDuration / 2, easing: Easing.linear }),
       ),
       -1,
       false,
     );
-    // Secondary layer: offset phase sweep for shimmer illusion
     opacity2.value = withRepeat(
       withSequence(
-        withTiming(0.0, { duration: baseDuration * 0.3 }),
-        withTiming(0.35, { duration: baseDuration * 0.35 }),
-        withTiming(0.0, { duration: baseDuration * 0.35 }),
+        withTiming(0.25, { duration: baseDuration / 2, easing: Easing.linear }),
+        withTiming(0, { duration: baseDuration / 2, easing: Easing.linear }),
       ),
       -1,
       false,
