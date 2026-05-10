@@ -12,10 +12,12 @@ import {
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withSpring,
   withTiming,
-  withSequence,
+  Easing,
 } from "react-native-reanimated";
+
+// Strong custom ease-out (per Emil's design-eng — built-in CSS easings lack punch)
+const EASE_OUT = Easing.bezier(0.23, 1, 0.32, 1);
 import {
   useFonts,
   PlusJakartaSans_400Regular,
@@ -51,28 +53,25 @@ function TabIcon({
   focused: boolean;
   isCenter?: boolean;
 }) {
-  const scale = useSharedValue(focused ? 1 : 0.94);
-  const dotScale = useSharedValue(focused ? 1 : 0);
+  // Subtle scale shift + opacity dot. No spring overshoot — Emil: button-feedback
+  // <160ms ease-out feels more responsive than ANY spring at the same duration.
+  // Dot starts at 0.5 (not 0) — nothing in real world appears from nothing.
+  const scale = useSharedValue(focused ? 1 : 0.96);
+  const dotScale = useSharedValue(focused ? 1 : 0.5);
+  const dotOpacity = useSharedValue(focused ? 1 : 0);
 
   useEffect(() => {
-    if (focused) {
-      scale.value = withSequence(
-        withSpring(1.18, { damping: 9, stiffness: 380 }),
-        withSpring(1.04, { damping: 16, stiffness: 220 })
-      );
-      dotScale.value = withSpring(1, { damping: 14, stiffness: 240 });
-    } else {
-      scale.value = withSpring(0.94, { damping: 16, stiffness: 220 });
-      dotScale.value = withSpring(0, { damping: 16, stiffness: 240 });
-    }
-  }, [focused, scale, dotScale]);
+    scale.value = withTiming(focused ? 1 : 0.96, { duration: 160, easing: EASE_OUT });
+    dotScale.value = withTiming(focused ? 1 : 0.5, { duration: 200, easing: EASE_OUT });
+    dotOpacity.value = withTiming(focused ? 1 : 0, { duration: 200, easing: EASE_OUT });
+  }, [focused, scale, dotScale, dotOpacity]);
 
   const animStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
   }));
   const dotStyle = useAnimatedStyle(() => ({
     transform: [{ scale: dotScale.value }],
-    opacity: dotScale.value,
+    opacity: dotOpacity.value,
   }));
 
   if (isCenter) {
@@ -150,10 +149,12 @@ export default function TabLayout() {
   useEffect(() => {
     if (fontsLoaded) {
       SplashScreen.hideAsync();
+      // Kort hold + snabb fade — splash visas vid varje session
+      // (Emil: frequent UI = under 300ms, anteckna ej även när det är "branding")
       const timer = setTimeout(() => {
-        splashOpacity.value = withTiming(0, { duration: 800 });
-        setTimeout(() => setShowSplash(false), 900);
-      }, 2000);
+        splashOpacity.value = withTiming(0, { duration: 280, easing: EASE_OUT });
+        setTimeout(() => setShowSplash(false), 320);
+      }, 600);
       return () => clearTimeout(timer);
     }
   }, [fontsLoaded, splashOpacity]);
