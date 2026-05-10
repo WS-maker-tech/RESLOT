@@ -1769,7 +1769,7 @@ export default function SubmitScreen() {
           paddingHorizontal: SPACING.lg,
           paddingTop: 16,
           paddingBottom: 16,
-          backgroundColor: "rgba(250, 248, 245, 0.97)",
+          backgroundColor: "rgba(248, 245, 238, 0.97)",
           borderTopWidth: 0.5,
           borderTopColor: "rgba(0,0,0,0.04)",
         }}
