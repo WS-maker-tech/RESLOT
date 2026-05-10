@@ -38,7 +38,7 @@ class ErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#F8F5EE", padding: 32 }}>
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#F7F6F2", padding: 32 }}>
           <Text style={{ fontFamily: "PlusJakartaSans_700Bold", fontSize: 20, color: "#111827", marginBottom: 8, letterSpacing: -0.3 }}>
             Något gick fel
           </Text>
@@ -79,8 +79,8 @@ const ReslotTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    background: '#F8F5EE',
-    card: '#F8F5EE',
+    background: '#F7F6F2',
+    card: '#F7F6F2',
     text: '#111827',
     border: 'rgba(0,0,0,0.06)',
     primary: '#7EC87A',
@@ -148,8 +148,8 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={ReslotTheme}>
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#F8F5EE' }, animation: 'fade' }}>
-        <Stack.Screen name="onboarding" options={{ headerShown: false, animation: 'none', contentStyle: { backgroundColor: '#F8F5EE' } }} />
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#F7F6F2' }, animation: 'fade' }}>
+        <Stack.Screen name="onboarding" options={{ headerShown: false, animation: 'none', contentStyle: { backgroundColor: '#F7F6F2' } }} />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="restaurant/[id]" options={{ presentation: "modal", headerShown: false, animation: "slide_from_bottom" }} />
         <Stack.Screen name="rewards" options={{ headerShown: false, animation: "slide_from_right" }} />
