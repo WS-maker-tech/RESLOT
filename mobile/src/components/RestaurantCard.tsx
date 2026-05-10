@@ -167,7 +167,7 @@ export const RestaurantCard = React.memo(function RestaurantCard({
   }));
 
   const handlePressIn = useCallback(() => {
-    scale.value = withSpring(0.97, { damping: 15, stiffness: 300 });
+    scale.value = withSpring(0.97, { damping: 15, stiffness: 250 });
     bgFlash.value = withTiming(1, { duration: 100 });
   }, [scale, bgFlash]);
 
