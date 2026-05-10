@@ -20,9 +20,9 @@ type ColorPalette = Record<
 
 export const C = {
   // ─── Identity v2 — extra färg-tokens (additivt, behåller alla legacy nedan) ───
-  cream: "#FAF3EB",         // = bg, för ny användning
-  creamSoft: "#FAF7F0",     // Lighter cream, subtle layering
-  creamDeep: "#F0E6D5",     // = bgInput, för ny användning
+  cream: "#F8F5EE",         // BG (tonal cooldown 2026-05-09: var #FAF3EB, -15% orange)
+  creamSoft: "#FCFAF4",     // Lighter cream, subtle layering (justerad mot ny cream)
+  creamDeep: "#EEEAE0",     // Inputs, sunken surfaces (cool-cream variant)
   forest: "#1F4D2A",        // Dark green — primary accent (icons, links, CTAs)
   forestDeep: "#143620",    // Pressed states
   forestSoft: "rgba(31,77,42,0.10)",
@@ -42,11 +42,11 @@ export const C = {
   grayLight: "#9CA3AF",
   gold: "#C9A96E",
   dark: "#111827",
-  bg: "#FAF3EB",
+  bg: "#F8F5EE",
 
   // Surfaces
   bgCard: "#FFFFFF",
-  bgInput: "#F0E6D5",
+  bgInput: "#EEEAE0",
 
   // Text
   textPrimary: "#111827",
