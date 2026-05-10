@@ -145,7 +145,7 @@ function ReservationCard({
   };
 
   return (
-    <Animated.View entering={FadeInDown.delay(index * 60).springify()}>
+    <Animated.View entering={FadeInDown.delay(index * 60).duration(180)}>
       <Pressable
         testID={`reservation-card-${reservation.id}`}
         accessibilityLabel={`Visa bokning på ${restaurant.name}`}
@@ -406,7 +406,7 @@ function FeedbackPrompt({
   if (step === "done") {
     return (
       <Animated.View
-        entering={FadeInDown.springify()}
+        entering={FadeInDown.duration(180)}
         style={{
           marginHorizontal: SPACING.lg,
           marginBottom: SPACING.md,
@@ -434,7 +434,7 @@ function FeedbackPrompt({
   if (step === "comment") {
     return (
       <Animated.View
-        entering={FadeInDown.springify()}
+        entering={FadeInDown.duration(180)}
         style={{
           marginHorizontal: SPACING.lg,
           marginBottom: SPACING.md,
@@ -500,7 +500,7 @@ function FeedbackPrompt({
 
   return (
     <Animated.View
-      entering={FadeInDown.springify()}
+      entering={FadeInDown.duration(180)}
       style={{
         marginHorizontal: SPACING.lg,
         marginBottom: SPACING.md,
@@ -725,14 +725,14 @@ export default function ReservationsScreen() {
                 Upplagda bokningar
               </Text>
               {submittedReservations.length === 0 ? (
-                <Animated.View entering={FadeInDown.delay(100).springify()} style={{ paddingHorizontal: SPACING.lg, paddingVertical: 32, alignItems: "center" }}>
-                  <Animated.View entering={ZoomIn.springify().delay(150)} style={{ width: 64, height: 64, borderRadius: 20, backgroundColor: C.pistachioLight, alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
+                <Animated.View entering={FadeInDown.delay(100).duration(180)} style={{ paddingHorizontal: SPACING.lg, paddingVertical: 32, alignItems: "center" }}>
+                  <Animated.View entering={ZoomIn.delay(150).duration(200)} style={{ width: 64, height: 64, borderRadius: 20, backgroundColor: C.pistachioLight, alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
                     <Upload size={28} color={C.pistachio} strokeWidth={1.5} />
                   </Animated.View>
-                  <Animated.View entering={FadeInDown.delay(200).springify()}>
+                  <Animated.View entering={FadeInDown.delay(200).duration(180)}>
                     <Text style={{ fontFamily: FONTS.displayBold, fontSize: 17, color: C.textPrimary, textAlign: "center", letterSpacing: -0.2 }}>Lägg upp din första bokning</Text>
                   </Animated.View>
-                  <Animated.View entering={FadeInDown.delay(280).springify()}>
+                  <Animated.View entering={FadeInDown.delay(280).duration(180)}>
                     <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textTertiary, marginTop: 6, textAlign: "center", lineHeight: 20 }}>Har du en bokning du inte kan använda?{"\n"}Dela den och tjäna +2 credits!</Text>
                   </Animated.View>
                 </Animated.View>
@@ -747,14 +747,14 @@ export default function ReservationsScreen() {
                 Övertagna bokningar
               </Text>
               {claimedReservations.length === 0 ? (
-                <Animated.View entering={FadeInDown.delay(100).springify()} style={{ paddingHorizontal: SPACING.lg, paddingVertical: 32, alignItems: "center" }}>
-                  <Animated.View entering={ZoomIn.springify().delay(150)} style={{ width: 64, height: 64, borderRadius: 20, backgroundColor: C.successLight, alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
+                <Animated.View entering={FadeInDown.delay(100).duration(180)} style={{ paddingHorizontal: SPACING.lg, paddingVertical: 32, alignItems: "center" }}>
+                  <Animated.View entering={ZoomIn.delay(150).duration(200)} style={{ width: 64, height: 64, borderRadius: 20, backgroundColor: C.successLight, alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
                     <UtensilsCrossed size={28} color={C.grayLight} strokeWidth={1.5} />
                   </Animated.View>
-                  <Animated.View entering={FadeInDown.delay(200).springify()}>
+                  <Animated.View entering={FadeInDown.delay(200).duration(180)}>
                     <Text style={{ fontFamily: FONTS.displayBold, fontSize: 17, color: C.textPrimary, textAlign: "center", letterSpacing: -0.2 }}>Hitta ditt nästa bord</Text>
                   </Animated.View>
-                  <Animated.View entering={FadeInDown.delay(280).springify()}>
+                  <Animated.View entering={FadeInDown.delay(280).duration(180)}>
                     <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textTertiary, marginTop: 6, textAlign: "center", lineHeight: 20 }}>Utforska tillgängliga bokningar på hemskärmen{"\n"}och ta över ett bord med dina credits</Text>
                   </Animated.View>
                 </Animated.View>

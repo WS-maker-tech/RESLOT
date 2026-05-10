@@ -350,6 +350,10 @@ export const MOTION = {
     standard: [0.2, 0.0, 0.0, 1.0] as const,
     decelerate: [0.0, 0.0, 0.2, 1.0] as const,
     accelerate: [0.4, 0.0, 1.0, 1.0] as const,
+    /** Emil's strong ease-out — punchier än CSS default. För all UI-entrance. */
+    outCubic: [0.23, 1, 0.32, 1] as const,
+    /** Emil's strong ease-in-out — för on-screen movement (modal, drawer). */
+    inOutCubic: [0.77, 0, 0.175, 1] as const,
     spring: {
       damping: 18,
       stiffness: 220,

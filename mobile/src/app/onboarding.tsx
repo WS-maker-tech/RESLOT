@@ -64,9 +64,11 @@ const SPRING_PRESS_IN = { damping: 14, stiffness: 400 };
 const SPRING_PRESS_OUT = { damping: 10, stiffness: 260 };
 
 // ── Entrance animation helpers ──
-const enterHeading = (delayMs: number) => FadeInDown.delay(delayMs).springify().damping(14).stiffness(130);
-const enterContent = (delayMs: number) => FadeInDown.delay(delayMs).springify().damping(18).stiffness(140);
-const enterFromBottom = (delayMs: number) => FadeInUp.delay(delayMs).springify().damping(16).stiffness(130);
+// Emil: hero/content entrance ska kännas confident, inte wobbly.
+// Spring overshoot byter mot ease-out duration — propagerar till ~30 användare.
+const enterHeading = (delayMs: number) => FadeInDown.delay(delayMs).duration(220);
+const enterContent = (delayMs: number) => FadeInDown.delay(delayMs).duration(220);
+const enterFromBottom = (delayMs: number) => FadeInUp.delay(delayMs).duration(220);
 
 // ── Animated Strip ──
 const CARD_H = 157;
@@ -207,9 +209,10 @@ function PulsingDot() {
   const opacity = useSharedValue(0.85);
 
   useEffect(() => {
+    // Snappier pulse: 600ms (var 900), scale-cap 1.8 (var 1.9). Emil: dec UI <700ms.
     scale.value = withRepeat(
       withSequence(
-        withTiming(1.9, { duration: 900, easing: Easing.out(Easing.quad) }),
+        withTiming(1.8, { duration: 600, easing: Easing.out(Easing.cubic) }),
         withTiming(1, { duration: 0 })
       ),
       -1,
@@ -217,7 +220,7 @@ function PulsingDot() {
     );
     opacity.value = withRepeat(
       withSequence(
-        withTiming(0, { duration: 900, easing: Easing.out(Easing.quad) }),
+        withTiming(0, { duration: 600, easing: Easing.out(Easing.cubic) }),
         withTiming(0.85, { duration: 0 })
       ),
       -1,
@@ -451,7 +454,7 @@ function SplashStep({ onGetStarted, onExplore, onRegister }: { onGetStarted: () 
       {/* Copy Section */}
       <View style={{ paddingHorizontal: 28, paddingBottom: 12, marginTop: -24 }}>
         {/* Logo — dramatic entrance, tighter spring for punch */}
-        <Animated.View entering={FadeInUp.delay(50).springify().damping(14).stiffness(140)} style={{ marginTop: 0 }}>
+        <Animated.View entering={FadeInUp.delay(50).duration(220)} style={{ marginTop: 0 }}>
           <Text
             style={{
               fontFamily: FONTS.displayBold,
@@ -464,7 +467,7 @@ function SplashStep({ onGetStarted, onExplore, onRegister }: { onGetStarted: () 
         </Animated.View>
 
         {/* Tagline — 50ms stagger after logo */}
-        <Animated.View entering={FadeInUp.delay(100).springify().damping(16).stiffness(120)} style={{ marginTop: 10 }}>
+        <Animated.View entering={FadeInUp.delay(100).duration(220)} style={{ marginTop: 10 }}>
           <Text
             style={{
               fontFamily: FONTS.displayBold,
@@ -482,7 +485,7 @@ function SplashStep({ onGetStarted, onExplore, onRegister }: { onGetStarted: () 
 
       {/* Bottom Actions — 50ms after tagline */}
       <Animated.View
-        entering={FadeInUp.delay(160).springify().damping(16).stiffness(130)}
+        entering={FadeInUp.delay(160).duration(220)}
         style={{ paddingHorizontal: 28, paddingBottom: 12 }}
       >
         <PrimaryButton
@@ -914,7 +917,7 @@ function OTPStep({
           </Animated.View>
 
           {hasError || error ? (
-            <Animated.View entering={FadeIn.springify()}>
+            <Animated.View entering={FadeIn.duration(200)}>
               <Text
                 style={{
                   fontFamily: FONTS.medium,
@@ -1311,7 +1314,7 @@ function CityCard({
           ) : null}
         </View>
         {isSelected ? (
-          <Animated.View entering={FadeIn.springify()}>
+          <Animated.View entering={FadeIn.duration(200)}>
             <View
               style={{
                 width: 28,

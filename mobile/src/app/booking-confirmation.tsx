@@ -39,6 +39,7 @@ import Animated, {
   withTiming,
   withSequence,
   withDelay,
+  Easing,
 } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { useReservation, useCancelClaim } from "@/lib/api/hooks";
@@ -88,8 +89,8 @@ function CountdownTimer({
   useEffect(() => {
     pulseScale.value = withRepeat(
       withSequence(
-        withTiming(1.05, { duration: 800 }),
-        withTiming(1, { duration: 800 })
+        withTiming(1.04, { duration: 600, easing: Easing.out(Easing.cubic) }),
+        withTiming(1, { duration: 600, easing: Easing.out(Easing.cubic) })
       ),
       -1,
       false
@@ -192,16 +193,18 @@ function CountdownTimer({
 }
 
 function CelebrationView() {
-  const bounceScale = useSharedValue(0);
+  // Start på 0.85, inte 0 (Emil: nothing appears from scale(0))
+  // Damping 12, inte 8 — gentler, mer professional celebration
+  const bounceScale = useSharedValue(0.85);
   const ringPulse = useSharedValue(1);
 
   useEffect(() => {
-    bounceScale.value = withSpring(1, { damping: 8, stiffness: 120 });
+    bounceScale.value = withSpring(1, { damping: 12, stiffness: 140 });
     setTimeout(() => {
       ringPulse.value = withRepeat(
         withSequence(
-          withTiming(1.06, { duration: 1000 }),
-          withTiming(1, { duration: 1000 })
+          withTiming(1.04, { duration: 800, easing: Easing.out(Easing.cubic) }),
+          withTiming(1, { duration: 800, easing: Easing.out(Easing.cubic) })
         ),
         -1,
         true
@@ -388,7 +391,7 @@ export default function BookingConfirmationScreen() {
         contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 80 }}
       >
         {/* Success header */}
-        <Animated.View entering={FadeInDown.springify()} style={{ paddingTop: 16, paddingBottom: 24 }}>
+        <Animated.View entering={FadeInDown.duration(180)} style={{ paddingTop: 16, paddingBottom: 24 }}>
           {cancelSuccess ? (
             <View style={{ alignItems: "center", padding: SPACING.lg }}>
               <CheckCircle size={40} color={C.success} strokeWidth={ICON.strokeWidth} />
@@ -405,7 +408,7 @@ export default function BookingConfirmationScreen() {
         {/* Restaurant info card */}
         {!cancelSuccess ? (
           <>
-            <Animated.View entering={FadeInDown.delay(40).springify()}>
+            <Animated.View entering={FadeInDown.delay(40).duration(180)}>
               <View
                 testID="restaurant-card"
                 style={{
@@ -493,7 +496,7 @@ export default function BookingConfirmationScreen() {
             </Animated.View>
 
             {/* Cost breakdown */}
-            <Animated.View entering={FadeInDown.delay(100).springify()} style={{ marginTop: SPACING.lg }}>
+            <Animated.View entering={FadeInDown.delay(100).duration(180)} style={{ marginTop: SPACING.lg }}>
               <View
                 testID="cost-breakdown-card"
                 style={{
@@ -530,7 +533,7 @@ export default function BookingConfirmationScreen() {
             </Animated.View>
 
             {/* Ångerfrist notice */}
-            <Animated.View entering={FadeInDown.delay(160).springify()} style={{ marginTop: SPACING.md }}>
+            <Animated.View entering={FadeInDown.delay(160).duration(180)} style={{ marginTop: SPACING.md }}>
               <Text
                 testID="angerfrist-notice"
                 style={{
@@ -546,7 +549,7 @@ export default function BookingConfirmationScreen() {
             </Animated.View>
 
             {/* Reslot-garanti badge */}
-            <Animated.View entering={FadeInDown.delay(220).springify()} style={{ marginTop: SPACING.md }}>
+            <Animated.View entering={FadeInDown.delay(220).duration(180)} style={{ marginTop: SPACING.md }}>
               <View
                 testID="reslot-garanti-badge"
                 style={{
@@ -567,7 +570,7 @@ export default function BookingConfirmationScreen() {
             </Animated.View>
 
             {/* Grace period / celebration */}
-            <Animated.View entering={FadeInDown.delay(280).springify()} style={{ marginTop: SPACING.lg }}>
+            <Animated.View entering={FadeInDown.delay(280).duration(180)} style={{ marginTop: SPACING.lg }}>
               {graceExpired ? (
                 <CelebrationView />
               ) : (
@@ -580,7 +583,7 @@ export default function BookingConfirmationScreen() {
 
             {/* Action buttons - shown after grace period */}
             {graceExpired && !cancelSuccess ? (
-              <Animated.View entering={FadeInDown.delay(360).springify()} style={{ marginTop: SPACING.lg, gap: 10 }}>
+              <Animated.View entering={FadeInDown.delay(360).duration(180)} style={{ marginTop: SPACING.lg, gap: 10 }}>
                 {/* Reference number */}
                 <View
                   style={{
@@ -679,7 +682,7 @@ export default function BookingConfirmationScreen() {
 
             {/* Cancel button during grace period */}
             {!graceExpired ? (
-              <Animated.View entering={FadeInDown.delay(340).springify()} style={{ marginTop: SPACING.lg }}>
+              <Animated.View entering={FadeInDown.delay(340).duration(180)} style={{ marginTop: SPACING.lg }}>
                 <Pressable
                   testID="cancel-claim-button"
                   accessibilityLabel="Ångra övertagande"
@@ -713,7 +716,7 @@ export default function BookingConfirmationScreen() {
             ) : null}
 
             {/* Helpful info */}
-            <Animated.View entering={FadeInDown.delay(420).springify()} style={{ marginTop: SPACING.xl }}>
+            <Animated.View entering={FadeInDown.delay(420).duration(180)} style={{ marginTop: SPACING.xl }}>
               <View
                 style={{
                   backgroundColor: C.pistachioLight,
