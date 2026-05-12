@@ -19,6 +19,8 @@ import Animated, {
   withTiming,
   withSequence,
   interpolateColor,
+  Easing,
+  ReduceMotion,
 } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import type { Reservation } from "@/lib/api/types";
@@ -31,8 +33,8 @@ function PulsingGreenDot({ size = 8 }: { size?: number }) {
   const scale = useSharedValue(1);
   const dotOpacity = useSharedValue(1);
   React.useEffect(() => {
-    scale.value = withRepeat(withTiming(1.5, { duration: 1000 }), -1, true);
-    dotOpacity.value = withRepeat(withTiming(0.5, { duration: 1000 }), -1, true);
+    scale.value = withRepeat(withTiming(1.5, { duration: 1000, easing: Easing.linear, reduceMotion: ReduceMotion.System }), -1, true);
+    dotOpacity.value = withRepeat(withTiming(0.5, { duration: 1000, easing: Easing.linear, reduceMotion: ReduceMotion.System }), -1, true);
   }, []);
   const animStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
@@ -60,16 +62,16 @@ function PulsingUrgencyDot({ size = 7 }: { size?: number }) {
   React.useEffect(() => {
     scale.value = withRepeat(
       withSequence(
-        withTiming(1.4, { duration: 600 }),
-        withTiming(1, { duration: 600 }),
+        withTiming(1.4, { duration: 600, easing: Easing.linear, reduceMotion: ReduceMotion.System }),
+        withTiming(1, { duration: 600, easing: Easing.linear, reduceMotion: ReduceMotion.System }),
       ),
       -1,
       false,
     );
     dotOpacity.value = withRepeat(
       withSequence(
-        withTiming(0.4, { duration: 600 }),
-        withTiming(1, { duration: 600 }),
+        withTiming(0.4, { duration: 600, easing: Easing.linear, reduceMotion: ReduceMotion.System }),
+        withTiming(1, { duration: 600, easing: Easing.linear, reduceMotion: ReduceMotion.System }),
       ),
       -1,
       false,

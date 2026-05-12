@@ -12,6 +12,8 @@ import Animated, {
   withSpring,
   withRepeat,
   withTiming,
+  Easing,
+  ReduceMotion,
 } from "react-native-reanimated";
 import { useProfile, usePurchaseCredits } from "@/lib/api/hooks";
 import { useAuthStore } from "@/lib/auth-store";
@@ -53,7 +55,7 @@ function AnimatedPressable({
 function MiniSpinner({ color }: { color: string }) {
   const rotation = useSharedValue(0);
   React.useEffect(() => {
-    rotation.value = withRepeat(withTiming(360, { duration: 800 }), -1, false);
+    rotation.value = withRepeat(withTiming(360, { duration: 800, easing: Easing.linear, reduceMotion: ReduceMotion.System }), -1, false);
   }, []);
   const animStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${rotation.value}deg` }],
