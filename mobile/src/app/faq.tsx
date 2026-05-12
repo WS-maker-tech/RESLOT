@@ -72,7 +72,7 @@ function AnimatedPressable({
     <Pressable
       testID={testID}
       accessibilityLabel={accessibilityLabel}
-      onPressIn={() => { scale.value = withSpring(0.97, { damping: 15, stiffness: 300 }); }}
+      onPressIn={() => { scale.value = withSpring(0.97, { damping: 15, stiffness: 240 }); }}
       onPressOut={() => { scale.value = withSpring(1, { damping: 12, stiffness: 200 }); }}
       onPress={onPress}
     >

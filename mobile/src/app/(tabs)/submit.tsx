@@ -1816,7 +1816,7 @@ export default function SubmitScreen() {
             accessibilityLabel={step < 5 ? `Gå vidare till ${NEXT_LABELS[step]}` : "Skicka in bokning"}
             disabled={submitReservationMutation.isPending}
             onPressIn={() => {
-              buttonScale.value = withSpring(0.96, { damping: 15, stiffness: 300 });
+              buttonScale.value = withSpring(0.96, { damping: 15, stiffness: 240 });
             }}
             onPressOut={() => {
               buttonScale.value = withSpring(1, { damping: 10, stiffness: 200 });

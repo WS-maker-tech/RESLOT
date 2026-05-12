@@ -24,7 +24,7 @@ export function CreditsBanner() {
         testID="credits-banner"
         accessibilityLabel="Visa Reslot credits"
         onPressIn={() => {
-          scale.value = withSpring(0.97, { damping: 15, stiffness: 300 });
+          scale.value = withSpring(0.97, { damping: 15, stiffness: 240 });
         }}
         onPressOut={() => {
           scale.value = withSpring(1, { damping: 12, stiffness: 200 });

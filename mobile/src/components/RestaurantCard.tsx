@@ -184,7 +184,7 @@ export const RestaurantCard = React.memo(function RestaurantCard({
   const handleToggleSave = useCallback(() => {
     if (isGuest || !phone) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    heartScale.value = withSpring(1.3, { damping: 8, stiffness: 300 }, () => {
+    heartScale.value = withSpring(1.3, { damping: 8, stiffness: 240 }, () => {
       heartScale.value = withSpring(1, { damping: 10, stiffness: 200 });
     });
     if (isSaved) {
