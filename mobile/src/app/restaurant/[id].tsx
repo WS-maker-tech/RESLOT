@@ -89,7 +89,7 @@ const ConfettiParticle = React.memo(function ConfettiParticle({ delay, color, st
 
   useEffect(() => {
     const xDrift = (Math.random() - 0.5) * 260;
-    scale.value = withDelay(delay, withSpring(1, { damping: 6, stiffness: 300 }));
+    scale.value = withDelay(delay, withSpring(1, { damping: 6, stiffness: 240 }));
     translateY.value = withDelay(
       delay,
       withTiming(350 + Math.random() * 200, { duration: 2200, easing: Easing.out(Easing.cubic) })

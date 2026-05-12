@@ -108,7 +108,7 @@ function ReservationCard({
   }));
 
   const handlePressIn = useCallback(() => {
-    scale.value = withSpring(0.95, { damping: 15, stiffness: 300 });
+    scale.value = withSpring(0.95, { damping: 15, stiffness: 240 });
   }, [scale]);
 
   const handlePressOut = useCallback(() => {

@@ -306,7 +306,7 @@ const MissedBookingCard = React.memo(function MissedBookingCard({
   }));
 
   const handlePressIn = useCallback(() => {
-    scale.value = withSpring(0.97, { damping: 15, stiffness: 300 });
+    scale.value = withSpring(0.97, { damping: 15, stiffness: 240 });
   }, [scale]);
 
   const handlePressOut = useCallback(() => {
@@ -946,7 +946,7 @@ function CityPickerModal({
         translateY.value = withTiming(400, { duration: 200 });
         runOnJS(onClose)();
       } else {
-        translateY.value = withSpring(0, { damping: 20, stiffness: 300 });
+        translateY.value = withSpring(0, { damping: 20, stiffness: 240 });
       }
     });
 

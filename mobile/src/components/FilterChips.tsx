@@ -40,7 +40,7 @@ function FilterChip({
       testID={`filter-${filter}`}
       accessibilityLabel={`Filtrera på ${filter}`}
       onPressIn={() => {
-        scale.value = withSpring(0.93, { damping: 15, stiffness: 300 });
+        scale.value = withSpring(0.93, { damping: 15, stiffness: 240 });
       }}
       onPressOut={() => {
         scale.value = withSpring(1, { damping: 12, stiffness: 200 });

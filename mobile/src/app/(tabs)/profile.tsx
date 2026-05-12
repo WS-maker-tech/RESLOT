@@ -481,7 +481,7 @@ export default function ProfileScreen() {
                 <Pressable
                   testID="buy-credits-cta"
                   accessibilityLabel="Köp credits"
-                  onPressIn={() => { buyScale.value = withSpring(0.96, { damping: 15, stiffness: 300 }); }}
+                  onPressIn={() => { buyScale.value = withSpring(0.96, { damping: 15, stiffness: 240 }); }}
                   onPressOut={() => { buyScale.value = withSpring(1, { damping: 12, stiffness: 200 }); }}
                   onPress={handleBuyCreditsPress}
                 >

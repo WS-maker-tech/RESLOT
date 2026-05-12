@@ -578,7 +578,7 @@ function PhoneStep({
 
   const checkScale = useSharedValue(agreed ? 1 : 0);
   useEffect(() => {
-    checkScale.value = withSpring(agreed ? 1 : 0, { damping: 14, stiffness: 300 });
+    checkScale.value = withSpring(agreed ? 1 : 0, { damping: 14, stiffness: 240 });
   }, [agreed]);
 
   const checkStyle = useAnimatedStyle(() => ({
