@@ -33,6 +33,10 @@ import {
   Armchair,
   Trees,
   AlertCircle,
+  ChevronDown,
+  ChevronUp,
+  Shield,
+  Pencil,
 } from "lucide-react-native";
 import Animated, {
   FadeIn,
@@ -45,10 +49,13 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
+import { useRouter } from "expo-router";
 import { useSubmitReservation, useRestaurants, useProfile } from "@/lib/api/hooks";
 import { useAuthStore } from "@/lib/auth-store";
 import type { Restaurant } from "@/lib/api/types";
 import { C, FONTS, SPACING, SHADOW, RADIUS, ICON } from "../../lib/theme";
+import SupportBubble from "@/components/SupportBubble";
+import { saveDraft, loadDraft, clearDraft } from "@/lib/use-draft-storage";
 
 // ── Web Date Picker ──
 const MONTHS_SV = ["Januari","Februari","Mars","April","Maj","Juni","Juli","Augusti","September","Oktober","November","December"];
@@ -192,7 +199,8 @@ interface FormState {
 
 type FormAction =
   | { type: "SET_FIELD"; field: keyof FormState; value: any }
-  | { type: "RESET" };
+  | { type: "RESET" }
+  | { type: "LOAD"; state: FormState };
 
 const initialFormState: FormState = {
   selectedRestaurant: null,
@@ -218,10 +226,20 @@ function formReducer(state: FormState, action: FormAction): FormState {
       return { ...state, [action.field]: action.value };
     case "RESET":
       return { ...initialFormState, bookingDate: (() => { const d = new Date(); d.setHours(18, 0, 0, 0); return d; })() };
+    case "LOAD":
+      return action.state;
     default:
       return state;
   }
 }
+
+type DraftPayload = {
+  form: Omit<FormState, "bookingDate" | "selectedRestaurant"> & {
+    bookingDate: string;
+    selectedRestaurant: Restaurant | null;
+  };
+  step: number;
+};
 
 export default function SubmitScreen() {
   const tabBarHeight = useBottomTabBarHeight();
@@ -230,7 +248,6 @@ export default function SubmitScreen() {
   const [form, dispatch] = useReducer(formReducer, initialFormState);
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
-  const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const [screenshotUri, setScreenshotUri] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<{
     restaurant: boolean;
@@ -284,6 +301,11 @@ export default function SubmitScreen() {
   const { data: restaurants = [] } = useRestaurants();
   const { data: profile } = useProfile(phone);
   const submitReservationMutation = useSubmitReservation();
+  const router = useRouter();
+  const [showReview, setShowReview] = useState<boolean>(false);
+  const [showResumeDraft, setShowResumeDraft] = useState<boolean>(false);
+  const [pendingDraft, setPendingDraft] = useState<DraftPayload | null>(null);
+  const [pricingExpanded, setPricingExpanded] = useState<boolean>(true);
 
   useEffect(() => {
     progressAnim.value = withTiming((step + 1) / STEP_LABELS.length, {
@@ -300,6 +322,31 @@ export default function SubmitScreen() {
       setField("lastName", profile.lastName);
     }
   }, [profile]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const draft = await loadDraft<DraftPayload>();
+      if (!cancelled && draft?.state) {
+        setPendingDraft(draft.state);
+        setShowResumeDraft(true);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    if (submitted || showResumeDraft) return;
+    if (step === 0 && !selectedRestaurant) return;
+    const t = setTimeout(() => {
+      const payload: DraftPayload = {
+        form: { ...form, bookingDate: form.bookingDate.toISOString() },
+        step,
+      };
+      saveDraft<DraftPayload>(payload);
+    }, 500);
+    return () => clearTimeout(t);
+  }, [form, step, submitted, showResumeDraft, selectedRestaurant]);
 
   const buttonStyle = useAnimatedStyle(() => ({
     transform: [{ scale: buttonScale.value }],
@@ -336,7 +383,7 @@ export default function SubmitScreen() {
   const handleActualSubmit = async () => {
     if (!selectedRestaurant || !phone) {
       setSubmitted(true);
-      setShowConfirmation(false);
+      setShowReview(false);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       return;
     }
@@ -363,12 +410,12 @@ export default function SubmitScreen() {
         cancellationWindowHours: cancellationWindowHours ? parseInt(cancellationWindowHours) : undefined,
       });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      setShowConfirmation(false);
+      setShowReview(false);
       setSubmitted(true);
+      await clearDraft();
     } catch (err: any) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       setSubmissionError(err?.message ?? "Något gick fel. Försök igen.");
-      setShowConfirmation(false);
     }
   };
 
@@ -424,7 +471,7 @@ export default function SubmitScreen() {
         useAuthStore.getState().openAuthModal({ type: "drop" });
         return;
       }
-      setShowConfirmation(true);
+      setShowReview(true);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
   };
@@ -439,7 +486,8 @@ export default function SubmitScreen() {
     setStep(0);
     setSearchQuery("");
     dispatch({ type: "RESET" });
-    setShowConfirmation(false);
+    setShowReview(false);
+    clearDraft();
     setValidationErrors({
       restaurant: false,
       date: false,
@@ -451,6 +499,42 @@ export default function SubmitScreen() {
       verifyMethod: false,
     });
   };
+
+  const goToStep = useCallback((target: number) => {
+    setShowReview(false);
+    setStep(target);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  }, []);
+
+  const handleSaveAndExit = useCallback(async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const payload: DraftPayload = {
+      form: { ...form, bookingDate: form.bookingDate.toISOString() },
+      step,
+    };
+    await saveDraft<DraftPayload>(payload);
+    router.replace("/(tabs)");
+  }, [form, step, router]);
+
+  const handleResumeDraft = useCallback(() => {
+    if (!pendingDraft) return;
+    const restored: FormState = {
+      ...pendingDraft.form,
+      bookingDate: new Date(pendingDraft.form.bookingDate),
+    };
+    dispatch({ type: "LOAD", state: restored });
+    setStep(pendingDraft.step);
+    setShowResumeDraft(false);
+    setPendingDraft(null);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  }, [pendingDraft]);
+
+  const handleDiscardDraft = useCallback(async () => {
+    await clearDraft();
+    setShowResumeDraft(false);
+    setPendingDraft(null);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  }, []);
 
   if (submitted) {
     return (
@@ -502,6 +586,21 @@ export default function SubmitScreen() {
                 <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textSecondary, textAlign: "center", marginTop: 4 }}>1 credit = 1 bokning du kan ta över</Text>
               </View>
 
+              {/* Reslot-skyddad trust badge */}
+              <View testID="trust-badge-card" style={{ flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: C.bgCard, borderRadius: RADIUS.lg, padding: 14, marginTop: 8, borderWidth: 1, borderColor: C.borderLight, ...SHADOW.card }}>
+                <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: C.pistachioLight, alignItems: "center", justifyContent: "center" }}>
+                  <Shield size={18} color={C.pistachio} strokeWidth={2} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: C.dark }}>
+                    Reslot-skyddad överlämning
+                  </Text>
+                  <Text style={{ fontFamily: FONTS.regular, fontSize: 11, color: C.textSecondary, marginTop: 2, lineHeight: 15 }}>
+                    Credits håller i escrow tills bokningen är överlämnad.
+                  </Text>
+                </View>
+              </View>
+
               <Pressable
                 testID="submit-another-button"
                 accessibilityLabel="Lägg upp en till bokning"
@@ -524,9 +623,186 @@ export default function SubmitScreen() {
     );
   }
 
+  if (showReview) {
+    const dateLabel = bookingDate.toLocaleDateString("sv-SE", { weekday: "short", day: "numeric", month: "short" });
+    const timeLabel = bookingDate.toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" });
+    const seatLabel = location === "indoor" ? "Inomhus" : location === "outdoor" ? "Utomhus" : "—";
+    const cancelWindowLabel = cancellationWindowHours ? `Avbokningsbar ${cancellationWindowHours}h innan` : "Inget avbokningsfönster";
+    const verifyLabel = verifyMethod === "link" ? "Inbjudningslänk" : verifyMethod === "screenshot" ? "Skärmdump" : "—";
+
+    const ReviewRow = ({ label, value, targetStep }: { label: string; value: string; targetStep: number }) => (
+      <View style={{ paddingVertical: 14, borderBottomWidth: 0.5, borderBottomColor: C.divider, flexDirection: "row", alignItems: "center", gap: 12 }}>
+        <View style={{ flex: 1 }}>
+          <Text style={{ fontFamily: FONTS.medium, fontSize: 11, letterSpacing: 0.5, textTransform: "uppercase", color: C.textTertiary, marginBottom: 2 }}>
+            {label}
+          </Text>
+          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.dark }} numberOfLines={2}>
+            {value}
+          </Text>
+        </View>
+        <Pressable
+          testID={`review-edit-${targetStep}`}
+          accessibilityLabel={`Ändra ${label}`}
+          onPress={() => goToStep(targetStep)}
+          hitSlop={8}
+          style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
+        >
+          <Pencil size={12} color={C.forest} strokeWidth={2.2} />
+          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: C.forest }}>
+            Ändra
+          </Text>
+        </Pressable>
+      </View>
+    );
+
+    return (
+      <View style={{ flex: 1, backgroundColor: C.bg }}>
+        <SafeAreaView edges={["top"]} style={{ backgroundColor: C.bg }}>
+          <View style={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+            <Pressable
+              testID="review-back"
+              accessibilityLabel="Tillbaka till verifiering"
+              onPress={() => { setShowReview(false); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }}
+              hitSlop={8}
+              style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
+            >
+              <ChevronLeft size={20} color={C.textSecondary} strokeWidth={2} />
+              <Text style={{ fontFamily: FONTS.medium, fontSize: 14, color: C.textSecondary }}>Tillbaka</Text>
+            </Pressable>
+            <Pressable
+              testID="review-save-and-exit"
+              accessibilityLabel="Spara och avsluta"
+              onPress={handleSaveAndExit}
+              hitSlop={8}
+            >
+              <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.textSecondary }}>
+                Spara & avsluta
+              </Text>
+            </Pressable>
+          </View>
+        </SafeAreaView>
+
+        <ScrollView
+          testID="review-scroll"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: SPACING.lg, paddingTop: 8, paddingBottom: 200 }}
+        >
+          <Animated.View entering={FadeInDown.duration(220)}>
+            <Text style={{ fontFamily: FONTS.displayBold, fontSize: 30, color: C.dark, letterSpacing: -1, marginBottom: 4 }}>
+              Granska din bokning
+            </Text>
+            <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textTertiary, marginBottom: 22 }}>
+              Allt ser bra ut? Tryck Publicera nedan.
+            </Text>
+          </Animated.View>
+
+          <Animated.View entering={FadeInDown.delay(50).duration(220)} style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.lg, paddingHorizontal: 16, ...SHADOW.card, borderWidth: 1, borderColor: C.borderLight, marginBottom: 16 }}>
+            <ReviewRow label="Restaurang" value={selectedRestaurant?.name ?? "—"} targetStep={0} />
+            <ReviewRow label="Plats" value={`${seatLabel}${locationDetail ? ` · ${locationDetail}` : ""}${mealType ? ` · ${mealType.charAt(0).toUpperCase()}${mealType.slice(1)}` : ""}`} targetStep={1} />
+            <ReviewRow label="Tid" value={`${dateLabel}, ${timeLabel}`} targetStep={2} />
+            <ReviewRow label="Bokningens namn" value={`${firstName} ${lastName} · ${partySize} pers`} targetStep={3} />
+            <ReviewRow label="Pris & avbokning" value={`2 credits · ${cancelWindowLabel}`} targetStep={4} />
+            <View style={{ paddingVertical: 14, flexDirection: "row", alignItems: "center", gap: 12 }}>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontFamily: FONTS.medium, fontSize: 11, letterSpacing: 0.5, textTransform: "uppercase", color: C.textTertiary, marginBottom: 2 }}>
+                  Verifiering
+                </Text>
+                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.dark }}>
+                  {verifyLabel}
+                </Text>
+              </View>
+              <Pressable
+                testID="review-edit-5"
+                accessibilityLabel="Ändra verifiering"
+                onPress={() => goToStep(5)}
+                hitSlop={8}
+                style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
+              >
+                <Pencil size={12} color={C.forest} strokeWidth={2.2} />
+                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: C.forest }}>
+                  Ändra
+                </Text>
+              </Pressable>
+            </View>
+          </Animated.View>
+
+          <Animated.View entering={FadeInDown.delay(100).duration(220)} style={{ flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: C.bgCard, borderRadius: RADIUS.lg, padding: 14, borderWidth: 1, borderColor: C.borderLight, ...SHADOW.card }}>
+            <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: C.pistachioLight, alignItems: "center", justifyContent: "center" }}>
+              <Shield size={18} color={C.pistachio} strokeWidth={2} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: C.dark }}>
+                Reslot-skyddad överlämning
+              </Text>
+              <Text style={{ fontFamily: FONTS.regular, fontSize: 11, color: C.textSecondary, marginTop: 2, lineHeight: 15 }}>
+                Credits håller i escrow tills bokningen är överlämnad.
+              </Text>
+            </View>
+          </Animated.View>
+        </ScrollView>
+
+        <View style={{ position: "absolute", bottom: tabBarHeight, left: 0, right: 0, paddingHorizontal: SPACING.lg, paddingTop: 16, paddingBottom: 16, backgroundColor: "rgba(250, 250, 248, 0.97)", borderTopWidth: 0.5, borderTopColor: "rgba(0,0,0,0.04)" }}>
+          {submissionError ? (
+            <View style={{ backgroundColor: C.pistachioLight, borderRadius: RADIUS.sm, padding: 10, marginBottom: 10, flexDirection: "row", alignItems: "center", gap: 8 }}>
+              <AlertCircle size={14} color={C.pistachio} strokeWidth={2} />
+              <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.pistachio, flex: 1 }}>
+                {submissionError}
+              </Text>
+            </View>
+          ) : null}
+          <Pressable
+            testID="review-publish-btn"
+            accessibilityLabel="Publicera bokning"
+            disabled={submitReservationMutation.isPending}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+              handleActualSubmit();
+            }}
+            style={{
+              backgroundColor: C.forest,
+              borderRadius: RADIUS.full,
+              paddingVertical: 16,
+              alignItems: "center",
+              justifyContent: "center",
+              shadowColor: C.forest,
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.25,
+              shadowRadius: 8,
+              elevation: 4,
+            }}
+          >
+            {submitReservationMutation.isPending ? (
+              <ActivityIndicator size="small" color={C.white} />
+            ) : (
+              <Text style={{ fontFamily: FONTS.bold, fontSize: 15, color: C.white }}>
+                Publicera bokning
+              </Text>
+            )}
+          </Pressable>
+        </View>
+
+        <SupportBubble />
+      </View>
+    );
+  }
+
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>
       <SafeAreaView edges={["top"]} style={{ backgroundColor: C.bg }}>
+        {step > 0 ? (
+          <View style={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 0, flexDirection: "row", justifyContent: "flex-start" }}>
+            <Pressable
+              testID="save-and-exit"
+              accessibilityLabel="Spara och avsluta"
+              onPress={handleSaveAndExit}
+              hitSlop={8}
+            >
+              <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.textSecondary, letterSpacing: 0.1 }}>
+                Spara & avsluta
+              </Text>
+            </Pressable>
+          </View>
+        ) : null}
         <Animated.View entering={FadeInDown.duration(220)} className="px-5 pt-2 pb-1">
           <Text
             style={{
@@ -1199,8 +1475,75 @@ export default function SubmitScreen() {
           {/* Step 4: Fees */}
           {step === 4 ? (
             <Animated.View entering={FadeInRight.duration(400)}>
+              {/* Pricing transparency — Airbnb-style breakdown */}
+              <Animated.View entering={FadeInDown.delay(0).duration(220)}>
+                <View
+                  testID="pricing-transparency-card"
+                  style={{
+                    backgroundColor: C.bgCard,
+                    borderRadius: RADIUS.lg,
+                    paddingHorizontal: 18,
+                    paddingVertical: 18,
+                    marginBottom: 18,
+                    borderWidth: 1.5,
+                    borderColor: C.pistachioPressed,
+                    ...SHADOW.card,
+                  }}
+                >
+                  <Text style={{ fontFamily: FONTS.medium, fontSize: 11, letterSpacing: 1, textTransform: "uppercase", color: C.textTertiary, marginBottom: 6 }}>
+                    När någon tar över
+                  </Text>
+                  <View style={{ flexDirection: "row", alignItems: "baseline", gap: 8 }}>
+                    <Text style={{ fontFamily: FONTS.displayBold, fontSize: 44, color: C.pistachio, letterSpacing: -1.5, lineHeight: 50 }}>
+                      2
+                    </Text>
+                    <Text style={{ fontFamily: FONTS.semiBold, fontSize: 18, color: C.dark }}>
+                      credits
+                    </Text>
+                  </View>
+                  <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textSecondary, marginTop: 4 }}>
+                    Du tjänar 2 credits när någon claimar din bokning.
+                  </Text>
+                  {pricingExpanded ? (
+                    <View style={{ marginTop: 14, paddingTop: 14, borderTopWidth: 0.5, borderTopColor: C.divider, gap: 8 }}>
+                      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                        <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary }}>Claimer betalar</Text>
+                        <Text style={{ fontFamily: FONTS.medium, fontSize: 14, color: C.dark }}>2 cr</Text>
+                      </View>
+                      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                        <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary }}>Du tjänar</Text>
+                        <Text style={{ fontFamily: FONTS.bold, fontSize: 14, color: C.pistachio }}>2 cr</Text>
+                      </View>
+                      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                        <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textTertiary }}>Reslot-avgift</Text>
+                        <Text style={{ fontFamily: FONTS.medium, fontSize: 14, color: C.textTertiary }}>0 cr</Text>
+                      </View>
+                    </View>
+                  ) : null}
+                  <Pressable
+                    testID="toggle-pricing-breakdown"
+                    accessibilityLabel={pricingExpanded ? "Visa mindre" : "Visa mer"}
+                    onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      setPricingExpanded((v) => !v);
+                    }}
+                    hitSlop={8}
+                    style={{ marginTop: 12, flexDirection: "row", alignItems: "center", gap: 4, alignSelf: "flex-start" }}
+                  >
+                    <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.textSecondary }}>
+                      {pricingExpanded ? "Visa mindre" : "Visa mer"}
+                    </Text>
+                    {pricingExpanded ? (
+                      <ChevronUp size={14} color={C.textSecondary} strokeWidth={2} />
+                    ) : (
+                      <ChevronDown size={14} color={C.textSecondary} strokeWidth={2} />
+                    )}
+                  </Pressable>
+                </View>
+              </Animated.View>
+
               {/* Cancel fee */}
-              <Animated.View entering={FadeInDown.delay(0 * 50).duration(220)}>
+              <Animated.View entering={FadeInDown.delay(1 * 50).duration(220)}>
                 <View
                   style={{
                     backgroundColor: C.bgCard,
@@ -1289,7 +1632,7 @@ export default function SubmitScreen() {
               </Animated.View>
 
               {/* Prepaid fee */}
-              <Animated.View entering={FadeInDown.delay(1 * 50).duration(220)}>
+              <Animated.View entering={FadeInDown.delay(2 * 50).duration(220)}>
                 <View
                   style={{
                     backgroundColor: C.bgCard,
@@ -1383,7 +1726,7 @@ export default function SubmitScreen() {
               </Animated.View>
 
               {/* Cancellation window */}
-              <Animated.View entering={FadeInDown.delay(2 * 50).duration(220)}>
+              <Animated.View entering={FadeInDown.delay(3 * 50).duration(220)}>
                 <View style={{ marginBottom: 14 }}>
                   <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.dark, marginBottom: 4 }}>
                     Avbokningsfönster (timmar)
@@ -1404,7 +1747,7 @@ export default function SubmitScreen() {
               </Animated.View>
 
               {/* Other info */}
-              <Animated.View entering={FadeInDown.delay(3 * 50).duration(220)}>
+              <Animated.View entering={FadeInDown.delay(4 * 50).duration(220)}>
                 <View style={{ marginTop: 6 }}>
                   <Text
                     style={{
@@ -1870,157 +2213,43 @@ export default function SubmitScreen() {
         </View>
       </View>
 
-      {/* Confirmation Overlay */}
-      {showConfirmation ? (
-        <View
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 100,
-          }}
-        >
-          {/* Backdrop */}
-          <Animated.View
-            entering={FadeIn.duration(250)}
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: "rgba(0,0,0,0.45)",
-            }}
-          >
-            <Pressable
-              testID="confirmation-backdrop"
-              accessibilityLabel="Stäng bekräftelse"
-              style={{ flex: 1 }}
-              onPress={() => setShowConfirmation(false)}
-            />
-          </Animated.View>
-
-          {/* Bottom Sheet Card */}
-          <Animated.View
-            entering={FadeInDown.duration(220)}
-            style={{
-              position: "absolute",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              backgroundColor: C.bgCard,
-              borderTopLeftRadius: 24,
-              borderTopRightRadius: 24,
-              paddingHorizontal: SPACING.lg,
-              paddingTop: 24,
-              paddingBottom: 40,
-              ...SHADOW.elevated,
-            }}
-          >
-            {/* Grabber */}
-            <View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: "rgba(0,0,0,0.12)", alignSelf: "center", marginBottom: 20 }} />
-
-            <Text
-              testID="confirm-header"
-              style={{
-                fontFamily: FONTS.displayBold,
-                fontSize: 20,
-                color: C.dark,
-                marginBottom: 20,
-              }}
-            >
-              Bekräfta bokning
-            </Text>
-
-            {/* Summary rows */}
-            <View style={{ gap: 12, marginBottom: 20 }}>
-              <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary }}>Restaurang</Text>
-                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.dark }}>{selectedRestaurant?.name ?? "-"}</Text>
-              </View>
-              <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary }}>Datum</Text>
-                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.dark }}>
-                  {bookingDate.toLocaleDateString("sv-SE", { weekday: "short", day: "numeric", month: "short" })}
-                </Text>
-              </View>
-              <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary }}>Tid</Text>
-                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.dark }}>
-                  {bookingDate.toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" })}
-                </Text>
-              </View>
-              <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary }}>Antal gäster</Text>
-                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.dark }}>{partySize} pers</Text>
-              </View>
-            </View>
-
-            {/* Divider */}
-            <View style={{ height: 0.5, backgroundColor: C.divider, marginBottom: 16 }} />
-
-            {/* Info text */}
-            <Text
-              style={{
-                fontFamily: FONTS.regular,
-                fontSize: 13,
-                color: C.textSecondary,
-                textAlign: "center",
-                marginBottom: 20,
-              }}
-            >
-              Du får 2 credits när någon tar över din bokning
-            </Text>
-
-            {/* Confirm CTA */}
-            <Pressable
-              testID="confirm-submit-btn"
-              accessibilityLabel="Bekräfta och lägg upp bokning"
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-                handleActualSubmit();
-              }}
-              style={{
-                backgroundColor: C.pistachio,
-                borderRadius: RADIUS.full,
-                paddingVertical: 16,
-                alignItems: "center",
-                justifyContent: "center",
-                shadowColor: C.pistachio,
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.25,
-                shadowRadius: 8,
-                elevation: 4,
-              }}
-            >
-              {submitReservationMutation.isPending ? (
-                <ActivityIndicator size="small" color={C.dark} />
-              ) : (
-                <Text style={{ fontFamily: FONTS.bold, fontSize: 15, color: C.dark }}>
-                  Lägg upp bokning
-                </Text>
-              )}
-            </Pressable>
-
-            {/* Cancel button */}
-            <Pressable
-              testID="cancel-confirm-btn"
-              accessibilityLabel="Avbryt"
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                setShowConfirmation(false);
-              }}
-              style={{ alignItems: "center", paddingVertical: 14, marginTop: 4 }}
-            >
-              <Text style={{ fontFamily: FONTS.medium, fontSize: 14, color: C.textSecondary }}>
-                Avbryt
+      {showResumeDraft ? (
+        <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 200 }}>
+          <Animated.View entering={FadeIn.duration(220)} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.45)" }} />
+          <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: SPACING.lg }}>
+            <Animated.View entering={FadeInDown.duration(220)} style={{ width: "100%", maxWidth: 400, backgroundColor: C.bgCard, borderRadius: RADIUS.xl, padding: SPACING.lg, ...SHADOW.elevated }}>
+              <Text style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: C.dark, marginBottom: 8 }}>
+                Fortsätt där du var?
               </Text>
-            </Pressable>
-          </Animated.View>
+              <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textSecondary, lineHeight: 20, marginBottom: 22 }}>
+                Vi har sparat din senaste påbörjade bokning. Vill du fortsätta eller börja om?
+              </Text>
+              <Pressable
+                testID="resume-draft-yes"
+                accessibilityLabel="Fortsätt med utkast"
+                onPress={handleResumeDraft}
+                style={{ backgroundColor: C.forest, borderRadius: RADIUS.full, paddingVertical: 14, alignItems: "center", marginBottom: 10 }}
+              >
+                <Text style={{ fontFamily: FONTS.bold, fontSize: 15, color: C.white }}>
+                  Ja, fortsätt
+                </Text>
+              </Pressable>
+              <Pressable
+                testID="resume-draft-no"
+                accessibilityLabel="Börja om från början"
+                onPress={handleDiscardDraft}
+                style={{ paddingVertical: 12, alignItems: "center" }}
+              >
+                <Text style={{ fontFamily: FONTS.medium, fontSize: 14, color: C.textSecondary }}>
+                  Nej, börja om
+                </Text>
+              </Pressable>
+            </Animated.View>
+          </View>
         </View>
       ) : null}
+
+      <SupportBubble />
     </View>
   );
 }
