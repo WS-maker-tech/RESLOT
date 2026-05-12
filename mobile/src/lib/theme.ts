@@ -337,12 +337,34 @@ export const ICON = {
   },
 } as const;
 
-/** Motion / animation tokens — Reanimated + native Animated samklang */
+/**
+ * Motion / animation tokens — Reanimated + native Animated samklang.
+ *
+ * Usage guidance (Emil + Material Motion blandning):
+ *   - **Entrance** (FadeIn/Down/Up.duration(...).easing(...)) → `MOTION.duration.entrance` + `MOTION.easing.outCubic`. NEVER `.springify()`.
+ *   - **Press feedback** (button/card scale) → `MOTION.press` (single source). NEVER hardcoded `stiffness: 300`.
+ *   - **Continuous loops** (pulse/breathing) → `withRepeat(withTiming(..., { easing: Easing.linear }), -1, true)`. NEVER spring.
+ *   - **Celebration** (success-moments) → `springBouncy` är OK för enstaka celebration. Default = ease-out.
+ *   - **Exit timing** = ~70% av entrance-duration. Snabbare ut än in.
+ *   - **List stagger** → `delay(i * MOTION.duration.stagger)` (50ms gap per Emil + M3).
+ *
+ * Reference curves:
+ *   - Material Motion M3 standard: cubic-bezier(0.2, 0, 0, 1)
+ *   - M3 emphasized enter: cubic-bezier(0.05, 0.7, 0.1, 1)
+ *   - M3 emphasized exit:  cubic-bezier(0.3, 0, 0.8, 0.15)
+ *   - Emil outCubic (default): cubic-bezier(0.23, 1, 0.32, 1) — närmast M3 standard, något kraftfullare
+ */
 export const MOTION = {
   duration: {
     instant: 100,
     fast: 180,
+    /** Default för all UI-entrance (FadeIn/Down/Up). */
+    entrance: 220,
     ease: 250,
+    /** Default exit-duration: ~70% av entrance. */
+    exit: 160,
+    /** Semantic stagger-gap per list item. */
+    stagger: 50,
     slow: 400,
     hero: 500,
   },
@@ -350,10 +372,15 @@ export const MOTION = {
     standard: [0.2, 0.0, 0.0, 1.0] as const,
     decelerate: [0.0, 0.0, 0.2, 1.0] as const,
     accelerate: [0.4, 0.0, 1.0, 1.0] as const,
-    /** Emil's strong ease-out — punchier än CSS default. För all UI-entrance. */
+    /** Emil's strong ease-out. Default för UI-entrance. */
     outCubic: [0.23, 1, 0.32, 1] as const,
     /** Emil's strong ease-in-out — för on-screen movement (modal, drawer). */
     inOutCubic: [0.77, 0, 0.175, 1] as const,
+    /** Material Motion M3 standard. */
+    materialStandard: [0.2, 0, 0, 1] as const,
+    /** Material Motion M3 emphasized — för hero-moments only. */
+    materialEmphasizedEnter: [0.05, 0.7, 0.1, 1] as const,
+    materialEmphasizedExit: [0.3, 0, 0.8, 0.15] as const,
     spring: {
       damping: 18,
       stiffness: 220,
@@ -369,6 +396,12 @@ export const MOTION = {
       stiffness: 280,
       mass: 1,
     },
+  },
+  /** Press-feedback (scale 0.97 → 1). Single source — override:a aldrig med stiffness 300. */
+  press: {
+    damping: 16,
+    stiffness: 240,
+    mass: 1,
   },
 } as const;
 
