@@ -59,7 +59,7 @@ export default function SupportWidget({
 
   return (
     <Animated.View
-      entering={FadeIn.duration(200).springify().damping(18)}
+      entering={FadeIn.duration(200).duration(220)}
       exiting={FadeOut.duration(150)}
       style={[
         {
@@ -123,7 +123,7 @@ export default function SupportWidget({
         {allMessages.map((msg) => (
           <Animated.View
             key={msg.id}
-            entering={FadeInDown.duration(200).springify()}
+            entering={FadeInDown.duration(200).duration(220)}
             style={{ alignSelf: msg.role === "user" ? "flex-end" : "flex-start", maxWidth: "82%" }}
           >
             <View style={{

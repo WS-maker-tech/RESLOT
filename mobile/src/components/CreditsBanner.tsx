@@ -19,7 +19,7 @@ export function CreditsBanner() {
   }));
 
   return (
-    <Animated.View entering={FadeInDown.delay(200).springify()}>
+    <Animated.View entering={FadeInDown.delay(200).duration(220)}>
       <Pressable
         testID="credits-banner"
         accessibilityLabel="Visa Reslot credits"

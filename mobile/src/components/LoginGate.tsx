@@ -40,7 +40,7 @@ export function LoginGate({ title, subtitle }: LoginGateProps) {
     >
       {/* Icon */}
       <Animated.View
-        entering={FadeInDown.delay(100).springify()}
+        entering={FadeInDown.delay(100).duration(220)}
         style={{
           width: 72,
           height: 72,
@@ -55,7 +55,7 @@ export function LoginGate({ title, subtitle }: LoginGateProps) {
       </Animated.View>
 
       {/* Text */}
-      <Animated.View entering={FadeInDown.delay(200).springify()} style={{ alignItems: "center" }}>
+      <Animated.View entering={FadeInDown.delay(200).duration(220)} style={{ alignItems: "center" }}>
         <Text
           style={{
             fontFamily: FONTS.displayBold,
@@ -82,7 +82,7 @@ export function LoginGate({ title, subtitle }: LoginGateProps) {
       </Animated.View>
 
       {/* CTA */}
-      <Animated.View entering={FadeInUp.delay(350).springify()} style={{ width: "100%", marginTop: 36 }}>
+      <Animated.View entering={FadeInUp.delay(350).duration(220)} style={{ width: "100%", marginTop: 36 }}>
         <Pressable
           testID="login-gate-btn"
           onPress={handleLogin}
@@ -107,7 +107,7 @@ export function LoginGate({ title, subtitle }: LoginGateProps) {
       </Animated.View>
 
       {/* Ghost link */}
-      <Animated.View entering={FadeInUp.delay(450).springify()} style={{ marginTop: SPACING.md }}>
+      <Animated.View entering={FadeInUp.delay(450).duration(220)} style={{ marginTop: SPACING.md }}>
         <Pressable
           testID="create-account-btn"
           onPress={handleLogin}

@@ -457,7 +457,7 @@ export default function SubmitScreen() {
       <View style={{ flex: 1, backgroundColor: C.bg }}>
         <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1 }}>
           <View className="flex-1 items-center justify-center px-8">
-            <Animated.View entering={FadeInDown.springify()}>
+            <Animated.View entering={FadeInDown.duration(220)}>
               <View
                 className="items-center justify-center"
                 style={{
@@ -527,7 +527,7 @@ export default function SubmitScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>
       <SafeAreaView edges={["top"]} style={{ backgroundColor: C.bg }}>
-        <Animated.View entering={FadeInDown.springify()} className="px-5 pt-2 pb-1">
+        <Animated.View entering={FadeInDown.duration(220)} className="px-5 pt-2 pb-1">
           <Text
             style={{
               fontFamily: FONTS.semiBold,
@@ -635,7 +635,7 @@ export default function SubmitScreen() {
               </View>
               {/* Search input */}
               <Animated.View
-                entering={FadeInDown.delay(0 * 50).springify()}
+                entering={FadeInDown.delay(0 * 50).duration(220)}
                 className="flex-row items-center"
                 style={{
                   backgroundColor: C.bgCard,
@@ -669,7 +669,7 @@ export default function SubmitScreen() {
                 {filteredRestaurants.map((restaurant: Restaurant, index: number) => {
                   const isSelected = selectedRestaurant?.id === restaurant.id;
                   return (
-                    <Animated.View key={restaurant.id} entering={FadeInDown.delay((index + 1) * 50).springify()}>
+                    <Animated.View key={restaurant.id} entering={FadeInDown.delay((index + 1) * 50).duration(220)}>
                       <Pressable
                         testID={`restaurant-${restaurant.name.toLowerCase().replace(/\s/g, "-")}`}
                         accessibilityLabel={`Välj ${restaurant.name}`}
@@ -746,7 +746,7 @@ export default function SubmitScreen() {
           {/* Step 1: Location */}
           {step === 1 ? (
             <Animated.View entering={FadeInRight.duration(400)}>
-              <Animated.View entering={FadeInDown.delay(0 * 50).springify()} className="flex-row" style={{ gap: 12 }}>
+              <Animated.View entering={FadeInDown.delay(0 * 50).duration(220)} className="flex-row" style={{ gap: 12 }}>
                 <Pressable
                   testID="location-indoor"
                   accessibilityLabel="Välj inomhus"
@@ -832,7 +832,7 @@ export default function SubmitScreen() {
               ) : null}
 
               {/* Meal type selector */}
-              <Animated.View entering={FadeInDown.delay(1 * 50).springify()} style={{ marginTop: 20 }}>
+              <Animated.View entering={FadeInDown.delay(1 * 50).duration(220)} style={{ marginTop: 20 }}>
                 <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.textSecondary, marginBottom: 8 }}>
                   Typ av sittning (valfritt)
                 </Text>
@@ -862,7 +862,7 @@ export default function SubmitScreen() {
                 </View>
               </Animated.View>
 
-              <Animated.View entering={FadeInDown.delay(2 * 50).springify()} style={{ marginTop: 20 }}>
+              <Animated.View entering={FadeInDown.delay(2 * 50).duration(220)} style={{ marginTop: 20 }}>
                 <Text
                   style={{
                     fontFamily: FONTS.medium,
@@ -899,7 +899,7 @@ export default function SubmitScreen() {
           {/* Step 2: When */}
           {step === 2 ? (
             <Animated.View entering={FadeInRight.duration(400)}>
-              <Animated.View entering={FadeInDown.delay(0 * 50).springify()}>
+              <Animated.View entering={FadeInDown.delay(0 * 50).duration(220)}>
                 <Text
                   style={{
                     fontFamily: FONTS.semiBold,
@@ -961,7 +961,7 @@ export default function SubmitScreen() {
               </Animated.View>
 
               {/* Time picker — native spinner on iOS/Android, html input on web */}
-              <Animated.View entering={FadeInDown.delay(1 * 50).springify()}>
+              <Animated.View entering={FadeInDown.delay(1 * 50).duration(220)}>
                 <View
                   style={{
                     backgroundColor: C.bgCard,
@@ -1010,7 +1010,7 @@ export default function SubmitScreen() {
               </Animated.View>
 
               {/* Helper hint */}
-              <Animated.View entering={FadeInDown.delay(2 * 50).springify()}>
+              <Animated.View entering={FadeInDown.delay(2 * 50).duration(220)}>
                 <View
                   className="rounded-xl p-4"
                   style={{ backgroundColor: C.successBg }}
@@ -1036,7 +1036,7 @@ export default function SubmitScreen() {
           {/* Step 3: Who */}
           {step === 3 ? (
             <Animated.View entering={FadeInRight.duration(400)}>
-              <Animated.View entering={FadeInDown.delay(0 * 50).springify()} className="mb-5">
+              <Animated.View entering={FadeInDown.delay(0 * 50).duration(220)} className="mb-5">
                 <View className="flex-row items-center mb-3" style={{ gap: 8 }}>
                   <User size={18} color={C.pistachio} strokeWidth={2} />
                   <Text
@@ -1081,7 +1081,7 @@ export default function SubmitScreen() {
                 ) : null}
               </Animated.View>
 
-              <Animated.View entering={FadeInDown.delay(1 * 50).springify()} className="mb-5">
+              <Animated.View entering={FadeInDown.delay(1 * 50).duration(220)} className="mb-5">
                 <View className="flex-row items-center mb-3" style={{ gap: 8 }}>
                   <User size={18} color={C.pistachio} strokeWidth={2} />
                   <Text
@@ -1126,7 +1126,7 @@ export default function SubmitScreen() {
                 ) : null}
               </Animated.View>
 
-              <Animated.View entering={FadeInDown.delay(2 * 50).springify()}>
+              <Animated.View entering={FadeInDown.delay(2 * 50).duration(220)}>
                 <View
                   className="rounded-xl p-4 mb-6"
                   style={{ backgroundColor: "rgba(201, 169, 110, 0.08)" }}
@@ -1144,7 +1144,7 @@ export default function SubmitScreen() {
                 </View>
               </Animated.View>
 
-              <Animated.View entering={FadeInDown.delay(3 * 50).springify()} style={{ paddingBottom: 16 }}>
+              <Animated.View entering={FadeInDown.delay(3 * 50).duration(220)} style={{ paddingBottom: 16 }}>
                 <View className="flex-row items-center mb-3" style={{ gap: 8 }}>
                   <Users size={18} color={C.pistachio} strokeWidth={2} />
                   <Text
@@ -1200,7 +1200,7 @@ export default function SubmitScreen() {
           {step === 4 ? (
             <Animated.View entering={FadeInRight.duration(400)}>
               {/* Cancel fee */}
-              <Animated.View entering={FadeInDown.delay(0 * 50).springify()}>
+              <Animated.View entering={FadeInDown.delay(0 * 50).duration(220)}>
                 <View
                   style={{
                     backgroundColor: C.bgCard,
@@ -1289,7 +1289,7 @@ export default function SubmitScreen() {
               </Animated.View>
 
               {/* Prepaid fee */}
-              <Animated.View entering={FadeInDown.delay(1 * 50).springify()}>
+              <Animated.View entering={FadeInDown.delay(1 * 50).duration(220)}>
                 <View
                   style={{
                     backgroundColor: C.bgCard,
@@ -1383,7 +1383,7 @@ export default function SubmitScreen() {
               </Animated.View>
 
               {/* Cancellation window */}
-              <Animated.View entering={FadeInDown.delay(2 * 50).springify()}>
+              <Animated.View entering={FadeInDown.delay(2 * 50).duration(220)}>
                 <View style={{ marginBottom: 14 }}>
                   <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.dark, marginBottom: 4 }}>
                     Avbokningsfönster (timmar)
@@ -1404,7 +1404,7 @@ export default function SubmitScreen() {
               </Animated.View>
 
               {/* Other info */}
-              <Animated.View entering={FadeInDown.delay(3 * 50).springify()}>
+              <Animated.View entering={FadeInDown.delay(3 * 50).duration(220)}>
                 <View style={{ marginTop: 6 }}>
                   <Text
                     style={{
@@ -1448,7 +1448,7 @@ export default function SubmitScreen() {
           {step === 5 ? (
             <Animated.View entering={FadeInRight.duration(400)}>
               {/* Booking summary */}
-              <Animated.View entering={FadeInDown.delay(0 * 50).springify()}>
+              <Animated.View entering={FadeInDown.delay(0 * 50).duration(220)}>
                 <View
                   style={{
                     backgroundColor: C.bgCard,
@@ -1502,7 +1502,7 @@ export default function SubmitScreen() {
               </Animated.View>
 
               {/* Invitation link option */}
-              <Animated.View entering={FadeInDown.delay(1 * 50).springify()}>
+              <Animated.View entering={FadeInDown.delay(1 * 50).duration(220)}>
                 <Pressable
                   testID="verify-link"
                   accessibilityLabel="Verifiera med inbjudningslänk"
@@ -1580,7 +1580,7 @@ export default function SubmitScreen() {
               </Animated.View>
 
               {/* Screenshot option */}
-              <Animated.View entering={FadeInDown.delay(2 * 50).springify()}>
+              <Animated.View entering={FadeInDown.delay(2 * 50).duration(220)}>
                 <Pressable
                   testID="verify-screenshot"
                   accessibilityLabel="Verifiera med skärmdump"
@@ -1904,7 +1904,7 @@ export default function SubmitScreen() {
 
           {/* Bottom Sheet Card */}
           <Animated.View
-            entering={FadeInDown.springify().damping(18).stiffness(200)}
+            entering={FadeInDown.duration(220)}
             style={{
               position: "absolute",
               bottom: 0,

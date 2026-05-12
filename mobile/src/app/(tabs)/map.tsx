@@ -200,7 +200,7 @@ export default function MapScreen() {
       {/* Empty state */}
       {groups.length === 0 ? (
         <View style={styles.emptyOverlay} pointerEvents="none">
-          <Animated.View entering={FadeInDown.springify()} style={styles.emptyCard}>
+          <Animated.View entering={FadeInDown.duration(220)} style={styles.emptyCard}>
             <MapPin size={24} color={C.textTertiary} strokeWidth={1.8} />
             <Text style={styles.emptyText}>Inga tillgängliga bord just nu</Text>
           </Animated.View>
@@ -210,7 +210,7 @@ export default function MapScreen() {
       {/* Bottom sheet popup */}
       {selectedGroup ? (
         <Animated.View
-          entering={FadeInDown.springify().damping(18)}
+          entering={FadeInDown.duration(220)}
           exiting={FadeOut.duration(150)}
           style={styles.popupContainer}
         >

@@ -54,7 +54,7 @@ export default function ChangePasswordScreen() {
       <SafeAreaView edges={["top"]} style={{ backgroundColor: C.bg }}>
         {showSuccess ? (
           <Animated.View
-            entering={FadeInDown.springify()}
+            entering={FadeInDown.duration(220)}
             exiting={FadeOutUp.duration(300)}
             style={{
               backgroundColor: C.success,
@@ -90,7 +90,7 @@ export default function ChangePasswordScreen() {
       </SafeAreaView>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 80 }} keyboardShouldPersistTaps="handled">
-        <Animated.View entering={FadeInDown.springify()}>
+        <Animated.View entering={FadeInDown.duration(220)}>
           <View style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: C.borderLight, padding: 20, marginTop: 8 }}>
             {/* Nuvarande lösenord */}
             <View style={{ marginBottom: 20 }}>

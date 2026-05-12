@@ -50,7 +50,7 @@ export const ClaimSection = React.memo(function ClaimSection({
     <>
       {/* Seller info */}
       {sellerName ? (
-        <Animated.View entering={FadeInDown.delay(160).springify()} style={styles.sellerContainer}>
+        <Animated.View entering={FadeInDown.delay(160).duration(220)} style={styles.sellerContainer}>
           <View style={styles.sellerCard}>
             <View style={styles.sellerAvatar}>
               <Text style={styles.sellerInitial}>{submitterFirstName?.charAt(0).toUpperCase()}</Text>
@@ -72,7 +72,7 @@ export const ClaimSection = React.memo(function ClaimSection({
 
       {/* Cost breakdown */}
       <Animated.View
-        entering={FadeInDown.delay(200).springify()}
+        entering={FadeInDown.delay(200).duration(220)}
         style={styles.costContainer}
       >
         <View
@@ -147,7 +147,7 @@ export const ClaimSection = React.memo(function ClaimSection({
 
       {/* Grace period info */}
       <Animated.View
-        entering={FadeInDown.delay(260).springify()}
+        entering={FadeInDown.delay(260).duration(220)}
         style={styles.graceContainer}
       >
         <View testID="grace-period-info" style={styles.graceCard}>
@@ -165,7 +165,7 @@ export const ClaimSection = React.memo(function ClaimSection({
 
       {/* Guarantee badge */}
       <Animated.View
-        entering={FadeInDown.delay(310).springify()}
+        entering={FadeInDown.delay(310).duration(220)}
         style={styles.guaranteeContainer}
       >
         <View testID="guarantee-badge" style={styles.guaranteeCard}>
@@ -179,7 +179,7 @@ export const ClaimSection = React.memo(function ClaimSection({
       {/* Error message with shake */}
       {claimError ? (
         <Animated.View
-          entering={FadeInDown.springify()}
+          entering={FadeInDown.duration(220)}
           style={[styles.errorContainer, errorShakeStyle]}
         >
           <View testID="claim-error" style={styles.errorCard}>

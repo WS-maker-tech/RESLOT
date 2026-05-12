@@ -54,7 +54,7 @@ export default function SavedScreen() {
           ))}
         </View>
       ) : saved.length === 0 ? (
-        <Animated.View entering={FadeInDown.springify()} style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 40 }}>
+        <Animated.View entering={FadeInDown.duration(220)} style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 40 }}>
           <View style={{ width: 64, height: 64, borderRadius: 24, backgroundColor: C.pistachioLight, alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
             <Heart size={28} color={C.pistachio} strokeWidth={2} />
           </View>
@@ -73,7 +73,7 @@ export default function SavedScreen() {
           contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 100 }}
           ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
           renderItem={({ item, index }: { item: SavedRestaurant; index: number }) => (
-            <Animated.View entering={FadeInDown.delay(index * 50).springify()}>
+            <Animated.View entering={FadeInDown.delay(index * 50).duration(220)}>
               <Pressable
                 testID={`saved-restaurant-${item.restaurantId}`}
                 accessibilityLabel={`Öppna ${item.restaurant.name}`}

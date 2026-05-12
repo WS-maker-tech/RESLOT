@@ -99,7 +99,7 @@ export default function HelpScreen() {
 
       <View style={{ flex: 1, paddingHorizontal: SPACING.lg, paddingTop: 8 }}>
         {/* Info box */}
-        <Animated.View entering={FadeInDown.springify().damping(16)}>
+        <Animated.View entering={FadeInDown.duration(220)}>
           <View
             style={{
               backgroundColor: "rgba(126,200,122,0.08)",
@@ -124,7 +124,7 @@ export default function HelpScreen() {
         </Animated.View>
 
         {/* Contact options */}
-        <Animated.View entering={FadeInDown.delay(80).springify().damping(16)}>
+        <Animated.View entering={FadeInDown.delay(80).duration(220)}>
           <View
             style={{
               backgroundColor: C.bgCard,
@@ -184,7 +184,7 @@ export default function HelpScreen() {
         </Animated.View>
 
         {/* Response time info */}
-        <Animated.View entering={FadeInDown.delay(160).springify().damping(16)}>
+        <Animated.View entering={FadeInDown.delay(160).duration(220)}>
           <Text
             style={{
               fontFamily: FONTS.regular,

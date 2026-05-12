@@ -160,7 +160,7 @@ export default function FeedbackScreen() {
             paddingTop: 32,
           }}
         >
-          <Animated.View entering={FadeInDown.springify()} style={{ alignItems: "center" }}>
+          <Animated.View entering={FadeInDown.duration(220)} style={{ alignItems: "center" }}>
             <Text
               style={{
                 fontFamily: FONTS.displayBold,
@@ -187,7 +187,7 @@ export default function FeedbackScreen() {
           </Animated.View>
 
           <Animated.View
-            entering={FadeInDown.delay(100).springify()}
+            entering={FadeInDown.delay(100).duration(220)}
             style={{
               flexDirection: "row",
               gap: 16,
@@ -265,7 +265,7 @@ export default function FeedbackScreen() {
           </Animated.View>
 
           {worked !== null ? (
-            <Animated.View entering={FadeInDown.springify()} style={{ marginTop: 28 }}>
+            <Animated.View entering={FadeInDown.duration(220)} style={{ marginTop: 28 }}>
               <Text
                 style={{
                   fontFamily: FONTS.semiBold,
@@ -304,7 +304,7 @@ export default function FeedbackScreen() {
           ) : null}
 
           {worked !== null ? (
-            <Animated.View entering={FadeInDown.delay(50).springify()} style={{ marginTop: 20 }}>
+            <Animated.View entering={FadeInDown.delay(50).duration(220)} style={{ marginTop: 20 }}>
               <Pressable
                 testID="feedback-submit"
                 accessibilityLabel="Skicka feedback"

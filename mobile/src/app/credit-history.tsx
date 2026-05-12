@@ -46,7 +46,7 @@ export default function CreditHistoryScreen() {
 
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
         {creditAlerts.length === 0 ? (
-          <Animated.View entering={FadeInDown.springify()} style={{ alignItems: "center", paddingTop: 80 }}>
+          <Animated.View entering={FadeInDown.duration(220)} style={{ alignItems: "center", paddingTop: 80 }}>
             <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: "rgba(201,169,110,0.10)", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
               <Clock size={28} color={C.gold} strokeWidth={ICON.strokeWidth} />
             </View>
@@ -72,7 +72,7 @@ export default function CreditHistoryScreen() {
                 return (
                   <Animated.View
                     key={alert.id}
-                    entering={FadeInDown.delay(index * 50).springify()}
+                    entering={FadeInDown.delay(index * 50).duration(220)}
                   >
                     {index > 0 ? (
                       <View style={{ height: 0.5, backgroundColor: C.divider, marginLeft: 62 }} />

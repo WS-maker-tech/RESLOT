@@ -37,7 +37,7 @@ export const RestaurantInfo = React.memo(function RestaurantInfo({
 }: RestaurantInfoProps) {
   return (
     <Animated.View
-      entering={FadeInDown.springify().damping(16)}
+      entering={FadeInDown.duration(220)}
       style={styles.container}
     >
       <Text

@@ -90,7 +90,7 @@ function RestaurantAlertCard({
   const restaurant = alert.restaurant;
 
   return (
-    <Animated.View entering={FadeInDown.delay(index * 60).springify()}>
+    <Animated.View entering={FadeInDown.delay(index * 60).duration(220)}>
       <Pressable
         testID={`restaurant-alert-${alert.id}`}
         accessibilityLabel={`Visa bevakning för ${restaurant.name}`}
@@ -205,7 +205,7 @@ function AlertItem({ alert, index }: { alert: ActivityAlert; index: number }) {
   const IconComponent = config.icon;
 
   return (
-    <Animated.View entering={FadeInDown.delay((index + 2) * 60).springify()}>
+    <Animated.View entering={FadeInDown.delay((index + 2) * 60).duration(220)}>
       <Pressable
         testID={`alert-${alert.id}`}
         accessibilityLabel={`Händelse: ${alert.title}`}
@@ -468,7 +468,7 @@ export default function AlertsScreen() {
         ) : activeTab === "activity" ? (
           <>
             {/* Restaurant Alerts Section */}
-            <Animated.View entering={FadeInDown.springify()}>
+            <Animated.View entering={FadeInDown.duration(220)}>
               <View className="px-5" style={{ marginBottom: 8 }}>
                 <View className="flex-row items-center justify-between" style={{ marginBottom: 12 }}>
                   <View className="flex-row items-center" style={{ gap: 8 }}>
@@ -622,7 +622,7 @@ export default function AlertsScreen() {
                 style={{ alignItems: "center", justifyContent: "center", paddingTop: 40 }}
               >
                 <Animated.View
-                  entering={ZoomIn.delay(100).springify()}
+                  entering={ZoomIn.delay(100).duration(220)}
                   style={{
                     width: 64,
                     height: 64,
@@ -636,7 +636,7 @@ export default function AlertsScreen() {
                   <Bell size={28} color={C.pistachio} strokeWidth={ICON.strokeWidth} />
                 </Animated.View>
                 <Animated.Text
-                  entering={FadeInDown.delay(200).springify()}
+                  entering={FadeInDown.delay(200).duration(220)}
                   style={{
                     fontFamily: FONTS.displayBold,
                     fontSize: 17,
@@ -647,7 +647,7 @@ export default function AlertsScreen() {
                   Inga händelser än
                 </Animated.Text>
                 <Animated.Text
-                  entering={FadeInDown.delay(300).springify()}
+                  entering={FadeInDown.delay(300).duration(220)}
                   style={{
                     fontFamily: FONTS.regular,
                     fontSize: 14,
@@ -693,7 +693,7 @@ export default function AlertsScreen() {
                 style={{ alignItems: "center", paddingTop: 60 }}
               >
                 <Animated.View
-                  entering={ZoomIn.delay(100).springify()}
+                  entering={ZoomIn.delay(100).duration(220)}
                   style={{
                     width: 64,
                     height: 64,
@@ -707,7 +707,7 @@ export default function AlertsScreen() {
                   <Eye size={28} color={C.info} strokeWidth={ICON.strokeWidth} />
                 </Animated.View>
                 <Animated.Text
-                  entering={FadeInDown.delay(200).springify()}
+                  entering={FadeInDown.delay(200).duration(220)}
                   style={{
                     fontFamily: FONTS.displayBold,
                     fontSize: 17,
@@ -718,7 +718,7 @@ export default function AlertsScreen() {
                   Du har inga bevakningar ännu
                 </Animated.Text>
                 <Animated.Text
-                  entering={FadeInDown.delay(300).springify()}
+                  entering={FadeInDown.delay(300).duration(220)}
                   style={{
                     fontFamily: FONTS.regular,
                     fontSize: 14,
@@ -731,7 +731,7 @@ export default function AlertsScreen() {
                 >
                   Lägg till en bevakning för att få notis när en bokning dyker upp
                 </Animated.Text>
-                <Animated.View entering={FadeInDown.delay(400).springify()}>
+                <Animated.View entering={FadeInDown.delay(400).duration(220)}>
                   <Pressable
                     testID="empty-watches-cta"
                     accessibilityLabel="Lägg till bevakning"
@@ -763,7 +763,7 @@ export default function AlertsScreen() {
                   const filters = parseWatchFiltersSafe(watch.filterOptions);
                   const WEEKDAY_LABELS_SHORT = ["Sön", "Mån", "Tis", "Ons", "Tor", "Fre", "Lör"];
                   return (
-                    <Animated.View key={watch.id} entering={FadeInDown.delay(index * 60).springify()}>
+                    <Animated.View key={watch.id} entering={FadeInDown.delay(index * 60).duration(220)}>
                       <View style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.lg, borderWidth: 0.5, borderColor: C.borderLight, padding: SPACING.md, shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1 }}>
                         <View style={{ flexDirection: "row", alignItems: "center" }}>
                           <View style={{ flex: 1 }}>
@@ -949,7 +949,7 @@ export default function AlertsScreen() {
                       restaurantAlerts.some((a: RestaurantAlertWithRestaurant) => a.restaurantId === restaurant.id) ||
                       addedIds.includes(restaurant.id);
                     return (
-                      <Animated.View key={restaurant.id} entering={FadeInDown.delay(index * 60).springify()}>
+                      <Animated.View key={restaurant.id} entering={FadeInDown.delay(index * 60).duration(220)}>
                         <Pressable
                           testID={`add-restaurant-${restaurant.id}`}
                           accessibilityLabel={`Lägg till bevakning för ${restaurant.name}`}

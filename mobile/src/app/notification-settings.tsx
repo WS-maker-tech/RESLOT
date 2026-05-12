@@ -115,7 +115,7 @@ export default function NotificationSettingsScreen() {
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 80 }}>
         {/* PUSHNOTISER */}
-        <Animated.View entering={FadeInDown.springify()}>
+        <Animated.View entering={FadeInDown.duration(220)}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginTop: 8, marginBottom: 10 }}>
             <Bell size={14} color={C.textTertiary} strokeWidth={2} />
             <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textTertiary, letterSpacing: 1, textTransform: "uppercase" }}>Pushnotiser</Text>
@@ -147,7 +147,7 @@ export default function NotificationSettingsScreen() {
         </Animated.View>
 
         {/* E-POSTNOTISER */}
-        <Animated.View entering={FadeInDown.delay(100).springify()}>
+        <Animated.View entering={FadeInDown.delay(100).duration(220)}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginTop: 28, marginBottom: 10 }}>
             <Mail size={14} color={C.textTertiary} strokeWidth={2} />
             <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textTertiary, letterSpacing: 1, textTransform: "uppercase" }}>E-postnotiser</Text>
@@ -172,7 +172,7 @@ export default function NotificationSettingsScreen() {
         </Animated.View>
 
         {/* SMS-NOTISER */}
-        <Animated.View entering={FadeInDown.delay(200).springify()}>
+        <Animated.View entering={FadeInDown.delay(200).duration(220)}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginTop: 28, marginBottom: 10 }}>
             <MessageSquare size={14} color={C.textTertiary} strokeWidth={2} />
             <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textTertiary, letterSpacing: 1, textTransform: "uppercase" }}>SMS-notiser</Text>

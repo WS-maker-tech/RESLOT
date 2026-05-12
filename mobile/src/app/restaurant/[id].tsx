@@ -189,7 +189,7 @@ const SuccessOverlay = React.memo(function SuccessOverlay({
 
       {/* Success circle — pistachio glow */}
       <Animated.View
-        entering={ZoomIn.springify().damping(8).stiffness(120)}
+        entering={ZoomIn.duration(220)}
         style={{
           width: 120,
           height: 120,
@@ -208,7 +208,7 @@ const SuccessOverlay = React.memo(function SuccessOverlay({
       </Animated.View>
 
       <Animated.Text
-        entering={FadeInDown.delay(180).springify()}
+        entering={FadeInDown.delay(180).duration(220)}
         style={{
           fontFamily: FONTS.displayBold,
           fontSize: 30,
@@ -221,7 +221,7 @@ const SuccessOverlay = React.memo(function SuccessOverlay({
       </Animated.Text>
 
       <Animated.Text
-        entering={FadeInDown.delay(240).springify()}
+        entering={FadeInDown.delay(240).duration(220)}
         style={{
           fontFamily: FONTS.bold,
           fontSize: 22,
@@ -236,7 +236,7 @@ const SuccessOverlay = React.memo(function SuccessOverlay({
       </Animated.Text>
 
       <Animated.Text
-        entering={FadeInDown.delay(300).springify()}
+        entering={FadeInDown.delay(300).duration(220)}
         style={{
           fontFamily: FONTS.medium,
           fontSize: 16,
@@ -249,7 +249,7 @@ const SuccessOverlay = React.memo(function SuccessOverlay({
       </Animated.Text>
 
       <Animated.View
-        entering={FadeInDown.delay(360).springify()}
+        entering={FadeInDown.delay(360).duration(220)}
         style={{
           backgroundColor: C.pistachioPressed,
           borderRadius: RADIUS.full,
@@ -275,7 +275,7 @@ const SuccessOverlay = React.memo(function SuccessOverlay({
 
       {/* Share button */}
       <Animated.View
-        entering={FadeInDown.delay(440).springify().damping(12)}
+        entering={FadeInDown.delay(440).duration(220)}
         style={shareBtnStyle}
       >
         <Pressable
@@ -393,7 +393,7 @@ const GracePeriodOverlay = React.memo(function GracePeriodOverlay({
       }}
     >
       <Animated.View
-        entering={FadeInDown.springify().damping(12)}
+        entering={FadeInDown.duration(220)}
         style={{
           backgroundColor: C.bgCard,
           borderRadius: 24,
@@ -408,7 +408,7 @@ const GracePeriodOverlay = React.memo(function GracePeriodOverlay({
       >
         {/* Success badge — pistachio */}
         <Animated.View
-          entering={ZoomIn.springify().damping(8)}
+          entering={ZoomIn.duration(220)}
           style={{
             width: 56,
             height: 56,
@@ -1201,7 +1201,7 @@ ${shareUrl}`,
 
         {/* Restaurant info */}
         <Animated.View
-          entering={FadeInDown.springify().damping(16)}
+          entering={FadeInDown.duration(220)}
           style={{ paddingHorizontal: SPACING.lg, paddingTop: 18 }}
         >
           <Text
@@ -1307,7 +1307,7 @@ ${shareUrl}`,
 
         {/* Grace period info — prominent */}
         <Animated.View
-          entering={FadeInDown.delay(260).springify()}
+          entering={FadeInDown.delay(260).duration(220)}
           style={{ paddingHorizontal: SPACING.lg, paddingTop: 14 }}
         >
           <View
@@ -1356,7 +1356,7 @@ ${shareUrl}`,
 
         {/* Cancellation info */}
         <Animated.View
-          entering={FadeInDown.delay(295).springify()}
+          entering={FadeInDown.delay(295).duration(220)}
           style={{ paddingHorizontal: SPACING.lg, paddingTop: 16 }}
         >
           <View style={{
@@ -1393,7 +1393,7 @@ ${shareUrl}`,
         {/* Error message with shake */}
         {claimError ? (
           <Animated.View
-            entering={FadeInDown.springify()}
+            entering={FadeInDown.duration(220)}
             style={[{ paddingHorizontal: SPACING.lg, paddingTop: 16 }, errorShakeStyle]}
           >
             <View
@@ -1420,7 +1420,7 @@ ${shareUrl}`,
         {/* Report button — only for claimer on completed reservations */}
         {isClaimerAndCompleted ? (
           <Animated.View
-            entering={FadeInDown.delay(400).springify()}
+            entering={FadeInDown.delay(400).duration(220)}
             style={{ paddingHorizontal: SPACING.lg, paddingTop: 20, paddingBottom: 8, alignItems: "center" }}
           >
             <Pressable
@@ -1448,7 +1448,7 @@ ${shareUrl}`,
         {/* Mini map */}
         {restaurant?.latitude && restaurant?.longitude ? (
           <Animated.View
-            entering={FadeInDown.delay(440).springify()}
+            entering={FadeInDown.delay(440).duration(220)}
             style={{ paddingHorizontal: SPACING.lg, paddingTop: 20, paddingBottom: 8 }}
           >
             {Platform.OS === "web" ? (

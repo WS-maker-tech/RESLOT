@@ -209,7 +209,7 @@ export const RestaurantCard = React.memo(function RestaurantCard({
   return (
     <Animated.View
       entering={FadeInDown.delay(index * 50)
-        .springify()}
+        .duration(220)}
     >
       <Pressable
         testID={`restaurant-row-${restaurant.id}`}
