@@ -117,7 +117,7 @@ const MenuItem = React.memo(function MenuItem({
   index = 0,
 }: MenuItemProps) {
   return (
-    <Animated.View entering={FadeInDown.delay(index * 50).springify()}>
+    <Animated.View entering={FadeInDown.delay(index * 50).duration(220)}>
       <Pressable
         testID={`menu-${label
           .toLowerCase()
@@ -382,7 +382,7 @@ export default function ProfileScreen() {
         ) : (
           <>
             <Animated.View
-              entering={FadeInDown.springify()}
+              entering={FadeInDown.duration(220)}
               className="items-center px-5 pt-4 pb-6"
               testID="profile-header"
             >
@@ -466,7 +466,7 @@ export default function ProfileScreen() {
             </Animated.View>
 
             {/* Credits card - simple dark background */}
-            <Animated.View entering={FadeInDown.delay(60).springify()} className="mx-5 mb-5" testID="credits-card">
+            <Animated.View entering={FadeInDown.delay(60).duration(220)} className="mx-5 mb-5" testID="credits-card">
               <Pressable onPress={handleBuyCreditsPress} style={{
                 backgroundColor: C.dark, borderRadius: RADIUS.lg, padding: 22,
                 ...SHADOW.card,
@@ -503,7 +503,7 @@ export default function ProfileScreen() {
             </Animated.View>
 
             {/* Quick booking stats */}
-            <Animated.View entering={FadeInDown.delay(160).springify()} className="mx-5 mb-5">
+            <Animated.View entering={FadeInDown.delay(160).duration(220)} className="mx-5 mb-5">
               <View style={{ flexDirection: "row", gap: 8 }}>
                 <Pressable
                   testID="uploaded-bookings-link"
@@ -536,7 +536,7 @@ export default function ProfileScreen() {
             </Animated.View>
 
             {/* Senaste aktivitet */}
-            <Animated.View entering={FadeInDown.delay(165).springify()} className="mx-5 mb-5" testID="recent-activity-section">
+            <Animated.View entering={FadeInDown.delay(165).duration(220)} className="mx-5 mb-5" testID="recent-activity-section">
               <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textTertiary, letterSpacing: 0.8, textTransform: "uppercase", marginBottom: SPACING.sm, paddingHorizontal: 4 }}>
                 Senaste aktivitet
               </Text>
@@ -575,7 +575,7 @@ export default function ProfileScreen() {
             </Animated.View>
 
             {/* Tjäna credits */}
-            <Animated.View entering={FadeInDown.delay(170).springify()} className="mx-5 mb-5" testID="earn-credits-section">
+            <Animated.View entering={FadeInDown.delay(170).duration(220)} className="mx-5 mb-5" testID="earn-credits-section">
               <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textTertiary, letterSpacing: 0.8, textTransform: "uppercase", marginBottom: SPACING.sm, paddingHorizontal: 4 }}>
                 Tjäna credits
               </Text>
@@ -614,7 +614,7 @@ export default function ProfileScreen() {
             </Animated.View>
 
             <Animated.View
-              entering={FadeInDown.delay(220).springify()}
+              entering={FadeInDown.delay(220).duration(220)}
               className="mx-5 mb-5"
               testID="account-section"
             >
@@ -690,7 +690,7 @@ export default function ProfileScreen() {
 
             {/* Juridiskt (Legal) Section */}
             <Animated.View
-              entering={FadeInDown.delay(260).springify()}
+              entering={FadeInDown.delay(260).duration(220)}
               className="mx-5 mb-5"
               testID="legal-section"
             >

@@ -102,7 +102,7 @@ function AccordionItem({
   };
 
   return (
-    <Animated.View entering={FadeInDown.delay(delay).springify()}>
+    <Animated.View entering={FadeInDown.delay(delay).duration(220)}>
       <Pressable
         testID={`accordion-${question.slice(0, 15).replace(/\s+/g, "-")}`}
         accessibilityLabel={`Fråga: ${question}`}
@@ -214,14 +214,14 @@ export default function SupportScreen() {
           keyboardShouldPersistTaps="handled"
         >
           {/* Intro */}
-          <Animated.View entering={FadeInDown.springify()} style={{ paddingTop: 16, paddingBottom: 20 }}>
+          <Animated.View entering={FadeInDown.duration(220)} style={{ paddingTop: 16, paddingBottom: 20 }}>
             <Text style={{ fontFamily: FONTS.regular, fontSize: 15, color: C.textSecondary, lineHeight: 22 }}>
               Vi hjälper dig gärna. Här hittar du svar på vanliga frågor, eller så kan du kontakta oss direkt.
             </Text>
           </Animated.View>
 
           {/* FAQ Section */}
-          <Animated.View entering={FadeInDown.delay(40).springify()}>
+          <Animated.View entering={FadeInDown.delay(40).duration(220)}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 12 }}>
               <HelpCircle size={18} color={C.gold} strokeWidth={2} />
               <Text style={{ fontFamily: FONTS.displayBold, fontSize: 16, color: C.textPrimary, letterSpacing: -0.3 }}>
@@ -234,7 +234,7 @@ export default function SupportScreen() {
             {FAQ_ITEMS.map((item, i) => (
               <AccordionItem key={`faq-${i}`} question={item.q} answer={item.a} delay={80 + i * 40} />
             ))}
-            <Animated.View entering={FadeInDown.delay(80 + FAQ_ITEMS.length * 40).springify()}>
+            <Animated.View entering={FadeInDown.delay(80 + FAQ_ITEMS.length * 40).duration(220)}>
               <Pressable
                 testID="see-all-faq"
                 accessibilityLabel="Se alla frågor och svar"
@@ -259,7 +259,7 @@ export default function SupportScreen() {
           </View>
 
           {/* Common Problems */}
-          <Animated.View entering={FadeInDown.delay(200).springify()}>
+          <Animated.View entering={FadeInDown.delay(200).duration(220)}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 12 }}>
               <AlertCircle size={18} color={C.pistachio} strokeWidth={2} />
               <Text style={{ fontFamily: FONTS.displayBold, fontSize: 16, color: C.textPrimary, letterSpacing: -0.3 }}>
@@ -275,7 +275,7 @@ export default function SupportScreen() {
           </View>
 
           {/* Contact Section */}
-          <Animated.View entering={FadeInDown.delay(400).springify()}>
+          <Animated.View entering={FadeInDown.delay(400).duration(220)}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 12 }}>
               <MessageCircle size={18} color={C.gold} strokeWidth={2} />
               <Text style={{ fontFamily: FONTS.displayBold, fontSize: 16, color: C.textPrimary, letterSpacing: -0.3 }}>
@@ -286,7 +286,7 @@ export default function SupportScreen() {
 
           <View style={{ gap: 12, marginBottom: 28 }}>
             {/* Email */}
-            <Animated.View entering={FadeInDown.delay(440).springify()}>
+            <Animated.View entering={FadeInDown.delay(440).duration(220)}>
               <Pressable
                 testID="email-support"
                 accessibilityLabel="Skicka e-post till support"
@@ -320,7 +320,7 @@ export default function SupportScreen() {
             </Animated.View>
 
             {/* In-app feedback form */}
-            <Animated.View entering={FadeInDown.delay(480).springify()}>
+            <Animated.View entering={FadeInDown.delay(480).duration(220)}>
               <View
                 testID="feedback-form"
                 style={{
@@ -424,7 +424,7 @@ export default function SupportScreen() {
           </View>
 
           {/* Info banner */}
-          <Animated.View entering={FadeInDown.delay(520).springify()}>
+          <Animated.View entering={FadeInDown.delay(520).duration(220)}>
             <View style={{ backgroundColor: C.pistachioLight, borderRadius: RADIUS.lg, padding: 16, flexDirection: "row", alignItems: "flex-start", gap: 12 }}>
               <Bell size={16} color={C.pistachio} strokeWidth={2} style={{ marginTop: 2 }} />
               <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textSecondary, lineHeight: 20, flex: 1 }}>

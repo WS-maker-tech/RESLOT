@@ -174,7 +174,7 @@ export default function CreditsScreen() {
       >
         {/* Header */}
         <Animated.View
-          entering={FadeInDown.springify()}
+          entering={FadeInDown.duration(220)}
           style={{ paddingHorizontal: SPACING.lg, paddingTop: SPACING.xl, paddingBottom: SPACING.xs }}
         >
           <Text
@@ -203,7 +203,7 @@ export default function CreditsScreen() {
 
         {/* Balance card */}
         <Animated.View
-          entering={FadeInDown.delay(80).springify()}
+          entering={FadeInDown.delay(80).duration(220)}
           style={{ marginHorizontal: SPACING.lg, marginTop: SPACING.lg }}
         >
           <View
@@ -297,7 +297,7 @@ export default function CreditsScreen() {
 
         {/* Så fungerar det */}
         <View style={{ marginTop: 32, paddingHorizontal: SPACING.lg }}>
-          <Animated.View entering={FadeInDown.delay(160).springify()}>
+          <Animated.View entering={FadeInDown.delay(160).duration(220)}>
             <Text
               style={{
                 fontFamily: FONTS.displayBold,
@@ -313,7 +313,7 @@ export default function CreditsScreen() {
 
           <View style={{ gap: SPACING.sm }}>
             {/* Earn row */}
-            <Animated.View entering={FadeInDown.delay(220).springify()}>
+            <Animated.View entering={FadeInDown.delay(220).duration(220)}>
               <View
                 style={{
                   backgroundColor: C.bgCard,
@@ -359,7 +359,7 @@ export default function CreditsScreen() {
             </Animated.View>
 
             {/* Spend row */}
-            <Animated.View entering={FadeInDown.delay(280).springify()}>
+            <Animated.View entering={FadeInDown.delay(280).duration(220)}>
               <View
                 style={{
                   backgroundColor: C.bgCard,
@@ -405,7 +405,7 @@ export default function CreditsScreen() {
 
         {/* Köp credits */}
         <View style={{ marginTop: SPACING.xl, paddingHorizontal: SPACING.lg }}>
-          <Animated.View entering={FadeInDown.delay(340).springify()}>
+          <Animated.View entering={FadeInDown.delay(340).duration(220)}>
             <View
               style={{
                 backgroundColor: C.bgCard,
@@ -489,7 +489,7 @@ export default function CreditsScreen() {
 
         {/* Tjäna credits */}
         <View style={{ marginTop: 32, paddingHorizontal: SPACING.lg }}>
-          <Animated.View entering={FadeInDown.delay(400).springify()}>
+          <Animated.View entering={FadeInDown.delay(400).duration(220)}>
             <Text
               style={{
                 fontFamily: FONTS.displayBold,
@@ -505,7 +505,7 @@ export default function CreditsScreen() {
 
           <View style={{ gap: SPACING.sm }}>
             {/* Bjud in en vän */}
-            <Animated.View entering={FadeInDown.delay(460).springify()}>
+            <Animated.View entering={FadeInDown.delay(460).duration(220)}>
               <AnimatedPressable
                 testID="invite-friend-btn"
                 accessibilityLabel="Bjud in en vän och få 1 credit"
@@ -555,7 +555,7 @@ export default function CreditsScreen() {
             </Animated.View>
 
             {/* Lägg upp en bokning */}
-            <Animated.View entering={FadeInDown.delay(520).springify()}>
+            <Animated.View entering={FadeInDown.delay(520).duration(220)}>
               <AnimatedPressable
                 testID="post-booking-btn"
                 accessibilityLabel="Lägg upp en bokning och få 2 credits"

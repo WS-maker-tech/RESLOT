@@ -59,7 +59,7 @@ export default function PaymentScreen() {
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 80 }}>
         {/* Security info box */}
-        <Animated.View entering={FadeInDown.springify()}>
+        <Animated.View entering={FadeInDown.duration(220)}>
           <View style={{ backgroundColor: "rgba(126,200,122,0.08)", borderRadius: RADIUS.lg, padding: SPACING.md, flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 20, borderWidth: 1, borderColor: "rgba(126,200,122,0.15)" }}>
             <ShieldCheck size={22} color={C.pistachio} strokeWidth={ICON.strokeWidth} />
             <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textSecondary, flex: 1, lineHeight: 20 }}>
@@ -72,7 +72,7 @@ export default function PaymentScreen() {
         {cardLoading ? (
           <ActivityIndicator size="small" color={C.pistachio} style={{ marginBottom: 20 }} />
         ) : cardStatus?.hasCard ? (
-          <Animated.View entering={FadeInDown.delay(40).springify()} style={{ marginBottom: 20 }}>
+          <Animated.View entering={FadeInDown.delay(40).duration(220)} style={{ marginBottom: 20 }}>
             <View style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.lg, padding: SPACING.md, borderWidth: 0.5, borderColor: C.divider, ...SHADOW.card }}>
               <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 10 }}>
                 <CheckCircle2 size={16} color={C.success} strokeWidth={2} />
@@ -96,7 +96,7 @@ export default function PaymentScreen() {
         ) : null}
 
         {/* Card input section */}
-        <Animated.View entering={FadeInDown.delay(80).springify()}>
+        <Animated.View entering={FadeInDown.delay(80).duration(220)}>
           <View style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.lg, padding: SPACING.lg, borderWidth: 0.5, borderColor: C.borderLight, ...SHADOW.card, marginBottom: 20 }}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: SPACING.md }}>
               <CreditCard size={18} color={C.textSecondary} strokeWidth={2} />
@@ -196,7 +196,7 @@ export default function PaymentScreen() {
         </Animated.View>
 
         {/* Save card button */}
-        <Animated.View entering={FadeInDown.delay(140).springify()}>
+        <Animated.View entering={FadeInDown.delay(140).duration(220)}>
           <Pressable
             testID="save-card-button"
             accessibilityLabel="Spara kort"
@@ -229,7 +229,7 @@ export default function PaymentScreen() {
         </Animated.View>
 
         {/* Security section */}
-        <Animated.View entering={FadeInDown.delay(200).springify()} style={{ marginTop: 28 }}>
+        <Animated.View entering={FadeInDown.delay(200).duration(220)} style={{ marginTop: 28 }}>
           <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textTertiary, letterSpacing: 0.8, textTransform: "uppercase", marginBottom: 12 }}>Säkerhet</Text>
           <View style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.lg, padding: SPACING.md, borderWidth: 0.5, borderColor: C.borderLight, ...SHADOW.card, gap: 16 }}>
             {[

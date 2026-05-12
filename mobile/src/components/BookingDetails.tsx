@@ -18,7 +18,7 @@ const BookingPill = React.memo(function BookingPill({
 }) {
   return (
     <Animated.View
-      entering={FadeInDown.delay(delay).springify()}
+      entering={FadeInDown.delay(delay).duration(220)}
       style={styles.pill}
     >
       <View style={styles.pillIcon}>
@@ -51,7 +51,7 @@ export const BookingDetails = React.memo(function BookingDetails({
 }: BookingDetailsProps) {
   return (
     <Animated.View
-      entering={FadeInDown.delay(80).springify()}
+      entering={FadeInDown.delay(80).duration(220)}
       style={styles.container}
     >
       <Text style={styles.title}>

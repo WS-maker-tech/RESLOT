@@ -101,7 +101,7 @@ function FaqItem({ question, answer, delay }: { question: string; answer: string
   };
 
   return (
-    <Animated.View entering={FadeInDown.delay(delay).springify()}>
+    <Animated.View entering={FadeInDown.delay(delay).duration(220)}>
       <AnimatedPressable
         testID={`faq-item-${question.slice(0, 10)}`}
         accessibilityLabel={`Fråga: ${question}`}
@@ -190,7 +190,7 @@ export default function FaqScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Animated.View
-          entering={FadeInDown.springify()}
+          entering={FadeInDown.duration(220)}
           style={{
             paddingHorizontal: SPACING.lg,
             paddingTop: SPACING.xl,
@@ -237,7 +237,7 @@ export default function FaqScreen() {
         </View>
 
         <Animated.View
-          entering={FadeInDown.delay(80 + FAQ_ITEMS.length * 40 + 40).springify()}
+          entering={FadeInDown.delay(80 + FAQ_ITEMS.length * 40 + 40).duration(220)}
           style={{
             marginHorizontal: SPACING.lg,
             marginTop: 32,

@@ -226,7 +226,7 @@ export default function AddWatchScreen() {
         renderItem={({ item: restaurant, index }: { item: any; index: number }) => {
           const isSelected = selectedRestaurantId === restaurant.id;
           return (
-            <Animated.View entering={FadeInDown.delay(index * 40).springify()}>
+            <Animated.View entering={FadeInDown.delay(index * 40).duration(220)}>
               <Pressable
                 testID={`restaurant-${restaurant.id}`}
                 accessibilityLabel={`Välj ${restaurant.name}`}
@@ -266,7 +266,7 @@ export default function AddWatchScreen() {
                   marginLeft: 10,
                 }}>
                   {isSelected ? (
-                    <Animated.View entering={ZoomIn.springify()}>
+                    <Animated.View entering={ZoomIn.duration(220)}>
                       <Check size={15} color={C.dark} strokeWidth={2.5} />
                     </Animated.View>
                   ) : null}
@@ -280,7 +280,7 @@ export default function AddWatchScreen() {
       {/* Bottom CTA */}
       {selectedRestaurant ? (
         <Animated.View
-          entering={FadeInDown.springify()}
+          entering={FadeInDown.duration(220)}
           style={{
             position: "absolute",
             bottom: 0,

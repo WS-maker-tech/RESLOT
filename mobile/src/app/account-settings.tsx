@@ -116,7 +116,7 @@ export default function AccountSettingsScreen() {
       <SafeAreaView edges={["top"]} style={{ backgroundColor: C.bg }}>
         {showSaveSuccess ? (
           <Animated.View
-            entering={FadeInDown.springify()}
+            entering={FadeInDown.duration(220)}
             exiting={FadeOutUp.duration(300)}
             style={{
               backgroundColor: C.success,
@@ -150,7 +150,7 @@ export default function AccountSettingsScreen() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 80 }}>
         {isLoading ? <ActivityIndicator color={C.pistachio} style={{ marginTop: 40 }} /> : (
           <>
-            <Animated.View entering={FadeInDown.springify()}>
+            <Animated.View entering={FadeInDown.duration(220)}>
               <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textTertiary, letterSpacing: 1, textTransform: "uppercase", marginBottom: 14, marginTop: 8 }}>Personuppgifter</Text>
               <InputField label="Förnamn" value={firstName} onChangeText={setFirstName} placeholder="Anna" />
               <InputField label="Efternamn" value={lastName} onChangeText={setLastName} placeholder="Svensson" />
@@ -158,13 +158,13 @@ export default function AccountSettingsScreen() {
               <InputField label="Stad" value={city} onChangeText={setCity} placeholder="Stockholm" />
             </Animated.View>
 
-            <Animated.View entering={FadeInDown.delay(100).springify()}>
+            <Animated.View entering={FadeInDown.delay(100).duration(220)}>
               <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textTertiary, letterSpacing: 1, textTransform: "uppercase", marginBottom: 14, marginTop: 24 }}>Kontaktuppgifter</Text>
               <InputField label="E-post" value={email} onChangeText={setEmail} placeholder="anna@example.com" keyboardType="email-address" verified={profile?.emailVerified} />
               <InputField label="Telefon" value={phone ?? ""} onChangeText={() => {}} placeholder={phone ?? ""} keyboardType="phone-pad" verified={profile?.phoneVerified} editable={false} />
             </Animated.View>
 
-            <Animated.View entering={FadeInDown.delay(200).springify()}>
+            <Animated.View entering={FadeInDown.delay(200).duration(220)}>
               <Pressable
                 testID="delete-account-button"
                 accessibilityLabel="Radera konto"

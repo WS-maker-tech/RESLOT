@@ -49,18 +49,18 @@ export default function InviteScreen() {
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 80 }}>
         {/* Big emoji + description */}
-        <Animated.View entering={ZoomIn.springify()} style={{ alignItems: "center", paddingTop: 32, paddingBottom: 8 }}>
+        <Animated.View entering={ZoomIn.duration(220)} style={{ alignItems: "center", paddingTop: 32, paddingBottom: 8 }}>
           <Text style={{ fontSize: 64 }}>🎁</Text>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(60).springify()} style={{ alignItems: "center", paddingBottom: 32 }}>
+        <Animated.View entering={FadeInDown.delay(60).duration(220)} style={{ alignItems: "center", paddingBottom: 32 }}>
           <Text style={{ fontFamily: FONTS.regular, fontSize: 15, color: C.textSecondary, textAlign: "center", lineHeight: 22, maxWidth: 300 }}>
             Du och din vän får vardera 1 credit när hen registrerar sig med din kod.
           </Text>
         </Animated.View>
 
         {/* Referral code box — dark */}
-        <Animated.View entering={FadeInDown.delay(120).springify()}>
+        <Animated.View entering={FadeInDown.delay(120).duration(220)}>
           <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textTertiary, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Din inbjudningskod</Text>
           <View style={{ backgroundColor: C.dark, borderRadius: RADIUS.xl, padding: SPACING.lg, ...SHADOW.elevated, marginBottom: 14 }}>
             <Text
@@ -104,7 +104,7 @@ export default function InviteScreen() {
         </Animated.View>
 
         {/* Share button */}
-        <Animated.View entering={FadeInDown.delay(180).springify()}>
+        <Animated.View entering={FadeInDown.delay(180).duration(220)}>
           <Pressable
             testID="share-button"
             accessibilityLabel="Dela med vän"
@@ -127,7 +127,7 @@ export default function InviteScreen() {
         </Animated.View>
 
         {/* Anti-abuse info */}
-        <Animated.View entering={FadeInDown.delay(240).springify()}>
+        <Animated.View entering={FadeInDown.delay(240).duration(220)}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: C.bgCard, borderRadius: RADIUS.lg, padding: SPACING.md, borderWidth: 0.5, borderColor: C.borderLight, ...SHADOW.card }}>
             <ShieldCheck size={18} color={C.textTertiary} strokeWidth={ICON.strokeWidth} />
             <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textTertiary, flex: 1, lineHeight: 19 }}>

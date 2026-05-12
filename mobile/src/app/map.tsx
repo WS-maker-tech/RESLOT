@@ -158,7 +158,7 @@ export default function MapScreen() {
       {/* Selected restaurant card */}
       {selectedRestaurant ? (
         <Animated.View
-          entering={FadeInDown.springify().damping(14)}
+          entering={FadeInDown.duration(220)}
           style={styles.cardContainer}
         >
           <Pressable

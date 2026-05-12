@@ -328,7 +328,7 @@ const MissedBookingCard = React.memo(function MissedBookingCard({
 
   return (
     <Animated.View
-      entering={FadeInDown.delay(index * 70).springify()}
+      entering={FadeInDown.delay(index * 70).duration(220)}
     >
       <Pressable
         testID={`missed-card-${index}`}
@@ -541,7 +541,7 @@ function MissedBookingsSection({ city }: { city: string }) {
   return (
     <Animated.View
       testID="missed-bookings-section"
-      entering={FadeInDown.delay(50).springify()}
+      entering={FadeInDown.delay(50).duration(220)}
       style={{ marginBottom: 8 }}
     >
       {/* Section header with FOMO styling */}
@@ -670,7 +670,7 @@ function NewOnReslotSection() {
   return (
     <Animated.View
       testID="new-on-reslot-section"
-      entering={FadeInDown.delay(80).springify()}
+      entering={FadeInDown.delay(80).duration(220)}
       style={{ marginBottom: 8 }}
     >
       <View
@@ -740,7 +740,7 @@ function NewOnReslotSection() {
         style={{ flexGrow: 0 }}
       >
         {newRestaurants.map((restaurant: Restaurant, index: number) => (
-          <Animated.View key={restaurant.id} entering={FadeInDown.delay(index * 70).springify()}>
+          <Animated.View key={restaurant.id} entering={FadeInDown.delay(index * 70).duration(220)}>
             <Pressable
               testID={`new-restaurant-${index}`}
               accessibilityLabel={`Visa ${restaurant.name}`}
@@ -1321,7 +1321,7 @@ export default function HomeScreen() {
             {todayBookings.length > 0 ? (
               <Animated.View
                 testID="today-bookings-section"
-                entering={FadeInDown.delay(100).springify()}
+                entering={FadeInDown.delay(100).duration(220)}
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
@@ -1440,11 +1440,11 @@ export default function HomeScreen() {
           !isLoading && !reservationsError ? (
             <Animated.View
               testID="empty-state"
-              entering={FadeInDown.delay(100).springify()}
+              entering={FadeInDown.delay(100).duration(220)}
               style={{ alignItems: "center", justifyContent: "center", paddingTop: 40, paddingHorizontal: 24 }}
             >
               <Animated.View
-                entering={ZoomIn.springify().delay(150)}
+                entering={ZoomIn.duration(220).delay(150)}
                 style={{
                   width: 88,
                   height: 88,
@@ -1457,7 +1457,7 @@ export default function HomeScreen() {
               >
                 <UtensilsCrossed size={38} color={C.grayLight} strokeWidth={1.5} />
               </Animated.View>
-              <Animated.View entering={FadeInDown.delay(220).springify()}>
+              <Animated.View entering={FadeInDown.delay(220).duration(220)}>
                 <Text
                   style={{
                     fontFamily: FONTS.displayBold,
@@ -1470,7 +1470,7 @@ export default function HomeScreen() {
                   Inga bord just nu
                 </Text>
               </Animated.View>
-              <Animated.View entering={FadeInDown.delay(300).springify()}>
+              <Animated.View entering={FadeInDown.delay(300).duration(220)}>
                 <Text
                   style={{
                     fontFamily: FONTS.regular,
@@ -1486,7 +1486,7 @@ export default function HomeScreen() {
               </Animated.View>
 
               {/* Example cards showing what's possible */}
-              <Animated.View entering={FadeInDown.delay(380).springify()} style={{ marginTop: 28, width: "100%", gap: 10 }}>
+              <Animated.View entering={FadeInDown.delay(380).duration(220)} style={{ marginTop: 28, width: "100%", gap: 10 }}>
                 <View style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.lg, borderWidth: 0.5, borderColor: C.borderLight, padding: 14, flexDirection: "row", alignItems: "center", gap: 12, opacity: 0.5, ...SHADOW.card }}>
                   <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: C.bgInput }} />
                   <View style={{ flex: 1, gap: 4 }}>
@@ -1503,7 +1503,7 @@ export default function HomeScreen() {
                 </View>
               </Animated.View>
 
-              <Animated.View entering={FadeInDown.delay(450).springify()}>
+              <Animated.View entering={FadeInDown.delay(450).duration(220)}>
                 <Pressable
                   testID="empty-state-cta"
                   accessibilityLabel="Bevaka restaurang"
