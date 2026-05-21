@@ -404,13 +404,14 @@ export function withSampleReservations(
   real: Reservation[],
   phone: string | null | undefined
 ): Reservation[] {
-  if (!SHOW_SAMPLE_DATA || !phone) return real;
+  if (!SHOW_SAMPLE_DATA) return real;
   if (real.length > 0) return real;
+  const p = phone || "__sample__";
   // Ersätt placeholder-phone med inloggad användares nummer
   return SAMPLE_ALL_RESERVATIONS.map((r) => ({
     ...r,
-    submitterPhone: r.submitterPhone === "__sample__" ? phone : r.submitterPhone,
-    claimerPhone: r.claimerPhone === "__sample__" ? phone : r.claimerPhone,
+    submitterPhone: r.submitterPhone === "__sample__" ? p : r.submitterPhone,
+    claimerPhone: r.claimerPhone === "__sample__" ? p : r.claimerPhone,
   }));
 }
 
