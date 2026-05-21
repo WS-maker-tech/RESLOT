@@ -1,5 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "./api";
+import {
+  withSampleReservations,
+  withSampleActivityAlerts,
+  withSampleRestaurantAlerts,
+  withSampleWatches,
+} from "@/lib/sample-data";
 import type {
   Restaurant,
   Reservation,
@@ -104,8 +110,12 @@ export function useMyReservations(phone: string) {
   return useQuery({
     queryKey: ["myReservations", phone],
     queryFn: async () => {
-      try { return await api.get<Reservation[]>(`/api/reservations/mine`) ?? []; }
-      catch { return [] as Reservation[]; }
+      try {
+        const real = await api.get<Reservation[]>(`/api/reservations/mine`) ?? [];
+        return withSampleReservations(real, phone);
+      } catch {
+        return withSampleReservations([], phone);
+      }
     },
     enabled: !!phone,
     staleTime: 5 * 60 * 1000,
@@ -211,8 +221,12 @@ export function useActivityAlerts(phone: string) {
   return useQuery({
     queryKey: ["activityAlerts", phone],
     queryFn: async () => {
-      try { return await api.get<ActivityAlert[]>(`/api/alerts`) ?? []; }
-      catch { return [] as ActivityAlert[]; }
+      try {
+        const real = await api.get<ActivityAlert[]>(`/api/alerts`) ?? [];
+        return withSampleActivityAlerts(real);
+      } catch {
+        return withSampleActivityAlerts([]);
+      }
     },
     enabled: !!phone,
     staleTime: 5 * 60 * 1000,
@@ -235,8 +249,12 @@ export function useRestaurantAlerts(phone: string) {
   return useQuery({
     queryKey: ["restaurantAlerts", phone],
     queryFn: async () => {
-      try { return await api.get<RestaurantAlertWithRestaurant[]>(`/api/alerts/restaurant-alerts`) ?? []; }
-      catch { return [] as RestaurantAlertWithRestaurant[]; }
+      try {
+        const real = await api.get<RestaurantAlertWithRestaurant[]>(`/api/alerts/restaurant-alerts`) ?? [];
+        return withSampleRestaurantAlerts(real);
+      } catch {
+        return withSampleRestaurantAlerts([]);
+      }
     },
     enabled: !!phone,
     staleTime: 60 * 1000,
@@ -275,8 +293,12 @@ export function useWatches(phone: string | null | undefined) {
   return useQuery({
     queryKey: ["watches", phone],
     queryFn: async () => {
-      try { return await api.get<Watch[]>(`/api/watches`) ?? []; }
-      catch { return [] as Watch[]; }
+      try {
+        const real = await api.get<Watch[]>(`/api/watches`) ?? [];
+        return withSampleWatches(real);
+      } catch {
+        return withSampleWatches([]);
+      }
     },
     enabled: !!phone,
     staleTime: 60 * 1000,
