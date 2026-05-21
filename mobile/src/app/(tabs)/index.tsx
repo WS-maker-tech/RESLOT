@@ -1197,12 +1197,8 @@ export default function HomeScreen() {
     const selDateStr = `${selYear}-${selMonth}-${selDay}`;
 
     return reservations.filter((res: Reservation) => {
-      // Jämför datum i lokal tid (undvik UTC-offset problem)
-      const resDate = new Date(res.reservationDate);
-      const resYear = resDate.getFullYear();
-      const resMonth = String(resDate.getMonth() + 1).padStart(2, "0");
-      const resDay = String(resDate.getDate()).padStart(2, "0");
-      const resDateStr = `${resYear}-${resMonth}-${resDay}`;
+      // Jämför datum direkt som sträng (undvik UTC-offset problem med new Date)
+      const resDateStr = res.reservationDate.substring(0, 10);
       if (resDateStr !== selDateStr) return false;
 
       if (activeFilter && activeFilter !== "Alla" && res.restaurant?.neighborhood !== activeFilter) return false;
