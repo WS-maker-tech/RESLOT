@@ -5,6 +5,7 @@ import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { useAuthStore } from "@/lib/auth-store";
 import { C, FONTS, SPACING, RADIUS, ICON } from "@/lib/theme";
+import { SHOW_SAMPLE_DATA } from "@/lib/sample-data";
 
 interface LoginGateProps {
   title: string;
@@ -19,6 +20,8 @@ export function LoginGate({ title, subtitle }: LoginGateProps) {
 
   const openAuthModal = useAuthStore((s) => s.openAuthModal);
 
+  const setGuestMode = useAuthStore((s) => s.setGuestMode);
+
   const handleLogin = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     if (isLoggedIn) {
@@ -26,6 +29,11 @@ export function LoginGate({ title, subtitle }: LoginGateProps) {
       return;
     }
     openAuthModal();
+  };
+
+  const handleDemo = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setGuestMode();
   };
 
   return (
@@ -123,6 +131,26 @@ export function LoginGate({ title, subtitle }: LoginGateProps) {
           </Text>
         </Pressable>
       </Animated.View>
+
+      {/* Demo-knapp — visas bara när SHOW_SAMPLE_DATA = true */}
+      {SHOW_SAMPLE_DATA ? (
+        <Animated.View entering={FadeInUp.delay(550).duration(220)} style={{ marginTop: SPACING.sm }}>
+          <Pressable
+            testID="demo-btn"
+            onPress={handleDemo}
+          >
+            <Text
+              style={{
+                fontFamily: FONTS.medium,
+                fontSize: 13,
+                color: C.textTertiary,
+              }}
+            >
+              Utforska demo utan konto
+            </Text>
+          </Pressable>
+        </Animated.View>
+      ) : null}
     </View>
   );
 }
