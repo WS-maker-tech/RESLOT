@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "./api";
 import {
   withSampleReservations,
+  withSampleActiveReservations,
   withSampleActivityAlerts,
   withSampleRestaurantAlerts,
   withSampleWatches,
@@ -84,8 +85,11 @@ export function useReservations(params?: {
           queryParams.set("neighborhood", params.neighborhood);
         if (params?.date) queryParams.set("date", params.date);
         const qs = queryParams.toString();
-        return await api.get<Reservation[]>(`/api/reservations${qs ? `?${qs}` : ""}`) ?? [];
-      } catch { return [] as Reservation[]; }
+        const real = await api.get<Reservation[]>(`/api/reservations${qs ? `?${qs}` : ""}`) ?? [];
+        return withSampleActiveReservations(real);
+      } catch {
+        return withSampleActiveReservations([]);
+      }
     },
     staleTime: 5 * 60 * 1000,
   });
