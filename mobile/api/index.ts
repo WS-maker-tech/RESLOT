@@ -52,24 +52,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json({ data: filtered });
   }
 
-  // POST /api/reservations — create new reservation
-  if (path === "reservations" && req.method === "POST") {
-    const body = req.body || {};
-    const nowIso = new Date().toISOString();
-    const { data, error } = await supabase
-      .from("Reservation")
-      .insert([{ id: genId(), createdAt: nowIso, updatedAt: nowIso, ...body, status: "active" }])
-      .select("*, Restaurant:restaurantId(*)")
-      .single();
-    if (error) return res.status(500).json({ error: { message: error.message } });
-    return res.status(200).json({ data: normalize(data) });
-  }
-
   // POST /api/admin/seed-future-reservations — generate 20 future-dated active reservations
-  // Protected by ?key=<SEED_KEY env or fallback>
+  // Requires SEED_KEY env var (no fallback — committed fallback is a leak).
   if (path === "admin/seed-future-reservations" && req.method === "POST") {
+    const expected = process.env.SEED_KEY;
+    if (!expected) {
+      return res.status(503).json({ error: { message: "Seed endpoint disabled: SEED_KEY env var not configured" } });
+    }
     const provided = (req.query.key as string) || (req.body && req.body.key) || "";
-    const expected = process.env.SEED_KEY || "reslot-cofounder-demo-2026";
     if (provided !== expected) {
       return res.status(401).json({ error: { message: "Unauthorized" } });
     }
@@ -299,15 +289,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json({ data: { success: true } });
   }
 
-    // POST /api/reservations — skapa ny bokning (submit-flödet)
+  // POST /api/reservations — skapa ny bokning (submit-flödet)
   if (path === "reservations" && req.method === "POST") {
+    const user = await getUser(token);
+    if (!user) return res.status(401).json({ error: { message: "Unauthorized" } });
+    const body = req.body || {};
+    if (!body.restaurantId || !body.reservationDate || !body.reservationTime || !body.nameOnReservation) {
+      return res.status(400).json({ error: { message: "Missing required fields" } });
+    }
     const { nanoid } = await import("nanoid");
-    const body = req.body;
     const id = nanoid();
     const { data, error } = await supabase.from("Reservation").insert([{
       id,
       restaurantId: body.restaurantId,
-      submitterPhone: body.submitterPhone,
+      submitterPhone: user.phone ?? user.id,
       submitterFirstName: body.submitterFirstName,
       submitterLastName: body.submitterLastName,
       reservationDate: body.reservationDate,
