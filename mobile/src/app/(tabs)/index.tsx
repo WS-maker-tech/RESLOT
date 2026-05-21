@@ -1297,7 +1297,7 @@ export default function HomeScreen() {
 
       <Animated.FlatList
         testID="home-feed-scroll"
-        data={isLoading || reservationsError ? [] : filteredReservations}
+        data={isLoading ? [] : filteredReservations}
         keyExtractor={(item: Reservation) => item.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120, paddingTop: 8 }}
@@ -1433,7 +1433,7 @@ export default function HomeScreen() {
           </>
         )}
         ListEmptyComponent={
-          !isLoading && !reservationsError ? (
+          !isLoading ? (
             <Animated.View
               testID="empty-state"
               entering={FadeInDown.delay(100).duration(220)}
