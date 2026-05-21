@@ -45,7 +45,7 @@ export const C = {
   grayLight: "#9CA3AF",
   gold: "#C9A96E",
   dark: "#111827",
-  bg: "#EAD9B8",            // Floor — aliasas paper, alla 42 callsites ärver warmth automatiskt
+  bg: "transparent",        // Floor — transparent så root paper-texture lyser genom 42 screens. Använd C.paper om du vill ha solid sand-fill.
 
   // Surfaces
   bgCard: "#FFFFFF",
