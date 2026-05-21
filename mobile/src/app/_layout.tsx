@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Platform, View, Text, Pressable, ImageBackground } from 'react-native';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack, useRouter } from 'expo-router';
+import { FONTS } from '@/lib/theme';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -46,7 +47,7 @@ class ErrorBoundary extends React.Component<
     if (this.state.hasError) {
       return (
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#F0E1CB", padding: 32 }}>
-          <Text style={{ fontFamily: "PlusJakartaSans_700Bold", fontSize: 20, color: "#111827", marginBottom: 8, letterSpacing: -0.3 }}>
+          <Text style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: "#111827", marginBottom: 8, letterSpacing: -0.3 }}>
             Något gick fel
           </Text>
           <Text style={{ fontFamily: "PlusJakartaSans_400Regular", fontSize: 14, color: "#6B7280", textAlign: "center", marginBottom: 24 }}>
@@ -56,7 +57,7 @@ class ErrorBoundary extends React.Component<
             onPress={() => this.setState({ hasError: false, error: null })}
             style={{ backgroundColor: "#7EC87A", borderRadius: 16, paddingHorizontal: 24, paddingVertical: 12 }}
           >
-            <Text style={{ fontFamily: "PlusJakartaSans_700Bold", fontSize: 15, color: "#111827" }}>Försök igen</Text>
+            <Text style={{ fontFamily: FONTS.displayBold, fontSize: 15, color: "#111827" }}>Försök igen</Text>
           </Pressable>
         </View>
       );

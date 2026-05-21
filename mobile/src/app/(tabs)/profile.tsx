@@ -791,7 +791,7 @@ export default function ProfileScreen() {
               </View>
               <Text
                 style={{
-                  fontFamily: "PlusJakartaSans_700Bold",
+                  fontFamily: FONTS.displayBold,
                   fontSize: 20,
                   color: C.dark,
                   letterSpacing: -0.4,
@@ -802,7 +802,7 @@ export default function ProfileScreen() {
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false}>
-              <Text style={{ fontFamily: "PlusJakartaSans_700Bold", fontSize: 15, color: C.dark, marginBottom: 8 }}>
+              <Text style={{ fontFamily: FONTS.displayBold, fontSize: 15, color: C.dark, marginBottom: 8 }}>
                 Hur fungerar ansvar på Reslot?
               </Text>
               <Text style={{ fontFamily: "PlusJakartaSans_400Regular", fontSize: 14, color: C.textSecondary, lineHeight: 22, marginBottom: 16 }}>
