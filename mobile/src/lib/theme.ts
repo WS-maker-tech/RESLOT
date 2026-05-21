@@ -176,10 +176,10 @@ export function getTheme(mode: "light" | "dark"): ColorPalette {
 }
 
 export const FONTS = {
-  // Display — Plus Jakarta Sans (all headings)
-  displayBold: "PlusJakartaSans_700Bold",
-  displaySemiBold: "PlusJakartaSans_600SemiBold",
-  // Body/UI — Plus Jakarta Sans
+  // Display — Unisketch Bold (hand-drawn, B&B-vibe, single heading weight)
+  displayBold: "Unisketch-Bold",
+  displaySemiBold: "Unisketch-Bold",
+  // Body/UI — Plus Jakarta Sans (oförändrat)
   bold: "PlusJakartaSans_700Bold",
   semiBold: "PlusJakartaSans_600SemiBold",
   medium: "PlusJakartaSans_500Medium",
