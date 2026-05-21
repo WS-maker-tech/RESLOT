@@ -47,6 +47,77 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json({ data: filtered });
   }
 
+  // POST /api/reservations — create new reservation
+  if (path === "reservations" && req.method === "POST") {
+    const body = req.body || {};
+    const { data, error } = await supabase
+      .from("Reservation")
+      .insert([{ ...body, status: "active" }])
+      .select("*, Restaurant:restaurantId(*)")
+      .single();
+    if (error) return res.status(500).json({ error: { message: error.message } });
+    return res.status(200).json({ data: normalize(data) });
+  }
+
+  // POST /api/admin/seed-future-reservations — generate 20 future-dated active reservations
+  // Protected by ?key=<SEED_KEY env or fallback>
+  if (path === "admin/seed-future-reservations" && req.method === "POST") {
+    const provided = (req.query.key as string) || (req.body && req.body.key) || "";
+    const expected = process.env.SEED_KEY || "reslot-cofounder-demo-2026";
+    if (provided !== expected) {
+      return res.status(401).json({ error: { message: "Unauthorized" } });
+    }
+
+    const { data: restaurants, error: rErr } = await supabase
+      .from("Restaurant")
+      .select("id, name");
+    if (rErr || !restaurants || restaurants.length === 0) {
+      return res.status(500).json({ error: { message: rErr?.message || "No restaurants found" } });
+    }
+
+    const times = ["18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00"];
+    const seatTypes = ["indoor", "outdoor", "bar"];
+    const firstNames = ["Anna", "Erik", "Sara", "Johan", "Emma", "Oscar", "Linnea", "Filip", "Astrid", "Lars", "Maja", "Viktor", "Wilma", "Hugo"];
+    const lastNames = ["Andersson", "Svensson", "Lindberg", "Nilsson", "Karlsson", "Johansson", "Eriksson", "Larsson", "Olsson", "Persson"];
+
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+
+    const rows = Array.from({ length: 20 }, (_, i) => {
+      const restaurant = restaurants[i % restaurants.length];
+      const daysAhead = 1 + Math.floor(i * 1.1);
+      const d = new Date(today.getTime() + daysAhead * 86400000);
+      const dateStr = d.toISOString().split("T")[0] + "T00:00:00";
+      const fn = firstNames[i % firstNames.length];
+      const ln = lastNames[i % lastNames.length];
+      return {
+        restaurantId: restaurant.id,
+        submitterPhone: `+467${String(10000000 + i * 137).slice(-8)}`,
+        submitterFirstName: fn,
+        submitterLastName: ln,
+        reservationDate: dateStr,
+        reservationTime: times[i % times.length],
+        partySize: 2 + (i % 5),
+        seatType: seatTypes[i % seatTypes.length],
+        nameOnReservation: `${fn} ${ln}`,
+        status: "active",
+        creditCost: 1 + (i % 3),
+      };
+    });
+
+    const { data: inserted, error: iErr } = await supabase
+      .from("Reservation")
+      .insert(rows)
+      .select("id, restaurantId, reservationDate, reservationTime, status");
+    if (iErr) return res.status(500).json({ error: { message: iErr.message } });
+
+    return res.status(200).json({
+      data: inserted,
+      count: inserted?.length || 0,
+      message: `Seeded ${inserted?.length || 0} future reservations`,
+    });
+  }
+
   // GET /api/reservations/missed
   if (path === "reservations/missed" && req.method === "GET") {
     const { city } = req.query;
