@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Platform, View, Text, Pressable } from 'react-native';
+import { Platform, View, Text, Pressable, ImageBackground } from 'react-native';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -45,7 +45,7 @@ class ErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#FAFAF8", padding: 32 }}>
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#F0E1CB", padding: 32 }}>
           <Text style={{ fontFamily: "PlusJakartaSans_700Bold", fontSize: 20, color: "#111827", marginBottom: 8, letterSpacing: -0.3 }}>
             Något gick fel
           </Text>
@@ -86,8 +86,8 @@ const ReslotTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    background: '#FAFAF8',
-    card: '#FAFAF8',
+    background: '#F0E1CB',
+    card: '#F0E1CB',
     text: '#111827',
     border: 'rgba(0,0,0,0.06)',
     primary: '#7EC87A',
@@ -169,8 +169,13 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={ReslotTheme}>
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#FAFAF8' }, animation: 'fade' }}>
-        <Stack.Screen name="onboarding" options={{ headerShown: false, animation: 'none', contentStyle: { backgroundColor: '#FAFAF8' } }} />
+      <ImageBackground
+        source={require('../../assets/textures/paper.jpg')}
+        resizeMode="repeat"
+        style={{ flex: 1, backgroundColor: '#F0E1CB' }}
+      >
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: 'fade' }}>
+        <Stack.Screen name="onboarding" options={{ headerShown: false, animation: 'none', contentStyle: { backgroundColor: 'transparent' } }} />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="restaurant/[id]" options={{ presentation: "modal", headerShown: false, animation: "slide_from_bottom" }} />
         <Stack.Screen name="rewards" options={{ headerShown: false, animation: "slide_from_right" }} />
@@ -203,7 +208,7 @@ function RootLayoutNav() {
         <Stack.Screen name="notification-settings" options={{ headerShown: false, animation: "slide_from_right" }} />
         <Stack.Screen name="help" options={{ headerShown: false, animation: "slide_from_right" }} />
       </Stack>
-
+      </ImageBackground>
       </ThemeProvider>
   );
 }

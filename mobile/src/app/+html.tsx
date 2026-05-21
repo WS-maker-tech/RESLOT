@@ -44,7 +44,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
 
         {/* Meta */}
         <meta name="description" content="Din genväg till fullbokade restauranger." />
-        <meta name="theme-color" content="#FAFAF8" />
+        <meta name="theme-color" content="#F0E1CB" />
         <meta name="application-name" content="Reslot" />
         <meta name="apple-mobile-web-app-title" content="Reslot" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -73,12 +73,16 @@ export default function Root({ children }: { children: React.ReactNode }) {
   );
 }
 
+// NOTE: Detta är Node SSR, kan inte referera C.paper runtime-token.
+// Om C.paper ändras: uppdatera HÄR + theme.ts + app.json (3-state truth).
 const responsiveBackground = `
 body {
-  background-color: #fff;
+  background-color: #F0E1CB;
+  background-image: url('/textures/paper.jpg');
+  background-repeat: repeat;
 }
 @media (prefers-color-scheme: dark) {
   body {
-    background-color: #000;
+    background-color: #2A2820;
   }
 }`;
