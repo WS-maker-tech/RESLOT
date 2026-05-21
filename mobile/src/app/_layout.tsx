@@ -7,6 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useAuthStore } from '@/lib/auth-store';
+import { SHOW_SAMPLE_DATA } from '@/lib/sample-data';
 import { Modal } from 'react-native';
 import { useFonts } from 'expo-font';
 import { registerForPushNotificationsAsync, setupNotificationHandlers } from '@/lib/notifications';
@@ -104,10 +105,24 @@ function RootLayoutNav() {
     // Wait for zustand to rehydrate from AsyncStorage
     const unsub = useAuthStore.persist.onFinishHydration(() => {
       setHydrated(true);
+      // DEMO-läge: sätt gästläge automatiskt om inte redan inloggad
+      if (SHOW_SAMPLE_DATA) {
+        const state = useAuthStore.getState();
+        if (!state.isLoggedIn && !state.isGuest) {
+          state.setGuestMode();
+        }
+      }
     });
     // If already hydrated
     if (useAuthStore.persist.hasHydrated()) {
       setHydrated(true);
+      // DEMO-läge: sätt gästläge automatiskt om inte redan inloggad
+      if (SHOW_SAMPLE_DATA) {
+        const state = useAuthStore.getState();
+        if (!state.isLoggedIn && !state.isGuest) {
+          state.setGuestMode();
+        }
+      }
     }
     return unsub;
   }, []);
