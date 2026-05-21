@@ -20,7 +20,7 @@ type ColorPalette = Record<
 
 export const C = {
   // ─── Identity v3 (Visual Foundation v1) — paper-textured floor ───
-  paper: "#F0E1CB",         // BG — warm oat paper (sampled avg från paper.jpg, B&B-vibe)
+  paper: "#EAD9B8",         // BG — warm sand paper (mer mättat oat, B&B-vibe, tydligt sand texture)
 
   // ─── Identity v2 — extra färg-tokens (additivt, behåller alla legacy nedan) ───
   cream: "#FAFAF8",         // Icon/text on dark surfaces (NOT floor — se C.paper)
@@ -45,7 +45,7 @@ export const C = {
   grayLight: "#9CA3AF",
   gold: "#C9A96E",
   dark: "#111827",
-  bg: "#F0E1CB",            // Floor — aliasas paper, alla 42 callsites ärver warmth automatiskt
+  bg: "#EAD9B8",            // Floor — aliasas paper, alla 42 callsites ärver warmth automatiskt
 
   // Surfaces
   bgCard: "#FFFFFF",

@@ -46,7 +46,7 @@ class ErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#F0E1CB", padding: 32 }}>
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#EAD9B8", padding: 32 }}>
           <Text style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: "#111827", marginBottom: 8, letterSpacing: -0.3 }}>
             Något gick fel
           </Text>
@@ -87,8 +87,8 @@ const ReslotTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    background: '#F0E1CB',
-    card: '#F0E1CB',
+    background: '#EAD9B8',
+    card: '#EAD9B8',
     text: '#111827',
     border: 'rgba(0,0,0,0.06)',
     primary: '#7EC87A',
@@ -172,8 +172,8 @@ function RootLayoutNav() {
     <ThemeProvider value={ReslotTheme}>
       <ImageBackground
         source={require('../../assets/textures/paper.jpg')}
-        resizeMode="repeat"
-        style={{ flex: 1, backgroundColor: '#F0E1CB' }}
+        resizeMode="cover"
+        style={{ flex: 1, backgroundColor: '#EAD9B8' }}
       >
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: 'fade' }}>
         <Stack.Screen name="onboarding" options={{ headerShown: false, animation: 'none', contentStyle: { backgroundColor: 'transparent' } }} />

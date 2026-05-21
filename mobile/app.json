@@ -32,7 +32,7 @@
     },
     "icon": "./assets/logo/icon-1024.png",
     "splash": {
-      "backgroundColor": "#F0E1CB"
+      "backgroundColor": "#EAD9B8"
     }
   }
 }

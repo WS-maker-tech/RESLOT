@@ -44,7 +44,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
 
         {/* Meta */}
         <meta name="description" content="Din genväg till fullbokade restauranger." />
-        <meta name="theme-color" content="#F0E1CB" />
+        <meta name="theme-color" content="#EAD9B8" />
         <meta name="application-name" content="Reslot" />
         <meta name="apple-mobile-web-app-title" content="Reslot" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -77,9 +77,14 @@ export default function Root({ children }: { children: React.ReactNode }) {
 // Om C.paper ändras: uppdatera HÄR + theme.ts + app.json (3-state truth).
 const responsiveBackground = `
 body {
-  background-color: #F0E1CB;
+  background-color: #EAD9B8;
   background-image: url('/textures/paper.jpg');
-  background-repeat: repeat;
+  background-size: cover;
+  background-position: center center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  filter: contrast(1.05) saturate(1.08);
+  min-height: 100vh;
 }
 @media (prefers-color-scheme: dark) {
   body {
