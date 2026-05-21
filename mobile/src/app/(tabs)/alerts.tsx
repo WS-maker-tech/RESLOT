@@ -41,6 +41,12 @@ import {
   useWatches,
   useDeleteWatch,
 } from "@/lib/api/hooks";
+import {
+  SHOW_SAMPLE_DATA,
+  SAMPLE_ACTIVITY_ALERTS,
+  SAMPLE_RESTAURANT_ALERTS,
+  SAMPLE_WATCHES,
+} from "@/lib/sample-data";
 import type { ActivityAlert, RestaurantAlertWithRestaurant, Watch, WatchFilterOptions } from "@/lib/api/types";
 import { parseWatchFiltersSafe } from "@/lib/api/types";
 import Animated, { FadeInDown, ZoomIn } from "react-native-reanimated";
@@ -293,14 +299,9 @@ export default function AlertsScreen() {
   const phone = useAuthStore((s) => s.phoneNumber);
   const router = useRouter();
 
-  if (!isLoggedIn) {
-    return (
-      <LoginGate
-        title="Bevakningar"
-        subtitle="Logga in för att se dina bevakningar och händelser."
-      />
-    );
-  }
+  // DEMO-läge: visa exempeldata utan inloggning
+  const isDemoMode = SHOW_SAMPLE_DATA && !isLoggedIn;
+
   const [activeTab, setActiveTab] = useState<"activity" | "watches">("activity");
   const [showAddAlert, setShowAddAlert] = useState(false);
   const [addedIds, setAddedIds] = useState<string[]>([]);
@@ -308,7 +309,7 @@ export default function AlertsScreen() {
 
   // Fetch activity alerts
   const {
-    data: activityAlerts = [],
+    data: apiActivityAlerts = [],
     isLoading: alertsLoading,
     error: alertsError,
     refetch: alertsRefetch,
@@ -316,7 +317,7 @@ export default function AlertsScreen() {
 
   // Fetch restaurant alerts
   const {
-    data: restaurantAlerts = [],
+    data: apiRestaurantAlerts = [],
     isLoading: restaurantAlertsLoading,
     refetch: restaurantAlertsRefetch,
   } = useRestaurantAlerts(phone || "");
@@ -330,13 +331,27 @@ export default function AlertsScreen() {
   const markReadMutation = useMarkAlertsRead();
 
   // Watches
-  const { data: watches = [], isLoading: watchesLoading, refetch: watchesRefetch } = useWatches(phone);
+  const { data: apiWatches = [], isLoading: watchesLoading, refetch: watchesRefetch } = useWatches(phone);
   const { mutate: deleteWatch } = useDeleteWatch();
+
+  // Använd exempeldata i demo-läge
+  const activityAlerts = isDemoMode ? SAMPLE_ACTIVITY_ALERTS : apiActivityAlerts;
+  const restaurantAlerts = isDemoMode ? SAMPLE_RESTAURANT_ALERTS : apiRestaurantAlerts;
+  const watches = isDemoMode ? SAMPLE_WATCHES : apiWatches;
 
   const unreadCount = useMemo(() => (activityAlerts as ActivityAlert[]).filter((a) => !a.read).length, [activityAlerts]);
   const filteredActivityAlerts = useMemo(() => (activityAlerts as ActivityAlert[]).filter((a) => a.type !== "premium"), [activityAlerts]);
   const totalAlerts = restaurantAlerts.length;
   const enabledAlerts = useMemo(() => (restaurantAlerts as RestaurantAlertWithRestaurant[]).filter((a) => a.enabled).length, [restaurantAlerts]);
+
+  if (!SHOW_SAMPLE_DATA && !isLoggedIn) {
+    return (
+      <LoginGate
+        title="Bevakningar"
+        subtitle="Logga in för att se dina bevakningar och händelser."
+      />
+    );
+  }
 
   const handleRemoveAlert = async (alertId: string) => {
     try {

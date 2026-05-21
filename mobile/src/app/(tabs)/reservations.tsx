@@ -29,6 +29,7 @@ import {
 import { useAuthStore } from "@/lib/auth-store";
 import { LoginGate } from "@/components/LoginGate";
 import { useMyReservations, useCancelReservation, useSubmitFeedback } from "@/lib/api/hooks";
+import { SHOW_SAMPLE_DATA, SAMPLE_ALL_RESERVATIONS } from "@/lib/sample-data";
 import type { Reservation } from "@/lib/api/types";
 import Animated, {
   FadeInDown,
@@ -589,6 +590,10 @@ export default function ReservationsScreen() {
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
   const phone = useAuthStore((s) => s.phoneNumber);
 
+  // DEMO-läge: visa exempeldata utan inloggning
+  const isDemoMode = SHOW_SAMPLE_DATA && (isGuest || !isLoggedIn);
+  const effectivePhone = phone || (isDemoMode ? "__sample__" : "");
+
   // Track which reservations have been given feedback
   const [feedbackGivenIds, setFeedbackGivenIds] = useState<Set<string>>(new Set());
   const handleFeedbackGiven = useCallback((id: string) => {
@@ -597,25 +602,35 @@ export default function ReservationsScreen() {
 
   // Fetch user's reservations
   const {
-    data: allReservations = [],
+    data: apiReservations = [],
     isLoading,
     error,
     refetch,
-  } = useMyReservations(phone || "");
+  } = useMyReservations(effectivePhone);
+
+  // I demo-läge: använd exempeldata direkt
+  const allReservations: Reservation[] = isDemoMode
+    ? SAMPLE_ALL_RESERVATIONS
+    : apiReservations;
 
   // Cancel mutation
   const cancelMutation = useCancelReservation();
 
   const submittedReservations = useMemo(() => {
-    return allReservations.filter((r: Reservation) => r.submitterPhone === phone);
-  }, [allReservations, phone]);
+    return allReservations.filter((r: Reservation) =>
+      r.submitterPhone === effectivePhone || r.submitterPhone === "__sample__"
+    );
+  }, [allReservations, effectivePhone]);
 
   const claimedReservations = useMemo(() => {
-    return allReservations.filter((r: Reservation) => r.claimerPhone === phone);
-  }, [allReservations, phone]);
+    return allReservations.filter((r: Reservation) =>
+      r.claimerPhone === effectivePhone || r.claimerPhone === "__sample__"
+    );
+  }, [allReservations, effectivePhone]);
 
   const handleCancel = useCallback(
     (reservationId: string) => {
+      if (isDemoMode) return; // Ingen avbokning i demo-läge
       Alert.alert(
         "Lämna bordet?",
         "Är du säker? Detta kan inte ångras.",
@@ -636,10 +651,10 @@ export default function ReservationsScreen() {
         ]
       );
     },
-    [cancelMutation]
+    [cancelMutation, isDemoMode]
   );
 
-  if (isGuest || !isLoggedIn) {
+  if (!SHOW_SAMPLE_DATA && (isGuest || !isLoggedIn)) {
     return (
       <LoginGate
         title="Dina bord"
