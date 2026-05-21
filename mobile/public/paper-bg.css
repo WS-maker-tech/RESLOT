@@ -1,0 +1,22 @@
+/* Reslot — paper texture global background.
+ * Laddas via <link> i +html.tsx HEAD (överlever Expo Router 5:s body-replacement
+ * som annars rensar bort vår paper-div). !important behövs för att overrida
+ * React Native Web's inline-style på rot-divarna. */
+
+body {
+  background-color: #EAD9B8 !important;
+  background-image: url('/textures/paper.jpg') !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-attachment: fixed !important;
+  background-repeat: no-repeat !important;
+  filter: contrast(1.05) saturate(1.08);
+}
+
+/* React Native Web wrappar appen i en rad divar med backgroundColor inline.
+ * Transparentar de översta så body-texturen lyser igenom. */
+#root,
+#root > div,
+#root > div > div {
+  background-color: transparent !important;
+}

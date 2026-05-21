@@ -20,6 +20,7 @@ import {
 import { registerForPushNotificationsAsync, setupNotificationHandlers } from '@/lib/notifications';
 import { router as expoRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase'; // cache-bust 2
+import '@/lib/web-paper-bg'; // side-effect: runtime-injectar paper-bg.css på web
 
 // react-native-keyboard-controller is native-only; skip on web
 const KeyboardProvider =
@@ -87,8 +88,10 @@ const ReslotTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    background: '#EAD9B8',
-    card: '#EAD9B8',
+    // Transparent på web så +html.tsx paper-div lyser igenom Navigation-stacken.
+    // Solid #EAD9B8 på native så ImageBackground-fallback fungerar.
+    background: Platform.OS === 'web' ? 'transparent' : '#EAD9B8',
+    card: Platform.OS === 'web' ? 'transparent' : '#EAD9B8',
     text: '#111827',
     border: 'rgba(0,0,0,0.06)',
     primary: '#7EC87A',
@@ -168,13 +171,23 @@ function RootLayoutNav() {
 
   if (!hydrated) return null;
 
+  // På web tar +html.tsx-divet hand om paper-texturen (fixed bakgrund).
+  // På native används ImageBackground, eftersom inline HTML inte renderas.
+  const PaperWrap = Platform.OS === 'web'
+    ? ({ children }: { children: React.ReactNode }) => <View style={{ flex: 1 }}>{children}</View>
+    : ({ children }: { children: React.ReactNode }) => (
+        <ImageBackground
+          source={require('../../assets/textures/paper.jpg')}
+          resizeMode="cover"
+          style={{ flex: 1, backgroundColor: '#EAD9B8' }}
+        >
+          {children}
+        </ImageBackground>
+      );
+
   return (
     <ThemeProvider value={ReslotTheme}>
-      <ImageBackground
-        source={require('../../assets/textures/paper.jpg')}
-        resizeMode="cover"
-        style={{ flex: 1, backgroundColor: '#EAD9B8' }}
-      >
+      <PaperWrap>
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: 'fade' }}>
         <Stack.Screen name="onboarding" options={{ headerShown: false, animation: 'none', contentStyle: { backgroundColor: 'transparent' } }} />
         <Stack.Screen name="(tabs)" />
@@ -209,7 +222,7 @@ function RootLayoutNav() {
         <Stack.Screen name="notification-settings" options={{ headerShown: false, animation: "slide_from_right" }} />
         <Stack.Screen name="help" options={{ headerShown: false, animation: "slide_from_right" }} />
       </Stack>
-      </ImageBackground>
+      </PaperWrap>
       </ThemeProvider>
   );
 }

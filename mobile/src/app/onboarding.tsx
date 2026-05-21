@@ -480,8 +480,8 @@ function SplashStep({ onGetStarted, onExplore, onRegister }: { onGetStarted: () 
           >
             Bord som andra{"\n"}inte kan ta
           </Text>
-          {/* B&B-krydda — hand-drawn scribble under tagline-ord "ta" */}
-          <Scribble name="underline-flick" color={C.forest} width={92} style={{ marginTop: 4, marginLeft: 88 }} />
+          {/* B&B-krydda — subtle understryk endast under ordet "ta" (sista ordet) */}
+          <Scribble name="underline" color={C.forest} width={42} style={{ marginTop: -2, marginLeft: 102, opacity: 0.85 }} />
         </Animated.View>
       </View>
 

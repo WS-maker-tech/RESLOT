@@ -18,8 +18,6 @@ export default function Root({ children }: { children: React.ReactNode }) {
         */}
         <ScrollViewStyleReset />
 
-        {/* Using raw CSS styles as an escape-hatch to ensure the background color never flickers in dark-mode. */}
-        <style dangerouslySetInnerHTML={{ __html: responsiveBackground }} />
         <title>Reslot</title>
 
         {/* Favicons */}
@@ -64,6 +62,11 @@ export default function Root({ children }: { children: React.ReactNode }) {
         {/* Leaflet map CSS */}
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
+        {/* Reslot paper-texture global bg. Servas från mobile/public/paper-bg.css.
+            Måste vara CSS-fil (inte inline style) — Expo Router 5 strippar
+            <style>-tags och body-children, men <link> i HEAD överlever. */}
+        <link rel="stylesheet" href="/paper-bg.css" />
+
 
 
         {/* Add any additional <head> elements that you want globally available on web... */}
@@ -73,21 +76,5 @@ export default function Root({ children }: { children: React.ReactNode }) {
   );
 }
 
-// NOTE: Detta är Node SSR, kan inte referera C.paper runtime-token.
-// Om C.paper ändras: uppdatera HÄR + theme.ts + app.json (3-state truth).
-const responsiveBackground = `
-body {
-  background-color: #EAD9B8;
-  background-image: url('/textures/paper.jpg');
-  background-size: cover;
-  background-position: center center;
-  background-attachment: fixed;
-  background-repeat: no-repeat;
-  filter: contrast(1.05) saturate(1.08);
-  min-height: 100vh;
-}
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: #2A2820;
-  }
-}`;
+// NOTE: Paper-texturen ligger i mobile/public/paper-bg.css (servad på /paper-bg.css).
+// Om C.paper-hex ändras: uppdatera HÄR + theme.ts + app.json (3-state truth).
