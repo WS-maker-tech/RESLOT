@@ -372,6 +372,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         nameOnReservation: b.ln,
         status: "active",
         creditCost: 2,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       }]).select("id").single();
       if (error) errors.push(error.message);
       else created.push(data?.id);
