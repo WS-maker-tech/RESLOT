@@ -54,6 +54,7 @@ import { api } from "@/lib/api/api";
 import { useAuthStore } from "@/lib/auth-store";
 import type { Reservation, MissedReservation, Restaurant } from "@/lib/api/types";
 import { C, FONTS, SPACING, SHADOW, RADIUS, ICON } from "../../lib/theme";
+import { Scribble } from "../../reslot-art";
 import { RestaurantCard } from "@/components/RestaurantCard";
 import { FilterChips } from "@/components/FilterChips";
 import { DayPicker, generateDays } from "@/components/DayPicker";
@@ -262,6 +263,8 @@ const Header = React.memo(function Header({
           </Text>
           <ChevronDown size={22} color={C.pistachio} strokeWidth={2.4} style={{ marginLeft: 6, marginTop: 4 }} />
         </Pressable>
+        {/* B&B-krydda — hand-drawn double-underline under stadnamnet, pistachio för brand-koppling */}
+        <Scribble name="underline-double" color={C.pistachio} width={140} style={{ marginTop: -2, marginLeft: 84 }} />
       </View>
 
       {showSearch ? (

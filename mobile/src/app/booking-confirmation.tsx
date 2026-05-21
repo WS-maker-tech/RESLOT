@@ -45,6 +45,7 @@ import * as Haptics from "expo-haptics";
 import { useReservation, useCancelClaim } from "@/lib/api/hooks";
 import { useAuthStore } from "@/lib/auth-store";
 import { C, FONTS, SPACING, SHADOW, RADIUS, ICON } from "../lib/theme";
+import { Doodle, Scribble } from "../reslot-art";
 
 const GRACE_PERIOD_SECONDS = 5 * 60; // 5 minutes
 
@@ -241,9 +242,17 @@ function CelebrationView() {
               backgroundColor: C.success,
               alignItems: "center",
               justifyContent: "center",
+              position: "relative",
             }}
           >
             <PartyPopper size={36} color={C.white} strokeWidth={2} />
+            {/* B&B-krydda — terracotta spark som accent på celebration-ringen */}
+            <Scribble
+              name="spark"
+              color={C.coral}
+              width={28}
+              style={{ position: "absolute", top: -14, right: -14 }}
+            />
           </View>
         </Animated.View>
       </Animated.View>

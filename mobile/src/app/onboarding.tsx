@@ -44,6 +44,7 @@ import * as Haptics from "expo-haptics";
 import { useAuthStore } from "@/lib/auth-store";
 import { supabase } from "@/lib/supabase";
 import { C as ThemeC, FONTS } from "../lib/theme";
+import { Scribble, Doodle } from "../reslot-art";
 
 // Use static fallback for constants needed at module level (card sizes etc)
 const { width: _INIT_W, height: _INIT_H } = Dimensions.get("window");
@@ -479,7 +480,8 @@ function SplashStep({ onGetStarted, onExplore, onRegister }: { onGetStarted: () 
           >
             Bord som andra{"\n"}inte kan ta
           </Text>
-
+          {/* B&B-krydda — hand-drawn scribble under tagline-ord "ta" */}
+          <Scribble name="underline-flick" color={C.forest} width={92} style={{ marginTop: 4, marginLeft: 88 }} />
         </Animated.View>
       </View>
 
@@ -1383,12 +1385,20 @@ function CreditsIntroStep({ onContinue, onBack }: { onContinue: () => void; onBa
       <ProgressBar current={4} total={5} />
 
       <View style={{ flex: 1, justifyContent: "center" }}>
-        {/* Animated coin icon */}
+        {/* Animated coin icon + B&B spark-accent (terracotta = gnista, sparsamt) */}
         <Animated.View
           entering={enterHeading(60)}
           style={{ alignItems: "center", marginBottom: 10 }}
         >
-          <AnimatedCoinIcon />
+          <View style={{ position: "relative" }}>
+            <AnimatedCoinIcon />
+            <Scribble
+              name="spark"
+              color={C.coral}
+              width={32}
+              style={{ position: "absolute", top: -10, right: -18 }}
+            />
+          </View>
         </Animated.View>
 
         <Animated.View
@@ -1726,8 +1736,14 @@ function WelcomeStep({ onContinue, firstName, cityName }: { onContinue: () => vo
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingHorizontal: 32 }}>
-      {/* Celebration ring + floating particles */}
+      {/* Celebration ring + floating particles + B&B star-accent (terracotta gnista) */}
       <View style={{ marginBottom: 32, alignItems: "center", justifyContent: "center" }}>
+        <Scribble
+          name="star"
+          color={C.coral}
+          width={28}
+          style={{ position: "absolute", top: -8, right: -6, zIndex: 5 }}
+        />
         <View style={{ position: "absolute", width: 130, height: 130, alignItems: "center", justifyContent: "center" }}>
           {particles.map((p, i) => <FloatingParticle key={i} {...p} />)}
         </View>
