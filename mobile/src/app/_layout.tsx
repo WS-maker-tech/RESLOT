@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Platform, View, Text, Pressable } from 'react-native';
+import { Platform, View, Text, Pressable, ImageBackground } from 'react-native';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack, useRouter } from 'expo-router';
+import { FONTS } from '@/lib/theme';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -10,6 +11,12 @@ import { useAuthStore } from '@/lib/auth-store';
 import { SHOW_SAMPLE_DATA } from '@/lib/sample-data';
 import { Modal } from 'react-native';
 import { useFonts } from 'expo-font';
+import {
+  PlusJakartaSans_400Regular,
+  PlusJakartaSans_500Medium,
+  PlusJakartaSans_600SemiBold,
+  PlusJakartaSans_700Bold,
+} from '@expo-google-fonts/plus-jakarta-sans';
 import { registerForPushNotificationsAsync, setupNotificationHandlers } from '@/lib/notifications';
 import { router as expoRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase'; // cache-bust 2
@@ -39,8 +46,8 @@ class ErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#FAFAF8", padding: 32 }}>
-          <Text style={{ fontFamily: "PlusJakartaSans_700Bold", fontSize: 20, color: "#111827", marginBottom: 8, letterSpacing: -0.3 }}>
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#F0E1CB", padding: 32 }}>
+          <Text style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: "#111827", marginBottom: 8, letterSpacing: -0.3 }}>
             Något gick fel
           </Text>
           <Text style={{ fontFamily: "PlusJakartaSans_400Regular", fontSize: 14, color: "#6B7280", textAlign: "center", marginBottom: 24 }}>
@@ -50,7 +57,7 @@ class ErrorBoundary extends React.Component<
             onPress={() => this.setState({ hasError: false, error: null })}
             style={{ backgroundColor: "#7EC87A", borderRadius: 16, paddingHorizontal: 24, paddingVertical: 12 }}
           >
-            <Text style={{ fontFamily: "PlusJakartaSans_700Bold", fontSize: 15, color: "#111827" }}>Försök igen</Text>
+            <Text style={{ fontFamily: FONTS.displayBold, fontSize: 15, color: "#111827" }}>Försök igen</Text>
           </Pressable>
         </View>
       );
@@ -80,8 +87,8 @@ const ReslotTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    background: '#FAFAF8',
-    card: '#FAFAF8',
+    background: '#F0E1CB',
+    card: '#F0E1CB',
     text: '#111827',
     border: 'rgba(0,0,0,0.06)',
     primary: '#7EC87A',
@@ -163,8 +170,13 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={ReslotTheme}>
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#FAFAF8' }, animation: 'fade' }}>
-        <Stack.Screen name="onboarding" options={{ headerShown: false, animation: 'none', contentStyle: { backgroundColor: '#FAFAF8' } }} />
+      <ImageBackground
+        source={require('../../assets/textures/paper.jpg')}
+        resizeMode="repeat"
+        style={{ flex: 1, backgroundColor: '#F0E1CB' }}
+      >
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' }, animation: 'fade' }}>
+        <Stack.Screen name="onboarding" options={{ headerShown: false, animation: 'none', contentStyle: { backgroundColor: 'transparent' } }} />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="restaurant/[id]" options={{ presentation: "modal", headerShown: false, animation: "slide_from_bottom" }} />
         <Stack.Screen name="rewards" options={{ headerShown: false, animation: "slide_from_right" }} />
@@ -197,13 +209,19 @@ function RootLayoutNav() {
         <Stack.Screen name="notification-settings" options={{ headerShown: false, animation: "slide_from_right" }} />
         <Stack.Screen name="help" options={{ headerShown: false, animation: "slide_from_right" }} />
       </Stack>
-
+      </ImageBackground>
       </ThemeProvider>
   );
 }
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({});
+  const [fontsLoaded] = useFonts({
+    PlusJakartaSans_400Regular,
+    PlusJakartaSans_500Medium,
+    PlusJakartaSans_600SemiBold,
+    PlusJakartaSans_700Bold,
+    "Unisketch-Bold": require("../../assets/fonts/Unisketch-Bold.ttf"),
+  });
   const notificationCleanupRef = useRef<(() => void) | null>(null);
 
   // Set up push notifications on mount

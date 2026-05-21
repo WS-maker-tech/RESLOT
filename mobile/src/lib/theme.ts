@@ -1,6 +1,6 @@
 type ColorPalette = Record<
   | "pistachio" | "pistachioLight" | "pistachioPressed"
-  | "gold" | "dark" | "bg"
+  | "gold" | "dark" | "bg" | "paper"
   | "bgCard" | "bgInput"
   | "textPrimary" | "textSecondary" | "textTertiary"
   | "divider" | "borderLight"
@@ -19,8 +19,11 @@ type ColorPalette = Record<
 >;
 
 export const C = {
+  // ─── Identity v3 (Visual Foundation v1) — paper-textured floor ───
+  paper: "#F0E1CB",         // BG — warm oat paper (sampled avg från paper.jpg, B&B-vibe)
+
   // ─── Identity v2 — extra färg-tokens (additivt, behåller alla legacy nedan) ───
-  cream: "#FAFAF8",         // BG — off-white "typ vit" (co-founder approved, pre-FAF3EB-värme)
+  cream: "#FAFAF8",         // Icon/text on dark surfaces (NOT floor — se C.paper)
   creamSoft: "#FCFCFB",     // Lighter off-white, subtle layering
   creamDeep: "#F0F0EE",     // Inputs, sunken surfaces (cool off-white)
   forest: "#1F4D2A",        // Dark green — primary accent (icons, links, CTAs)
@@ -42,7 +45,7 @@ export const C = {
   grayLight: "#9CA3AF",
   gold: "#C9A96E",
   dark: "#111827",
-  bg: "#FAFAF8",
+  bg: "#F0E1CB",            // Floor — aliasas paper, alla 42 callsites ärver warmth automatiskt
 
   // Surfaces
   bgCard: "#FFFFFF",
@@ -101,7 +104,8 @@ export const C = {
  * No existing components are changed — this is infrastructure only.
  */
 export const DARK_COLORS: ColorPalette = {
-  // Identity v2 dark counterparts (infrastructure only — ej använt)
+  // Identity v3 dark counterparts (infrastructure only — ej använt)
+  paper: "#2A2820",         // Dark warm "paper" floor
   cream: "#1A1A1A",
   creamSoft: "#222222",
   creamDeep: "#2A2A2A",
@@ -123,7 +127,7 @@ export const DARK_COLORS: ColorPalette = {
   grayLight: "#9CA3AF",
   gold: "#D4B87E",
   dark: "#FAFAFA",
-  bg: "#1A1A1A",
+  bg: "#2A2820",            // Floor — alias för paper
 
   bgCard: "#2A2A2A",
   bgInput: "#333333",
@@ -172,10 +176,10 @@ export function getTheme(mode: "light" | "dark"): ColorPalette {
 }
 
 export const FONTS = {
-  // Display — Plus Jakarta Sans (all headings)
-  displayBold: "PlusJakartaSans_700Bold",
-  displaySemiBold: "PlusJakartaSans_600SemiBold",
-  // Body/UI — Plus Jakarta Sans
+  // Display — Unisketch Bold (hand-drawn, B&B-vibe, single heading weight)
+  displayBold: "Unisketch-Bold",
+  displaySemiBold: "Unisketch-Bold",
+  // Body/UI — Plus Jakarta Sans (oförändrat)
   bold: "PlusJakartaSans_700Bold",
   semiBold: "PlusJakartaSans_600SemiBold",
   medium: "PlusJakartaSans_500Medium",

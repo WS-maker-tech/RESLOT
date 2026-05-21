@@ -11,7 +11,8 @@ module.exports = {
     extend: {
       colors: {
         reslot: {
-          bg: "#FAFAF8",
+          bg: "#F0E1CB",
+          paper: "#F0E1CB",
           card: "#FFFFFF",
           charcoal: "#111827",
           muted: "#6B7280",

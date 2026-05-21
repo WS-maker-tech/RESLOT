@@ -18,13 +18,6 @@ import Animated, {
 
 // Strong custom ease-out (per Emil's design-eng — built-in CSS easings lack punch)
 const EASE_OUT = Easing.bezier(0.23, 1, 0.32, 1);
-import {
-  useFonts,
-  PlusJakartaSans_400Regular,
-  PlusJakartaSans_500Medium,
-  PlusJakartaSans_600SemiBold,
-  PlusJakartaSans_700Bold,
-} from "@expo-google-fonts/plus-jakarta-sans";
 
 import * as SplashScreen from "expo-splash-screen";
 import { useActivityAlerts } from "@/lib/api/hooks";
@@ -125,13 +118,7 @@ function TabIcon({
 }
 
 export default function TabLayout() {
-  const [fontsLoaded] = useFonts({
-    PlusJakartaSans_400Regular,
-    PlusJakartaSans_500Medium,
-    PlusJakartaSans_600SemiBold,
-    PlusJakartaSans_700Bold,
-  });
-
+  // Fonts laddas i root _layout.tsx — (tabs) renderas inte förrän de är klara.
   const [showSplash, setShowSplash] = useState(true);
   const splashOpacity = useSharedValue(1);
   const phone = useAuthStore((s) => s.phoneNumber);
@@ -147,22 +134,18 @@ export default function TabLayout() {
   }));
 
   useEffect(() => {
-    if (fontsLoaded) {
-      SplashScreen.hideAsync();
-      // Kort hold + snabb fade — splash visas vid varje session
-      // (Emil: frequent UI = under 300ms, anteckna ej även när det är "branding")
-      const timer = setTimeout(() => {
-        splashOpacity.value = withTiming(0, { duration: 280, easing: EASE_OUT });
-        setTimeout(() => setShowSplash(false), 320);
-      }, 600);
-      return () => clearTimeout(timer);
-    }
-  }, [fontsLoaded, splashOpacity]);
-
-  if (!fontsLoaded) return null;
+    SplashScreen.hideAsync();
+    // Kort hold + snabb fade — splash visas vid varje session
+    // (Emil: frequent UI = under 300ms, anteckna ej även när det är "branding")
+    const timer = setTimeout(() => {
+      splashOpacity.value = withTiming(0, { duration: 280, easing: EASE_OUT });
+      setTimeout(() => setShowSplash(false), 320);
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [splashOpacity]);
 
   return (
-    <View className="flex-1" style={{ backgroundColor: C.bg }}>
+    <View className="flex-1" style={{ backgroundColor: "transparent" }}>
       {showSplash ? (
         <Animated.View
           style={[
@@ -172,7 +155,8 @@ export default function TabLayout() {
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: C.bg,
+              // Transparent så root-paper-texturen synas direkt vid splash.
+              backgroundColor: "transparent",
               zIndex: 999,
               alignItems: "center",
               justifyContent: "center",
