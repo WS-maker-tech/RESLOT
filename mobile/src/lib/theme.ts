@@ -176,9 +176,9 @@ export function getTheme(mode: "light" | "dark"): ColorPalette {
 }
 
 export const FONTS = {
-  // Display — Unisketch Bold (hand-drawn, B&B-vibe, single heading weight)
-  displayBold: "Unisketch-Bold",
-  displaySemiBold: "Unisketch-Bold",
+  // Display — Plus Jakarta Sans (Unisketch reverted, letar efter rätt B&B-font)
+  displayBold: "PlusJakartaSans_700Bold",
+  displaySemiBold: "PlusJakartaSans_600SemiBold",
   // Body/UI — Plus Jakarta Sans (oförändrat)
   bold: "PlusJakartaSans_700Bold",
   semiBold: "PlusJakartaSans_600SemiBold",
