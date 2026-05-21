@@ -10,6 +10,12 @@ import { useAuthStore } from '@/lib/auth-store';
 import { SHOW_SAMPLE_DATA } from '@/lib/sample-data';
 import { Modal } from 'react-native';
 import { useFonts } from 'expo-font';
+import {
+  PlusJakartaSans_400Regular,
+  PlusJakartaSans_500Medium,
+  PlusJakartaSans_600SemiBold,
+  PlusJakartaSans_700Bold,
+} from '@expo-google-fonts/plus-jakarta-sans';
 import { registerForPushNotificationsAsync, setupNotificationHandlers } from '@/lib/notifications';
 import { router as expoRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase'; // cache-bust 2
@@ -203,7 +209,13 @@ function RootLayoutNav() {
 }
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({});
+  const [fontsLoaded] = useFonts({
+    PlusJakartaSans_400Regular,
+    PlusJakartaSans_500Medium,
+    PlusJakartaSans_600SemiBold,
+    PlusJakartaSans_700Bold,
+    "Unisketch-Bold": require("../../assets/fonts/Unisketch-Bold.ttf"),
+  });
   const notificationCleanupRef = useRef<(() => void) | null>(null);
 
   // Set up push notifications on mount
