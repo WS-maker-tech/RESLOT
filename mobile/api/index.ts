@@ -1,5 +1,10 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient } from "@supabase/supabase-js";
+import { randomBytes } from "crypto";
+
+function genId() {
+  return "c" + Date.now().toString(36) + randomBytes(8).toString("hex");
+}
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -50,9 +55,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // POST /api/reservations — create new reservation
   if (path === "reservations" && req.method === "POST") {
     const body = req.body || {};
+    const nowIso = new Date().toISOString();
     const { data, error } = await supabase
       .from("Reservation")
-      .insert([{ ...body, status: "active" }])
+      .insert([{ id: genId(), createdAt: nowIso, updatedAt: nowIso, ...body, status: "active" }])
       .select("*, Restaurant:restaurantId(*)")
       .single();
     if (error) return res.status(500).json({ error: { message: error.message } });
@@ -83,6 +89,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const today = new Date();
     today.setUTCHours(0, 0, 0, 0);
 
+    const nowIso = new Date().toISOString();
     const rows = Array.from({ length: 20 }, (_, i) => {
       const restaurant = restaurants[i % restaurants.length];
       const daysAhead = 1 + Math.floor(i * 1.1);
@@ -91,6 +98,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const fn = firstNames[i % firstNames.length];
       const ln = lastNames[i % lastNames.length];
       return {
+        id: genId(),
         restaurantId: restaurant.id,
         submitterPhone: `+467${String(10000000 + i * 137).slice(-8)}`,
         submitterFirstName: fn,
@@ -102,6 +110,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         nameOnReservation: `${fn} ${ln}`,
         status: "active",
         creditCost: 1 + (i % 3),
+        createdAt: nowIso,
+        updatedAt: nowIso,
       };
     });
 
