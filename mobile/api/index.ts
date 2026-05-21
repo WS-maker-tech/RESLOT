@@ -289,6 +289,96 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json({ data: { success: true } });
   }
 
+    // POST /api/reservations — skapa ny bokning (submit-flödet)
+  if (path === "reservations" && req.method === "POST") {
+    const { nanoid } = await import("nanoid");
+    const body = req.body;
+    const id = nanoid();
+    const { data, error } = await supabase.from("Reservation").insert([{
+      id,
+      restaurantId: body.restaurantId,
+      submitterPhone: body.submitterPhone,
+      submitterFirstName: body.submitterFirstName,
+      submitterLastName: body.submitterLastName,
+      reservationDate: body.reservationDate,
+      reservationTime: body.reservationTime,
+      partySize: body.partySize,
+      seatType: body.seatType,
+      nameOnReservation: body.nameOnReservation,
+      status: "active",
+      cancelFee: body.cancelFee ?? null,
+      prepaidAmount: body.prepaidAmount ?? null,
+      extraInfo: body.extraInfo ?? null,
+      creditCost: 2,
+    }]).select().single();
+    if (error) return res.status(500).json({ error: { message: error.message } });
+    return res.status(201).json({ data });
+  }
+
+  // GET /api/admin/seed-reservations — sätter upp exempeldata (temporärt, ta bort efter test)
+  if (path === "admin/seed-reservations" && req.method === "GET") {
+    const { nanoid } = await import("nanoid");
+    function offsetDate(days: number): string {
+      const d = new Date();
+      d.setDate(d.getDate() + days);
+      d.setHours(0, 0, 0, 0);
+      return d.toISOString();
+    }
+    // Hämta restaurang-IDs
+    const { data: rests } = await supabase.from("Restaurant").select("id, name").eq("city", "Stockholm").limit(10);
+    if (!rests || rests.length === 0) return res.status(500).json({ error: { message: "Inga restauranger hittades" } });
+
+    const bookings = [
+      { ri: 0, days: 0, time: "18:30", party: 2, fn: "Anna", ln: "Lindgren" },
+      { ri: 1, days: 0, time: "19:00", party: 4, fn: "Erik", ln: "Svensson" },
+      { ri: 2, days: 0, time: "20:00", party: 2, fn: "Maria", ln: "Bergöström" },
+      { ri: 3, days: 0, time: "19:30", party: 3, fn: "Johan", ln: "Lindqvist" },
+      { ri: 4, days: 0, time: "17:30", party: 2, fn: "Sofia", ln: "Karlsson" },
+      { ri: 0, days: 1, time: "19:00", party: 2, fn: "Anders", ln: "Nilsson" },
+      { ri: 1, days: 1, time: "18:30", party: 2, fn: "Klara", ln: "Björk" },
+      { ri: 2, days: 1, time: "20:00", party: 4, fn: "Marcus", ln: "Holm" },
+      { ri: 5, days: 1, time: "19:30", party: 2, fn: "Emma", ln: "Wahlberg" },
+      { ri: 6, days: 1, time: "20:30", party: 3, fn: "David", ln: "Ek" },
+      { ri: 7, days: 2, time: "19:00", party: 2, fn: "Sara", ln: "Lindén" },
+      { ri: 8, days: 2, time: "20:00", party: 2, fn: "Henrik", ln: "Strand" },
+      { ri: 9, days: 2, time: "18:00", party: 4, fn: "Lina", ln: "Persson" },
+      { ri: 3, days: 2, time: "19:00", party: 2, fn: "Pontus", ln: "Engström" },
+      { ri: 4, days: 3, time: "19:30", party: 2, fn: "Maja", ln: "Hellström" },
+      { ri: 0, days: 3, time: "18:30", party: 3, fn: "Oscar", ln: "Rydén" },
+      { ri: 1, days: 3, time: "20:00", party: 2, fn: "Julia", ln: "Nordin" },
+      { ri: 5, days: 4, time: "19:00", party: 4, fn: "Viktor", ln: "Sjöberg" },
+      { ri: 6, days: 4, time: "18:30", party: 2, fn: "Hanna", ln: "Lindblom" },
+      { ri: 7, days: 4, time: "20:00", party: 2, fn: "Tobias", ln: "Engel" },
+      { ri: 8, days: 5, time: "19:30", party: 2, fn: "Cecilia", ln: "Strand" },
+      { ri: 9, days: 5, time: "18:00", party: 4, fn: "Filip", ln: "Magnusson" },
+      { ri: 2, days: 5, time: "20:30", party: 2, fn: "Annika", ln: "Johansson" },
+    ];
+
+    const created = [];
+    const errors = [];
+    for (const b of bookings) {
+      const rest = rests[b.ri % rests.length];
+      if (!rest) continue;
+      const { data, error } = await supabase.from("Reservation").insert([{
+        id: nanoid(),
+        restaurantId: rest.id,
+        submitterPhone: "+46709000099",
+        submitterFirstName: b.fn,
+        submitterLastName: b.ln,
+        reservationDate: offsetDate(b.days),
+        reservationTime: b.time,
+        partySize: b.party,
+        seatType: "Inne",
+        nameOnReservation: b.ln,
+        status: "active",
+        creditCost: 2,
+      }]).select("id").single();
+      if (error) errors.push(error.message);
+      else created.push(data?.id);
+    }
+    return res.status(200).json({ data: { created: created.length, errors } });
+  }
+
   // Stub routes (not yet implemented)
   const stubs = ["alerts", "alerts/read", "alerts/restaurant-alerts", "saved-restaurants", "support", "referral/code", "referral/use", "credits/card-status", "credits/purchase", "credits/setup-card"];
   if (stubs.some(s => path === s || path.startsWith(s + "/"))) {
