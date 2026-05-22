@@ -669,13 +669,13 @@ reservationsRouter.post("/:id/finalize", authMiddleware, async (c) => {
 
     await tx.userProfile.upsert({
       where: { phone: reservation.submitterPhone },
-      update: { credits: { increment: 2 } },
+      update: { credits: { increment: 1 } },
       create: {
         phone: reservation.submitterPhone,
         firstName: reservation.submitterFirstName,
         lastName: reservation.submitterLastName,
         email: "",
-        credits: 2,
+        credits: 1,
       },
     });
 
@@ -694,8 +694,8 @@ reservationsRouter.post("/:id/finalize", authMiddleware, async (c) => {
     data: {
       userPhone: reservation.submitterPhone,
       type: "credit",
-      title: "Du fick 2 credits!",
-      message: `Din bokning p\u00e5 ${reservation.restaurant.name} har bekr\u00e4ftats. Du har f\u00e5tt 2 credits!`,
+      title: "Du fick 1 credit!",
+      message: `Din bokning p\u00e5 ${reservation.restaurant.name} har bekr\u00e4ftats. Du har f\u00e5tt 1 credit!`,
       restaurantId: reservation.restaurantId,
     },
   });

@@ -353,10 +353,10 @@ export default function CreditsScreen() {
                     Lägg upp en bokning
                   </Text>
                   <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary, marginTop: 1 }}>
-                    +2 credits efter att bokningen tagits över
+                    +1 credit efter att bokningen tagits över
                   </Text>
                 </View>
-                <CreditBadge label="+2 credits" color="green" />
+                <CreditBadge label="+1 credit" color="green" />
               </View>
             </Animated.View>
 
@@ -560,7 +560,7 @@ export default function CreditsScreen() {
             <Animated.View entering={FadeInDown.delay(520).duration(220)}>
               <AnimatedPressable
                 testID="post-booking-btn"
-                accessibilityLabel="Lägg upp en bokning och få 2 credits"
+                accessibilityLabel="Lägg upp en bokning och få 1 credit"
                 onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   router.push("/(tabs)/submit");
@@ -601,7 +601,7 @@ export default function CreditsScreen() {
                     Lägg upp en bokning
                   </Text>
                 </View>
-                <CreditBadge label="+2 credits" color="green" />
+                <CreditBadge label="+1 credit" color="green" />
                 <ChevronRight size={16} color={C.textTertiary} strokeWidth={2} />
               </AnimatedPressable>
             </Animated.View>

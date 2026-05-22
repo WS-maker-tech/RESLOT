@@ -192,13 +192,13 @@ setInterval(async () => {
 
         await tx.userProfile.upsert({
           where: { phone: reservation.submitterPhone },
-          update: { credits: { increment: 2 } },
+          update: { credits: { increment: 1 } },
           create: {
             phone: reservation.submitterPhone,
             firstName: reservation.submitterFirstName,
             lastName: reservation.submitterLastName,
             email: "",
-            credits: 2,
+            credits: 1,
           },
         });
 
@@ -206,8 +206,8 @@ setInterval(async () => {
           data: {
             userPhone: reservation.submitterPhone,
             type: "credit",
-            title: "Credits intjänade!",
-            message: "Du fick 2 credits för din delade bokning.",
+            title: "Credit intjänad!",
+            message: "Du fick 1 credit för din delade bokning.",
           },
         });
       });
@@ -222,8 +222,8 @@ setInterval(async () => {
       // Push notification: credits awarded to submitter
       sendPushToUser(
         reservation.submitterPhone,
-        "+2 credits",
-        `Tack! Du fick 2 credits för bokningen på ${reservation.restaurant.name}.`,
+        "+1 credit",
+        `Tack! Du fick 1 credit för bokningen på ${reservation.restaurant.name}.`,
         { type: "credits_awarded", reservationId: reservation.id, restaurantId: reservation.restaurantId }
       ).catch(() => {});
 
@@ -232,7 +232,7 @@ setInterval(async () => {
       sendPushToUser(
         reservation.submitterPhone,
         `Bordet på ${reservation.restaurant.name} är överlåtet`,
-        `Någon tog bordet på ${reservation.restaurant.name}. Dina 2 credits är utbetalade.`,
+        `Någon tog bordet på ${reservation.restaurant.name}. Din credit är utbetald.`,
         { type: "booking_claimed", reservationId: reservation.id, restaurantId: reservation.restaurantId }
       ).catch(() => {});
 
