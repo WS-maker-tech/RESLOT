@@ -606,7 +606,7 @@ export default function ProfileScreen() {
                   </View>
                   <Text style={{ fontFamily: FONTS.medium, fontSize: 15, color: C.textPrimary, flex: 1 }}>Lägg upp en bokning</Text>
                   <View style={{ backgroundColor: C.successLight, paddingHorizontal: 8, paddingVertical: 3, borderRadius: RADIUS.sm }}>
-                    <Text style={{ fontFamily: FONTS.bold, fontSize: 11, color: C.success }}>+2 credits</Text>
+                    <Text style={{ fontFamily: FONTS.bold, fontSize: 11, color: C.success }}>+1 credit</Text>
                   </View>
                   <ChevronRight size={18} color={C.textTertiary} strokeWidth={2} />
                 </Pressable>

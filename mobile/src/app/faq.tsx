@@ -48,7 +48,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Hur får jag fler credits?",
-    a: "Lägg upp ett bord (+2), bjud in en vän (+1) eller köp direkt i appen.",
+    a: "Lägg upp ett bord (+1), bjud in en vän (+1) eller köp direkt i appen.",
   },
 ];
 

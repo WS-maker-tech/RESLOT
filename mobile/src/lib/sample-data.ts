@@ -309,12 +309,12 @@ export const SAMPLE_ACTIVITY_ALERTS: ActivityAlert[] = [
   {
     id: "sample-act-1", userPhone: "__sample__", type: "claim",
     title: "Ditt bord är övertaget! 🎉",
-    message: "Någon tog över din bokning på Le Moule. Du har fått +2 credits.",
+    message: "Någon tog över din bokning på Le Moule. Du har fått +1 credit.",
     read: false, restaurantId: "sample-r3", createdAt: new Date().toISOString(),
   },
   {
     id: "sample-act-2", userPhone: "__sample__", type: "credit",
-    title: "+2 credits",
+    title: "+1 credit",
     message: "Du fick credits för att du lade upp ett bord på Trattoria Roma. Tack!",
     read: true, restaurantId: "sample-r4", createdAt: new Date().toISOString(),
   },
