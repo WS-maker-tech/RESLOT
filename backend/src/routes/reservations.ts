@@ -229,6 +229,29 @@ reservationsRouter.post(
       data: { timesBookedOnReslot: { increment: 1 } },
     });
 
+    // Grant 1 credit to submitter for posting the booking
+    await db.userProfile.upsert({
+      where: { phone: submitterPhone },
+      update: { credits: { increment: 1 } },
+      create: {
+        phone: submitterPhone,
+        firstName: body.submitterFirstName,
+        lastName: body.submitterLastName,
+        email: "",
+        credits: 1,
+      },
+    });
+
+    await db.activityAlert.create({
+      data: {
+        userPhone: submitterPhone,
+        type: "credit",
+        title: "+1 credit",
+        message: `Du fick 1 credit för att du lade upp ett bord på ${restaurant.name}. Tack!`,
+        restaurantId: body.restaurantId,
+      },
+    });
+
     // Create activity alerts for users who have alerts for this restaurant
     const alerts = await db.restaurantAlert.findMany({
       where: { restaurantId: body.restaurantId, enabled: true },
@@ -667,18 +690,6 @@ reservationsRouter.post("/:id/finalize", authMiddleware, async (c) => {
       throw new Error("OPTIMISTIC_LOCK_FAILED");
     }
 
-    await tx.userProfile.upsert({
-      where: { phone: reservation.submitterPhone },
-      update: { credits: { increment: 1 } },
-      create: {
-        phone: reservation.submitterPhone,
-        firstName: reservation.submitterFirstName,
-        lastName: reservation.submitterLastName,
-        email: "",
-        credits: 1,
-      },
-    });
-
     return tx.reservation.findUnique({
       where: { id },
       include: { restaurant: true },
@@ -689,13 +700,13 @@ reservationsRouter.post("/:id/finalize", authMiddleware, async (c) => {
     return c.json({ error: { message: "Reservation not found after update", code: "NOT_FOUND" } }, 404);
   }
 
-  // Notify submitter about credit award
+  // Notify submitter about successful handover
   await db.activityAlert.create({
     data: {
       userPhone: reservation.submitterPhone,
-      type: "credit",
-      title: "Du fick 1 credit!",
-      message: `Din bokning p\u00e5 ${reservation.restaurant.name} har bekr\u00e4ftats. Du har f\u00e5tt 1 credit!`,
+      type: "claim",
+      title: "Din bokning \u00e4r bekr\u00e4ftad",
+      message: `Din bokning p\u00e5 ${reservation.restaurant.name} har tagits \u00f6ver. Tack f\u00f6r delningen!`,
       restaurantId: reservation.restaurantId,
     },
   });

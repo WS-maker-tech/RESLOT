@@ -317,6 +317,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       creditCost: 2,
     }]).select().single();
     if (error) return res.status(500).json({ error: { message: error.message } });
+
+    // Grant 1 credit to submitter for posting the booking
+    const submitterPhone = user.phone ?? user.id;
+    const { data: profile } = await supabase
+      .from("UserProfile")
+      .select("credits")
+      .eq("phone", submitterPhone)
+      .maybeSingle();
+    if (profile) {
+      await supabase
+        .from("UserProfile")
+        .update({ credits: (profile.credits ?? 0) + 1 })
+        .eq("phone", submitterPhone);
+    } else {
+      await supabase.from("UserProfile").insert([{
+        phone: submitterPhone,
+        firstName: body.submitterFirstName ?? "",
+        lastName: body.submitterLastName ?? "",
+        email: "",
+        credits: 1,
+      }]);
+    }
+
     return res.status(201).json({ data });
   }
 

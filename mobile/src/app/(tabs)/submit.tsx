@@ -498,7 +498,7 @@ export default function SubmitScreen() {
 
               {/* Credits info box */}
               <View style={{ backgroundColor: "rgba(126,200,122,0.1)", borderRadius: RADIUS.lg, padding: 16, marginTop: 20, marginBottom: 8, borderWidth: 1, borderColor: "rgba(126,200,122,0.3)" }}>
-                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: "#3d7a3a", textAlign: "center" }}>Du får 1 credit när någon tar bordet</Text>
+                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: "#3d7a3a", textAlign: "center" }}>+1 credit tillagd på ditt konto</Text>
               </View>
 
               <Pressable
@@ -629,7 +629,7 @@ export default function SubmitScreen() {
               <View style={{ flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: "rgba(126,200,122,0.08)", borderRadius: RADIUS.md, padding: 12, marginBottom: 16, borderWidth: 1, borderColor: "rgba(126,200,122,0.2)" }}>
                 <Text style={{ fontSize: 20 }}>🎟️</Text>
                 <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textSecondary, flex: 1, lineHeight: 18 }}>
-                  Du får <Text style={{ fontFamily: FONTS.semiBold, color: "#3d7a3a" }}>1 credit</Text> när någon tar över din bokning. Använd credits för att ta andra bokningar.
+                  Du får <Text style={{ fontFamily: FONTS.semiBold, color: "#3d7a3a" }}>1 credit</Text> direkt när du lägger upp en bokning. Använd credits för att ta andra bokningar.
                 </Text>
               </View>
               {/* Search input */}
@@ -1970,7 +1970,7 @@ export default function SubmitScreen() {
                 marginBottom: 20,
               }}
             >
-              Du får 1 credit när någon tar över din bokning
+              Du får 1 credit direkt när du lägger upp bokningen
             </Text>
 
             {/* Confirm CTA */}
