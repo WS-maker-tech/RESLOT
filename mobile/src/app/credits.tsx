@@ -353,7 +353,7 @@ export default function CreditsScreen() {
                     Lägg upp en bokning
                   </Text>
                   <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary, marginTop: 1 }}>
-                    +1 credit efter att bokningen tagits över
+                    Utbetalas när bokningen tas över
                   </Text>
                 </View>
                 <CreditBadge label="+1 credit" color="green" />
@@ -399,7 +399,7 @@ export default function CreditsScreen() {
                     Ta över en bokning
                   </Text>
                 </View>
-                <CreditBadge label="-2 credits" color="pistachio" />
+                <CreditBadge label="−2 credits" color="pistachio" />
               </View>
             </Animated.View>
           </View>
