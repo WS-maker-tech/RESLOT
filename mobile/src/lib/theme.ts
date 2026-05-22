@@ -20,7 +20,7 @@ type ColorPalette = Record<
 
 export const C = {
   // ─── Identity v3 (Visual Foundation v1) — paper-textured floor ───
-  paper: "#EAD9B8",         // BG — warm sand paper (mer mättat oat, B&B-vibe, tydligt sand texture)
+  paper: "#FAFAF8",         // Floor — benvit off-white (co-founder-locked sedan PR #57)
 
   // ─── Identity v2 — extra färg-tokens (additivt, behåller alla legacy nedan) ───
   cream: "#FAFAF8",         // Icon/text on dark surfaces (NOT floor — se C.paper)
@@ -45,7 +45,7 @@ export const C = {
   grayLight: "#9CA3AF",
   gold: "#C9A96E",
   dark: "#111827",
-  bg: "transparent",        // Floor — transparent så root paper-texture lyser genom 42 screens. Använd C.paper om du vill ha solid sand-fill.
+  bg: "#FAFAF8",            // Floor — benvit off-white. Alla 42 callsites använder denna.
 
   // Surfaces
   bgCard: "#FFFFFF",

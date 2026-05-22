@@ -145,7 +145,7 @@ export default function TabLayout() {
   }, [splashOpacity]);
 
   return (
-    <View className="flex-1" style={{ backgroundColor: "transparent" }}>
+    <View className="flex-1" style={{ backgroundColor: C.bg }}>
       {showSplash ? (
         <Animated.View
           style={[
@@ -155,8 +155,7 @@ export default function TabLayout() {
               left: 0,
               right: 0,
               bottom: 0,
-              // Transparent så root-paper-texturen synas direkt vid splash.
-              backgroundColor: "transparent",
+              backgroundColor: C.bg,
               zIndex: 999,
               alignItems: "center",
               justifyContent: "center",
