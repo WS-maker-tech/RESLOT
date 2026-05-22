@@ -46,7 +46,7 @@ class ErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#EAD9B8", padding: 32 }}>
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#FAFAF8", padding: 32 }}>
           <Text style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: "#111827", marginBottom: 8, letterSpacing: -0.3 }}>
             Något gick fel
           </Text>
