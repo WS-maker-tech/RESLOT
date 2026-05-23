@@ -43,6 +43,7 @@ import Animated, {
 } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { C, FONTS, SPACING, SHADOW, RADIUS, TYPO, ICON } from "../../lib/theme";
+import { Doodle, Scribble } from "@/reslot-art";
 import { Skeleton } from "@/components/Skeleton";
 
 function ReservationsSkeleton() {
@@ -679,17 +680,20 @@ export default function ReservationsScreen() {
           >
             Översikt
           </Text>
-          <Text
-            testID="reservations-header"
-            style={{
-              fontFamily: FONTS.displayBold,
-              fontSize: 32,
-              color: C.textPrimary,
-              letterSpacing: -1.0,
-            }}
-          >
-            Mina bokningar
-          </Text>
+          <View style={{ alignSelf: "flex-start" }}>
+            <Text
+              testID="reservations-header"
+              style={{
+                fontFamily: FONTS.displayBold,
+                fontSize: 32,
+                color: C.textPrimary,
+                letterSpacing: -1.0,
+              }}
+            >
+              Mina bokningar
+            </Text>
+            <Scribble name="underline-flick" color={C.pistachio} width={128} style={{ marginTop: 1, opacity: 0.9 }} />
+          </View>
           <Text
             testID="reservations-count"
             style={{
@@ -742,7 +746,7 @@ export default function ReservationsScreen() {
               {submittedReservations.length === 0 ? (
                 <Animated.View entering={FadeInDown.delay(100).duration(180)} style={{ paddingHorizontal: SPACING.lg, paddingVertical: 32, alignItems: "center" }}>
                   <Animated.View entering={ZoomIn.delay(150).duration(200)} style={{ width: 64, height: 64, borderRadius: 20, backgroundColor: C.pistachioLight, alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
-                    <Upload size={28} color={C.pistachio} strokeWidth={1.5} />
+                    <Doodle name="table" color={C.forest} width={40} />
                   </Animated.View>
                   <Animated.View entering={FadeInDown.delay(200).duration(180)}>
                     <Text style={{ fontFamily: FONTS.displayBold, fontSize: 17, color: C.textPrimary, textAlign: "center", letterSpacing: -0.2 }}>Lägg upp din första bokning</Text>
@@ -764,7 +768,7 @@ export default function ReservationsScreen() {
               {claimedReservations.length === 0 ? (
                 <Animated.View entering={FadeInDown.delay(100).duration(180)} style={{ paddingHorizontal: SPACING.lg, paddingVertical: 32, alignItems: "center" }}>
                   <Animated.View entering={ZoomIn.delay(150).duration(200)} style={{ width: 64, height: 64, borderRadius: 20, backgroundColor: C.successLight, alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
-                    <UtensilsCrossed size={28} color={C.grayLight} strokeWidth={1.5} />
+                    <Doodle name="plate" color={C.forest} width={44} />
                   </Animated.View>
                   <Animated.View entering={FadeInDown.delay(200).duration(180)}>
                     <Text style={{ fontFamily: FONTS.displayBold, fontSize: 17, color: C.textPrimary, textAlign: "center", letterSpacing: -0.2 }}>Hitta ditt nästa bord</Text>

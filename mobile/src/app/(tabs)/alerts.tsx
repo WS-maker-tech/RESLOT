@@ -53,6 +53,7 @@ import Animated, { FadeInDown, ZoomIn } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { C, FONTS, SPACING, RADIUS, ICON } from "../../lib/theme";
+import { Doodle, Scribble } from "@/reslot-art";
 import { Skeleton } from "@/components/Skeleton";
 import { LoginGate } from "@/components/LoginGate";
 
@@ -407,17 +408,20 @@ export default function AlertsScreen() {
             >
               Aktivitet
             </Text>
-            <Text
-              testID="alerts-header"
-              style={{
-                fontFamily: FONTS.displayBold,
-                fontSize: 32,
-                color: C.dark,
-                letterSpacing: -1.0,
-              }}
-            >
-              Bevakningar
-            </Text>
+            <View style={{ alignSelf: "flex-start" }}>
+              <Text
+                testID="alerts-header"
+                style={{
+                  fontFamily: FONTS.displayBold,
+                  fontSize: 32,
+                  color: C.dark,
+                  letterSpacing: -1.0,
+                }}
+              >
+                Bevakningar
+              </Text>
+              <Scribble name="underline" color={C.pistachio} width={120} style={{ marginTop: 1, opacity: 0.9 }} />
+            </View>
             {unreadCount > 0 && activeTab === "activity" ? (
               <Text
                 testID="unread-count"
@@ -648,7 +652,7 @@ export default function AlertsScreen() {
                     marginBottom: 16,
                   }}
                 >
-                  <Bell size={28} color={C.pistachio} strokeWidth={ICON.strokeWidth} />
+                  <Doodle name="bell" color={C.forest} width={36} />
                 </Animated.View>
                 <Animated.Text
                   entering={FadeInDown.delay(200).duration(220)}
@@ -719,7 +723,7 @@ export default function AlertsScreen() {
                     marginBottom: 16,
                   }}
                 >
-                  <Eye size={28} color={C.info} strokeWidth={ICON.strokeWidth} />
+                  <Doodle name="table" color={C.forest} width={40} />
                 </Animated.View>
                 <Animated.Text
                   entering={FadeInDown.delay(200).duration(220)}

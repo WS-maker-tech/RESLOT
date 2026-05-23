@@ -9,6 +9,7 @@ import Animated, { FadeInDown, ZoomIn } from "react-native-reanimated";
 import { useReferralCode } from "@/lib/api/hooks";
 import { useAuthStore } from "@/lib/auth-store";
 import { C, FONTS, SPACING, RADIUS, SHADOW, ICON } from "@/lib/theme";
+import { Doodle, Scribble } from "@/reslot-art";
 
 export default function InviteScreen() {
   const router = useRouter();
@@ -48,9 +49,12 @@ export default function InviteScreen() {
       </SafeAreaView>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 80 }}>
-        {/* Big emoji + description */}
+        {/* Hand-drawn doodle hero — dela en middag med en vän (B&B-signatur) */}
         <Animated.View entering={ZoomIn.duration(220)} style={{ alignItems: "center", paddingTop: 32, paddingBottom: 8 }}>
-          <Text style={{ fontSize: 64 }}>🎁</Text>
+          <View style={{ position: "relative" }}>
+            <Doodle name="wineglass" color={C.forest} width={64} />
+            <Scribble name="spark" color={C.coral} width={26} style={{ position: "absolute", top: -6, right: -16 }} />
+          </View>
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(60).duration(220)} style={{ alignItems: "center", paddingBottom: 32 }}>

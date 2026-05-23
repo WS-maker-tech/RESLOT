@@ -9,6 +9,7 @@ import * as Haptics from "expo-haptics";
 import { useSavedRestaurants, useUnsaveRestaurant } from "@/lib/api/hooks";
 import { useAuthStore } from "@/lib/auth-store";
 import { C, FONTS, SPACING, RADIUS, SHADOW } from "@/lib/theme";
+import { Doodle } from "@/reslot-art";
 import { Skeleton } from "@/components/Skeleton";
 import type { SavedRestaurant } from "@/lib/api/types";
 
@@ -56,7 +57,7 @@ export default function SavedScreen() {
       ) : saved.length === 0 ? (
         <Animated.View entering={FadeInDown.duration(220)} style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 40 }}>
           <View style={{ width: 64, height: 64, borderRadius: 24, backgroundColor: C.pistachioLight, alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
-            <Heart size={28} color={C.pistachio} strokeWidth={2} />
+            <Doodle name="plate" color={C.forest} width={42} />
           </View>
           <Text style={{ fontFamily: FONTS.displayBold, fontSize: 18, color: C.textPrimary, textAlign: "center", letterSpacing: -0.3 }}>
             Inga sparade restauranger

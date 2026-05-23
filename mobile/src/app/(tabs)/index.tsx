@@ -54,6 +54,7 @@ import { api } from "@/lib/api/api";
 import { useAuthStore } from "@/lib/auth-store";
 import type { Reservation, MissedReservation, Restaurant } from "@/lib/api/types";
 import { C, FONTS, SPACING, SHADOW, RADIUS, ICON } from "../../lib/theme";
+import { Doodle } from "../../reslot-art";
 import { RestaurantCard } from "@/components/RestaurantCard";
 import { FilterChips } from "@/components/FilterChips";
 import { DayPicker, generateDays } from "@/components/DayPicker";
@@ -1451,7 +1452,7 @@ export default function HomeScreen() {
                   marginBottom: 24,
                 }}
               >
-                <UtensilsCrossed size={38} color={C.grayLight} strokeWidth={1.5} />
+                <Doodle name="plate" color={C.forest} width={52} />
               </Animated.View>
               <Animated.View entering={FadeInDown.delay(220).duration(220)}>
                 <Text

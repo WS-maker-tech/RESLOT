@@ -18,6 +18,7 @@ import Animated, {
 import { useProfile, usePurchaseCredits } from "@/lib/api/hooks";
 import { useAuthStore } from "@/lib/auth-store";
 import { C, FONTS, SPACING, SHADOW, RADIUS, ICON } from "../lib/theme";
+import { Doodle, Scribble } from "@/reslot-art";
 
 function AnimatedPressable({
   children,
@@ -191,16 +192,19 @@ export default function CreditsScreen() {
           >
             Saldo & paket
           </Text>
-          <Text
-            style={{
-              fontFamily: FONTS.displayBold,
-              fontSize: 32,
-              color: C.textPrimary,
-              letterSpacing: -1.0,
-            }}
-          >
-            Reslot credits
-          </Text>
+          <View style={{ alignSelf: "flex-start" }}>
+            <Text
+              style={{
+                fontFamily: FONTS.displayBold,
+                fontSize: 32,
+                color: C.textPrimary,
+                letterSpacing: -1.0,
+              }}
+            >
+              Reslot credits
+            </Text>
+            <Scribble name="underline-double" color={C.gold} width={150} style={{ marginTop: 1, opacity: 0.9 }} />
+          </View>
         </Animated.View>
 
         {/* Balance card */}
@@ -232,6 +236,13 @@ export default function CreditsScreen() {
                 borderRadius: 70,
                 backgroundColor: "rgba(201,169,110,0.07)",
               }}
+            />
+            {/* B&B-signatur — handritad guldmynt-doodle i hörnet */}
+            <Doodle
+              name="coin"
+              color={C.gold}
+              width={56}
+              style={{ position: "absolute", top: 14, right: 14, opacity: 0.9 }}
             />
             <View
               style={{

@@ -469,19 +469,26 @@ function SplashStep({ onGetStarted, onExplore, onRegister }: { onGetStarted: () 
 
         {/* Tagline — 50ms stagger after logo */}
         <Animated.View entering={FadeInUp.delay(100).duration(220)} style={{ marginTop: 10 }}>
-          <Text
-            style={{
-              fontFamily: FONTS.displayBold,
-              fontSize: 27,
-              color: C.text,
-              letterSpacing: -0.7,
-              lineHeight: 35,
-            }}
-          >
-            Bord som andra{"\n"}inte kan ta
-          </Text>
-          {/* B&B-krydda — subtle understryk endast under ordet "ta" (sista ordet) */}
-          <Scribble name="underline" color={C.forest} width={42} style={{ marginTop: -2, marginLeft: 102, opacity: 0.85 }} />
+          <View style={{ position: "relative", alignSelf: "flex-start" }}>
+            <Text
+              style={{
+                fontFamily: FONTS.displayBold,
+                fontSize: 27,
+                color: C.text,
+                letterSpacing: -0.7,
+                lineHeight: 35,
+              }}
+            >
+              Bord som andra{"\n"}inte kan ta
+            </Text>
+            {/* B&B-signatur — handritad understrykning under första ordet "Bord" */}
+            <Scribble
+              name="underline"
+              color={C.pistachio}
+              width={82}
+              style={{ position: "absolute", top: 31, left: 0, opacity: 0.95 }}
+            />
+          </View>
         </Animated.View>
       </View>
 

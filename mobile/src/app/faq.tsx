@@ -12,6 +12,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { C, FONTS, SPACING, RADIUS, SHADOW, ICON } from "@/lib/theme";
+import { Scribble } from "@/reslot-art";
 
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -200,16 +201,19 @@ export default function FaqScreen() {
             justifyContent: "space-between",
           }}
         >
-          <Text
-            style={{
-              fontFamily: FONTS.displayBold,
-              fontSize: 32,
-              color: C.textPrimary,
-              letterSpacing: -1.0,
-            }}
-          >
-            Frågor & svar
-          </Text>
+          <View>
+            <Text
+              style={{
+                fontFamily: FONTS.displayBold,
+                fontSize: 32,
+                color: C.textPrimary,
+                letterSpacing: -1.0,
+              }}
+            >
+              Frågor & svar
+            </Text>
+            <Scribble name="underline" color={C.pistachio} width={110} style={{ marginTop: 1, opacity: 0.9 }} />
+          </View>
           <Pressable
             testID="faq-close-button"
             accessibilityLabel="Stäng"
