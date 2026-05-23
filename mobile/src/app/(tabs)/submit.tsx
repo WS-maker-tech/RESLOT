@@ -1,5 +1,7 @@
-import React, { useState, useCallback, useEffect, useReducer } from "react";
+import React, { useState, useCallback, useEffect, useReducer, useMemo } from "react";
 import * as ImagePicker from "expo-image-picker";
+import { Image } from "expo-image";
+import { router } from "expo-router";
 import {
   View,
   Text,
@@ -18,7 +20,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Search,
-  MapPin,
   Check,
   CalendarDays,
   Clock,
@@ -33,6 +34,10 @@ import {
   Armchair,
   Trees,
   AlertCircle,
+  Star,
+  Flame,
+  Ticket,
+  X,
 } from "lucide-react-native";
 import Animated, {
   FadeIn,
@@ -42,13 +47,16 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
   withTiming,
+  interpolateColor,
   Easing,
+  ReduceMotion,
 } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { useSubmitReservation, useRestaurants, useProfile } from "@/lib/api/hooks";
 import { useAuthStore } from "@/lib/auth-store";
 import type { Restaurant } from "@/lib/api/types";
-import { C, FONTS, SPACING, SHADOW, RADIUS, ICON } from "../../lib/theme";
+import { RestaurantMonogram } from "@/components/RestaurantMonogram";
+import { C, FONTS, SPACING, SHADOW, RADIUS, ICON, MOTION } from "../../lib/theme";
 
 // ── Web Date Picker ──
 const MONTHS_SV = ["Januari","Februari","Mars","April","Maj","Juni","Juli","Augusti","September","Oktober","November","December"];
@@ -223,6 +231,177 @@ function formReducer(state: FormState, action: FormAction): FormState {
   }
 }
 
+// ── Segmented step indicator — fills as you progress ──
+function StepSegment({ active }: { active: boolean }) {
+  const fill = useSharedValue(active ? 1 : 0);
+  useEffect(() => {
+    fill.value = withTiming(active ? 1 : 0, {
+      duration: 340,
+      easing: Easing.out(Easing.cubic),
+      reduceMotion: ReduceMotion.System,
+    });
+  }, [active]);
+  const style = useAnimatedStyle(() => ({
+    backgroundColor: interpolateColor(fill.value, [0, 1], [C.borderLight, C.pistachio]),
+  }));
+  return (
+    <View style={{ flex: 1, height: 4, borderRadius: 2, overflow: "hidden", backgroundColor: C.borderLight }}>
+      <Animated.View style={[style, { flex: 1, borderRadius: 2 }]} />
+    </View>
+  );
+}
+
+// ── Price level as a 4-dot scale ──
+function PriceDots({ level }: { level: number }) {
+  const n = Math.max(0, Math.min(4, Math.round(level || 0)));
+  if (n === 0) return null;
+  return (
+    <View style={{ flexDirection: "row", alignItems: "center", gap: 2.5 }}>
+      {[0, 1, 2, 3].map((i) => (
+        <View
+          key={i}
+          style={{
+            width: 4,
+            height: 4,
+            borderRadius: 2,
+            backgroundColor: i < n ? C.gold : "rgba(0,0,0,0.12)",
+          }}
+        />
+      ))}
+    </View>
+  );
+}
+
+// ── Rich, monogram-led restaurant row with spring selection feedback ──
+interface RestaurantRowProps {
+  restaurant: Restaurant;
+  isSelected: boolean;
+  onSelect: () => void;
+  entering?: any;
+}
+
+const RestaurantRow = React.memo(function RestaurantRow({
+  restaurant,
+  isSelected,
+  onSelect,
+  entering,
+}: RestaurantRowProps) {
+  const pressScale = useSharedValue(1);
+  const selectProgress = useSharedValue(isSelected ? 1 : 0);
+
+  useEffect(() => {
+    selectProgress.value = withTiming(isSelected ? 1 : 0, {
+      duration: 200,
+      easing: Easing.out(Easing.cubic),
+      reduceMotion: ReduceMotion.System,
+    });
+  }, [isSelected]);
+
+  const containerStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pressScale.value }],
+    backgroundColor: interpolateColor(
+      selectProgress.value,
+      [0, 1],
+      ["rgba(255,255,255,0)", "rgba(126,200,122,0.10)"],
+    ),
+    borderColor: interpolateColor(
+      selectProgress.value,
+      [0, 1],
+      ["rgba(0,0,0,0)", "rgba(126,200,122,0.45)"],
+    ),
+  }));
+
+  const checkStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: selectProgress.value }],
+    opacity: selectProgress.value,
+  }));
+
+  const cuisine = restaurant.cuisine?.trim();
+  const neighborhood = restaurant.neighborhood?.trim();
+  const subtitle = [cuisine, neighborhood].filter(Boolean).join(" · ");
+  const bookedCount = restaurant.timesBookedOnReslot ?? 0;
+
+  return (
+    <Animated.View entering={entering}>
+      <Pressable
+        testID={`restaurant-${restaurant.name.toLowerCase().replace(/\s/g, "-")}`}
+        accessibilityLabel={`Välj ${restaurant.name}`}
+        onPressIn={() => { pressScale.value = withSpring(0.98, MOTION.press); }}
+        onPressOut={() => { pressScale.value = withSpring(1, MOTION.press); }}
+        onPress={onSelect}
+      >
+        <Animated.View
+          style={[
+            containerStyle,
+            {
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 14,
+              paddingVertical: 11,
+              paddingHorizontal: 11,
+              borderRadius: RADIUS.lg,
+              borderWidth: 1.5,
+            },
+          ]}
+        >
+          <RestaurantMonogram name={restaurant.name} size={52} ring={isSelected} />
+
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text numberOfLines={1} style={{ fontFamily: FONTS.semiBold, fontSize: 15.5, color: C.dark, letterSpacing: -0.3 }}>
+              {restaurant.name}
+            </Text>
+            {subtitle ? (
+              <Text numberOfLines={1} style={{ fontFamily: FONTS.regular, fontSize: 12.5, color: C.textTertiary }}>
+                {subtitle}
+              </Text>
+            ) : null}
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 9, marginTop: 2 }}>
+              {restaurant.rating > 0 ? (
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 3 }}>
+                  <Star size={12} color={C.gold} fill={C.gold} strokeWidth={0} />
+                  <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.dark }}>
+                    {restaurant.rating.toFixed(1)}
+                  </Text>
+                  {restaurant.reviewCount > 0 ? (
+                    <Text style={{ fontFamily: FONTS.regular, fontSize: 11.5, color: C.textTertiary }}>
+                      ({restaurant.reviewCount})
+                    </Text>
+                  ) : null}
+                </View>
+              ) : null}
+              <PriceDots level={restaurant.priceLevel} />
+              {bookedCount >= 3 ? (
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 3 }}>
+                  <Flame size={11} color={C.pistachio} strokeWidth={2.4} />
+                  <Text style={{ fontFamily: FONTS.semiBold, fontSize: 11.5, color: "#3d7a3a" }}>
+                    {bookedCount} bokade
+                  </Text>
+                </View>
+              ) : null}
+            </View>
+          </View>
+
+          <Animated.View
+            style={[
+              checkStyle,
+              {
+                width: 26,
+                height: 26,
+                borderRadius: 13,
+                backgroundColor: C.pistachio,
+                alignItems: "center",
+                justifyContent: "center",
+              },
+            ]}
+          >
+            <Check size={15} color={C.dark} strokeWidth={ICON.strokeWidth} />
+          </Animated.View>
+        </Animated.View>
+      </Pressable>
+    </Animated.View>
+  );
+});
+
 export default function SubmitScreen() {
   const tabBarHeight = useBottomTabBarHeight();
   const [step, setStep] = useState<number>(0);
@@ -277,20 +456,13 @@ export default function SubmitScreen() {
   }, []);
 
   const buttonScale = useSharedValue(1);
-  const progressAnim = useSharedValue((0 + 1) / STEP_LABELS.length);
+  const ctaProgress = useSharedValue(0);
 
   const phone = useAuthStore((s) => s.phoneNumber);
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
-  const { data: restaurants = [] } = useRestaurants();
+  const { data: restaurants = [], isLoading: restaurantsLoading } = useRestaurants();
   const { data: profile } = useProfile(phone);
   const submitReservationMutation = useSubmitReservation();
-
-  useEffect(() => {
-    progressAnim.value = withTiming((step + 1) / STEP_LABELS.length, {
-      duration: 450,
-      easing: Easing.out(Easing.cubic),
-    });
-  }, [step]);
 
   useEffect(() => {
     if (profile?.firstName && !firstName) {
@@ -305,14 +477,35 @@ export default function SubmitScreen() {
     transform: [{ scale: buttonScale.value }],
   }));
 
-  const progressBarStyle = useAnimatedStyle(() => ({
-    width: `${progressAnim.value * 100}%`,
+  const ctaAnimStyle = useAnimatedStyle(() => ({
+    backgroundColor: interpolateColor(ctaProgress.value, [0, 1], [C.bgInput, C.pistachio]),
   }));
 
-  const filteredRestaurants = restaurants.filter((r: Restaurant) =>
-    r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    r.address.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredRestaurants = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    const matches = restaurants.filter((r: Restaurant) =>
+      r.name.toLowerCase().includes(q) ||
+      r.address.toLowerCase().includes(q) ||
+      (r.neighborhood ?? "").toLowerCase().includes(q) ||
+      (r.cuisine ?? "").toLowerCase().includes(q),
+    );
+    return [...matches].sort((a, b) => (b.timesBookedOnReslot ?? 0) - (a.timesBookedOnReslot ?? 0));
+  }, [restaurants, searchQuery]);
+
+  const popularRestaurants = useMemo(
+    () =>
+      [...restaurants]
+        .filter((r: Restaurant) => (r.timesBookedOnReslot ?? 0) > 0)
+        .sort((a, b) => (b.timesBookedOnReslot ?? 0) - (a.timesBookedOnReslot ?? 0))
+        .slice(0, 6),
+    [restaurants],
   );
+
+  const handleSelectRestaurant = useCallback((restaurant: Restaurant) => {
+    setField("selectedRestaurant", restaurant);
+    setValidationErrors((prev) => (prev.restaurant ? { ...prev, restaurant: false } : prev));
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  }, [setField]);
 
   const canAdvance = useCallback(() => {
     switch (step) {
@@ -332,6 +525,15 @@ export default function SubmitScreen() {
         return false;
     }
   }, [step, selectedRestaurant, location, firstName, lastName, verifyMethod]);
+
+  const ready = canAdvance();
+  useEffect(() => {
+    ctaProgress.value = withTiming(ready ? 1 : 0, {
+      duration: 220,
+      easing: Easing.out(Easing.cubic),
+      reduceMotion: ReduceMotion.System,
+    });
+  }, [ready]);
 
   const handleActualSubmit = async () => {
     if (!selectedRestaurant || !phone) {
@@ -562,28 +764,18 @@ export default function SubmitScreen() {
           </Text>
         </Animated.View>
 
-        {/* Animated progress bar */}
+        {/* Segmented step indicator */}
         <View className="px-5 pt-3 pb-2">
-          <View
-            style={{
-              height: 2,
-              backgroundColor: C.borderLight,
-              borderRadius: 2,
-              overflow: "hidden",
-            }}
-          >
-            <Animated.View
-              style={[
-                progressBarStyle,
-                { height: 2, backgroundColor: C.pistachio, borderRadius: 2 },
-              ]}
-            />
+          <View style={{ flexDirection: "row", gap: 5 }}>
+            {STEP_LABELS.map((_, i) => (
+              <StepSegment key={i} active={i <= step} />
+            ))}
           </View>
           <View
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
-              marginTop: 6,
+              marginTop: 8,
             }}
           >
             <Text
@@ -602,7 +794,7 @@ export default function SubmitScreen() {
                 color: C.textTertiary,
               }}
             >
-              {step + 1} / {STEP_LABELS.length}
+              Steg {step + 1} av {STEP_LABELS.length}
             </Text>
           </View>
         </View>
@@ -624,24 +816,43 @@ export default function SubmitScreen() {
         >
           {/* Step 0: Restaurant */}
           {step === 0 ? (
-            <Animated.View entering={FadeInRight.duration(400)}>
-              {/* Credits info */}
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: "rgba(126,200,122,0.08)", borderRadius: RADIUS.md, padding: 12, marginBottom: 16, borderWidth: 1, borderColor: "rgba(126,200,122,0.2)" }}>
-                <Text style={{ fontSize: 20 }}>🎟️</Text>
-                <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textSecondary, flex: 1, lineHeight: 18 }}>
-                  Du får <Text style={{ fontFamily: FONTS.semiBold, color: "#3d7a3a" }}>1 credit</Text> direkt när du lägger upp en bokning. Använd credits för att ta andra bokningar.
-                </Text>
+            <Animated.View entering={FadeInRight.duration(MOTION.duration.slow).easing(Easing.out(Easing.cubic)).reduceMotion(ReduceMotion.System)}>
+              {/* Credits reward strip */}
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 12,
+                  backgroundColor: "rgba(126,200,122,0.10)",
+                  borderRadius: RADIUS.lg,
+                  padding: 14,
+                  marginBottom: 18,
+                  borderWidth: 1,
+                  borderColor: "rgba(126,200,122,0.22)",
+                }}
+              >
+                <View style={{ width: 38, height: 38, borderRadius: 19, backgroundColor: "rgba(126,200,122,0.22)", alignItems: "center", justifyContent: "center" }}>
+                  <Ticket size={19} color="#3d7a3a" strokeWidth={2} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13.5, color: "#2f6b2d" }}>
+                    Du tjänar 1 credit direkt
+                  </Text>
+                  <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textSecondary, marginTop: 1, lineHeight: 16 }}>
+                    Lägg upp en bokning — använd din credit för att ta över andras.
+                  </Text>
+                </View>
               </View>
+
               {/* Search input */}
-              <Animated.View
-                entering={FadeInDown.delay(0 * 50).duration(220)}
+              <View
                 className="flex-row items-center"
                 style={{
                   backgroundColor: C.bgCard,
                   borderRadius: RADIUS.md,
                   paddingHorizontal: 16,
                   borderWidth: 1,
-                  borderColor: searchQuery.length > 0 ? C.pistachioPressed : C.borderLight,
+                  borderColor: searchQuery.length > 0 ? C.pistachio : C.borderLight,
                   ...SHADOW.card,
                 }}
               >
@@ -650,92 +861,151 @@ export default function SubmitScreen() {
                   testID="restaurant-search-input"
                   value={searchQuery}
                   onChangeText={setSearchQuery}
-                  placeholder="Sök restaurang..."
-                  placeholderTextColor="#D1D5DB"
+                  placeholder="Sök restaurang eller område..."
+                  placeholderTextColor="#C2C6CC"
                   style={{
                     fontFamily: FONTS.regular,
                     fontSize: 16,
                     color: C.dark,
                     flex: 1,
-                    paddingVertical: 16,
+                    paddingVertical: 15,
                     marginLeft: 10,
                   }}
                 />
-              </Animated.View>
-
-              {/* Restaurant list */}
-              <View style={{ marginTop: 12, gap: 6 }}>
-                {filteredRestaurants.map((restaurant: Restaurant, index: number) => {
-                  const isSelected = selectedRestaurant?.id === restaurant.id;
-                  return (
-                    <Animated.View key={restaurant.id} entering={FadeInDown.delay((index + 1) * 50).duration(220)}>
-                      <Pressable
-                        testID={`restaurant-${restaurant.name.toLowerCase().replace(/\s/g, "-")}`}
-                        accessibilityLabel={`Välj ${restaurant.name}`}
-                        onPress={() => {
-                          setField("selectedRestaurant", restaurant);
-                          if (validationErrors.restaurant) setValidationErrors(prev => ({ ...prev, restaurant: false }));
-                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                        }}
-                        style={{
-                          backgroundColor: isSelected ? "rgba(224,106,78,0.06)" : C.bgCard,
-                          borderRadius: RADIUS.md,
-                          paddingHorizontal: 16,
-                          paddingVertical: 14,
-                          borderWidth: 1.5,
-                          borderColor: isSelected ? C.pistachio : "rgba(0,0,0,0.05)",
-                          flexDirection: "row",
-                          alignItems: "center",
-                        }}
-                      >
-                        <View style={{ flex: 1 }}>
-                          <Text
-                            style={{
-                              fontFamily: isSelected ? FONTS.semiBold : FONTS.medium,
-                              fontSize: 15,
-                              color: isSelected ? C.pistachio : C.dark,
-                            }}
-                          >
-                            {restaurant.name}
-                          </Text>
-                          <View className="flex-row items-center" style={{ marginTop: 3, gap: 4 }}>
-                            <MapPin size={12} color={C.textTertiary} strokeWidth={2} />
-                            <Text
-                              style={{
-                                fontFamily: FONTS.regular,
-                                fontSize: 12,
-                                color: C.textTertiary,
-                              }}
-                            >
-                              {restaurant.address}
-                            </Text>
-                          </View>
-                        </View>
-                        {isSelected ? (
-                          <View
-                            style={{
-                              width: 24,
-                              height: 24,
-                              borderRadius: 12,
-                              backgroundColor: C.pistachio,
-                              alignItems: "center",
-                              justifyContent: "center",
-                            }}
-                          >
-                            <Check size={14} color={C.dark} strokeWidth={ICON.strokeWidth} />
-                          </View>
-                        ) : null}
-                      </Pressable>
-                    </Animated.View>
-                  );
-                })}
+                {searchQuery.length > 0 ? (
+                  <Pressable
+                    testID="clear-search"
+                    accessibilityLabel="Rensa sökning"
+                    hitSlop={10}
+                    onPress={() => { setSearchQuery(""); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }}
+                    style={{ padding: 4 }}
+                  >
+                    <X size={16} color={C.textTertiary} strokeWidth={2.2} />
+                  </Pressable>
+                ) : null}
               </View>
+
+              {/* Popular quick-pick chips */}
+              {searchQuery.length === 0 && popularRestaurants.length > 0 ? (
+                <View style={{ marginTop: 16 }}>
+                  <Text style={{ fontFamily: FONTS.semiBold, fontSize: 11, letterSpacing: 0.8, textTransform: "uppercase", color: C.textTertiary, marginBottom: 9 }}>
+                    Populära just nu
+                  </Text>
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    style={{ flexGrow: 0 }}
+                    contentContainerStyle={{ gap: 8, paddingRight: 8 }}
+                  >
+                    {popularRestaurants.map((r: Restaurant) => {
+                      const active = selectedRestaurant?.id === r.id;
+                      return (
+                        <Pressable
+                          key={r.id}
+                          testID={`popular-${r.name.toLowerCase().replace(/\s/g, "-")}`}
+                          accessibilityLabel={`Snabbval ${r.name}`}
+                          onPress={() => handleSelectRestaurant(r)}
+                          style={{
+                            flexDirection: "row",
+                            alignItems: "center",
+                            gap: 8,
+                            paddingVertical: 6,
+                            paddingLeft: 6,
+                            paddingRight: 14,
+                            borderRadius: RADIUS.pill,
+                            backgroundColor: active ? "rgba(126,200,122,0.14)" : C.bgCard,
+                            borderWidth: 1.5,
+                            borderColor: active ? C.pistachio : C.borderLight,
+                            ...SHADOW.subtle,
+                          }}
+                        >
+                          <RestaurantMonogram name={r.name} size={28} radius={9} />
+                          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: active ? "#2f6b2d" : C.dark }}>
+                            {r.name}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
+                  </ScrollView>
+                </View>
+              ) : null}
+
+              {/* Section label */}
+              <Text style={{ fontFamily: FONTS.semiBold, fontSize: 11, letterSpacing: 0.8, textTransform: "uppercase", color: C.textTertiary, marginTop: 18, marginBottom: 8 }}>
+                {searchQuery.length > 0
+                  ? `${filteredRestaurants.length} ${filteredRestaurants.length === 1 ? "träff" : "träffar"}`
+                  : "Alla restauranger"}
+              </Text>
+
+              {/* Restaurant list or empty state */}
+              {filteredRestaurants.length > 0 ? (
+                <View style={{ gap: 4 }}>
+                  {filteredRestaurants.map((restaurant: Restaurant, index: number) => (
+                    <RestaurantRow
+                      key={restaurant.id}
+                      restaurant={restaurant}
+                      isSelected={selectedRestaurant?.id === restaurant.id}
+                      onSelect={() => handleSelectRestaurant(restaurant)}
+                      entering={
+                        searchQuery.length === 0
+                          ? FadeInDown.delay(Math.min(index, 8) * 40)
+                              .duration(MOTION.duration.entrance)
+                              .easing(Easing.out(Easing.cubic))
+                              .reduceMotion(ReduceMotion.System)
+                          : undefined
+                      }
+                    />
+                  ))}
+                </View>
+              ) : searchQuery.length > 0 ? (
+                <Animated.View
+                  entering={FadeIn.duration(MOTION.duration.entrance).reduceMotion(ReduceMotion.System)}
+                  style={{ alignItems: "center", paddingVertical: 36, paddingHorizontal: 24 }}
+                >
+                  <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: "rgba(0,0,0,0.04)", alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
+                    <Search size={24} color={C.textTertiary} strokeWidth={2} />
+                  </View>
+                  <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.dark, textAlign: "center" }}>
+                    Ingen träff på ”{searchQuery}”
+                  </Text>
+                  <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textTertiary, textAlign: "center", marginTop: 4, lineHeight: 19 }}>
+                    Kontrollera stavningen eller sök på området istället.
+                  </Text>
+                  <Pressable
+                    testID="empty-clear-search"
+                    accessibilityLabel="Rensa sökning"
+                    onPress={() => { setSearchQuery(""); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }}
+                    style={{ marginTop: 16, paddingVertical: 10, paddingHorizontal: 20, borderRadius: RADIUS.pill, backgroundColor: C.dark }}
+                  >
+                    <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13.5, color: C.white }}>Rensa sökning</Text>
+                  </Pressable>
+                </Animated.View>
+              ) : restaurantsLoading ? (
+                <View testID="restaurants-loading" style={{ alignItems: "center", paddingVertical: 48 }}>
+                  <ActivityIndicator size="small" color={C.pistachio} />
+                  <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textTertiary, marginTop: 12 }}>
+                    Hämtar restauranger…
+                  </Text>
+                </View>
+              ) : (
+                <View style={{ alignItems: "center", paddingVertical: 40, paddingHorizontal: 24 }}>
+                  <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: "rgba(0,0,0,0.04)", alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
+                    <Search size={24} color={C.textTertiary} strokeWidth={2} />
+                  </View>
+                  <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.dark, textAlign: "center" }}>
+                    Inga restauranger tillgängliga än
+                  </Text>
+                  <Text style={{ fontFamily: FONTS.regular, fontSize: 13, color: C.textTertiary, textAlign: "center", marginTop: 4, lineHeight: 19 }}>
+                    Försök igen om en liten stund.
+                  </Text>
+                </View>
+              )}
 
               {/* Inline validation error */}
               {validationErrors.restaurant ? (
-                <Animated.View entering={FadeInDown.duration(300)} style={{ marginTop: 8, paddingLeft: 4 }}>
+                <Animated.View entering={FadeInDown.duration(300)} style={{ marginTop: 10, paddingLeft: 4 }}>
                   <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.error }}>
-                    Välj en restaurang
+                    Välj en restaurang för att fortsätta
                   </Text>
                 </Animated.View>
               ) : null}
@@ -1698,7 +1968,10 @@ export default function SubmitScreen() {
                     {screenshotUri ? (
                       <>
                         <Image source={{ uri: screenshotUri }} style={{ width: "100%", height: 160, borderRadius: RADIUS.md }} contentFit="cover" />
-                        <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: C.success, marginTop: 8 }}>✓ Bild uppladdad — tryck för att byta</Text>
+                        <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginTop: 8 }}>
+                          <CheckCircle2 size={14} color={C.success} strokeWidth={2} />
+                          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: C.success }}>Bild uppladdad — tryck för att byta</Text>
+                        </View>
                       </>
                     ) : (
                       <>
@@ -1815,29 +2088,29 @@ export default function SubmitScreen() {
             accessibilityLabel={step < 5 ? `Gå vidare till ${NEXT_LABELS[step]}` : "Skicka in bokning"}
             disabled={submitReservationMutation.isPending}
             onPressIn={() => {
-              buttonScale.value = withSpring(0.96, { damping: 15, stiffness: 240 });
+              buttonScale.value = withSpring(0.96, MOTION.press);
             }}
             onPressOut={() => {
-              buttonScale.value = withSpring(1, { damping: 10, stiffness: 200 });
+              buttonScale.value = withSpring(1, MOTION.press);
             }}
             onPress={handleNext}
-            style={{ flex: 1, opacity: (step === 0 && !selectedRestaurant) ? 0.5 : 1 }}
+            style={{ flex: 1 }}
           >
             <Animated.View
               style={[
                 buttonStyle,
+                ctaAnimStyle,
                 {
-                  backgroundColor: canAdvance() ? C.pistachio : C.pistachioPressed,
                   borderRadius: 26,
                   paddingVertical: 16,
                   alignItems: "center",
                   justifyContent: "center",
                   flexDirection: "row",
-                  shadowColor: canAdvance() ? C.pistachio : "transparent",
-                  shadowOffset: { width: 0, height: 4 },
-                  shadowOpacity: canAdvance() ? 0.25 : 0,
-                  shadowRadius: 8,
-                  elevation: canAdvance() ? 4 : 0,
+                  shadowColor: C.pistachio,
+                  shadowOffset: { width: 0, height: 6 },
+                  shadowOpacity: ready ? 0.3 : 0,
+                  shadowRadius: 12,
+                  elevation: ready ? 5 : 0,
                 },
               ]}
             >
@@ -1849,7 +2122,7 @@ export default function SubmitScreen() {
                     style={{
                       fontFamily: FONTS.bold,
                       fontSize: 15,
-                      color: C.dark,
+                      color: ready ? C.dark : C.textTertiary,
                     }}
                   >
                     {NEXT_LABELS[step]}
@@ -1857,7 +2130,7 @@ export default function SubmitScreen() {
                   {step < 5 ? (
                     <ChevronRight
                       size={18}
-                      color={C.dark}
+                      color={ready ? C.dark : C.textTertiary}
                       strokeWidth={ICON.strokeWidth}
                       style={{ marginLeft: 4 }}
                     />
