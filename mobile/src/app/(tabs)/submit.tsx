@@ -145,7 +145,7 @@ function WebTimePicker({ value, onChange }: { value: Date; onChange: (d: Date) =
     <View style={{ gap: 16 }}>
       {TIME_GROUPS.map((g) => (
         <View key={g.label}>
-          <Text style={[TYPO.serifSection, { marginBottom: 9 }]}>{g.label}</Text>
+          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, letterSpacing: 0.4, textTransform: "uppercase", color: C.textTertiary, marginBottom: 9 }}>{g.label}</Text>
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
             {g.slots.map((t) => {
               const selected = t === current;
@@ -781,8 +781,8 @@ export default function SubmitScreen() {
               </View>
               <Text
                 style={{
-                  fontFamily: FONTS.serifDisplay,
-                  fontSize: 28,
+                  fontFamily: FONTS.displayBold,
+                  fontSize: 26,
                   color: C.dark,
                   textAlign: "center",
                   letterSpacing: -0.5,
@@ -851,7 +851,7 @@ export default function SubmitScreen() {
             key={step}
             entering={FadeIn.duration(MOTION.duration.entrance).easing(Easing.out(Easing.cubic)).reduceMotion(ReduceMotion.System)}
             testID="submit-header"
-            style={TYPO.serifHero}
+            style={TYPO.stepHero}
           >
             {STEP_SUBTITLES[step]}
           </Animated.Text>
@@ -2254,9 +2254,8 @@ export default function SubmitScreen() {
             <Text
               testID="confirm-header"
               style={{
-                fontFamily: FONTS.serifDisplay,
-                fontSize: 23,
-                letterSpacing: -0.4,
+                fontFamily: FONTS.displayBold,
+                fontSize: 20,
                 color: C.dark,
                 marginBottom: 20,
               }}
