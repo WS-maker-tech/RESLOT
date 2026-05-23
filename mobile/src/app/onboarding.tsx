@@ -476,17 +476,17 @@ function SplashStep({ onGetStarted, onExplore, onRegister }: { onGetStarted: () 
                 fontSize: 27,
                 color: C.text,
                 letterSpacing: -0.7,
-                lineHeight: 35,
+                lineHeight: 42,
               }}
             >
               Bord som andra{"\n"}inte kan ta
             </Text>
-            {/* B&B-signatur — handritad understrykning under första ordet "Bord" */}
+            {/* B&B-signatur — handritad understrykning under första ordet "Bord" (rad 1) */}
             <Scribble
               name="underline"
               color={C.pistachio}
-              width={82}
-              style={{ position: "absolute", top: 31, left: 0, opacity: 0.95 }}
+              width={68}
+              style={{ position: "absolute", top: 34, left: 1, opacity: 0.95 }}
             />
           </View>
         </Animated.View>
