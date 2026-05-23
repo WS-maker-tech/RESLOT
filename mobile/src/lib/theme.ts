@@ -184,10 +184,6 @@ export const FONTS = {
   semiBold: "PlusJakartaSans_600SemiBold",
   medium: "PlusJakartaSans_500Medium",
   regular: "PlusJakartaSans_400Regular",
-  // Editorial serif — Fraunces (dining-identitet: rubrik-serif + sans-body)
-  serifDisplay: "Fraunces_700Bold",
-  serifSemi: "Fraunces_600SemiBold",
-  serifItalic: "Fraunces_500Medium_Italic",
 } as const;
 
 export const SPACING = {
@@ -334,20 +330,13 @@ export const TYPO = {
     fontVariant: ["tabular-nums"] as const,
     color: C.textPrimary,
   },
-  /** Editorial serif hero — the per-step question (dining-identitet). */
-  serifHero: {
-    fontFamily: FONTS.serifDisplay,
-    fontSize: 29,
+  /** Per-step question hero — Plus Jakarta Sans display, the question is the headline. */
+  stepHero: {
+    fontFamily: FONTS.displayBold,
+    fontSize: 28,
     lineHeight: 34,
-    letterSpacing: -0.5,
+    letterSpacing: -0.6,
     color: C.textPrimary,
-  },
-  /** Italic serif section eyebrow (222-style). */
-  serifSection: {
-    fontFamily: FONTS.serifItalic,
-    fontSize: 13,
-    letterSpacing: 0.2,
-    color: C.textSecondary,
   },
 } as const;
 
