@@ -692,7 +692,7 @@ export default function ReservationsScreen() {
             >
               Mina bokningar
             </Text>
-            <Scribble name="underline-flick" color={C.pistachio} width={128} style={{ marginTop: 1, opacity: 0.9 }} />
+            <Scribble name="underline" color={C.pistachio} width={150} style={{ marginTop: 2, opacity: 0.9 }} />
           </View>
           <Text
             testID="reservations-count"
