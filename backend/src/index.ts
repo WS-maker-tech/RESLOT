@@ -189,27 +189,6 @@ setInterval(async () => {
         });
 
         if (result.count === 0) return;
-
-        await tx.userProfile.upsert({
-          where: { phone: reservation.submitterPhone },
-          update: { credits: { increment: 1 } },
-          create: {
-            phone: reservation.submitterPhone,
-            firstName: reservation.submitterFirstName,
-            lastName: reservation.submitterLastName,
-            email: "",
-            credits: 1,
-          },
-        });
-
-        await tx.activityAlert.create({
-          data: {
-            userPhone: reservation.submitterPhone,
-            type: "credit",
-            title: "Credit intjänad!",
-            message: "Du fick 1 credit för din delade bokning.",
-          },
-        });
       });
 
       // Real-time validation: re-check reservation state before sending push
@@ -219,20 +198,12 @@ setInterval(async () => {
         continue;
       }
 
-      // Push notification: credits awarded to submitter
-      sendPushToUser(
-        reservation.submitterPhone,
-        "+1 credit",
-        `Tack! Du fick 1 credit för bokningen på ${reservation.restaurant.name}.`,
-        { type: "credits_awarded", reservationId: reservation.id, restaurantId: reservation.restaurantId }
-      ).catch(() => {});
-
       // DELAYED submitter notification: booking was claimed (sent after grace period, not immediately)
       const dateStr = new Date(reservation.reservationDate).toLocaleDateString("sv-SE");
       sendPushToUser(
         reservation.submitterPhone,
         `Bordet på ${reservation.restaurant.name} är överlåtet`,
-        `Någon tog bordet på ${reservation.restaurant.name}. Din credit är utbetald.`,
+        `Någon tog bordet på ${reservation.restaurant.name}. Tack för delningen!`,
         { type: "booking_claimed", reservationId: reservation.id, restaurantId: reservation.restaurantId }
       ).catch(() => {});
 
