@@ -1357,7 +1357,7 @@ function CreditsIntroStep({ onContinue, onBack }: { onContinue: () => void; onBa
       iconBg: "rgba(201,169,110,0.12)",
       iconColor: C.gold,
       title: "Du tjänar — de vinner",
-      subtitle: "Någon tar ditt bord. Du får 1 credit. Alla glada.",
+      subtitle: "Bordet hittar nya ägare. Din credit ligger redan på kontot.",
       badge: null as string | null,
       badgeBg: undefined as string | undefined,
       badgeColor: undefined as string | undefined,
