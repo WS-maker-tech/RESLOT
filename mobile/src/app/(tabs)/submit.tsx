@@ -402,6 +402,57 @@ const RestaurantRow = React.memo(function RestaurantRow({
   );
 });
 
+// ── Shared selectable tile — one selection vocabulary across all steps ──
+interface SelectableTileProps {
+  selected: boolean;
+  onPress: () => void;
+  children: React.ReactNode;
+  contentStyle?: any;
+  flex?: number;
+  testID?: string;
+  accessibilityLabel?: string;
+}
+
+function SelectableTile({ selected, onPress, children, contentStyle, flex, testID, accessibilityLabel }: SelectableTileProps) {
+  const scale = useSharedValue(1);
+  const progress = useSharedValue(selected ? 1 : 0);
+  useEffect(() => {
+    progress.value = withTiming(selected ? 1 : 0, {
+      duration: 180,
+      easing: Easing.out(Easing.cubic),
+      reduceMotion: ReduceMotion.System,
+    });
+  }, [selected]);
+  const aStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    backgroundColor: interpolateColor(progress.value, [0, 1], ["#FFFFFF", "rgba(126,200,122,0.10)"]),
+    borderColor: interpolateColor(progress.value, [0, 1], ["rgba(0,0,0,0.05)", "rgba(126,200,122,0.55)"]),
+  }));
+  return (
+    <Pressable
+      testID={testID}
+      accessibilityLabel={accessibilityLabel}
+      onPress={onPress}
+      onPressIn={() => { scale.value = withSpring(0.97, MOTION.press); }}
+      onPressOut={() => { scale.value = withSpring(1, MOTION.press); }}
+      style={flex != null ? { flex } : undefined}
+    >
+      <Animated.View
+        style={[
+          aStyle,
+          { borderWidth: 1.5, borderRadius: RADIUS.lg, ...SHADOW.card },
+          contentStyle,
+        ]}
+      >
+        {children}
+      </Animated.View>
+    </Pressable>
+  );
+}
+
+// Selected-state accent (readable dark green) vs resting tone
+const SELECTED_ACCENT = "#2f6b2d";
+
 export default function SubmitScreen() {
   const tabBarHeight = useBottomTabBarHeight();
   const [step, setStep] = useState<number>(0);
@@ -1014,31 +1065,23 @@ export default function SubmitScreen() {
 
           {/* Step 1: Location */}
           {step === 1 ? (
-            <Animated.View entering={FadeInRight.duration(400)}>
-              <Animated.View entering={FadeInDown.delay(0 * 50).duration(220)} className="flex-row" style={{ gap: 12 }}>
-                <Pressable
+            <Animated.View entering={FadeInRight.duration(MOTION.duration.slow).easing(Easing.out(Easing.cubic)).reduceMotion(ReduceMotion.System)}>
+              <View className="flex-row" style={{ gap: 12 }}>
+                <SelectableTile
                   testID="location-indoor"
                   accessibilityLabel="Välj inomhus"
+                  flex={1}
+                  selected={location === "indoor"}
                   onPress={() => {
                     setField("location", "indoor");
                     if (validationErrors.location) setValidationErrors(prev => ({ ...prev, location: false }));
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   }}
-                  style={{
-                    flex: 1,
-                    paddingVertical: 22,
-                    borderRadius: RADIUS.lg,
-                    backgroundColor: location === "indoor" ? "rgba(224,106,78,0.06)" : C.bgCard,
-                    borderWidth: 1.5,
-                    borderColor: location === "indoor" ? C.pistachio : "rgba(0,0,0,0.05)",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    ...SHADOW.card,
-                  }}
+                  contentStyle={{ paddingVertical: 22, alignItems: "center", justifyContent: "center" }}
                 >
                   <Armchair
                     size={30}
-                    color={location === "indoor" ? C.pistachio : C.textTertiary}
+                    color={location === "indoor" ? SELECTED_ACCENT : C.textTertiary}
                     strokeWidth={ICON.strokeWidth}
                     style={{ marginBottom: 8 }}
                   />
@@ -1046,36 +1089,28 @@ export default function SubmitScreen() {
                     style={{
                       fontFamily: location === "indoor" ? FONTS.bold : FONTS.semiBold,
                       fontSize: 16,
-                      color: location === "indoor" ? C.pistachio : C.dark,
+                      color: location === "indoor" ? SELECTED_ACCENT : C.dark,
                     }}
                   >
                     Inomhus
                   </Text>
-                </Pressable>
+                </SelectableTile>
 
-                <Pressable
+                <SelectableTile
                   testID="location-outdoor"
                   accessibilityLabel="Välj utomhus"
+                  flex={1}
+                  selected={location === "outdoor"}
                   onPress={() => {
                     setField("location", "outdoor");
                     if (validationErrors.location) setValidationErrors(prev => ({ ...prev, location: false }));
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   }}
-                  style={{
-                    flex: 1,
-                    paddingVertical: 22,
-                    borderRadius: RADIUS.lg,
-                    backgroundColor: location === "outdoor" ? "rgba(224,106,78,0.06)" : C.bgCard,
-                    borderWidth: 1.5,
-                    borderColor: location === "outdoor" ? C.pistachio : "rgba(0,0,0,0.05)",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    ...SHADOW.card,
-                  }}
+                  contentStyle={{ paddingVertical: 22, alignItems: "center", justifyContent: "center" }}
                 >
                   <Trees
                     size={30}
-                    color={location === "outdoor" ? C.pistachio : C.textTertiary}
+                    color={location === "outdoor" ? SELECTED_ACCENT : C.textTertiary}
                     strokeWidth={ICON.strokeWidth}
                     style={{ marginBottom: 8 }}
                   />
@@ -1083,13 +1118,13 @@ export default function SubmitScreen() {
                     style={{
                       fontFamily: location === "outdoor" ? FONTS.bold : FONTS.semiBold,
                       fontSize: 16,
-                      color: location === "outdoor" ? C.pistachio : C.dark,
+                      color: location === "outdoor" ? SELECTED_ACCENT : C.dark,
                     }}
                   >
                     Utomhus
                   </Text>
-                </Pressable>
-              </Animated.View>
+                </SelectableTile>
+              </View>
 
               {/* Location validation error */}
               {validationErrors.location ? (
@@ -1107,26 +1142,19 @@ export default function SubmitScreen() {
                 </Text>
                 <View style={{ flexDirection: "row", gap: 8 }}>
                   {(["frukost", "brunch", "lunch", "middag"] as const).map((type) => (
-                    <Pressable
+                    <SelectableTile
                       key={type}
                       testID={`meal-type-${type}`}
                       accessibilityLabel={`Välj ${type}`}
+                      flex={1}
+                      selected={mealType === type}
                       onPress={() => { setField("mealType", mealType === type ? null : type); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }}
-                      style={{
-                        flex: 1,
-                        paddingVertical: 10,
-                        borderRadius: RADIUS.md,
-                        backgroundColor: mealType === type ? "rgba(224,106,78,0.06)" : C.bgCard,
-                        borderWidth: 1.5,
-                        borderColor: mealType === type ? C.pistachio : "rgba(0,0,0,0.05)",
-                        alignItems: "center",
-                        ...SHADOW.card,
-                      }}
+                      contentStyle={{ paddingVertical: 11, alignItems: "center", borderRadius: RADIUS.md }}
                     >
-                      <Text style={{ fontFamily: mealType === type ? FONTS.bold : FONTS.semiBold, fontSize: 14, color: mealType === type ? C.pistachio : C.dark }}>
+                      <Text style={{ fontFamily: mealType === type ? FONTS.bold : FONTS.semiBold, fontSize: 14, color: mealType === type ? SELECTED_ACCENT : C.dark }}>
                         {type.charAt(0).toUpperCase() + type.slice(1)}
                       </Text>
-                    </Pressable>
+                    </SelectableTile>
                   ))}
                 </View>
               </Animated.View>
@@ -1167,7 +1195,7 @@ export default function SubmitScreen() {
 
           {/* Step 2: When */}
           {step === 2 ? (
-            <Animated.View entering={FadeInRight.duration(400)}>
+            <Animated.View entering={FadeInRight.duration(MOTION.duration.slow).easing(Easing.out(Easing.cubic)).reduceMotion(ReduceMotion.System)}>
               <Animated.View entering={FadeInDown.delay(0 * 50).duration(220)}>
                 <Text
                   style={{
@@ -1304,7 +1332,7 @@ export default function SubmitScreen() {
 
           {/* Step 3: Who */}
           {step === 3 ? (
-            <Animated.View entering={FadeInRight.duration(400)}>
+            <Animated.View entering={FadeInRight.duration(MOTION.duration.slow).easing(Easing.out(Easing.cubic)).reduceMotion(ReduceMotion.System)}>
               <Animated.View entering={FadeInDown.delay(0 * 50).duration(220)} className="mb-5">
                 <View className="flex-row items-center mb-3" style={{ gap: 8 }}>
                   <User size={18} color={C.pistachio} strokeWidth={2} />
@@ -1467,7 +1495,7 @@ export default function SubmitScreen() {
 
           {/* Step 4: Fees */}
           {step === 4 ? (
-            <Animated.View entering={FadeInRight.duration(400)}>
+            <Animated.View entering={FadeInRight.duration(MOTION.duration.slow).easing(Easing.out(Easing.cubic)).reduceMotion(ReduceMotion.System)}>
               {/* Cancel fee */}
               <Animated.View entering={FadeInDown.delay(0 * 50).duration(220)}>
                 <View
@@ -1715,9 +1743,9 @@ export default function SubmitScreen() {
 
           {/* Step 5: Verify */}
           {step === 5 ? (
-            <Animated.View entering={FadeInRight.duration(400)}>
+            <Animated.View entering={FadeInRight.duration(MOTION.duration.slow).easing(Easing.out(Easing.cubic)).reduceMotion(ReduceMotion.System)}>
               {/* Booking summary */}
-              <Animated.View entering={FadeInDown.delay(0 * 50).duration(220)}>
+              <Animated.View entering={FadeInDown.duration(MOTION.duration.entrance).easing(Easing.out(Easing.cubic)).reduceMotion(ReduceMotion.System)}>
                 <View
                   style={{
                     backgroundColor: C.bgCard,
@@ -1729,66 +1757,94 @@ export default function SubmitScreen() {
                     ...SHADOW.card,
                   }}
                 >
-                  <Text
-                    style={{
-                      fontFamily: FONTS.semiBold,
-                      fontSize: 13,
-                      color: C.textTertiary,
-                      letterSpacing: 0.5,
-                      textTransform: "uppercase",
-                      marginBottom: 12,
-                    }}
-                  >
-                    Sammanfattning
-                  </Text>
-                  <View style={{ gap: 8 }}>
-                    <View className="flex-row items-center" style={{ gap: 10 }}>
-                      <CalendarDays size={15} color={C.pistachio} strokeWidth={2} />
-                      <Text
-                        style={{
-                          fontFamily: FONTS.medium,
-                          fontSize: 14,
-                          color: C.dark,
-                        }}
-                      >
-                        {bookingDate.toLocaleDateString("sv-SE", { weekday: "short", day: "numeric", month: "short" })}
+                  {selectedRestaurant ? (
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 12,
+                        paddingBottom: 14,
+                        marginBottom: 14,
+                        borderBottomWidth: 1,
+                        borderBottomColor: C.divider,
+                      }}
+                    >
+                      <RestaurantMonogram name={selectedRestaurant.name} size={44} radius={12} />
+                      <View style={{ flex: 1 }}>
+                        <Text numberOfLines={1} style={{ fontFamily: FONTS.semiBold, fontSize: 16, color: C.dark, letterSpacing: -0.3 }}>
+                          {selectedRestaurant.name}
+                        </Text>
+                        {selectedRestaurant.cuisine || selectedRestaurant.neighborhood ? (
+                          <Text numberOfLines={1} style={{ fontFamily: FONTS.regular, fontSize: 12.5, color: C.textTertiary, marginTop: 2 }}>
+                            {[selectedRestaurant.cuisine, selectedRestaurant.neighborhood].filter(Boolean).join(" · ")}
+                          </Text>
+                        ) : null}
+                      </View>
+                    </View>
+                  ) : (
+                    <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: C.textTertiary, letterSpacing: 0.5, textTransform: "uppercase", marginBottom: 12 }}>
+                      Sammanfattning
+                    </Text>
+                  )}
+
+                  <View style={{ gap: 11 }}>
+                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                      <View style={{ flexDirection: "row", alignItems: "center", gap: 9 }}>
+                        <CalendarDays size={15} color={C.pistachio} strokeWidth={2} />
+                        <Text style={{ fontFamily: FONTS.regular, fontSize: 13.5, color: C.textSecondary }}>Datum</Text>
+                      </View>
+                      <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13.5, color: C.dark }}>
+                        {bookingDate.toLocaleDateString("sv-SE", { weekday: "long", day: "numeric", month: "long" })}
                       </Text>
                     </View>
-                    <View className="flex-row items-center" style={{ gap: 10 }}>
-                      <Clock size={15} color={C.pistachio} strokeWidth={2} />
-                      <Text
-                        style={{
-                          fontFamily: FONTS.medium,
-                          fontSize: 14,
-                          color: C.dark,
-                        }}
-                      >
+                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                      <View style={{ flexDirection: "row", alignItems: "center", gap: 9 }}>
+                        <Clock size={15} color={C.pistachio} strokeWidth={2} />
+                        <Text style={{ fontFamily: FONTS.regular, fontSize: 13.5, color: C.textSecondary }}>Tid</Text>
+                      </View>
+                      <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13.5, color: C.dark }}>
                         {bookingDate.toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" })}
                       </Text>
                     </View>
+                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                      <View style={{ flexDirection: "row", alignItems: "center", gap: 9 }}>
+                        <Users size={15} color={C.pistachio} strokeWidth={2} />
+                        <Text style={{ fontFamily: FONTS.regular, fontSize: 13.5, color: C.textSecondary }}>Gäster</Text>
+                      </View>
+                      <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13.5, color: C.dark }}>{partySize} pers</Text>
+                    </View>
+                    {location ? (
+                      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                        <View style={{ flexDirection: "row", alignItems: "center", gap: 9 }}>
+                          {location === "indoor" ? (
+                            <Armchair size={15} color={C.pistachio} strokeWidth={2} />
+                          ) : (
+                            <Trees size={15} color={C.pistachio} strokeWidth={2} />
+                          )}
+                          <Text style={{ fontFamily: FONTS.regular, fontSize: 13.5, color: C.textSecondary }}>Plats</Text>
+                        </View>
+                        <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13.5, color: C.dark }}>
+                          {location === "indoor" ? "Inomhus" : "Utomhus"}
+                          {mealType ? ` · ${mealType.charAt(0).toUpperCase()}${mealType.slice(1)}` : ""}
+                        </Text>
+                      </View>
+                    ) : null}
                   </View>
                 </View>
               </Animated.View>
 
               {/* Invitation link option */}
-              <Animated.View entering={FadeInDown.delay(1 * 50).duration(220)}>
-                <Pressable
+              <View style={{ marginBottom: 12 }}>
+                <SelectableTile
                   testID="verify-link"
                   accessibilityLabel="Verifiera med inbjudningslänk"
+                  selected={verifyMethod === "link"}
                   onPress={() => {
                     setField("verifyMethod", "link");
                     if (validationErrors.verifyMethod) setValidationErrors(prev => ({ ...prev, verifyMethod: false }));
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   }}
-                  style={{
-                    backgroundColor: verifyMethod === "link" ? "rgba(224,106,78,0.06)" : C.bgCard,
-                    borderRadius: RADIUS.lg,
-                    padding: SPACING.lg,
-                    marginBottom: 12,
-                    borderWidth: 1.5,
-                    borderColor: verifyMethod === "link" ? C.pistachio : "rgba(0,0,0,0.05)",
-                    ...SHADOW.card,
-                  }}
+                  contentStyle={{ padding: SPACING.lg }}
                 >
                   <View className="flex-row items-center" style={{ gap: 14 }}>
                     <View
@@ -1796,16 +1852,14 @@ export default function SubmitScreen() {
                         width: 48,
                         height: 48,
                         borderRadius: RADIUS.md,
-                        backgroundColor: verifyMethod === "link"
-                          ? C.pistachioLight
-                          : "rgba(0,0,0,0.04)",
+                        backgroundColor: verifyMethod === "link" ? C.pistachioLight : "rgba(0,0,0,0.04)",
                         alignItems: "center",
                         justifyContent: "center",
                       }}
                     >
                       <Link
                         size={22}
-                        color={verifyMethod === "link" ? C.pistachio : C.textSecondary}
+                        color={verifyMethod === "link" ? SELECTED_ACCENT : C.textSecondary}
                         strokeWidth={2}
                       />
                     </View>
@@ -1814,7 +1868,7 @@ export default function SubmitScreen() {
                         style={{
                           fontFamily: FONTS.semiBold,
                           fontSize: 16,
-                          color: verifyMethod === "link" ? C.pistachio : C.dark,
+                          color: verifyMethod === "link" ? SELECTED_ACCENT : C.dark,
                         }}
                       >
                         Inbjudningslänk
@@ -1845,28 +1899,21 @@ export default function SubmitScreen() {
                       </View>
                     ) : null}
                   </View>
-                </Pressable>
-              </Animated.View>
+                </SelectableTile>
+              </View>
 
               {/* Screenshot option */}
-              <Animated.View entering={FadeInDown.delay(2 * 50).duration(220)}>
-                <Pressable
+              <View style={{ marginBottom: 16 }}>
+                <SelectableTile
                   testID="verify-screenshot"
                   accessibilityLabel="Verifiera med skärmdump"
+                  selected={verifyMethod === "screenshot"}
                   onPress={() => {
                     setField("verifyMethod", "screenshot");
                     if (validationErrors.verifyMethod) setValidationErrors(prev => ({ ...prev, verifyMethod: false }));
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   }}
-                  style={{
-                    backgroundColor: verifyMethod === "screenshot" ? "rgba(224,106,78,0.06)" : C.bgCard,
-                    borderRadius: RADIUS.lg,
-                    padding: SPACING.lg,
-                    marginBottom: 16,
-                    borderWidth: 1.5,
-                    borderColor: verifyMethod === "screenshot" ? C.pistachio : "rgba(0,0,0,0.05)",
-                    ...SHADOW.card,
-                  }}
+                  contentStyle={{ padding: SPACING.lg }}
                 >
                   <View className="flex-row items-center" style={{ gap: 14 }}>
                     <View
@@ -1874,16 +1921,14 @@ export default function SubmitScreen() {
                         width: 48,
                         height: 48,
                         borderRadius: RADIUS.md,
-                        backgroundColor: verifyMethod === "screenshot"
-                          ? C.pistachioLight
-                          : "rgba(0,0,0,0.04)",
+                        backgroundColor: verifyMethod === "screenshot" ? C.pistachioLight : "rgba(0,0,0,0.04)",
                         alignItems: "center",
                         justifyContent: "center",
                       }}
                     >
                       <Camera
                         size={22}
-                        color={verifyMethod === "screenshot" ? C.pistachio : C.textSecondary}
+                        color={verifyMethod === "screenshot" ? SELECTED_ACCENT : C.textSecondary}
                         strokeWidth={2}
                       />
                     </View>
@@ -1892,7 +1937,7 @@ export default function SubmitScreen() {
                         style={{
                           fontFamily: FONTS.semiBold,
                           fontSize: 16,
-                          color: verifyMethod === "screenshot" ? C.pistachio : C.dark,
+                          color: verifyMethod === "screenshot" ? SELECTED_ACCENT : C.dark,
                         }}
                       >
                         Skärmdump
@@ -1923,8 +1968,8 @@ export default function SubmitScreen() {
                       </View>
                     ) : null}
                   </View>
-                </Pressable>
-              </Animated.View>
+                </SelectableTile>
+              </View>
 
               {/* Verification validation error */}
               {validationErrors.verifyMethod ? (
@@ -1961,7 +2006,7 @@ export default function SubmitScreen() {
                       paddingVertical: 28,
                       alignItems: "center",
                       justifyContent: "center",
-                      backgroundColor: "rgba(224,106,78,0.04)",
+                      backgroundColor: "rgba(126,200,122,0.06)",
                       marginBottom: 16,
                     }}
                   >
