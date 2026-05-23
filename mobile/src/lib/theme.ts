@@ -184,6 +184,10 @@ export const FONTS = {
   semiBold: "PlusJakartaSans_600SemiBold",
   medium: "PlusJakartaSans_500Medium",
   regular: "PlusJakartaSans_400Regular",
+  // Editorial serif — Fraunces (dining-identitet: rubrik-serif + sans-body)
+  serifDisplay: "Fraunces_700Bold",
+  serifSemi: "Fraunces_600SemiBold",
+  serifItalic: "Fraunces_500Medium_Italic",
 } as const;
 
 export const SPACING = {
@@ -330,6 +334,21 @@ export const TYPO = {
     fontVariant: ["tabular-nums"] as const,
     color: C.textPrimary,
   },
+  /** Editorial serif hero — the per-step question (dining-identitet). */
+  serifHero: {
+    fontFamily: FONTS.serifDisplay,
+    fontSize: 29,
+    lineHeight: 34,
+    letterSpacing: -0.5,
+    color: C.textPrimary,
+  },
+  /** Italic serif section eyebrow (222-style). */
+  serifSection: {
+    fontFamily: FONTS.serifItalic,
+    fontSize: 13,
+    letterSpacing: 0.2,
+    color: C.textSecondary,
+  },
 } as const;
 
 export const ICON = {
@@ -428,4 +447,19 @@ export const SEMANTIC = {
   onSurface: C.textPrimary,
   onSurfaceMuted: C.textSecondary,
   onSurfaceFaint: C.textTertiary,
+} as const;
+
+/**
+ * Selection vocabulary — ONE source for every "selected"/active state across the
+ * submit flow (tiles, chips, day-circle, time-slot, primary CTA). Forest-green
+ * editorial accent. Pistachio stays for success/celebration; gold for credits/ratings.
+ */
+export const SELECT = {
+  bg: "rgba(31,77,42,0.08)",        // selected tile fill
+  bgStrong: "rgba(31,77,42,0.14)",  // selected icon-badge / chip fill
+  border: "rgba(31,77,42,0.45)",    // selected tile/chip border
+  fg: C.forest,                     // selected text / icon (#1F4D2A)
+  solid: C.forest,                  // solid CTA / selected pill / day-circle
+  onSolid: C.cream,                 // text / icon on solid forest
+  ring: C.ringForest,               // subtle focus ring
 } as const;

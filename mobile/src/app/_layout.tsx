@@ -17,6 +17,11 @@ import {
   PlusJakartaSans_600SemiBold,
   PlusJakartaSans_700Bold,
 } from '@expo-google-fonts/plus-jakarta-sans';
+import {
+  Fraunces_600SemiBold,
+  Fraunces_700Bold,
+  Fraunces_500Medium_Italic,
+} from '@expo-google-fonts/fraunces';
 import { registerForPushNotificationsAsync, setupNotificationHandlers } from '@/lib/notifications';
 import { router as expoRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase'; // cache-bust 2
@@ -214,6 +219,9 @@ export default function RootLayout() {
     PlusJakartaSans_500Medium,
     PlusJakartaSans_600SemiBold,
     PlusJakartaSans_700Bold,
+    Fraunces_600SemiBold,
+    Fraunces_700Bold,
+    Fraunces_500Medium_Italic,
     "Unisketch-Bold": require("../../assets/fonts/Unisketch-Bold.ttf"),
   });
   const notificationCleanupRef = useRef<(() => void) | null>(null);

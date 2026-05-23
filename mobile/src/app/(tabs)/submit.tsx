@@ -30,7 +30,6 @@ import {
   Camera,
   Upload,
   CheckCircle2,
-  Sparkles,
   Armchair,
   Trees,
   AlertCircle,
@@ -56,97 +55,129 @@ import { useSubmitReservation, useRestaurants, useProfile } from "@/lib/api/hook
 import { useAuthStore } from "@/lib/auth-store";
 import type { Restaurant } from "@/lib/api/types";
 import { RestaurantMonogram } from "@/components/RestaurantMonogram";
-import { C, FONTS, SPACING, SHADOW, RADIUS, ICON, MOTION } from "../../lib/theme";
+import { C, FONTS, SPACING, SHADOW, RADIUS, ICON, MOTION, TYPO, SELECT } from "../../lib/theme";
+import { Callout } from "@/components/Callout";
+import { LegalModal } from "@/components/LegalModal";
+import { TERMS_CONDITIONS } from "@/lib/legal-content";
 
 // ── Web Date Picker ──
 const MONTHS_SV = ["Januari","Februari","Mars","April","Maj","Juni","Juli","Augusti","September","Oktober","November","December"];
 const DAYS_SV = ["Mån","Tis","Ons","Tor","Fre","Lör","Sön"];
 
+// Horizontal day-circle row (Airbnb/Fresha pattern) — replaces the month grid on web.
 function WebDatePicker({ value, onChange }: { value: Date; onChange: (d: Date) => void }) {
-  const [viewDate, setViewDate] = useState(new Date(value));
-  const today = new Date(); today.setHours(0,0,0,0);
-
-  const year = viewDate.getFullYear();
-  const month = viewDate.getMonth();
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const offset = firstDay === 0 ? 6 : firstDay - 1;
-
-  const cells: (number | null)[] = [];
-  for (let i = 0; i < offset; i++) cells.push(null);
-  for (let i = 1; i <= daysInMonth; i++) cells.push(i);
-  while (cells.length % 7 !== 0) cells.push(null);
-
-  const isSelected = (d: number) => {
-    const sel = new Date(value);
-    return sel.getDate() === d && sel.getMonth() === month && sel.getFullYear() === year;
-  };
-  const isPast = (d: number) => new Date(year, month, d) < today;
+  const days = useMemo(() => {
+    const base = new Date(); base.setHours(0, 0, 0, 0);
+    return Array.from({ length: 45 }, (_, i) => {
+      const d = new Date(base); d.setDate(base.getDate() + i); return d;
+    });
+  }, []);
 
   return (
-    <View style={{ paddingTop: 4 }}>
-      {/* Header */}
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-        <Pressable accessibilityLabel="Föregående månad" onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); const d = new Date(viewDate); d.setMonth(d.getMonth()-1); setViewDate(d); }}
-          style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: "rgba(0,0,0,0.05)", alignItems: "center", justifyContent: "center" }}>
-          <ChevronLeft size={16} color={C.textSecondary} strokeWidth={ICON.strokeWidth} />
-        </Pressable>
-        <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.dark }}>
-          {MONTHS_SV[month]} {year}
-        </Text>
-        <Pressable accessibilityLabel="Nästa månad" onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); const d = new Date(viewDate); d.setMonth(d.getMonth()+1); setViewDate(d); }}
-          style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: "rgba(0,0,0,0.05)", alignItems: "center", justifyContent: "center" }}>
-          <ChevronRight size={16} color={C.textSecondary} strokeWidth={ICON.strokeWidth} />
-        </Pressable>
-      </View>
-      {/* Day labels */}
-      <View style={{ flexDirection: "row", marginBottom: 4 }}>
-        {DAYS_SV.map(d => (
-          <Text key={d} style={{ flex: 1, textAlign: "center", fontFamily: FONTS.medium, fontSize: 11, color: C.textTertiary, letterSpacing: 0.3 }}>{d}</Text>
-        ))}
-      </View>
-      {/* Grid */}
-      {Array.from({ length: cells.length / 7 }, (_, row) => (
-        <View key={row} style={{ flexDirection: "row", marginBottom: 2 }}>
-          {cells.slice(row*7, row*7+7).map((d, i) => (
-            <Pressable key={i} accessibilityLabel={d ? `Välj dag ${d}` : undefined} onPress={() => { if (!d || isPast(d)) return; Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); const next = new Date(value); next.setFullYear(year, month, d); onChange(next); }}
-              style={{ flex: 1, height: 38, alignItems: "center", justifyContent: "center",
-                backgroundColor: d && isSelected(d) ? C.pistachio : "transparent",
-                borderRadius: 19, opacity: d && isPast(d) ? 0.3 : 1 }}>
-              {d ? <Text style={{ fontFamily: isSelected(d) ? FONTS.semiBold : FONTS.regular, fontSize: 14,
-                color: isSelected(d) ? C.dark : C.dark }}>{d}</Text> : null}
-            </Pressable>
-          ))}
-        </View>
-      ))}
-    </View>
-  );
-}
-
-function WebTimePicker({ value, onChange }: { value: Date; onChange: (d: Date) => void }) {
-  const times: string[] = [];
-  for (let h = 6; h < 24; h++) {
-    for (const m of [0, 15, 30, 45]) {
-      times.push(`${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}`);
-    }
-  }
-  const current = `${String(value.getHours()).padStart(2,"0")}:${String(Math.round(value.getMinutes()/15)*15).padStart(2,"0")}`;
-
-  return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 4 }}
-      contentContainerStyle={{ gap: 8, paddingVertical: 4 }}>
-      {times.map(t => {
-        const selected = t === current;
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      style={{ flexGrow: 0, marginHorizontal: -4 }}
+      contentContainerStyle={{ gap: 8, paddingVertical: 4, paddingHorizontal: 4 }}
+    >
+      {days.map((d, i) => {
+        const selected = d.toDateString() === value.toDateString();
+        const weekday = DAYS_SV[(d.getDay() + 6) % 7];
         return (
-          <Pressable key={t} accessibilityLabel={`Välj tid ${t}`} onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); const [h,m] = t.split(":").map(Number); const next = new Date(value); next.setHours(h!,m!,0,0); onChange(next); }}
-            style={{ paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20,
-              backgroundColor: selected ? C.pistachio : "rgba(0,0,0,0.05)" }}>
-            <Text style={{ fontFamily: selected ? FONTS.semiBold : FONTS.regular, fontSize: 14,
-              color: selected ? C.dark : C.textSecondary }}>{t}</Text>
+          <Pressable
+            key={i}
+            testID={`day-${i}`}
+            accessibilityLabel={`Välj ${weekday} ${d.getDate()} ${MONTHS_SV[d.getMonth()]}`}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              const next = new Date(value);
+              next.setFullYear(d.getFullYear(), d.getMonth(), d.getDate());
+              onChange(next);
+            }}
+            style={{
+              width: 54,
+              paddingVertical: 10,
+              borderRadius: RADIUS.lg,
+              alignItems: "center",
+              backgroundColor: selected ? SELECT.solid : C.bgCard,
+              borderWidth: 1.5,
+              borderColor: selected ? SELECT.solid : C.borderLight,
+              ...SHADOW.subtle,
+            }}
+          >
+            <Text style={{ fontFamily: FONTS.medium, fontSize: 10.5, letterSpacing: 0.4, textTransform: "uppercase", color: selected ? "rgba(250,250,248,0.75)" : C.textTertiary }}>
+              {i === 0 ? "Idag" : weekday}
+            </Text>
+            <Text style={{ fontFamily: FONTS.semiBold, fontSize: 18, marginTop: 3, color: selected ? SELECT.onSolid : C.dark }}>
+              {d.getDate()}
+            </Text>
+            <Text style={{ fontFamily: FONTS.regular, fontSize: 10, marginTop: 1, color: selected ? "rgba(250,250,248,0.75)" : C.textTertiary }}>
+              {MONTHS_SV[d.getMonth()].slice(0, 3).toLowerCase()}
+            </Text>
           </Pressable>
         );
       })}
     </ScrollView>
+  );
+}
+
+// Build "HH:MM" slots every 30 min between two times (inclusive).
+function makeSlots(sh: number, sm: number, eh: number, em: number): string[] {
+  const out: string[] = [];
+  let h = sh, m = sm;
+  while (h < eh || (h === eh && m <= em)) {
+    out.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
+    m += 30; if (m >= 60) { m = 0; h++; }
+  }
+  return out;
+}
+
+const TIME_GROUPS = [
+  { label: "Lunch", slots: makeSlots(11, 0, 14, 30) },
+  { label: "Middag", slots: makeSlots(17, 0, 21, 30) },
+  { label: "Sent", slots: makeSlots(22, 0, 23, 30) },
+] as const;
+
+// Period-grouped time-slot pills (Fresha pattern) — replaces the 15-min scroll.
+function WebTimePicker({ value, onChange }: { value: Date; onChange: (d: Date) => void }) {
+  const current = `${String(value.getHours()).padStart(2, "0")}:${value.getMinutes() < 30 ? "00" : "30"}`;
+  return (
+    <View style={{ gap: 16 }}>
+      {TIME_GROUPS.map((g) => (
+        <View key={g.label}>
+          <Text style={[TYPO.serifSection, { marginBottom: 9 }]}>{g.label}</Text>
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+            {g.slots.map((t) => {
+              const selected = t === current;
+              return (
+                <Pressable
+                  key={t}
+                  accessibilityLabel={`Välj tid ${t}`}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    const [h, m] = t.split(":").map(Number);
+                    const next = new Date(value); next.setHours(h!, m!, 0, 0);
+                    onChange(next);
+                  }}
+                  style={{
+                    paddingHorizontal: 15,
+                    paddingVertical: 9,
+                    borderRadius: RADIUS.pill,
+                    backgroundColor: selected ? SELECT.solid : C.bgCard,
+                    borderWidth: 1.5,
+                    borderColor: selected ? SELECT.solid : C.borderLight,
+                  }}
+                >
+                  <Text style={{ fontFamily: selected ? FONTS.semiBold : FONTS.medium, fontSize: 14, color: selected ? SELECT.onSolid : C.dark }}>
+                    {t}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+      ))}
+    </View>
   );
 }
 
@@ -242,7 +273,7 @@ function StepSegment({ active }: { active: boolean }) {
     });
   }, [active]);
   const style = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(fill.value, [0, 1], [C.borderLight, C.pistachio]),
+    backgroundColor: interpolateColor(fill.value, [0, 1], [C.borderLight, SELECT.solid]),
   }));
   return (
     <View style={{ flex: 1, height: 4, borderRadius: 2, overflow: "hidden", backgroundColor: C.borderLight }}>
@@ -302,12 +333,12 @@ const RestaurantRow = React.memo(function RestaurantRow({
     backgroundColor: interpolateColor(
       selectProgress.value,
       [0, 1],
-      ["rgba(255,255,255,0)", "rgba(126,200,122,0.10)"],
+      ["rgba(255,255,255,0)", SELECT.bg],
     ),
     borderColor: interpolateColor(
       selectProgress.value,
       [0, 1],
-      ["rgba(0,0,0,0)", "rgba(126,200,122,0.45)"],
+      ["rgba(0,0,0,0)", SELECT.border],
     ),
   }));
 
@@ -388,13 +419,13 @@ const RestaurantRow = React.memo(function RestaurantRow({
                 width: 26,
                 height: 26,
                 borderRadius: 13,
-                backgroundColor: C.pistachio,
+                backgroundColor: SELECT.solid,
                 alignItems: "center",
                 justifyContent: "center",
               },
             ]}
           >
-            <Check size={15} color={C.dark} strokeWidth={ICON.strokeWidth} />
+            <Check size={15} color={SELECT.onSolid} strokeWidth={ICON.strokeWidth} />
           </Animated.View>
         </Animated.View>
       </Pressable>
@@ -425,8 +456,8 @@ function SelectableTile({ selected, onPress, children, contentStyle, flex, testI
   }, [selected]);
   const aStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
-    backgroundColor: interpolateColor(progress.value, [0, 1], ["#FFFFFF", "rgba(126,200,122,0.10)"]),
-    borderColor: interpolateColor(progress.value, [0, 1], ["rgba(0,0,0,0.05)", "rgba(126,200,122,0.55)"]),
+    backgroundColor: interpolateColor(progress.value, [0, 1], ["#FFFFFF", SELECT.bg]),
+    borderColor: interpolateColor(progress.value, [0, 1], ["rgba(0,0,0,0.05)", SELECT.border]),
   }));
   return (
     <Pressable
@@ -451,7 +482,7 @@ function SelectableTile({ selected, onPress, children, contentStyle, flex, testI
 }
 
 // Selected-state accent (readable dark green) vs resting tone
-const SELECTED_ACCENT = "#2f6b2d";
+const SELECTED_ACCENT = SELECT.fg;
 
 export default function SubmitScreen() {
   const tabBarHeight = useBottomTabBarHeight();
@@ -461,6 +492,7 @@ export default function SubmitScreen() {
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
+  const [showTerms, setShowTerms] = useState<boolean>(false);
   const [screenshotUri, setScreenshotUri] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<{
     restaurant: boolean;
@@ -529,7 +561,8 @@ export default function SubmitScreen() {
   }));
 
   const ctaAnimStyle = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(ctaProgress.value, [0, 1], [C.bgInput, C.pistachio]),
+    backgroundColor: interpolateColor(ctaProgress.value, [0, 1], ["rgba(31,77,42,0.06)", SELECT.solid]),
+    borderColor: interpolateColor(ctaProgress.value, [0, 1], [SELECT.border, SELECT.solid]),
   }));
 
   const filteredRestaurants = useMemo(() => {
@@ -585,6 +618,28 @@ export default function SubmitScreen() {
       reduceMotion: ReduceMotion.System,
     });
   }, [ready]);
+
+  // Live context line carried in the footer (Airbnb pattern) — confirms choices as you go.
+  const footerSummary = useMemo(() => {
+    switch (step) {
+      case 0:
+        return selectedRestaurant?.name ?? null;
+      case 1:
+        return location
+          ? `${location === "indoor" ? "Inomhus" : "Utomhus"}${mealType ? ` · ${mealType.charAt(0).toUpperCase()}${mealType.slice(1)}` : ""}`
+          : null;
+      case 2:
+        return `${bookingDate.toLocaleDateString("sv-SE", { weekday: "short", day: "numeric", month: "short" })} · ${bookingDate.toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" })}`;
+      case 3:
+        return `${partySize} ${partySize === 1 ? "gäst" : "gäster"}`;
+      case 4:
+        return hasCancelFee || hasPrepaidFee ? "Avgifter tillagda" : "Inga avgifter";
+      case 5:
+        return "Du tjänar 1 credit direkt";
+      default:
+        return null;
+    }
+  }, [step, selectedRestaurant, location, mealType, bookingDate, partySize, hasCancelFee, hasPrepaidFee]);
 
   const handleActualSubmit = async () => {
     if (!selectedRestaurant || !phone) {
@@ -726,14 +781,14 @@ export default function SubmitScreen() {
               </View>
               <Text
                 style={{
-                  fontFamily: FONTS.displayBold,
-                  fontSize: 26,
+                  fontFamily: FONTS.serifDisplay,
+                  fontSize: 28,
                   color: C.dark,
                   textAlign: "center",
                   letterSpacing: -0.5,
                 }}
               >
-                Bokning Upplagd
+                Bokning upplagd
               </Text>
               <Text
                 style={{
@@ -784,35 +839,22 @@ export default function SubmitScreen() {
             style={{
               fontFamily: FONTS.semiBold,
               fontSize: 11,
-              letterSpacing: 1.2,
+              letterSpacing: 1.4,
               textTransform: "uppercase",
               color: C.textTertiary,
-              marginBottom: 4,
-            }}
-          >
-            Hjälp någon ikväll
-          </Text>
-          <Text
-            testID="submit-header"
-            style={{
-              fontFamily: FONTS.displayBold,
-              fontSize: 32,
-              color: C.dark,
-              letterSpacing: -1.0,
+              marginBottom: 6,
             }}
           >
             Lägg upp bokning
           </Text>
-          <Text
-            style={{
-              fontFamily: FONTS.regular,
-              fontSize: 14,
-              color: C.textTertiary,
-              marginTop: 3,
-            }}
+          <Animated.Text
+            key={step}
+            entering={FadeIn.duration(MOTION.duration.entrance).easing(Easing.out(Easing.cubic)).reduceMotion(ReduceMotion.System)}
+            testID="submit-header"
+            style={TYPO.serifHero}
           >
             {STEP_SUBTITLES[step]}
-          </Text>
+          </Animated.Text>
         </Animated.View>
 
         {/* Segmented step indicator */}
@@ -833,7 +875,7 @@ export default function SubmitScreen() {
               style={{
                 fontFamily: FONTS.semiBold,
                 fontSize: 11,
-                color: C.pistachio,
+                color: SELECT.fg,
               }}
             >
               {STEP_LABELS[step]}
@@ -903,7 +945,7 @@ export default function SubmitScreen() {
                   borderRadius: RADIUS.md,
                   paddingHorizontal: 16,
                   borderWidth: 1,
-                  borderColor: searchQuery.length > 0 ? C.pistachio : C.borderLight,
+                  borderColor: searchQuery.length > 0 ? SELECT.border : C.borderLight,
                   ...SHADOW.card,
                 }}
               >
@@ -964,14 +1006,14 @@ export default function SubmitScreen() {
                             paddingLeft: 6,
                             paddingRight: 14,
                             borderRadius: RADIUS.pill,
-                            backgroundColor: active ? "rgba(126,200,122,0.14)" : C.bgCard,
+                            backgroundColor: active ? SELECT.bgStrong : C.bgCard,
                             borderWidth: 1.5,
-                            borderColor: active ? C.pistachio : C.borderLight,
+                            borderColor: active ? SELECT.border : C.borderLight,
                             ...SHADOW.subtle,
                           }}
                         >
                           <RestaurantMonogram name={r.name} size={28} radius={9} />
-                          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: active ? "#2f6b2d" : C.dark }}>
+                          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13, color: active ? SELECT.fg : C.dark }}>
                             {r.name}
                           </Text>
                         </Pressable>
@@ -1197,18 +1239,6 @@ export default function SubmitScreen() {
           {step === 2 ? (
             <Animated.View entering={FadeInRight.duration(MOTION.duration.slow).easing(Easing.out(Easing.cubic)).reduceMotion(ReduceMotion.System)}>
               <Animated.View entering={FadeInDown.delay(0 * 50).duration(220)}>
-                <Text
-                  style={{
-                    fontFamily: FONTS.semiBold,
-                    fontSize: 16,
-                    color: C.dark,
-                    marginBottom: 16,
-                    letterSpacing: -0.2,
-                  }}
-                >
-                  När är bokningen?
-                </Text>
-
                 {/* Date picker — native spinner on iOS/Android, html input on web */}
                 <View
                   style={{
@@ -1308,24 +1338,9 @@ export default function SubmitScreen() {
 
               {/* Helper hint */}
               <Animated.View entering={FadeInDown.delay(2 * 50).duration(220)}>
-                <View
-                  className="rounded-xl p-4"
-                  style={{ backgroundColor: C.successBg }}
-                >
-                  <View className="flex-row items-center" style={{ gap: 6 }}>
-                    <Sparkles size={14} color={C.success} strokeWidth={2} />
-                    <Text
-                      style={{
-                        fontFamily: FONTS.medium,
-                        fontSize: 13,
-                        color: C.success,
-                        flex: 1,
-                      }}
-                    >
-                      Se till att datum och tid matchar exakt det som står på din bokning.
-                    </Text>
-                  </View>
-                </View>
+                <Callout variant="tip">
+                  Se till att datum och tid matchar exakt det som står på din bokning.
+                </Callout>
               </Animated.View>
             </Animated.View>
           ) : null}
@@ -1335,7 +1350,7 @@ export default function SubmitScreen() {
             <Animated.View entering={FadeInRight.duration(MOTION.duration.slow).easing(Easing.out(Easing.cubic)).reduceMotion(ReduceMotion.System)}>
               <Animated.View entering={FadeInDown.delay(0 * 50).duration(220)} className="mb-5">
                 <View className="flex-row items-center mb-3" style={{ gap: 8 }}>
-                  <User size={18} color={C.pistachio} strokeWidth={2} />
+                  <User size={18} color={C.forest} strokeWidth={2} />
                   <Text
                     style={{
                       fontFamily: FONTS.semiBold,
@@ -1365,7 +1380,7 @@ export default function SubmitScreen() {
                     paddingHorizontal: 16,
                     paddingVertical: 16,
                     borderWidth: 1,
-                    borderColor: validationErrors.firstName ? C.error : firstName.length > 0 ? C.pistachioPressed : C.borderLight,
+                    borderColor: validationErrors.firstName ? C.error : firstName.length > 0 ? SELECT.border : C.borderLight,
                     ...SHADOW.card,
                   }}
                 />
@@ -1380,7 +1395,7 @@ export default function SubmitScreen() {
 
               <Animated.View entering={FadeInDown.delay(1 * 50).duration(220)} className="mb-5">
                 <View className="flex-row items-center mb-3" style={{ gap: 8 }}>
-                  <User size={18} color={C.pistachio} strokeWidth={2} />
+                  <User size={18} color={C.forest} strokeWidth={2} />
                   <Text
                     style={{
                       fontFamily: FONTS.semiBold,
@@ -1410,7 +1425,7 @@ export default function SubmitScreen() {
                     paddingHorizontal: 16,
                     paddingVertical: 16,
                     borderWidth: 1,
-                    borderColor: validationErrors.lastName ? C.error : lastName.length > 0 ? C.pistachioPressed : C.borderLight,
+                    borderColor: validationErrors.lastName ? C.error : lastName.length > 0 ? SELECT.border : C.borderLight,
                     ...SHADOW.card,
                   }}
                 />
@@ -1423,27 +1438,15 @@ export default function SubmitScreen() {
                 ) : null}
               </Animated.View>
 
-              <Animated.View entering={FadeInDown.delay(2 * 50).duration(220)}>
-                <View
-                  className="rounded-xl p-4 mb-6"
-                  style={{ backgroundColor: "rgba(201, 169, 110, 0.08)" }}
-                >
-                  <Text
-                    style={{
-                      fontFamily: FONTS.regular,
-                      fontSize: 13,
-                      color: C.gold,
-                      lineHeight: 19,
-                    }}
-                  >
-                    Ditt namn delas bara med den som tar över bokningen.
-                  </Text>
-                </View>
+              <Animated.View entering={FadeInDown.delay(2 * 50).duration(220)} style={{ marginBottom: 24 }}>
+                <Callout variant="trust">
+                  Ditt namn delas bara med den som tar över bokningen.
+                </Callout>
               </Animated.View>
 
               <Animated.View entering={FadeInDown.delay(3 * 50).duration(220)} style={{ paddingBottom: 16 }}>
                 <View className="flex-row items-center mb-3" style={{ gap: 8 }}>
-                  <Users size={18} color={C.pistachio} strokeWidth={2} />
+                  <Users size={18} color={C.forest} strokeWidth={2} />
                   <Text
                     style={{
                       fontFamily: FONTS.semiBold,
@@ -1469,11 +1472,11 @@ export default function SubmitScreen() {
                         width: 56,
                         height: 56,
                         borderRadius: RADIUS.md,
-                        backgroundColor: partySize === size ? C.dark : C.bgCard,
+                        backgroundColor: partySize === size ? SELECT.solid : C.bgCard,
                         alignItems: "center",
                         justifyContent: "center",
                         borderWidth: 1.5,
-                        borderColor: partySize === size ? C.dark : C.borderLight,
+                        borderColor: partySize === size ? SELECT.solid : C.borderLight,
                         ...SHADOW.card,
                       }}
                     >
@@ -1481,7 +1484,7 @@ export default function SubmitScreen() {
                         style={{
                           fontFamily: FONTS.semiBold,
                           fontSize: 17,
-                          color: partySize === size ? C.white : C.dark,
+                          color: partySize === size ? SELECT.onSolid : C.dark,
                         }}
                       >
                         {size}
@@ -1514,12 +1517,12 @@ export default function SubmitScreen() {
                           width: 40,
                           height: 40,
                           borderRadius: RADIUS.md,
-                          backgroundColor: C.pistachioLight,
+                          backgroundColor: SELECT.bgStrong,
                           alignItems: "center",
                           justifyContent: "center",
                         }}
                       >
-                        <Banknote size={20} color={C.pistachio} strokeWidth={2} />
+                        <Banknote size={20} color={C.forest} strokeWidth={2} />
                       </View>
                       <View style={{ flex: 1 }}>
                         <Text
@@ -1551,7 +1554,7 @@ export default function SubmitScreen() {
                         if (!val) setField("cancelFeeAmount", "");
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                       }}
-                      trackColor={{ false: "#E5E5E0", true: C.pistachio }}
+                      trackColor={{ false: "#E5E5E0", true: C.forest }}
                       thumbColor={C.white}
                     />
                   </View>
@@ -1640,7 +1643,7 @@ export default function SubmitScreen() {
                         if (!val) setField("prepaidFeeAmount", "");
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                       }}
-                      trackColor={{ false: "#E5E5E0", true: C.pistachio }}
+                      trackColor={{ false: "#E5E5E0", true: C.forest }}
                       thumbColor={C.white}
                     />
                   </View>
@@ -1790,7 +1793,7 @@ export default function SubmitScreen() {
                   <View style={{ gap: 11 }}>
                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                       <View style={{ flexDirection: "row", alignItems: "center", gap: 9 }}>
-                        <CalendarDays size={15} color={C.pistachio} strokeWidth={2} />
+                        <CalendarDays size={15} color={C.forest} strokeWidth={2} />
                         <Text style={{ fontFamily: FONTS.regular, fontSize: 13.5, color: C.textSecondary }}>Datum</Text>
                       </View>
                       <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13.5, color: C.dark }}>
@@ -1799,7 +1802,7 @@ export default function SubmitScreen() {
                     </View>
                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                       <View style={{ flexDirection: "row", alignItems: "center", gap: 9 }}>
-                        <Clock size={15} color={C.pistachio} strokeWidth={2} />
+                        <Clock size={15} color={C.forest} strokeWidth={2} />
                         <Text style={{ fontFamily: FONTS.regular, fontSize: 13.5, color: C.textSecondary }}>Tid</Text>
                       </View>
                       <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13.5, color: C.dark }}>
@@ -1808,7 +1811,7 @@ export default function SubmitScreen() {
                     </View>
                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                       <View style={{ flexDirection: "row", alignItems: "center", gap: 9 }}>
-                        <Users size={15} color={C.pistachio} strokeWidth={2} />
+                        <Users size={15} color={C.forest} strokeWidth={2} />
                         <Text style={{ fontFamily: FONTS.regular, fontSize: 13.5, color: C.textSecondary }}>Gäster</Text>
                       </View>
                       <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13.5, color: C.dark }}>{partySize} pers</Text>
@@ -1817,9 +1820,9 @@ export default function SubmitScreen() {
                       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                         <View style={{ flexDirection: "row", alignItems: "center", gap: 9 }}>
                           {location === "indoor" ? (
-                            <Armchair size={15} color={C.pistachio} strokeWidth={2} />
+                            <Armchair size={15} color={C.forest} strokeWidth={2} />
                           ) : (
-                            <Trees size={15} color={C.pistachio} strokeWidth={2} />
+                            <Trees size={15} color={C.forest} strokeWidth={2} />
                           )}
                           <Text style={{ fontFamily: FONTS.regular, fontSize: 13.5, color: C.textSecondary }}>Plats</Text>
                         </View>
@@ -1852,7 +1855,7 @@ export default function SubmitScreen() {
                         width: 48,
                         height: 48,
                         borderRadius: RADIUS.md,
-                        backgroundColor: verifyMethod === "link" ? C.pistachioLight : "rgba(0,0,0,0.04)",
+                        backgroundColor: verifyMethod === "link" ? SELECT.bgStrong : "rgba(0,0,0,0.04)",
                         alignItems: "center",
                         justifyContent: "center",
                       }}
@@ -1890,12 +1893,12 @@ export default function SubmitScreen() {
                           width: 24,
                           height: 24,
                           borderRadius: 12,
-                          backgroundColor: C.pistachio,
+                          backgroundColor: SELECT.solid,
                           alignItems: "center",
                           justifyContent: "center",
                         }}
                       >
-                        <Check size={14} color={C.dark} strokeWidth={ICON.strokeWidth} />
+                        <Check size={14} color={SELECT.onSolid} strokeWidth={ICON.strokeWidth} />
                       </View>
                     ) : null}
                   </View>
@@ -1921,7 +1924,7 @@ export default function SubmitScreen() {
                         width: 48,
                         height: 48,
                         borderRadius: RADIUS.md,
-                        backgroundColor: verifyMethod === "screenshot" ? C.pistachioLight : "rgba(0,0,0,0.04)",
+                        backgroundColor: verifyMethod === "screenshot" ? SELECT.bgStrong : "rgba(0,0,0,0.04)",
                         alignItems: "center",
                         justifyContent: "center",
                       }}
@@ -1959,12 +1962,12 @@ export default function SubmitScreen() {
                           width: 24,
                           height: 24,
                           borderRadius: 12,
-                          backgroundColor: C.pistachio,
+                          backgroundColor: SELECT.solid,
                           alignItems: "center",
                           justifyContent: "center",
                         }}
                       >
-                        <Check size={14} color={C.dark} strokeWidth={ICON.strokeWidth} />
+                        <Check size={14} color={SELECT.onSolid} strokeWidth={ICON.strokeWidth} />
                       </View>
                     ) : null}
                   </View>
@@ -2001,12 +2004,12 @@ export default function SubmitScreen() {
                     style={{
                       borderWidth: 2,
                       borderStyle: "dashed",
-                      borderColor: C.pistachioPressed,
+                      borderColor: SELECT.border,
                       borderRadius: RADIUS.lg,
                       paddingVertical: 28,
                       alignItems: "center",
                       justifyContent: "center",
-                      backgroundColor: "rgba(126,200,122,0.06)",
+                      backgroundColor: SELECT.bg,
                       marginBottom: 16,
                     }}
                   >
@@ -2020,8 +2023,8 @@ export default function SubmitScreen() {
                       </>
                     ) : (
                       <>
-                        <Upload size={28} color={C.pistachio} strokeWidth={ICON.strokeWidth} />
-                        <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.pistachio, marginTop: 10 }}>Ladda upp bekräftelse</Text>
+                        <Upload size={28} color={C.forest} strokeWidth={ICON.strokeWidth} />
+                        <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.forest, marginTop: 10 }}>Ladda upp bekräftelse</Text>
                         <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary, marginTop: 4 }}>JPG eller PNG</Text>
                       </>
                     )}
@@ -2094,7 +2097,7 @@ export default function SubmitScreen() {
         {submissionError ? (
           <View
             style={{
-              backgroundColor: C.pistachioLight,
+              backgroundColor: C.errorBg,
               borderRadius: RADIUS.sm,
               padding: 10,
               marginBottom: 10,
@@ -2103,9 +2106,17 @@ export default function SubmitScreen() {
               gap: 8,
             }}
           >
-            <AlertCircle size={14} color={C.pistachio} strokeWidth={2} />
-            <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.pistachio, flex: 1 }}>
+            <AlertCircle size={14} color={C.error} strokeWidth={2} />
+            <Text style={{ fontFamily: FONTS.medium, fontSize: 12, color: C.error, flex: 1 }}>
               {submissionError}
+            </Text>
+          </View>
+        ) : null}
+        {footerSummary ? (
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 7, marginBottom: 10, paddingHorizontal: 4 }}>
+            <View style={{ width: 5, height: 5, borderRadius: 2.5, backgroundColor: SELECT.solid }} />
+            <Text numberOfLines={1} style={{ flex: 1, fontFamily: FONTS.medium, fontSize: 12.5, color: C.textSecondary }}>
+              {footerSummary}
             </Text>
           </View>
         ) : null}
@@ -2151,23 +2162,24 @@ export default function SubmitScreen() {
                   alignItems: "center",
                   justifyContent: "center",
                   flexDirection: "row",
-                  shadowColor: C.pistachio,
+                  borderWidth: 1.5,
+                  shadowColor: C.forest,
                   shadowOffset: { width: 0, height: 6 },
-                  shadowOpacity: ready ? 0.3 : 0,
+                  shadowOpacity: ready ? 0.22 : 0,
                   shadowRadius: 12,
                   elevation: ready ? 5 : 0,
                 },
               ]}
             >
               {submitReservationMutation.isPending ? (
-                <ActivityIndicator size="small" color={C.dark} />
+                <ActivityIndicator size="small" color={SELECT.onSolid} />
               ) : (
                 <>
                   <Text
                     style={{
                       fontFamily: FONTS.bold,
                       fontSize: 15,
-                      color: ready ? C.dark : C.textTertiary,
+                      color: ready ? SELECT.onSolid : SELECT.fg,
                     }}
                   >
                     {NEXT_LABELS[step]}
@@ -2175,7 +2187,7 @@ export default function SubmitScreen() {
                   {step < 5 ? (
                     <ChevronRight
                       size={18}
-                      color={ready ? C.dark : C.textTertiary}
+                      color={ready ? SELECT.onSolid : SELECT.fg}
                       strokeWidth={ICON.strokeWidth}
                       style={{ marginLeft: 4 }}
                     />
@@ -2242,8 +2254,9 @@ export default function SubmitScreen() {
             <Text
               testID="confirm-header"
               style={{
-                fontFamily: FONTS.displayBold,
-                fontSize: 20,
+                fontFamily: FONTS.serifDisplay,
+                fontSize: 23,
+                letterSpacing: -0.4,
                 color: C.dark,
                 marginBottom: 20,
               }}
@@ -2278,34 +2291,56 @@ export default function SubmitScreen() {
             {/* Divider */}
             <View style={{ height: 0.5, backgroundColor: C.divider, marginBottom: 16 }} />
 
-            {/* Info text */}
+            {/* Reward + trust */}
             <Text
               style={{
                 fontFamily: FONTS.regular,
                 fontSize: 13,
                 color: C.textSecondary,
                 textAlign: "center",
+                marginBottom: 8,
+              }}
+            >
+              Du får 1 credit direkt när du lägger upp bokningen.
+            </Text>
+            <Text
+              style={{
+                fontFamily: FONTS.regular,
+                fontSize: 12,
+                color: C.textTertiary,
+                textAlign: "center",
+                lineHeight: 18,
                 marginBottom: 20,
               }}
             >
-              Du får 1 credit direkt när du lägger upp bokningen
+              Genom att lägga upp godkänner du Reslots{" "}
+              <Text
+                onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setShowTerms(true); }}
+                style={{ fontFamily: FONTS.semiBold, color: C.forest, textDecorationLine: "underline" }}
+              >
+                villkor
+              </Text>
+              .
             </Text>
 
             {/* Confirm CTA */}
             <Pressable
               testID="confirm-submit-btn"
               accessibilityLabel="Bekräfta och lägg upp bokning"
+              disabled={submitReservationMutation.isPending}
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
                 handleActualSubmit();
               }}
               style={{
-                backgroundColor: C.pistachio,
+                backgroundColor: C.forest,
                 borderRadius: RADIUS.full,
                 paddingVertical: 16,
+                flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "center",
-                shadowColor: C.pistachio,
+                gap: 10,
+                shadowColor: C.forest,
                 shadowOffset: { width: 0, height: 4 },
                 shadowOpacity: 0.25,
                 shadowRadius: 8,
@@ -2313,9 +2348,14 @@ export default function SubmitScreen() {
               }}
             >
               {submitReservationMutation.isPending ? (
-                <ActivityIndicator size="small" color={C.dark} />
+                <>
+                  <ActivityIndicator size="small" color={SELECT.onSolid} />
+                  <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: SELECT.onSolid }}>
+                    Lägger upp…
+                  </Text>
+                </>
               ) : (
-                <Text style={{ fontFamily: FONTS.bold, fontSize: 15, color: C.dark }}>
+                <Text style={{ fontFamily: FONTS.bold, fontSize: 15, color: SELECT.onSolid }}>
                   Lägg upp bokning
                 </Text>
               )}
@@ -2338,6 +2378,13 @@ export default function SubmitScreen() {
           </Animated.View>
         </View>
       ) : null}
+
+      <LegalModal
+        visible={showTerms}
+        onClose={() => setShowTerms(false)}
+        title="Användarvillkor"
+        content={TERMS_CONDITIONS}
+      />
     </View>
   );
 }
