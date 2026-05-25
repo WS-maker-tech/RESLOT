@@ -1,5 +1,7 @@
 # Reslot — Claude Code Instructions
 
+> **📄 Levande dokument:** Detta är en ögonblicksbild av projektets *nuvarande* tillstånd, inte en evig sanning. När stack, flöden, design-identitet eller konventioner ändras — uppdatera den här filen i samma PR. Behandla allt nedan (särskilt design-identiteten) som "senast godkänt", inte "låst för alltid". Föredrar du att börja jobba mot en ny riktning, gör det och uppdatera dokumentet därefter.
+
 > **🔑 Start här:** Läs `RESLOT-VAULT.md` (full kontext, deploy-flöde, gotchas) och `SESSION_HANDOFF.md` (senaste sessionens status, identity-lock, motion-tokens) i repo-roten först. `VISUAL_FOUNDATION_V1.md` beskriver design-identiteten v3. Denna fil (`CLAUDE.md`) är den auktoritativa, kondenserade versionen.
 >
 > **OBS — stale nested CLAUDE.md:** `mobile/CLAUDE.md` och `backend/CLAUDE.md` är gamla Vibecode-templates. De auto-laddas som nästlad kontext men är delvis felaktiga (säger "du är i Vibecode", "rör inte git", fel RN-version). **Denna root-fil gäller** vid konflikt. De nästlade filerna innehåller dock fortfarande nyttiga RN/Expo-konventioner (routing, safe-area, vanliga misstag) som är värda att läsa.
@@ -153,10 +155,14 @@ npx vercel --prod --force   # manuell production deploy
 
 **Normalisering:** Supabase returnerar join som `Restaurant` (PascalCase) → API normaliserar till `restaurant` (lowercase) innan svar till frontend. JSON-fält (tags/filterOptions) kan komma som sträng → använd `parseTags`/`parseWatchFiltersSafe` i `types.ts`.
 
-## Design System — Identity v3 (Visual Foundation v1)
-Allt i `mobile/src/lib/theme.ts`. **Använd alltid tokens, aldrig hårdkodade värden.** Identiteten är co-founder-låst — ändra inte färger/fonter utan William's OK (har reverterats flera gånger).
+## Design System — aktiv identitet (living, versionerad)
+Allt i `mobile/src/lib/theme.ts`. **Använd alltid tokens, aldrig hårdkodade värden.**
 
-### Färg-roller (`C`)
+> **Identiteten är versionerad, inte fryst.** Avsnittet nedan beskriver den *nuvarande aktiva* identiteten (v3 / Visual Foundation v1) — det William senast godkänt, inte en permanent låsning. **När en ny design-identitet införs (t.ex. _Kloes identitet_), gäller den nya riktningen:** uppdatera `theme.ts`-tokens **och detta avsnitt** så att de speglar den, och följ den senaste godkända identiteten istället för att reverta till den gamla. Lägg gärna upp den nya identiteten som ett nytt versionsnamn (t.ex. "Identity v4 — Kloe") så historiken är spårbar.
+>
+> **Guardrail (varför "locked" stod här):** ändra inte färger/fonter *unilateralt utan en uttalad riktning* — tidigare ad-hoc-ändringar reverterades. Poängen är vem som styr designbesluten (William / den utsedda designern), inte att v3 är hugget i sten. Har du en ny identitet att jobba mot — kör på den.
+
+### Färg-roller (`C`) — nuvarande (v3)
 | Token | Hex | Roll |
 |-------|-----|------|
 | `C.paper` / `C.bg` | `#FAFAF8` | Floor — benvit off-white (locked, INTE varm cream). Alla bakgrunder. |
