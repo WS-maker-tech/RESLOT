@@ -19,6 +19,7 @@ import { useAddWatch, useRestaurants } from "@/lib/api/hooks";
 import { useAuthStore } from "@/lib/auth-store";
 import type { WatchFilterOptions } from "@/lib/api/types";
 import { C, FONTS, SPACING, RADIUS, ICON } from "@/lib/theme";
+import { Doodle, Scribble } from "@/reslot-art";
 
 const WEEKDAY_LABELS = ["Alla", "Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"];
 const PARTY_SIZES = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -204,7 +205,9 @@ export default function AddWatchScreen() {
           })}
         </ScrollView>
 
-        <View style={{ height: 0.5, backgroundColor: C.borderLight, marginBottom: 12 }} />
+        <View style={{ alignItems: "center", marginBottom: 10 }}>
+          <Scribble name="squiggle" color={C.inkFaint} width={110} style={{ opacity: 0.6 }} />
+        </View>
       </View>
 
       {/* Restaurant list */}
@@ -217,6 +220,7 @@ export default function AddWatchScreen() {
         ListEmptyComponent={
           searchQuery ? (
             <View style={{ alignItems: "center", paddingTop: 60 }}>
+              <Doodle name="magnifier" color={C.textTertiary} width={30} style={{ marginBottom: 12 }} />
               <Text style={{ fontFamily: FONTS.regular, fontSize: 14, color: C.textTertiary }}>
                 Inga restauranger matchar "{searchQuery}"
               </Text>

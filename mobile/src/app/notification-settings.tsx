@@ -7,6 +7,7 @@ import * as Haptics from "expo-haptics";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { C, FONTS, SPACING, RADIUS } from "@/lib/theme";
+import { Doodle } from "@/reslot-art";
 
 type ToggleKey =
   | "notif_push_new_booking"
@@ -117,7 +118,7 @@ export default function NotificationSettingsScreen() {
         {/* PUSHNOTISER */}
         <Animated.View entering={FadeInDown.duration(220)}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginTop: 8, marginBottom: 10 }}>
-            <Bell size={14} color={C.textTertiary} strokeWidth={2} />
+            <Doodle name="bell" color={C.textTertiary} width={14} />
             <Text style={{ fontFamily: FONTS.semiBold, fontSize: 12, color: C.textTertiary, letterSpacing: 1, textTransform: "uppercase" }}>Pushnotiser</Text>
           </View>
           <View style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: C.borderLight, paddingHorizontal: 16 }}>

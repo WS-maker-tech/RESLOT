@@ -303,9 +303,12 @@ export default function CreditsScreen() {
           onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/credit-history"); }}
           style={{ alignSelf: "flex-end", marginRight: SPACING.lg, marginTop: SPACING.sm }}
         >
-          <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.textTertiary }}>
-            {"Visa historik →"}
-          </Text>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-end" }}>
+            <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.textTertiary }}>
+              Visa historik
+            </Text>
+            <Scribble name="arrow-right" color={C.textTertiary} width={15} />
+          </View>
         </Pressable>
 
         {/* Så fungerar det */}

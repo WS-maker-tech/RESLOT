@@ -500,9 +500,12 @@ export default function ProfileScreen() {
                   onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/credit-history"); }}
                   style={{ alignSelf: "center", marginTop: 10 }}
                 >
-                  <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.textSecondary }}>
-                    {"Visa historik →"}
-                  </Text>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                    <Text style={{ fontFamily: FONTS.medium, fontSize: 13, color: C.textSecondary }}>
+                      Visa historik
+                    </Text>
+                    <Scribble name="arrow-right" color={C.textSecondary} width={15} />
+                  </View>
                 </Pressable>
               </Pressable>
             </Animated.View>
