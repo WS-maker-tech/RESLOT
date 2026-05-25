@@ -27,7 +27,7 @@ const CONTACT_OPTIONS = [
   },
   {
     key: "faq",
-    label: "Vanliga fr\u00e5gor",
+    label: "Vanliga frågor",
     icon: HelpCircle,
     iconBg: "#E5E7EB",
     iconColor: C.textSecondary,
@@ -68,7 +68,7 @@ export default function HelpScreen() {
         >
           <Pressable
             testID="back-button"
-            accessibilityLabel="G\u00e5 tillbaka"
+            accessibilityLabel="Gå tillbaka"
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               router.back();
@@ -93,7 +93,7 @@ export default function HelpScreen() {
               letterSpacing: -0.6,
             }}
           >
-            Hj\u00e4lp & support
+            Hjälp & support
           </Text>
         </View>
       </SafeAreaView>
@@ -124,7 +124,7 @@ export default function HelpScreen() {
                 flex: 1,
               }}
             >
-              Har du en fr\u00e5ga? Vi svarar s\u00e5 snart vi kan.
+              Har du en fråga? Vi svarar så snart vi kan.
             </Text>
           </View>
         </Animated.View>
@@ -200,7 +200,7 @@ export default function HelpScreen() {
               textAlign: "center",
             }}
           >
-            Vi svarar normalt inom 24 timmar p\u00e5 vardagar.
+            Vi svarar normalt inom 24 timmar på vardagar.
           </Text>
         </Animated.View>
       </View>
