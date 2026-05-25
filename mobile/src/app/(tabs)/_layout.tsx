@@ -15,6 +15,7 @@ import Animated, {
   withTiming,
   Easing,
 } from "react-native-reanimated";
+import { Scribble } from "@/reslot-art";
 
 // Strong custom ease-out (per Emil's design-eng — built-in CSS easings lack punch)
 const EASE_OUT = Easing.bezier(0.23, 1, 0.32, 1);
@@ -173,6 +174,7 @@ export default function TabLayout() {
             <Text style={{ color: C.textPrimary }}>Re</Text>
             <Text style={{ color: C.pistachio }}>slot</Text>
           </Text>
+          <Scribble name="underline-flick" color={C.pistachio} width={116} style={{ marginTop: 6 }} />
           <Text
             style={{
               fontFamily: FONTS.regular,

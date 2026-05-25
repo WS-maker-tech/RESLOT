@@ -1,11 +1,14 @@
 import { Link, Stack } from 'expo-router';
 import { Text, View } from 'react-native';
+import { Doodle } from '@/reslot-art';
+import { C } from '@/lib/theme';
 
 export default function NotFoundScreen() {
   return (
     <>
       <Stack.Screen options={{ title: 'Sidan hittades inte' }} />
       <View testID="not-found-screen" className="flex-1 items-center justify-center bg-white p-5 dark:bg-black">
+        <Doodle name="cutlery" color={C.forest} width={52} style={{ marginBottom: 18, opacity: 0.9 }} />
         <Text className="text-xl font-bold text-black dark:text-white">
           Den här sidan finns inte.
         </Text>

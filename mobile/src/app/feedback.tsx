@@ -11,11 +11,12 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useMutation } from "@tanstack/react-query";
-import { ThumbsUp, ThumbsDown, X, CheckCircle } from "lucide-react-native";
+import { ThumbsUp, ThumbsDown, X } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import Animated, { FadeInDown, FadeIn } from "react-native-reanimated";
 import { C, FONTS, SPACING, RADIUS, SHADOW } from "@/lib/theme";
 import { useAuthStore } from "@/lib/auth-store";
+import { Scribble } from "@/reslot-art";
 
 export default function FeedbackScreen() {
   const router = useRouter();
@@ -76,7 +77,7 @@ export default function FeedbackScreen() {
       <View style={{ flex: 1, backgroundColor: C.bg }}>
         <SafeAreaView style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
           <Animated.View entering={FadeIn.duration(300)} style={{ alignItems: "center" }}>
-            <CheckCircle size={56} color={C.success} strokeWidth={1.8} />
+            <Scribble name="check" color={C.success} width={56} />
             <Text
               style={{
                 fontFamily: FONTS.displayBold,

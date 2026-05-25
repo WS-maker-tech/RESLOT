@@ -2,13 +2,14 @@ import React from "react";
 import { View, Text, ScrollView, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { ChevronLeft, Clock, ArrowUpRight, ArrowDownLeft } from "lucide-react-native";
+import { ChevronLeft, ArrowUpRight, ArrowDownLeft } from "lucide-react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { useActivityAlerts } from "@/lib/api/hooks";
 import type { ActivityAlert } from "@/lib/api/types";
 import { useAuthStore } from "@/lib/auth-store";
 import { C, FONTS, SPACING, SHADOW, RADIUS, ICON } from "../lib/theme";
+import { Doodle } from "@/reslot-art";
 
 function formatRelativeDate(dateString: string): string {
   const date = new Date(dateString);
@@ -48,7 +49,7 @@ export default function CreditHistoryScreen() {
         {creditAlerts.length === 0 ? (
           <Animated.View entering={FadeInDown.duration(220)} style={{ alignItems: "center", paddingTop: 80 }}>
             <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: "rgba(201,169,110,0.10)", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
-              <Clock size={28} color={C.gold} strokeWidth={ICON.strokeWidth} />
+              <Doodle name="coin" color={C.gold} width={32} />
             </View>
             <Text style={{ fontFamily: FONTS.displayBold, fontSize: 17, color: C.textPrimary, textAlign: "center", letterSpacing: -0.2 }}>
               Ingen historik än

@@ -261,6 +261,9 @@ export default function FaqScreen() {
           >
             Hittar du inte din fråga här?
           </Text>
+          <View style={{ alignItems: "center", marginBottom: 8 }}>
+            <Scribble name="arrow-down" color={C.inkFaint} width={20} />
+          </View>
           <AnimatedPressable
             testID="contact-support-button"
             accessibilityLabel="Kontakta support"

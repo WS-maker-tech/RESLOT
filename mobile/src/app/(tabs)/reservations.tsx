@@ -420,6 +420,7 @@ function FeedbackPrompt({
           alignItems: "center",
         }}
       >
+        <Scribble name="check" color={C.success} width={22} style={{ marginBottom: 5 }} />
         <Text
           style={{
             fontFamily: FONTS.medium,
@@ -768,7 +769,7 @@ export default function ReservationsScreen() {
               {claimedReservations.length === 0 ? (
                 <Animated.View entering={FadeInDown.delay(100).duration(180)} style={{ paddingHorizontal: SPACING.lg, paddingVertical: 32, alignItems: "center" }}>
                   <Animated.View entering={ZoomIn.delay(150).duration(200)} style={{ width: 64, height: 64, borderRadius: 20, backgroundColor: C.successLight, alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
-                    <Doodle name="plate" color={C.forest} width={44} />
+                    <Doodle name="key" color={C.forest} width={40} />
                   </Animated.View>
                   <Animated.View entering={FadeInDown.delay(200).duration(180)}>
                     <Text style={{ fontFamily: FONTS.displayBold, fontSize: 17, color: C.textPrimary, textAlign: "center", letterSpacing: -0.2 }}>Hitta ditt nästa bord</Text>

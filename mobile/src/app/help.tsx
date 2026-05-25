@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, MessageCircle, Mail, HelpCircle } from "luci
 import * as Haptics from "expo-haptics";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { C, FONTS, SPACING, RADIUS } from "@/lib/theme";
+import { Doodle } from "@/reslot-art";
 
 const CONTACT_OPTIONS = [
   {
@@ -108,14 +109,19 @@ export default function HelpScreen() {
               marginBottom: 28,
               borderWidth: 1,
               borderColor: "rgba(126,200,122,0.15)",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 14,
             }}
           >
+            <Doodle name="cup" color={C.forest} width={34} />
             <Text
               style={{
                 fontFamily: FONTS.medium,
                 fontSize: 14,
                 color: C.textPrimary,
                 lineHeight: 21,
+                flex: 1,
               }}
             >
               Har du en fr\u00e5ga? Vi svarar s\u00e5 snart vi kan.

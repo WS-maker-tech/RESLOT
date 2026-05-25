@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import { View, Text, ScrollView, Pressable, TextInput, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { ChevronLeft, Eye, EyeOff, CheckCircle } from "lucide-react-native";
+import { ChevronLeft, Eye, EyeOff } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
 import { C, FONTS, SPACING, RADIUS } from "@/lib/theme";
 import { supabase } from "@/lib/supabase";
+import { Scribble } from "@/reslot-art";
 
 export default function ChangePasswordScreen() {
   const router = useRouter();
@@ -68,7 +69,7 @@ export default function ChangePasswordScreen() {
               marginBottom: 4,
             }}
           >
-            <CheckCircle size={18} color={C.bgCard} strokeWidth={2.5} />
+            <Scribble name="check" color={C.bgCard} width={20} />
             <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.bgCard }}>
               Lösenord uppdaterat!
             </Text>

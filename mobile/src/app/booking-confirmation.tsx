@@ -613,9 +613,13 @@ export default function BookingConfirmationScreen() {
                     </View>
                     <View>
                       <Text style={{ fontFamily: FONTS.regular, fontSize: 12, color: C.textTertiary }}>Referensnummer</Text>
-                      <Text testID="reference-number" style={{ fontFamily: FONTS.bold, fontSize: 16, color: C.textPrimary, letterSpacing: 1 }}>
-                        {reservation.id.substring(0, 8).toUpperCase()}
-                      </Text>
+                      <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                        <Scribble name="bracket-left" color={C.inkSoft} width={9} />
+                        <Text testID="reference-number" style={{ fontFamily: FONTS.bold, fontSize: 16, color: C.textPrimary, letterSpacing: 1 }}>
+                          {reservation.id.substring(0, 8).toUpperCase()}
+                        </Text>
+                        <Scribble name="bracket-right" color={C.inkSoft} width={9} />
+                      </View>
                     </View>
                   </View>
                   <Pressable

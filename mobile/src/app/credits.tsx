@@ -470,7 +470,8 @@ export default function CreditsScreen() {
                   }}
                 >
                   {qty === 2 ? (
-                    <View style={{ position: "absolute", top: -10, right: 12, backgroundColor: C.dark, paddingHorizontal: 8, paddingVertical: 2, borderRadius: RADIUS.sm }}>
+                    <View style={{ position: "absolute", top: -10, right: 12, backgroundColor: C.dark, paddingHorizontal: 8, paddingVertical: 2, borderRadius: RADIUS.sm, flexDirection: "row", alignItems: "center", gap: 5 }}>
+                      <Scribble name="star" color={C.gold} width={11} />
                       <Text style={{ fontFamily: FONTS.bold, fontSize: 10, color: C.white }}>Rekommenderat</Text>
                     </View>
                   ) : null}

@@ -46,6 +46,7 @@ import { useAuthStore } from "@/lib/auth-store";
 import { LoginGate } from "@/components/LoginGate";
 import { C, FONTS, SPACING, SHADOW, RADIUS, ICON } from "../../lib/theme";
 import { Skeleton } from "@/components/Skeleton";
+import { Scribble } from "@/reslot-art";
 
 import { LegalModal } from "@/components/LegalModal";
 import { TERMS_CONDITIONS, PRIVACY_POLICY } from "@/lib/legal-content";
@@ -474,9 +475,13 @@ export default function ProfileScreen() {
                 <Text style={{ fontFamily: FONTS.medium, fontSize: 11, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 4 }}>
                   DITT SALDO
                 </Text>
-                <View style={{ flexDirection: "row", alignItems: "baseline", gap: 6 }}>
-                  <AnimatedCreditsCount value={profile?.credits ?? 0} />
-                  <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: "rgba(255,255,255,0.6)" }}>credits</Text>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 9 }}>
+                  <Scribble name="bracket-left" color={C.gold} width={15} />
+                  <View style={{ flexDirection: "row", alignItems: "baseline", gap: 6 }}>
+                    <AnimatedCreditsCount value={profile?.credits ?? 0} />
+                    <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: "rgba(255,255,255,0.6)" }}>credits</Text>
+                  </View>
+                  <Scribble name="bracket-right" color={C.gold} width={15} />
                 </View>
                 <Pressable
                   testID="buy-credits-cta"

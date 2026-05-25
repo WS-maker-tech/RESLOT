@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import { Scribble } from "@/reslot-art";
 import {
   ChevronLeft,
   ChevronRight,
@@ -21,7 +22,6 @@ import {
   Mail,
   Bell,
   Send,
-  CheckCircle,
   HelpCircle,
   AlertCircle,
 } from "lucide-react-native";
@@ -346,7 +346,7 @@ export default function SupportScreen() {
 
                 {submitted ? (
                   <View style={{ alignItems: "center", paddingVertical: SPACING.md }}>
-                    <CheckCircle size={32} color={C.success} strokeWidth={2} />
+                    <Scribble name="check" color={C.success} width={36} />
                     <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.success, marginTop: 8 }}>
                       Tack för ditt meddelande!
                     </Text>

@@ -58,6 +58,7 @@ import { RestaurantMonogram } from "@/components/RestaurantMonogram";
 import { C, FONTS, SPACING, SHADOW, RADIUS, ICON, MOTION, TYPO, SELECT } from "../../lib/theme";
 import { Callout } from "@/components/Callout";
 import { LegalModal } from "@/components/LegalModal";
+import { Scribble } from "@/reslot-art";
 import { TERMS_CONDITIONS } from "@/lib/legal-content";
 
 // ── Web Date Picker ──
@@ -766,18 +767,19 @@ export default function SubmitScreen() {
         <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1 }}>
           <View className="flex-1 items-center justify-center px-8">
             <Animated.View entering={FadeInDown.duration(220)}>
-              <View
-                className="items-center justify-center"
-                style={{
-                  width: 80,
-                  height: 80,
-                  borderRadius: 40,
-                  backgroundColor: C.successLight,
-                  alignSelf: "center",
-                  marginBottom: 24,
-                }}
-              >
-                <Check size={36} color={C.success} strokeWidth={ICON.strokeWidth} />
+              <View style={{ alignSelf: "center", marginBottom: 24 }}>
+                <View
+                  className="items-center justify-center"
+                  style={{
+                    width: 80,
+                    height: 80,
+                    borderRadius: 40,
+                    backgroundColor: C.successLight,
+                  }}
+                >
+                  <Check size={36} color={C.success} strokeWidth={ICON.strokeWidth} />
+                </View>
+                <Scribble name="ring" color={C.coral} width={132} style={{ position: "absolute", top: -3, left: -26, opacity: 0.9 }} />
               </View>
               <Text
                 style={{

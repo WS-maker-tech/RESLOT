@@ -19,6 +19,7 @@ import { useAuthStore } from "@/lib/auth-store";
 import { C, FONTS, SPACING, RADIUS, SHADOW } from "@/lib/theme";
 import { WebMap } from "@/components/WebMap";
 import type { Reservation, Restaurant } from "@/lib/api/types";
+import { Doodle } from "@/reslot-art";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -201,7 +202,7 @@ export default function MapScreen() {
       {groups.length === 0 ? (
         <View style={styles.emptyOverlay} pointerEvents="none">
           <Animated.View entering={FadeInDown.duration(220)} style={styles.emptyCard}>
-            <MapPin size={24} color={C.textTertiary} strokeWidth={1.8} />
+            <Doodle name="table" color={C.forest} width={36} style={{ marginBottom: 4 }} />
             <Text style={styles.emptyText}>Inga tillgängliga bord just nu</Text>
           </Animated.View>
         </View>

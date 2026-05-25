@@ -54,7 +54,7 @@ import { api } from "@/lib/api/api";
 import { useAuthStore } from "@/lib/auth-store";
 import type { Reservation, MissedReservation, Restaurant } from "@/lib/api/types";
 import { C, FONTS, SPACING, SHADOW, RADIUS, ICON } from "../../lib/theme";
-import { Doodle } from "../../reslot-art";
+import { Doodle, Scribble } from "../../reslot-art";
 import { RestaurantCard } from "@/components/RestaurantCard";
 import { FilterChips } from "@/components/FilterChips";
 import { DayPicker, generateDays } from "@/components/DayPicker";
@@ -1358,26 +1358,29 @@ export default function HomeScreen() {
                     </Text>
                   </View>
                 </View>
-                <View
-                  style={{
-                    backgroundColor: "#16A34A",
-                    borderRadius: 12,
-                    minWidth: 28,
-                    height: 28,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    paddingHorizontal: 10,
-                  }}
-                >
-                  <Text
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                  <Scribble name="speedlines" color={C.coral} width={26} style={{ opacity: 0.85 }} />
+                  <View
                     style={{
-                      fontFamily: FONTS.bold,
-                      fontSize: 13,
-                      color: C.white,
+                      backgroundColor: "#16A34A",
+                      borderRadius: 12,
+                      minWidth: 28,
+                      height: 28,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      paddingHorizontal: 10,
                     }}
                   >
-                    {todayBookings.length}
-                  </Text>
+                    <Text
+                      style={{
+                        fontFamily: FONTS.bold,
+                        fontSize: 13,
+                        color: C.white,
+                      }}
+                    >
+                      {todayBookings.length}
+                    </Text>
+                  </View>
                 </View>
               </Animated.View>
             ) : null}

@@ -48,6 +48,7 @@ import Animated, {
 } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
+import { Doodle } from "@/reslot-art";
 import {
   useReservation,
   useClaimReservation,
@@ -937,7 +938,7 @@ ${shareUrl}`,
         </SafeAreaView>
         <View testID="error-view" style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 32 }}>
           <View style={{ width: 72, height: 72, borderRadius: 36, backgroundColor: C.pistachioLight, alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
-            <AlertCircle size={36} color={C.pistachio} strokeWidth={2} />
+            <Doodle name="cutlery" color={C.forest} width={38} />
           </View>
           <Text style={{ fontFamily: FONTS.displayBold, fontSize: 20, color: C.textPrimary, textAlign: "center", letterSpacing: -0.5 }}>
             Bokningen hittades inte

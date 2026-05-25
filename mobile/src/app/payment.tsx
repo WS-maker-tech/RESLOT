@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import { View, Text, ScrollView, Pressable, TextInput, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { ChevronLeft, ShieldCheck, CreditCard, CheckCircle2, AlertCircle } from "lucide-react-native";
+import { ChevronLeft, ShieldCheck, CreditCard, AlertCircle } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import * as WebBrowser from "expo-web-browser";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { C, FONTS, SPACING, RADIUS, SHADOW, ICON } from "@/lib/theme";
 import { useCardStatus, useSetupCard } from "@/lib/api/hooks";
 import { useAuthStore } from "@/lib/auth-store";
+import { Scribble } from "@/reslot-art";
 
 export default function PaymentScreen() {
   const router = useRouter();
@@ -75,7 +76,7 @@ export default function PaymentScreen() {
           <Animated.View entering={FadeInDown.delay(40).duration(220)} style={{ marginBottom: 20 }}>
             <View style={{ backgroundColor: C.bgCard, borderRadius: RADIUS.lg, padding: SPACING.md, borderWidth: 0.5, borderColor: C.divider, ...SHADOW.card }}>
               <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                <CheckCircle2 size={16} color={C.success} strokeWidth={2} />
+                <Scribble name="check" color={C.success} width={18} />
                 <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, color: C.textPrimary }}>
                   {(cardStatus.cardBrand ?? "Kort").charAt(0).toUpperCase() + (cardStatus.cardBrand ?? "kort").slice(1)} som slutar på {cardStatus.cardLast4}
                 </Text>
