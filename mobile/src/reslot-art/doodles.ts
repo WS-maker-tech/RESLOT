@@ -12,5 +12,8 @@ export const DOODLES = {
   coin: { src: require('./assets/doodle-coin.png'), w: 218, h: 207 },
   gift: { src: require('./assets/doodle-gift.png'), w: 490, h: 534 },
   magnifier: { src: require('./assets/doodle-magnifier.png'), w: 577, h: 576 },
+  envelope: { src: require('./assets/doodle-envelope.png'), w: 684, h: 560 },
+  house: { src: require('./assets/doodle-house.png'), w: 662, h: 615 },
+  guestbook: { src: require('./assets/doodle-guestbook.png'), w: 973, h: 658 },
 } as const;
 export type DoodleName = keyof typeof DOODLES;

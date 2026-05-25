@@ -561,7 +561,9 @@ function LoginStep({ onNext, onBack, onForgot }: { onNext: (email: string, passw
           </View>
         </Animated.View>
 
-        <View style={{ flex: 1 }} />
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", minHeight: 90 }}>
+          <Doodle name="key" color={C.forest} width={74} style={{ opacity: 0.8 }} />
+        </View>
         <Animated.View entering={enterFromBottom(200)} style={{ paddingBottom: 16 }}>
           <PrimaryButton label="Logga in" onPress={() => onNext(email.trim(), password)} disabled={!isValid} />
         </Animated.View>
@@ -717,7 +719,9 @@ function PhoneStep({
           </Pressable>
         </Animated.View>
 
-        <View style={{ flex: 1 }} />
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", minHeight: 90 }}>
+          <Doodle name="envelope" color={C.forest} width={84} style={{ opacity: 0.85 }} />
+        </View>
 
         {error ? (
           <Animated.View entering={FadeIn.duration(200)} style={{ paddingBottom: 12 }}>
@@ -964,7 +968,9 @@ function OTPStep({
           </Pressable>
         </Animated.View>
 
-        <View style={{ flex: 1 }} />
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", minHeight: 90 }}>
+          <Doodle name="key" color={C.forest} width={76} style={{ opacity: 0.8 }} />
+        </View>
 
         <Animated.View entering={enterFromBottom(240)} style={{ paddingBottom: 16 }}>
           <PrimaryButton
@@ -1164,7 +1170,9 @@ function RegisterStep({
           </View>
         </Animated.View>
 
-        <View style={{ flex: 1 }} />
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", minHeight: 80 }}>
+          <Doodle name="guestbook" color={C.forest} width={92} style={{ opacity: 0.85 }} />
+        </View>
 
         <Animated.View entering={enterFromBottom(240)} style={{ paddingBottom: 16 }}>
           <PrimaryButton
@@ -1243,6 +1251,10 @@ function CityStep({ onSelect, onBack }: { onSelect: (city: string) => void; onBa
             </Animated.View>
           );
         })}
+      </View>
+
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+        <Doodle name="house" color={C.forest} width={92} style={{ opacity: 0.85 }} />
       </View>
     </View>
   );
