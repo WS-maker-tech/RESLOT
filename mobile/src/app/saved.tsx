@@ -57,7 +57,7 @@ export default function SavedScreen() {
       ) : saved.length === 0 ? (
         <Animated.View entering={FadeInDown.duration(220)} style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 40 }}>
           <View style={{ width: 64, height: 64, borderRadius: 24, backgroundColor: C.pistachioLight, alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
-            <Scribble name="star" color={C.forest} width={36} />
+            <Scribble name="heart" color={C.forest} width={40} />
           </View>
           <Text style={{ fontFamily: FONTS.displayBold, fontSize: 18, color: C.textPrimary, textAlign: "center", letterSpacing: -0.3 }}>
             Inga sparade restauranger

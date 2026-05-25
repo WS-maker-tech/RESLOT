@@ -52,7 +52,7 @@ export default function InviteScreen() {
         {/* Hand-drawn doodle hero — dela en middag med en vän (B&B-signatur) */}
         <Animated.View entering={ZoomIn.duration(220)} style={{ alignItems: "center", paddingTop: 32, paddingBottom: 8 }}>
           <View style={{ position: "relative" }}>
-            <Doodle name="wineglass" color={C.forest} width={64} />
+            <Doodle name="gift" color={C.forest} width={62} />
             <Scribble name="spark" color={C.coral} width={26} style={{ position: "absolute", top: -6, right: -16 }} />
           </View>
         </Animated.View>

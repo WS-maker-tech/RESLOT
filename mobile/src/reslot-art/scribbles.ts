@@ -17,5 +17,6 @@ export const SCRIBBLES = {
   'bracket-right': { src: require('./assets/scribble-bracket-right.png'), w: 69, h: 158 },
   speedlines: { src: require('./assets/scribble-speedlines.png'), w: 210, h: 143 },
   squiggle: { src: require('./assets/scribble-squiggle.png'), w: 371, h: 104 },
+  heart: { src: require('./assets/scribble-heart.png'), w: 470, h: 557 },
 } as const;
 export type ScribbleName = keyof typeof SCRIBBLES;

@@ -58,7 +58,7 @@ import { RestaurantMonogram } from "@/components/RestaurantMonogram";
 import { C, FONTS, SPACING, SHADOW, RADIUS, ICON, MOTION, TYPO, SELECT } from "../../lib/theme";
 import { Callout } from "@/components/Callout";
 import { LegalModal } from "@/components/LegalModal";
-import { Scribble } from "@/reslot-art";
+import { Doodle, Scribble } from "@/reslot-art";
 import { TERMS_CONDITIONS } from "@/lib/legal-content";
 
 // ── Web Date Picker ──
@@ -1058,7 +1058,7 @@ export default function SubmitScreen() {
                   style={{ alignItems: "center", paddingVertical: 36, paddingHorizontal: 24 }}
                 >
                   <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: "rgba(0,0,0,0.04)", alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
-                    <Search size={24} color={C.textTertiary} strokeWidth={2} />
+                    <Doodle name="magnifier" color={C.textTertiary} width={30} />
                   </View>
                   <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.dark, textAlign: "center" }}>
                     Ingen träff på ”{searchQuery}”
@@ -1085,7 +1085,7 @@ export default function SubmitScreen() {
               ) : (
                 <View style={{ alignItems: "center", paddingVertical: 40, paddingHorizontal: 24 }}>
                   <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: "rgba(0,0,0,0.04)", alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
-                    <Search size={24} color={C.textTertiary} strokeWidth={2} />
+                    <Doodle name="magnifier" color={C.textTertiary} width={30} />
                   </View>
                   <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: C.dark, textAlign: "center" }}>
                     Inga restauranger tillgängliga än
