@@ -2,7 +2,7 @@
 
 > **📄 Levande dokument:** Detta är en ögonblicksbild av projektets *nuvarande* tillstånd, inte en evig sanning. När stack, flöden, design-identitet eller konventioner ändras — uppdatera den här filen i samma PR. Behandla allt nedan (särskilt design-identiteten) som "senast godkänt", inte "låst för alltid". Föredrar du att börja jobba mot en ny riktning, gör det och uppdatera dokumentet därefter.
 
-> **🔑 Start här:** Läs `RESLOT-VAULT.md` (full kontext, deploy-flöde, gotchas) och `SESSION_HANDOFF.md` (senaste sessionens status, identity-lock, motion-tokens) i repo-roten först. `VISUAL_FOUNDATION_V1.md` beskriver design-identiteten v3. Denna fil (`CLAUDE.md`) är den auktoritativa, kondenserade versionen.
+> **🔑 Start här:** Läs `RESLOT-VAULT.md` (full kontext, deploy-flöde, gotchas) och `SESSION_HANDOFF.md` (senaste sessionens status, motion-tokens) i repo-roten först. `VISUAL_FOUNDATION_V1.md` är *historiskt* underlag för en tidigare design-identitet (v3) — referens, inte nuvarande regel. Denna fil (`CLAUDE.md`) är den auktoritativa, kondenserade versionen.
 >
 > **OBS — stale nested CLAUDE.md:** `mobile/CLAUDE.md` och `backend/CLAUDE.md` är gamla Vibecode-templates. De auto-laddas som nästlad kontext men är delvis felaktiga (säger "du är i Vibecode", "rör inte git", fel RN-version). **Denna root-fil gäller** vid konflikt. De nästlade filerna innehåller dock fortfarande nyttiga RN/Expo-konventioner (routing, safe-area, vanliga misstag) som är värda att läsa.
 
@@ -65,7 +65,7 @@ npx vercel --prod --force   # manuell production deploy
 | Validering | Zod | 4.1.11 |
 | Animationer | react-native-reanimated | 3.17.4 |
 | Ikoner | lucide-react-native | ^0.468.0 |
-| Fonts | @expo-google-fonts/plus-jakarta-sans | Plus Jakarta Sans (only) |
+| Fonts | @expo-google-fonts/* | se `FONTS` i `theme.ts` (nuvarande typsnitt) |
 | Databas | Supabase (PostgreSQL) | ^2.101.1 |
 | Auth | Supabase Auth (OTP) + expo-secure-store | — |
 | Kartor | Leaflet / react-leaflet (web, via WebMap) + react-native-maps (mockad) | — |
@@ -155,44 +155,18 @@ npx vercel --prod --force   # manuell production deploy
 
 **Normalisering:** Supabase returnerar join som `Restaurant` (PascalCase) → API normaliserar till `restaurant` (lowercase) innan svar till frontend. JSON-fält (tags/filterOptions) kan komma som sträng → använd `parseTags`/`parseWatchFiltersSafe` i `types.ts`.
 
-## Design System — aktiv identitet (living, versionerad)
-Allt i `mobile/src/lib/theme.ts`. **Använd alltid tokens, aldrig hårdkodade värden.**
+## Design System — tokens + nuvarande riktning (adaptiv)
 
-> **Identiteten är versionerad, inte fryst.** Avsnittet nedan beskriver den *nuvarande aktiva* identiteten (v3 / Visual Foundation v1) — det William senast godkänt, inte en permanent låsning. **När en ny design-identitet införs (t.ex. _Kloes identitet_), gäller den nya riktningen:** uppdatera `theme.ts`-tokens **och detta avsnitt** så att de speglar den, och följ den senaste godkända identiteten istället för att reverta till den gamla. Lägg gärna upp den nya identiteten som ett nytt versionsnamn (t.ex. "Identity v4 — Kloe") så historiken är spårbar.
->
-> **Guardrail (varför "locked" stod här):** ändra inte färger/fonter *unilateralt utan en uttalad riktning* — tidigare ad-hoc-ändringar reverterades. Poängen är vem som styr designbesluten (William / den utsedda designern), inte att v3 är hugget i sten. Har du en ny identitet att jobba mot — kör på den.
+> **Design rör sig framåt — anta inget från minnet.** `mobile/src/lib/theme.ts` är enda sanningen för design. Läs de faktiska tokens där; reproducera inte specifika färger, fonter eller roller i detta dokument, och reverta inte till en tidigare identitet bara för att den en gång var godkänd. Inför William (eller den utsedda designern) en ny identitet — t.ex. _Kloes_ — jobba mot den och uppdatera `theme.ts`.
 
-### Färg-roller (`C`) — nuvarande (v3)
-| Token | Hex | Roll |
-|-------|-----|------|
-| `C.paper` / `C.bg` | `#FAFAF8` | Floor — benvit off-white (locked, INTE varm cream). Alla bakgrunder. |
-| `C.forest` | `#1F4D2A` | **Primary brand-accent** — ikoner, länkar, CTA, FAB, aktiva states |
-| `C.forestDeep` | `#143620` | Pressed |
-| `C.pistachio` | `#7EC87A` | "slot"-grön — logo + ortnamn i h1. Success/celebration. |
-| `C.coral` | `#D97757` | Reserverad delight (max ~3 skärmar — sparsamt) |
-| `C.gold` | `#C9A96E` | Credits, ratings |
-| `C.ink` | `#1A1A1A` | Varm body-text · `inkSoft`/`inkFaint` för sekundär |
-| `C.error` | `#EF4444` | Fel/varning |
+Principer (identitets-neutrala, gäller oavsett riktning):
+- **Använd alltid tokens, aldrig hårdkodade värden.** Token-grupper i `theme.ts`: `C` (färg) · `FONTS`/`TYPO` (typografi) · `SPACING` · `RADIUS` · `SHADOW` · `ICON` · `IMG` · `MOTION` · `SELECT` (selected/aktiva states) · `SEMANTIC` (meningsbärande wrappers).
+- **Följ den nuvarande riktningen, inte en gammal.** Vad som är primärfärg, typsnitt eller accent avgörs av vad som ligger i `theme.ts` *just nu* — slå upp det, gissa inte.
+- **Ändra inte design unilateralt utan en uttalad riktning.** Det är ett ägarskaps-/koordinations-guardrail (vem som styr designbesluten), inte en låsning av någon specifik palett.
+- **Motion-konventioner** bor som kommentarer i `MOTION` (theme.ts) + skillen `emil-design-eng` (PRIMARY för anim/polish). Använd dem som levande konventioner, inte som en låst regelbok.
+- **Dark mode:** token-infrastruktur finns (`DARK_COLORS` + `getTheme('dark')`), ej aktiverad i komponenter.
 
-Dark mode finns som infrastruktur (`DARK_COLORS` + `getTheme('dark')`) men är **inte aktiverad** i komponenter.
-
-### Typografi
-- **Plus Jakarta Sans only.** Fraunces/Playfair-serif är **reverterad** (co-founder). Paketen finns kvar i `package.json` men `FONTS` pekar enbart på Plus Jakarta Sans (`displayBold`, `displaySemiBold`, `bold`, `semiBold`, `medium`, `regular`).
-- Använd `TYPO`-presets (`display`, `displayXL`, `h1`–`h3`, `body`, `label`, `eyebrow`, `caption`, `cta`, `numeric`, `stepHero`) för konsekvent hierarki.
-- Italic endast naturligt, aldrig tvingat.
-
-### Övriga tokens
-- `SELECT` — **EN källa** för alla "selected"/aktiva states (tiles, chips, day-circle, time-slot, CTA) i submit-flödet. Forest-grön. Pistachio = success, gold = credits/ratings.
-- `SEMANTIC` — meningsbärande wrappers (`brand`, `surface`, `onSurface`, …).
-- `SPACING`, `RADIUS` (`full: 28`, `pill: 999`), `SHADOW` (`subtle`→`floating`), `ICON` (strokeWidth 2), `IMG` (aspect ratios).
-
-### Motion (`MOTION`) — viktigt, AI-tell-känsligt
-- **Entrance:** `FadeIn/Down/Up.duration(MOTION.duration.entrance /*220*/).easing(MOTION.easing.outCubic)`. **ALDRIG `.springify()`** på UI-entrance (det är ett AI-tell — ease-out duration istället).
-- **Exit:** ~70% av entrance (`MOTION.duration.exit` = 160ms).
-- **List stagger:** `delay(i * MOTION.duration.stagger /*50*/)`.
-- **Press feedback:** `MOTION.press` (`damping:16, stiffness:240`) — **single source, override aldrig** med hårdkodad `stiffness: 300`.
-- **Loopar (pulse/breathing):** `withRepeat(withTiming(..., { easing: Easing.linear }), -1, true)` + respektera `ReduceMotion.System` / `use-reduced-motion.ts`. Aldrig spring i loopar.
-- **Celebration:** `springBouncy` OK för enstaka success-moment.
+> Behöver du historik kring tidigare identiteter (v3 / Visual Foundation v1): se `VISUAL_FOUNDATION_V1.md` och `SESSION_HANDOFF.md`. De är referens, inte regler för vad designen *ska* vara nu.
 
 ## Gotchas
 - **`vercel --prod --force` alltid** — utan `--force` cachas gamla builds.
@@ -204,7 +178,7 @@ Dark mode finns som infrastruktur (`DARK_COLORS` + `getTheme('dark')`) men är *
 - **Kartan (`map`)** finns som tab men är dold (`href: null`).
 - **SupportBubble** visas bara på `/faq`, inte globalt (`SupportBubble.web.tsx` för web).
 - **Supabase join** returnerar `Restaurant` (PascalCase) — normalisera alltid i API-lagret.
-- **`app.json` splash.backgroundColor** måste matcha `C.bg`/`paper` (`#FAFAF8`) — vanlig rot-orsak till "bg känns varm". Kolla samtidigt med `theme.ts`.
+- **`app.json` splash.backgroundColor** måste matcha bakgrundsfärgen (`C.bg`) i `theme.ts` — mismatch är vanlig rot-orsak till att bakgrunden "känns fel". Uppdatera båda när bg-färgen ändras.
 - **Subtila färgskift är osynliga** — behöver ≥7 hex-points shift för synlig diff.
 - **Stale nested CLAUDE.md** (`mobile/`, `backend/`) — denna root-fil gäller vid konflikt.
 
