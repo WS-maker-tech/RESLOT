@@ -176,7 +176,9 @@ export function getTheme(mode: "light" | "dark"): ColorPalette {
 }
 
 export const FONTS = {
-  // Display — Plus Jakarta Sans (Unisketch reverted, letar efter rätt B&B-font)
+  // Title — Generic (only on screen-level h1 + viktiga rubriker)
+  title: "Generic-Standard",
+  // Display — Plus Jakarta Sans (sub-headings, card-titles, section-heads)
   displayBold: "PlusJakartaSans_700Bold",
   displaySemiBold: "PlusJakartaSans_600SemiBold",
   // Body/UI — Plus Jakarta Sans (oförändrat)
@@ -258,13 +260,13 @@ export const SHADOW = {
 /** Typography presets — use these for consistent hierarchy */
 export const TYPO = {
   display: {
-    fontFamily: FONTS.displayBold,
+    fontFamily: FONTS.title,
     fontSize: 30,
     letterSpacing: -0.8,
     color: C.textPrimary,
   },
   h1: {
-    fontFamily: FONTS.displayBold,
+    fontFamily: FONTS.title,
     fontSize: 24,
     letterSpacing: -0.5,
     color: C.textPrimary,
@@ -312,7 +314,7 @@ export const TYPO = {
     color: C.dark,
   },
   displayXL: {
-    fontFamily: FONTS.displayBold,
+    fontFamily: FONTS.title,
     fontSize: 44,
     lineHeight: 48,
     letterSpacing: -1.2,
@@ -330,9 +332,9 @@ export const TYPO = {
     fontVariant: ["tabular-nums"] as const,
     color: C.textPrimary,
   },
-  /** Per-step question hero — Plus Jakarta Sans display, the question is the headline. */
+  /** Per-step question hero — Generic title, the question is the headline. */
   stepHero: {
-    fontFamily: FONTS.displayBold,
+    fontFamily: FONTS.title,
     fontSize: 28,
     lineHeight: 34,
     letterSpacing: -0.6,

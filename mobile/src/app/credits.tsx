@@ -195,7 +195,7 @@ export default function CreditsScreen() {
           <View style={{ alignSelf: "flex-start" }}>
             <Text
               style={{
-                fontFamily: FONTS.displayBold,
+                fontFamily: FONTS.title,
                 fontSize: 32,
                 color: C.textPrimary,
                 letterSpacing: -1.0,

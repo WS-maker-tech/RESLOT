@@ -211,7 +211,7 @@ const SuccessOverlay = React.memo(function SuccessOverlay({
       <Animated.Text
         entering={FadeInDown.delay(180).duration(220)}
         style={{
-          fontFamily: FONTS.displayBold,
+          fontFamily: FONTS.title,
           fontSize: 30,
           color: C.white,
           marginTop: 26,
@@ -1121,7 +1121,7 @@ ${shareUrl}`,
           >
             <Text
               style={{
-                fontFamily: FONTS.displayBold,
+                fontFamily: FONTS.title,
                 fontSize: 36,
                 color: C.white,
                 letterSpacing: -1.0,

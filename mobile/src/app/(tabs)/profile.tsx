@@ -431,7 +431,7 @@ export default function ProfileScreen() {
               <Text
                 testID="profile-display-name"
                 style={{
-                  fontFamily: FONTS.displayBold,
+                  fontFamily: FONTS.title,
                   fontSize: 30,
                   color: C.textPrimary,
                   marginTop: 14,

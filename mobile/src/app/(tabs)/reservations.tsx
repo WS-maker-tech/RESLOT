@@ -685,7 +685,7 @@ export default function ReservationsScreen() {
             <Text
               testID="reservations-header"
               style={{
-                fontFamily: FONTS.displayBold,
+                fontFamily: FONTS.title,
                 fontSize: 32,
                 color: C.textPrimary,
                 letterSpacing: -1.0,

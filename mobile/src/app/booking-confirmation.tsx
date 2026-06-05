@@ -259,7 +259,7 @@ function CelebrationView() {
       <Text
         testID="confirmed-text"
         style={{
-          fontFamily: FONTS.displayBold,
+          fontFamily: FONTS.title,
           fontSize: 24,
           color: C.success,
           marginTop: SPACING.md,
