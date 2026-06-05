@@ -258,7 +258,7 @@ const Header = React.memo(function Header({
           onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); onCityPress(); }}
           style={{ flexDirection: "row", alignItems: "center" }}
         >
-          <Text style={{ fontFamily: FONTS.displayBold, fontSize: 32, color: C.ink, letterSpacing: -0.9, lineHeight: 38 }}>
+          <Text style={{ fontFamily: FONTS.title, fontSize: 32, color: C.ink, letterSpacing: -0.9, lineHeight: 38 }}>
             Bord i <Text style={{ color: C.pistachio }}>{selectedCity}</Text>
           </Text>
           <ChevronDown size={22} color={C.pistachio} strokeWidth={2.4} style={{ marginLeft: 6, marginTop: 4 }} />

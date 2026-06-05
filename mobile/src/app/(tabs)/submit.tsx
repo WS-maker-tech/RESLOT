@@ -783,7 +783,7 @@ export default function SubmitScreen() {
               </View>
               <Text
                 style={{
-                  fontFamily: FONTS.displayBold,
+                  fontFamily: FONTS.title,
                   fontSize: 26,
                   color: C.dark,
                   textAlign: "center",

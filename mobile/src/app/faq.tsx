@@ -204,7 +204,7 @@ export default function FaqScreen() {
           <View>
             <Text
               style={{
-                fontFamily: FONTS.displayBold,
+                fontFamily: FONTS.title,
                 fontSize: 32,
                 color: C.textPrimary,
                 letterSpacing: -1.0,

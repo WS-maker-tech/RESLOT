@@ -215,6 +215,7 @@ export default function RootLayout() {
     PlusJakartaSans_600SemiBold,
     PlusJakartaSans_700Bold,
     "Unisketch-Bold": require("../../assets/fonts/Unisketch-Bold.ttf"),
+    "Generic-Standard": require("../../assets/fonts/Generic-Standard.otf"),
   });
   const notificationCleanupRef = useRef<(() => void) | null>(null);
 

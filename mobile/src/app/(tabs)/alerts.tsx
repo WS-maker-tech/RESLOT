@@ -412,7 +412,7 @@ export default function AlertsScreen() {
               <Text
                 testID="alerts-header"
                 style={{
-                  fontFamily: FONTS.displayBold,
+                  fontFamily: FONTS.title,
                   fontSize: 32,
                   color: C.dark,
                   letterSpacing: -1.0,
